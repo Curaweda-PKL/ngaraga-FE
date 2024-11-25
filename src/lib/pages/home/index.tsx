@@ -1,11 +1,8 @@
-import { SomeText } from './components/some-text';
 
 const Home = () => {
-  return (
-    <div className="flex min-h-[60vh] flex-col items-center justify-center gap-8 text-center">
-      <SomeText />
-    </div>
-  );
+  return <div className="text-white min-h-screen overflow-hidden ">
+    app
+  </div>;
 };
 
 export default Home;
