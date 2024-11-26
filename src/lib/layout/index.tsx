@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 
-// import { ThemeProvider } from 'next-themes';
+// Import reusable components
 import { Footer } from './components/footer';
 import { Navbar } from './components/nav-user';
 import { Meta } from './components/meta';
@@ -11,14 +11,13 @@ type LayoutProps = {
 
 export const Layout = ({ children }: LayoutProps) => {
   return (
-    // <ThemeProvider attribute="class">
-    <div>
+    <div className="flex flex-col min-h-screen">
       <Meta />
-      <div >
-        <Navbar />
-        <main className="wrapper">{children}</main>
-        <Footer />
-      </div>
-      </div>
+      <Navbar />
+      <main className="flex-1 wrapper p-4">
+        {children}
+      </main>
+      <Footer />
+    </div>
   );
 };

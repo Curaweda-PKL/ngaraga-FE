@@ -11,15 +11,4 @@ html, body {
 
 @layer base {
   /* Fullscreen container */
-  .wrapper {
-    max-width: 100%;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between; 
-  }
-
-  .main-content {
-    @apply flex-grow;
-  }
 }
