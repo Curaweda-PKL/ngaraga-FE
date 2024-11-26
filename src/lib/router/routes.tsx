@@ -1,15 +1,15 @@
-import React from 'react';
-import type { PathRouteProps } from 'react-router-dom';
+import React from "react";
+import type {PathRouteProps} from "react-router-dom";
 
-const Home = React.lazy(() => import('@/lib/pages/home'));
-const Login = React.lazy(() => import('@/lib/pages/auth/login/login'));
+const Home = React.lazy(() => import("@/lib/pages/home/Home"));
+const Login = React.lazy(() => import("@/lib/pages/auth/login/login"));
 export const routes: Array<PathRouteProps> = [
   {
-    path: '/',
+    path: "/",
     element: <Home />,
   },
   {
-    path: '/login',
+    path: "/login",
     element: <Login />,
   },
 ];
