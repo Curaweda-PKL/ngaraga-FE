@@ -7,22 +7,10 @@ export const TrendingCards = () => {
       id: 1,
       title: "DSGN Animals",
       creator: "MrFox",
-      avatar: "https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg", // Avatar for MrFox
+      avatar: "https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg",
       image: "https://www.shutterstock.com/image-vector/west-nusa-tenggara-indonesia-desember-260nw-2091073114.jpg",
     },
-    {
-      id: 2,
-      title: "DSGN Animals",
-      creator: "MrFox",
-      avatar: "https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg", // Avatar for MrFox
-      image: "https://www.shutterstock.com/image-vector/west-nusa-tenggara-indonesia-desember-260nw-2091073114.jpg",
-    },    {
-      id: 3,
-      title: "DSGN Animals",
-      creator: "MrFox",
-      avatar: "https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg", // Avatar for MrFox
-      image: "https://www.shutterstock.com/image-vector/west-nusa-tenggara-indonesia-desember-260nw-2091073114.jpg",
-    },
+    
     
   ];
 
