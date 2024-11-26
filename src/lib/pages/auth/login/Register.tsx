@@ -22,6 +22,14 @@ const LoginPage = () => {
           <form>
             <div className="mb-4">
               <input
+                type="text"
+                id="username"
+                className="border border-gray-300 bg-white rounded-full py-2 px-3 w-full focus:outline-none focus:ring-2 focus:ring-[#A259FF]"
+                placeholder="Username"
+              />
+            </div>
+            <div className="mb-4">
+              <input
                 type="email"
                 id="email"
                 className="border border-gray-300 bg-white rounded-full py-2 px-3 w-full focus:outline-none focus:ring-2 focus:ring-[#A259FF]"
@@ -34,6 +42,14 @@ const LoginPage = () => {
                 id="password"
                 className="border border-gray-300 bg-white rounded-full py-2 px-3 w-full focus:outline-none focus:ring-2 focus:ring-[#A259FF]"
                 placeholder="Password"
+              />
+            </div>
+            <div className="mb-4">
+              <input
+                type="password"
+                id="confirm-password"
+                className="border border-gray-300 bg-white rounded-full py-2 px-3 w-full focus:outline-none focus:ring-2 focus:ring-[#A259FF]"
+                placeholder="Confirm your password"
               />
             </div>
             <button

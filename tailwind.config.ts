@@ -1,4 +1,3 @@
-/* eslint-disable import/no-extraneous-dependencies */
 import tailwindTypography from '@tailwindcss/typography';
 import daisyui from 'daisyui';
 import type { Config } from 'tailwindcss';
@@ -14,9 +13,10 @@ export default {
         'background-secondary': 'var(--background-secondary)',
         'call-to-action': 'var(--call-to-action)',
       },
-    },
-    fontFamily: {
-      sans: ['"Work Sans"', ...fontFamily.sans],
+      fontFamily: {
+        sans: ['"Work Sans"', ...fontFamily.sans], // Keep Work Sans for sans family
+        mono: ['"Space Mono"', 'monospace'], // Add Space Mono as the mono family
+      },
     },
   },
   plugins: [tailwindTypography, daisyui],
