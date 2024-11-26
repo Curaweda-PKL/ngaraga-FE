@@ -10,7 +10,7 @@ export const Footer: React.FC = () => {
   ];
 
   return (
-    <footer className="border-t border-[#3B3B3B] bg-[#2B2B2B] px-4 py-8 sm:px-6 md:px-8 lg:px-16 xl:px-24">
+    <footer className="bg-[#3B3B3B] px-4 py-8 sm:px-6 md:px-8 lg:px-16 xl:px-24">
       <div className="grid gap-8 sm:gap-10 md:grid-cols-3 md:gap-12">
         {/* Left Column - About */}
         <div className="grid gap-4 text-center md:text-left">
@@ -89,7 +89,7 @@ export const Footer: React.FC = () => {
       </div>
 
       {/* Copyright */}
-      <div className="mt-8 sm:mt-10 md:mt-12 border-t border-[#3B3B3B] pt-6 sm:pt-8">
+      <div className="mt-8 sm:mt-10 md:mt-12 border-t pt-6 sm:pt-8">
         <p className="text-sm text-[#858584] text-center md:text-left">
           © Ngaraga by Dolanan yuk x Curaweda
         </p>

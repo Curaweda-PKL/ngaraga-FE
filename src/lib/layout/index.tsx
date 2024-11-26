@@ -1,9 +1,7 @@
-import type { ReactNode } from 'react';
-
-// Import reusable components
-import { Footer } from './components/footer';
-import { Meta } from './components/meta';
-import { Navbar } from './components/nav-user';
+import type {ReactNode} from "react";
+import {Meta} from "./components/meta";
+import {Navbar} from "./components/nav-user";
+import {Footer} from "./components/footer";
 
 type LayoutProps = {
   children: ReactNode;
@@ -14,22 +12,20 @@ export const Layout = ({children}: LayoutProps) => {
     <div className="flex flex-col min-h-screen w-full overflow-hidden">
       {/* Meta tags for SEO */}
       <Meta />
-      
+
       {/* Navbar */}
       <header className="text-white">
         <Navbar />
       </header>
-      
+
       {/* Main Content */}
       <main className="flex-grow w-full">
         <div className="container mx-auto w-full ">{children}</div>
       </main>
-      
+
       {/* Footer */}
-      <footer className="text-white bg-gray-800 w-full">
-        <div className="container mx-auto text-center px-4 w-full">
-          <Footer />
-        </div>
+      <footer className="text-white w-full">
+        <Footer />
       </footer>
     </div>
   );

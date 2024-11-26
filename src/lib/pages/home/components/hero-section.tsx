@@ -1,14 +1,14 @@
 import type React from "react";
-import { RiRocketFill } from "react-icons/ri";
+import {RiRocketFill} from "react-icons/ri";
 
-// todo : 
+// todo :
 //  -- make all necessary use type data
 // clean up unnecesarry css
 // resposnive image card
 export const HeroFrame: React.FC = () => {
   return (
-    <div className="flex items-center justify-center min-h-screen text-white p-8 " >
-      <div className="flex flex-col lg:flex-row items-center bg-transparent border border-transparent gap-8 max-w-6xl w-full  rounded-xl shadow-xl overflow-hidden">
+    <div className="flex items-center justify-center min-h-screen text-white p-8 ">
+      <div className="flex flex-col lg:flex-row items-center bg-transparent border border-transparent gap-8 max-w-6xl w-full  rounded-xl overflow-hidden">
         {/* Left Section (Hero Section) */}
         <div className="flex flex-col items-center lg:items-start gap-8 w-full lg:w-1/2 p-8">
           <h1 className="text-4xl font-bold text-center lg:text-left">
@@ -69,7 +69,5 @@ export const HeroFrame: React.FC = () => {
         </div>
       </div>
     </div>
-    
   );
 };
-
