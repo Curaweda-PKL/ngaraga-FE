@@ -1,11 +1,8 @@
-import React from 'react';
+import type React from 'react';
 
-type loginProps = {
-  
+type loginProps = {};
+
+const login: React.FC<loginProps> = () => {
+  return <div>Have a good coding</div>;
 };
-
-const login:React.FC<loginProps> = () => {
-  
-  return <div>Have a good coding</div>
-}
 export default login;

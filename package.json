@@ -9,7 +9,7 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "biome check --fix && vite build",
+    "build": "vite build",
     "serve": "vite preview",
     "biome:check": "biome check --fix --unsafe ",
     "biome:ci": "biome ci"

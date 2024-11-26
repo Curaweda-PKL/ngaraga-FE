@@ -1,23 +1,23 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import tailwindTypography from '@tailwindcss/typography';
+import daisyui from 'daisyui';
 import type { Config } from 'tailwindcss';
 import { fontFamily } from 'tailwindcss/defaultTheme';
-import daisyui from "daisyui"
 
 export default {
   darkMode: ['class'],
   content: ['./src/**/*.{js,jsx,ts,tsx}'],
   theme: {
-    extend:{
-      colors:{
+    extend: {
+      colors: {
         'background-primary': '#2B2B2B',
         'background-secondary': 'var(--background-secondary)',
         'call-to-action': 'var(--call-to-action)',
-      }
+      },
     },
     fontFamily: {
-      sans: ['"Plus Jakarta Sans"', ...fontFamily.sans],
+      sans: ['"Work Sans"', ...fontFamily.sans],
     },
   },
-  plugins: [tailwindTypography, daisyui], 
+  plugins: [tailwindTypography, daisyui],
 } satisfies Config;

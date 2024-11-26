@@ -1,8 +1,12 @@
+import { HeroFrame } from './components/hero-section';
 
 const Home = () => {
-  return <div className="text-white min-h-screen overflow-hidden ">
-    app
-  </div>;
+  return (
+    <div className="text-white">
+      <HeroFrame />
+      
+    </div>
+  );
 };
 
 export default Home;
