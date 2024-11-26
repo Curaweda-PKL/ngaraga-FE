@@ -1,6 +1,8 @@
+import { BrowseCategories } from "./components/browse-categories";
 import { HeroFrame } from "./components/hero-section";
 import { CollectorCards } from "./components/top-collectors";
 import { TrendingCards } from "./components/trending-cards";
+import { WeeklyUpdateForm} from "./components/weekly-update";
 
 const Home = () => {
   return (
@@ -8,7 +10,8 @@ const Home = () => {
       <HeroFrame />
       <TrendingCards />
       <CollectorCards/>
-
+      <BrowseCategories />
+      <WeeklyUpdateForm />
     </div>
   );
 };
