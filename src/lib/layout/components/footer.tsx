@@ -1,49 +1,101 @@
 import React from "react";
+import {Youtube, Twitter, Instagram} from "lucide-react";
+import {FaStore} from "react-icons/fa";
 
 export const Footer: React.FC = () => {
+  const socialLinks = [
+    {icon: <Youtube className="h-5 w-5" />, href: "#"},
+    {icon: <Twitter className="h-5 w-5" />, href: "#"},
+    {icon: <Instagram className="h-5 w-5" />, href: "#"},
+  ];
+
   return (
-    <footer className="footer bg-background-primary text-white p-10 border border-black">
-      <nav>
-        <h6 className="footer-title">Services</h6>
-        <a className="link link-hover" href="#">Branding</a>
-        <a className="link link-hover" href="#">Design</a>
-        <a className="link link-hover" href="#">Marketing</a>
-        <a className="link link-hover" href="#">Advertisement</a>
-      </nav>
-      <nav>
-        <h6 className="footer-title">Company</h6>
-        <a className="link link-hover" href="#">About us</a>
-        <a className="link link-hover" href="#">Contact</a>
-        <a className="link link-hover" href="#">Jobs</a>
-        <a className="link link-hover" href="#">Press kit</a>
-      </nav>
-      <nav>
-        <h6 className="footer-title">Legal</h6>
-        <a className="link link-hover" href="#">Terms of use</a>
-        <a className="link link-hover" href="#">Privacy policy</a>
-        <a className="link link-hover" href="#">Cookie policy</a>
-      </nav>
-      <form>
-        <h6 className="footer-title">Newsletter</h6>
-        <fieldset className="form-control w-80">
-          <label className="label">
-            <span className="label-text">Enter your email address</span>
-          </label>
-          <div className="join">
+    <footer className="border-t border-[#3B3B3B] bg-[#2B2B2B] px-4 py-8 sm:px-6 md:px-8 lg:px-16 xl:px-24">
+      <div className="grid gap-8 sm:gap-10 md:grid-cols-3 md:gap-12">
+        {/* Left Column - About */}
+        <div className="grid gap-4 text-center md:text-left">
+          {/* Logo */}
+          <div className="flex items-center justify-center md:justify-start gap-2">
+            <a className="btn btn-ghost text-xl flex items-center">
+              <FaStore
+                size={24}
+                color="#A259FF"
+                className="mr-2"
+              />
+              Ngaraga
+            </a>
+          </div>
+
+          {/* Description */}
+          <p className="text-sm text-[#858584] max-w-xs mx-auto md:mx-0">
+            Lorem ipsum dolor amet lorem ipsum dolor amet
+          </p>
+
+          {/* Community Section */}
+          <div className="grid gap-4">
+            <p className="text-sm text-[#858584]">Join our community</p>
+            <div className="flex gap-3 justify-center md:justify-start">
+              {socialLinks.map((social, index) => (
+                <a
+                  key={index}
+                  href={social.href}
+                  className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#3B3B3B] text-[#858584] transition-colors hover:bg-[#A259FF] hover:text-white"
+                >
+                  {social.icon}
+                </a>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Middle Column - Explore */}
+        <div className="grid gap-4 text-center md:text-left">
+          <h3 className="text-xl font-bold text-white">Explore</h3>
+          <div className="grid gap-3">
+            <a
+              href="#"
+              className="text-sm text-[#858584] hover:text-white"
+            >
+              Marketplace
+            </a>
+            <a
+              href="#"
+              className="text-sm text-[#858584] hover:text-white"
+            >
+              Rankings
+            </a>
+          </div>
+        </div>
+
+        {/* Right Column - Newsletter */}
+        <div className="grid gap-4 text-center md:text-left">
+          <h3 className="text-xl font-bold text-white">
+            Join Our Weekly Update
+          </h3>
+          <p className="text-sm text-[#858584] max-w-xs mx-auto md:mx-0">
+            Get exclusive promotions & updates straight to your inbox.
+          </p>
+          <div className="flex overflow-hidden rounded-full bg-white">
             <input
               type="email"
-              placeholder="username@site.com"
-              className="input input-bordered join-item"
-              aria-label="Email address"
+              placeholder="Enter your email here"
+              className="flex-1 px-4 py-3 text-sm bg-white text-gray-500 outline-none"
             />
-            <button type="submit" className="btn btn-primary join-item">
+            <button className="bg-[#A259FF] px-6 py-3 text-sm text-white transition-colors hover:bg-[#8839FF]">
               Subscribe
             </button>
           </div>
-        </fieldset>
-      </form>
+        </div>
+      </div>
+
+      {/* Copyright */}
+      <div className="mt-8 sm:mt-10 md:mt-12 border-t border-[#3B3B3B] pt-6 sm:pt-8">
+        <p className="text-sm text-[#858584] text-center md:text-left">
+          © Ngaraga by Dolanan yuk x Curaweda
+        </p>
+      </div>
     </footer>
   );
 };
 
-
+export default Footer;
