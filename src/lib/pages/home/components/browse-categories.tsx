@@ -1,12 +1,9 @@
-
-
 export const BrowseCategories = () => {
     const trendingData = [
       {
         id: 1,
         title: "DSGN Animals",
-        image:
-          "/src/assets/img/lumba.png",
+        image: "/src/assets/img/lumba.png",
         svgPath: "/src/assets/svg/PaintBrush.svg",
       },
       {
@@ -41,7 +38,7 @@ export const BrowseCategories = () => {
   
           {/* Cards Grid */}
           <div
-            className="grid grid-cols-2 md:grid-cols-4 gap-6 w-full px-4"
+            className="grid grid-cols-2 md:grid-cols-4 gap-6 w-full px-4 ml-4"  
             style={{ gap: "30px" }}
           >
             {trendingData.map((card) => (
@@ -49,26 +46,26 @@ export const BrowseCategories = () => {
                 key={card.id}
                 className="w-full flex flex-col items-start gap-[15px] shadow-xl rounded-lg bg-[#3B3B3B] transition-transform hover:scale-[1.02]"
               >
-                <figure className="relative w-full" style={{ height: "316px" }}>
+                <figure className="relative w-full" style={{ height: "250px" }}>  {/* Reduced height */}
                   {card.image ? (
                     <>
                       {/* Blurred Background Image */}
                       <img
                         src={card.image}
                         alt={card.title}
-                        className="w-full h-full rounded-t-lg object-cover filter blur-sm brightness-75"
+                        className="w-full h-full rounded-t-lg object-cover filter blur-sm brightness-100"
                       />
                       {/* Centered SVG Overlay */}
                       <div className="absolute inset-0 flex items-center justify-center">
                         <img
                           src={card.svgPath}
                           alt={`${card.title} Icon`}
-                          className="w-24 h-24"
+                          className="w-20 h-20"  
                         />
                       </div>
                     </>
                   ) : (
-                    <div className="w-full h-[316px] flex items-center justify-center bg-gray-700 text-gray-400 rounded-t-lg">
+                    <div className="w-full h-[250px] flex items-center justify-center bg-gray-700 text-gray-400 rounded-t-lg">
                       No Image Available
                     </div>
                   )}
