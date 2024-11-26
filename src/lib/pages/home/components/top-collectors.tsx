@@ -1,4 +1,5 @@
 import { FaRocket } from 'react-icons/fa'; 
+
 export const CollectorCards = () => {
   const trendingData = [
     {
@@ -9,6 +10,8 @@ export const CollectorCards = () => {
       totalCards: 25,
       rank: 1,
     },
+    
+    
   ];
 
   return (
@@ -33,7 +36,7 @@ export const CollectorCards = () => {
         </div>
   
         {/* Cards Section */}
-        <div className="grid gap-6 md:grid-cols-3 w-full px-8">
+        <div className="grid gap-16 md:grid-cols-4 w-full px-8">
           {trendingData.map((card) => (
             <div
               key={card.id}
