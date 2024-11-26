@@ -21,20 +21,20 @@ export const TrendingCards = () => {
   ];
 
   return (
-    <div className="flex items-center justify-center text-white mb-2">
-      <div className="flex flex-col lg:flex-row items-center bg-transparent border border-transparent gap-8 max-w-6xl w-full rounded-xl shadow-xl overflow-hidden">
+    <div className="flex items-center justify-center text-white ">
+      <div className="flex flex-col items-center bg-transparent border border-transparent gap-8 max-w-6xl w-full rounded-xl shadow-xl overflow-hidden">
         {/* Text Section */}
-        <div className="flex flex-col items-center lg:items-start gap-8 w-full lg:w-1/2 p-8">
+        <div className="flex flex-col items-center lg:items-start gap-8 w-full p-8">
           <h2 className="text-3xl font-bold text-center lg:text-left text-white md:text-4xl">
             Trending Cards
           </h2>
-          <p className="text-sm text-center lg:text-left text-gray-400 md:text-base">
+          <p className="text-sm text-center lg:text-left text-white md:text-base">
             Checkout Our Weekly Updated Trending Collection.
           </p>
         </div>
 
         {/* Cards Grid */}
-        <div className="grid gap-6 md:grid-cols-3 w-full">
+        <div className="grid gap-6 md:grid-cols-3 w-full px-8">
           {trendingData.map((card) => (
             <div
               key={card.id}
