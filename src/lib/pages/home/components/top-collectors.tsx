@@ -1,4 +1,4 @@
-import { FaRocket } from "react-icons/fa";
+import {FaRocket} from "react-icons/fa";
 
 export const CollectorCards = () => {
   const trendingData = [
@@ -38,7 +38,7 @@ export const CollectorCards = () => {
 
   return (
     <div className="flex items-center justify-center text-white p-8 m-10">
-      <div className="flex flex-col items-center bg-transparent border border-transparent gap-8 max-w-6xl w-full rounded-xl  overflow-hidden">
+      <div className="flex flex-col items-center bg-transparent border border-transparent gap-8 max-w-6xl w-full rounded-xl overflow-hidden">
         {/* Header Section */}
         <div className="flex flex-col lg:flex-row items-center lg:items-start gap-8 w-full p-8 justify-between">
           <div className="flex flex-col items-center lg:items-start gap-4">
