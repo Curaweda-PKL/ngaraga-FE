@@ -1,8 +1,8 @@
 // todo :
 // check anything needed, fix it, and clean up
-import dog from "@/assets/img/dogpng.png"
-import mushfroom from "@/assets/img/mushroom.png"
-import robotai from "@/assets/img/robotai.png"
+import dog from "@/assets/img/dogpng.png";
+import mushfroom from "@/assets/img/mushroom.png";
+import robotai from "@/assets/img/robotai.png";
 
 // change the image type if not development for dynamic ability
 export const TrendingCards = () => {
@@ -11,25 +11,26 @@ export const TrendingCards = () => {
       id: 1,
       title: "DSGN Animals",
       creator: "MrFox",
-      avatar: "https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg",
+      avatar:
+        "https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg",
       image: dog,
     },
     {
       id: 2,
       title: "DSGN Animals",
       creator: "MrFox",
-      avatar: "https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg",
+      avatar:
+        "https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg",
       image: mushfroom,
     },
     {
       id: 3,
       title: "DSGN Animals",
       creator: "MrFox",
-      avatar: "https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg",
+      avatar:
+        "https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg",
       image: robotai,
     },
-    
-    
   ];
 
   return (
@@ -50,7 +51,7 @@ export const TrendingCards = () => {
           {trendingData.map((card) => (
             <div
               key={card.id}
-              className="w-[330px] flex flex-col items-start gap-[15px] flex-shrink-0 shadow-xl rounded-lg  transition-transform hover:scale-[1.02]"
+              className="w-[330px] flex flex-col items-start gap-[15px] flex-shrink-0 shadow-xl rounded-lg transition-transform hover:scale-[1.02]"
             >
               <figure className="w-full">
                 {card.image ? (
