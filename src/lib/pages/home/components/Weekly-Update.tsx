@@ -11,7 +11,7 @@ export const WeeklyUpdateForm: React.FC = () => {
   };
 
   return (
-    <div className="flex justify-center items-center h-auto py-28 font-sans">
+    <div className="flex flex-col justify-center items-center lg:flex-row py-20 max-w-6xl mx-auto sm:px-6 md:px-4 lg:px-0">
       <div className="flex bg-[#3B3B3B] py-10 px-10 rounded-3xl">
         <div className="flex-1 p-8">
           <img
@@ -21,21 +21,23 @@ export const WeeklyUpdateForm: React.FC = () => {
           />
         </div>
         <div className="flex-1 p-8 text-white">
-          <h1 className="text-5xl font-bold mb-4">Join Our Weekly Update</h1>
-          <p className="mb-6 text-2xl">
+          <h1 className="text-4xl sm:text-5xl font-bold mb-4">
+            Join Our Weekly Update
+          </h1>
+          <p className="mb-6 text-xl sm:text-2xl">
             Get Exclusive Promotions & Updates Straight To Your Inbox.
           </p>
-          <div className="flex justify-center">
+          <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter your email here"
-              className="px-20 py-4 rounded-2xl focus:outline-none"
+              className="px-6 py-3 sm:px-20 sm:py-4 rounded-2xl focus:outline-none bg-white text-gray-500"
             />
             <button
               onClick={handleSubscribe}
-              className="bg-purple-600 text-white px-10 py-2 rounded-2xl hover:bg-purple-700 focus:outline-none"
+              className="bg-[#A259FF] text-white px-6 py-3 sm:px-10 sm:py-4 rounded-2xl hover:bg-[#8839FF] focus:outline-none"
             >
               Subscribe
             </button>

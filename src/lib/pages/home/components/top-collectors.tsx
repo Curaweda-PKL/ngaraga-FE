@@ -106,10 +106,10 @@ export const CollectorCards = () => {
         {/* Header Section */}
         <div className="flex flex-col lg:flex-row items-center lg:items-start gap-8 w-full p-8 justify-between">
           <div className="flex flex-col items-center lg:items-start gap-4">
-            <h2 className="text-3xl font-bold text-center lg:text-left text-white md:text-4xl">
+            <h2 className="text-4xl font-bold text-center lg:text-left text-white md:text-4xl">
               Top Collectors
             </h2>
-            <p className="text-sm text-center lg:text-left text-white md:text-base">
+            <p className="text-2xl text-center lg:text-left text-white md:text-base">
               Checkout Top Rated Collectors On The Ngaraga Marketplace
             </p>
           </div>

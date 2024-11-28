@@ -1,5 +1,3 @@
-import React from "react";
-
 export const DiscoverMoreCards = () => {
   const discoverData = [
     {
@@ -26,7 +24,7 @@ export const DiscoverMoreCards = () => {
   ];
 
   return (
-    <div className="flex items-center justify-center bg-[#2B2B2B] text-white py-12">
+    <div className="flex items-center justify-center bg-[#2B2B2B] text-white pt-24">
       <div className="max-w-6xl w-full">
         {/* Text Section */}
         <div className="flex items-center justify-between w-full px-8 mb-8">
@@ -34,7 +32,7 @@ export const DiscoverMoreCards = () => {
             <h2 className="text-4xl font-bold font-[Poppins]">
               Discover More Cards
             </h2>
-            <p className="text-base text-[#808080] font-[Nunito]">
+            <p className="text-2xl text-[#808080] font-[Nunito]">
               Explore New Trending Cards
             </p>
           </div>

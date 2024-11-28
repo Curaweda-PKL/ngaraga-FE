@@ -25,10 +25,10 @@ export const TrendingCards = () => {
       <div className="flex flex-col items-center bg-transparent border border-transparent gap-8 max-w-6xl w-full rounded-xl overflow-hidden">
         {/* Text Section */}
         <div className="flex flex-col items-center lg:items-start gap-8 w-full p-8">
-          <h2 className="text-3xl font-bold text-center lg:text-left text-white md:text-4xl">
+          <h2 className="text-4xl font-bold text-center lg:text-left text-white md:text-4xl">
             Trending Cards
           </h2>
-          <p className="text-sm text-center lg:text-left text-white md:text-base">
+          <p className="text-2xl text-center lg:text-left text-white md:text-base">
             Checkout Our Weekly Updated Trending Collection.
           </p>
         </div>

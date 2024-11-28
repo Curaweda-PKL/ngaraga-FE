@@ -3,7 +3,7 @@ import {HeroFrame} from "./components/hero-section";
 import {CollectorCards} from "./components/top-collectors";
 import {TrendingCards} from "./components/trending-cards";
 import {DiscoverMoreCards} from "./components/Discover-More";
-import {OnboardingSteps} from "./components/Find-Out";
+import {HowItWorks} from "./components/Find-Out";
 import {WeeklyUpdateForm} from "./components/Weekly-Update";
 
 const Home = () => {
@@ -14,7 +14,7 @@ const Home = () => {
       <CollectorCards />
       <BrowseCategories />
       <DiscoverMoreCards />
-      <OnboardingSteps />
+      <HowItWorks />
       <WeeklyUpdateForm />
     </div>
   );
