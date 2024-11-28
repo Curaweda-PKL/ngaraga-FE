@@ -1,10 +1,12 @@
-const LoginPage = () => {
+import space from "@/assets/img/spacestarry.png"
+
+ const Login = () => {
   return (
     <div className="flex h-screen bg-[#2B2B2B]">
       {/* Left Section - Image */}
       <div className="hidden md:flex flex-1 justify-center items-center">
         <img
-          src="/api/placeholder/500/500"
+          src={space}
           alt="Decorative"
           className="h-3/4 w-auto object-contain rounded-lg shadow-lg"
         />
@@ -49,4 +51,4 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage;
+export default Login

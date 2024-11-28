@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-
+import astronaut from "@/assets/img/discoverastro.png"
 export const WeeklyUpdateForm: React.FC = () => {
   const [email, setEmail] = useState("");
 
@@ -15,7 +15,7 @@ export const WeeklyUpdateForm: React.FC = () => {
       <div className="flex bg-[#3B3B3B] py-20 px-56 rounded-3xl">
         <div className="flex-1 p-8">
           <img
-            src="astronaut.jpg"
+            src={astronaut}
             alt="Astronaut"
             className="w-full h-auto"
           />
