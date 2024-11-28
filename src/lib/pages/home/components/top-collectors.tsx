@@ -1,36 +1,36 @@
-import {FaRocket} from "react-icons/fa";
+import { FaRocket } from 'react-icons/fa';
 
 export const CollectorCards = () => {
   const trendingData = [
     {
       id: 1,
-      username: "Kakarotto",
+      username: 'Kakarotto',
       avatar:
-        "https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg",
+        'https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg',
       totalCards: 25,
       rank: 1,
     },
     {
       id: 2,
-      username: "Vegetta",
+      username: 'Vegetta',
       avatar:
-        "https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg",
+        'https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg',
       totalCards: 25,
       rank: 2,
     },
     {
       id: 3,
-      username: "Trunks",
+      username: 'Trunks',
       avatar:
-        "https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg",
+        'https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg',
       totalCards: 25,
       rank: 3,
     },
     {
       id: 4,
-      username: "Goten",
+      username: 'Goten',
       avatar:
-        "https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg",
+        'https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg',
       totalCards: 25,
       rank: 4,
     },
@@ -84,7 +84,7 @@ export const CollectorCards = () => {
                 <div className="flex justify-center items-center space-x-1 text-[#858584]">
                   <p>Total Cards:</p>
                   <p className="text-sm font-mono text-white">
-                    {" "}
+                    {' '}
                     {card.totalCards} cards
                   </p>
                 </div>

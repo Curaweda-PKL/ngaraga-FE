@@ -1,5 +1,4 @@
-import space from "@/assets/img/spacestarry.png"
-
+import space from '@/assets/img/spacestarry.png';
 
 const Register = () => {
   return (
@@ -68,4 +67,4 @@ const Register = () => {
   );
 };
 
-export default Register
+export default Register;

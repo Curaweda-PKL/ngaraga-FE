@@ -1,6 +1,6 @@
-import space from "@/assets/img/spacestarry.png"
+import space from '@/assets/img/spacestarry.png';
 
- const Login = () => {
+const Login = () => {
   return (
     <div className="flex h-screen bg-[#2B2B2B]">
       {/* Left Section - Image */}
@@ -51,4 +51,4 @@ import space from "@/assets/img/spacestarry.png"
   );
 };
 
-export default Login
+export default Login;

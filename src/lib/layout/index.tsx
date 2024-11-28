@@ -1,13 +1,13 @@
-import type {ReactNode} from "react";
-import {Meta} from "./components/meta";
-import {Navbar} from "./components/nav-user";
-import {Footer} from "./components/footer";
+import type { ReactNode } from 'react';
+import { Footer } from './components/footer';
+import { Meta } from './components/meta';
+import { Navbar } from './components/nav-user';
 
 type LayoutProps = {
   children: ReactNode;
 };
 
-export const Layout = ({children}: LayoutProps) => {
+export const Layout = ({ children }: LayoutProps) => {
   return (
     <div className="flex flex-col min-h-screen w-full overflow-hidden">
       {/* Meta tags for SEO */}
@@ -20,7 +20,7 @@ export const Layout = ({children}: LayoutProps) => {
 
       {/* Main Content */}
       <main className="flex-grow w-full">
-        <div className="container mx-auto w-full ">{children}</div>
+        <div className=" mx-auto w-full ">{children}</div>
       </main>
 
       {/* Footer */}

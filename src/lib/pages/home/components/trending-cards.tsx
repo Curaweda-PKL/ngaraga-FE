@@ -1,34 +1,34 @@
 // todo :
 // check anything needed, fix it, and clean up
-import dog from "@/assets/img/dogpng.png";
-import mushfroom from "@/assets/img/mushroom.png";
-import robotai from "@/assets/img/robotai.png";
+import dog from '@/assets/img/dogpng.png';
+import mushfroom from '@/assets/img/mushroom.png';
+import robotai from '@/assets/img/robotai.png';
 
 // change the image type if not development for dynamic ability
 export const TrendingCards = () => {
   const trendingData = [
     {
       id: 1,
-      title: "DSGN Animals",
-      creator: "MrFox",
+      title: 'DSGN Animals',
+      creator: 'MrFox',
       avatar:
-        "https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg",
+        'https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg',
       image: dog,
     },
     {
       id: 2,
-      title: "DSGN Animals",
-      creator: "MrFox",
+      title: 'DSGN Animals',
+      creator: 'MrFox',
       avatar:
-        "https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg",
+        'https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg',
       image: mushfroom,
     },
     {
       id: 3,
-      title: "DSGN Animals",
-      creator: "MrFox",
+      title: 'DSGN Animals',
+      creator: 'MrFox',
       avatar:
-        "https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg",
+        'https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg',
       image: robotai,
     },
   ];

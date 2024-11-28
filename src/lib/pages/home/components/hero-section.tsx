@@ -1,6 +1,6 @@
-import type React from "react";
-import {RiRocketFill} from "react-icons/ri";
-import heroImage from "@/assets/img/astroheropng.png"
+import heroImage from '@/assets/img/astroheropng.png';
+import type React from 'react';
+import { RiRocketFill } from 'react-icons/ri';
 // todo :
 //  -- make all necessary use type data
 // clean up unnecesarry css
@@ -54,9 +54,7 @@ export const HeroFrame: React.FC = () => {
             />
           </figure>
           <div className="flex flex-col items-start gap-4 p-6">
-            <h2 className="text-2xl font-semibold text-white">
-              Space Walking
-            </h2>
+            <h2 className="text-2xl font-semibold text-white">Space Walking</h2>
             <div className="flex items-center gap-4">
               <img
                 src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp"

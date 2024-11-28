@@ -13,8 +13,8 @@ export default defineConfig({
     million.vite({ auto: true }),
     react(),
     checker({
-      typescript: false,
-      biome: false,
+      typescript: true,
+      biome: true,
     }),
     tsConfigPaths(),
     visualizer({ template: 'sunburst' }) as unknown as PluginOption,

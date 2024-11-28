@@ -2,27 +2,27 @@ export const BrowseCategories = () => {
   const trendingData = [
     {
       id: 1,
-      title: "DSGN Animals",
-      image: "/src/assets/img/lumba.png",
-      svgPath: "/src/assets/svg/PaintBrush.svg",
+      title: 'DSGN Animals',
+      image: '/src/assets/img/lumba.png',
+      svgPath: '/src/assets/svg/PaintBrush.svg',
     },
     {
       id: 2,
-      title: "Abstract Art",
-      image: "/src/assets/img/monkey.png",
-      svgPath: "/src/assets/svg/Swatches.svg",
+      title: 'Abstract Art',
+      image: '/src/assets/img/monkey.png',
+      svgPath: '/src/assets/svg/Swatches.svg',
     },
     {
       id: 3,
-      title: "Nature",
-      image: "/src/assets/img/gitar.png",
-      svgPath: "/src/assets/svg/MusicNotes.svg",
+      title: 'Nature',
+      image: '/src/assets/img/gitar.png',
+      svgPath: '/src/assets/svg/MusicNotes.svg',
     },
     {
       id: 4,
-      title: "Modern Art",
-      image: "/src/assets/img/oldman.png",
-      svgPath: "/src/assets/svg/Camera.svg",
+      title: 'Modern Art',
+      image: '/src/assets/img/oldman.png',
+      svgPath: '/src/assets/svg/Camera.svg',
     },
   ];
 
@@ -39,17 +39,14 @@ export const BrowseCategories = () => {
         {/* Cards Grid */}
         <div
           className="grid grid-cols-2 md:grid-cols-4 gap-6 w-full px-4"
-          style={{gap: "30px"}}
+          style={{ gap: '30px' }}
         >
           {trendingData.map((card) => (
             <div
               key={card.id}
               className="w-full flex flex-col items-start gap-[15px] shadow-xl rounded-lg bg-[#3B3B3B] transition-transform hover:scale-[1.02]"
             >
-              <figure
-                className="relative w-full"
-                style={{height: "316px"}}
-              >
+              <figure className="relative w-full" style={{ height: '316px' }}>
                 {card.image ? (
                   <>
                     {/* Blurred Background Image */}

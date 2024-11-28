@@ -7,8 +7,6 @@ const Page404 = () => {
       <Link to="/" className="text-blue-500 ">
         <p>Go back to home</p>
         <p>the ugliest 404 you would find?</p>
-
-        
       </Link>
     </div>
   );

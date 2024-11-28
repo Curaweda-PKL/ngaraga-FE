@@ -1,9 +1,9 @@
 // todo: dischange foto
 
-import React from "react";
-import dog from "@/assets/img/dogpng.png";
-import mushroom from "@/assets/img/mushroom.png";
-import robotai from "@/assets/img/robotai.png";
+import dog from '@/assets/img/dogpng.png';
+import mushroom from '@/assets/img/mushroom.png';
+import robotai from '@/assets/img/robotai.png';
+import type React from 'react';
 
 interface Card {
   id: number;
@@ -15,33 +15,33 @@ interface Card {
 }
 
 export const DiscoverMoreCards: React.FC = () => {
-  const discoverData: Card[] = [
+  const discoverData: Array<Card> = [
     {
       id: 1,
-      title: "Distant Galaxy",
-      creator: "MoonDancer",
+      title: 'Distant Galaxy',
+      creator: 'MoonDancer',
       avatar:
-        "https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg",
+        'https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg',
       image: dog,
-      price: "Rp. 200.000",
+      price: 'Rp. 200.000',
     },
     {
       id: 2,
-      title: "Life On Edena",
-      creator: "NebulaKid",
+      title: 'Life On Edena',
+      creator: 'NebulaKid',
       avatar:
-        "https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg",
+        'https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg',
       image: mushroom,
-      price: "Rp. 300.000",
+      price: 'Rp. 300.000',
     },
     {
       id: 3,
-      title: "AstroFiction",
-      creator: "Spaceone",
+      title: 'AstroFiction',
+      creator: 'Spaceone',
       avatar:
-        "https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg",
+        'https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg',
       image: robotai,
-      price: "Rp. 200.000",
+      price: 'Rp. 200.000',
     },
   ];
 

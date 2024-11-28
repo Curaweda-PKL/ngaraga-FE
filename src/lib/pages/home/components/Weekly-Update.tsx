@@ -1,12 +1,12 @@
-import React, {useState} from "react";
-import astronaut from "@/assets/img/discoverastro.png"
+import astronaut from '@/assets/img/discoverastro.png';
+import type React from 'react';
+import { useState } from 'react';
 export const WeeklyUpdateForm: React.FC = () => {
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState('');
 
   const handleSubscribe = () => {
-    if (email.trim() !== "") {
-      console.log("Subscribed:", email);
-      setEmail("");
+    if (email.trim() !== '') {
+      setEmail('');
     }
   };
 
@@ -14,11 +14,7 @@ export const WeeklyUpdateForm: React.FC = () => {
     <div className="flex justify-center items-center h-auto py-32 font-sans">
       <div className="flex bg-[#3B3B3B] py-20 px-56 rounded-3xl">
         <div className="flex-1 p-8">
-          <img
-            src={astronaut}
-            alt="Astronaut"
-            className="w-full h-auto"
-          />
+          <img src={astronaut} alt="Astronaut" className="w-full h-auto" />
         </div>
         <div className="flex-1 p-8 text-white">
           <h1 className="text-3xl font-bold mb-4">Join Our Weekly Update</h1>
@@ -45,4 +41,3 @@ export const WeeklyUpdateForm: React.FC = () => {
     </div>
   );
 };
-
