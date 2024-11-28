@@ -28,11 +28,75 @@ export const CollectorCards = () => {
     },
     {
       id: 4,
-      username: "Goten",
+      username: "Frieza",
       avatar:
         "https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg",
       totalCards: 25,
       rank: 4,
+    },
+    {
+      id: 5,
+      username: "Gohan",
+      avatar:
+        "https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg",
+      totalCards: 25,
+      rank: 5,
+    },
+    {
+      id: 6,
+      username: "Goten",
+      avatar:
+        "https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg",
+      totalCards: 25,
+      rank: 6,
+    },
+    {
+      id: 7,
+      username: "Krilin",
+      avatar:
+        "https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg",
+      totalCards: 25,
+      rank: 7,
+    },
+    {
+      id: 8,
+      username: "Bulma",
+      avatar:
+        "https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg",
+      totalCards: 25,
+      rank: 8,
+    },
+    {
+      id: 9,
+      username: "Chi-Chi",
+      avatar:
+        "https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg",
+      totalCards: 25,
+      rank: 9,
+    },
+    {
+      id: 10,
+      username: "Piccolo",
+      avatar:
+        "https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg",
+      totalCards: 25,
+      rank: 10,
+    },
+    {
+      id: 11,
+      username: "Android 17",
+      avatar:
+        "https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg",
+      totalCards: 25,
+      rank: 11,
+    },
+    {
+      id: 12,
+      username: "Android 18",
+      avatar:
+        "https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg",
+      totalCards: 25,
+      rank: 12,
     },
   ];
 
@@ -58,7 +122,7 @@ export const CollectorCards = () => {
         </div>
 
         {/* Cards Section */}
-        <div className="grid gap-16 md:grid-cols-4 w-full px-8">
+        <div className="grid gap-8 md:grid-cols-4 w-full px-12">
           {trendingData.map((card) => (
             <div
               key={card.id}

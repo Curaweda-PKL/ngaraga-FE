@@ -11,18 +11,18 @@ export const WeeklyUpdateForm: React.FC = () => {
   };
 
   return (
-    <div className="flex justify-center items-center h-auto py-32 font-sans">
-      <div className="flex bg-[#3B3B3B] py-20 px-56 rounded-3xl">
+    <div className="flex justify-center items-center h-auto py-28 font-sans">
+      <div className="flex bg-[#3B3B3B] py-10 px-10 rounded-3xl">
         <div className="flex-1 p-8">
           <img
-            src="astronaut.jpg"
+            src="/src/assets/img/Astronout.png"
             alt="Astronaut"
             className="w-full h-auto"
           />
         </div>
         <div className="flex-1 p-8 text-white">
-          <h1 className="text-3xl font-bold mb-4">Join Our Weekly Update</h1>
-          <p className="mb-6">
+          <h1 className="text-5xl font-bold mb-4">Join Our Weekly Update</h1>
+          <p className="mb-6 text-2xl">
             Get Exclusive Promotions & Updates Straight To Your Inbox.
           </p>
           <div className="flex justify-center">
@@ -31,11 +31,11 @@ export const WeeklyUpdateForm: React.FC = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter your email here"
-              className="px-4 py-2 rounded-l-md focus:outline-none"
+              className="px-20 py-4 rounded-2xl focus:outline-none"
             />
             <button
               onClick={handleSubscribe}
-              className="bg-purple-600 text-white px-4 py-2 rounded-r-md hover:bg-purple-700 focus:outline-none"
+              className="bg-purple-600 text-white px-10 py-2 rounded-2xl hover:bg-purple-700 focus:outline-none"
             >
               Subscribe
             </button>
@@ -45,4 +45,3 @@ export const WeeklyUpdateForm: React.FC = () => {
     </div>
   );
 };
-

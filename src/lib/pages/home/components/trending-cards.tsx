@@ -1,9 +1,5 @@
 // todo :
 // check anything needed, fix it, and clean up
-import dog from "@/assets/img/dogpng.png";
-import mushfroom from "@/assets/img/mushroom.png";
-import robotai from "@/assets/img/robotai.png";
-
 // change the image type if not development for dynamic ability
 export const TrendingCards = () => {
   const trendingData = [
@@ -13,23 +9,23 @@ export const TrendingCards = () => {
       creator: "MrFox",
       avatar:
         "https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg",
-      image: dog,
+      image: "/src/assets/img/dogpng.png",
     },
     {
       id: 2,
-      title: "DSGN Animals",
-      creator: "MrFox",
+      title: "Magic Mushroom",
+      creator: "Shroomie",
       avatar:
         "https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg",
-      image: mushfroom,
+      image: "/src/assets/img/mushroom.png",
     },
     {
       id: 3,
-      title: "DSGN Animals",
-      creator: "MrFox",
+      title: "Disco Machines",
+      creator: "BeKind2Robots",
       avatar:
         "https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg",
-      image: robotai,
+      image: "/src/assets/img/robotai.png",
     },
   ];
 

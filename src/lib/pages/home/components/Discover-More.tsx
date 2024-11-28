@@ -1,9 +1,4 @@
-// todo: dischange foto
-
 import React from "react";
-import dog from "@/assets/img/dogpng.png";
-import mushroom from "@/assets/img/mushroom.png";
-import robotai from "@/assets/img/robotai.png";
 
 interface Card {
   id: number;
@@ -22,7 +17,7 @@ export const DiscoverMoreCards: React.FC = () => {
       creator: "MoonDancer",
       avatar:
         "https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg",
-      image: dog,
+      image: "/src/assets/img/Distant-Galaxy.png",
       price: "Rp. 200.000",
     },
     {
@@ -31,7 +26,7 @@ export const DiscoverMoreCards: React.FC = () => {
       creator: "NebulaKid",
       avatar:
         "https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg",
-      image: mushroom,
+      image: "/src/assets/img/LifeonEdena.png",
       price: "Rp. 300.000",
     },
     {
@@ -40,7 +35,7 @@ export const DiscoverMoreCards: React.FC = () => {
       creator: "Spaceone",
       avatar:
         "https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg",
-      image: robotai,
+      image: "/src/assets/img/AstroFiction.png",
       price: "Rp. 200.000",
     },
   ];
@@ -78,9 +73,7 @@ export const DiscoverMoreCards: React.FC = () => {
                     className="w-full rounded-t-lg"
                   />
                 ) : (
-                  <div className="w-full h-[200px] flex items-center justify-center bg-gray-700 text-gray-400 rounded-t-lg">
-                    No Image Available
-                  </div>
+                  <div className="w-full h-[200px] flex items-center justify-center bg-[#3B3B3B] text-gray-400 rounded-t-lg"></div>
                 )}
               </figure>
               <div className="p-4 flex flex-col gap-4 w-full">
