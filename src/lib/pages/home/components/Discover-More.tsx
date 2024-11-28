@@ -1,3 +1,5 @@
+import React from "react";
+
 export const DiscoverMoreCards = () => {
   const discoverData = [
     {
@@ -24,51 +26,51 @@ export const DiscoverMoreCards = () => {
   ];
 
   return (
-    <div className="flex items-center justify-center text-white">
-      <div className="flex flex-col items-center bg-transparent border border-transparent gap-8 max-w-6xl w-full rounded-xl overflow-hidden">
+    <div className="flex items-center justify-center bg-[#2B2B2B] text-white py-12">
+      <div className="max-w-6xl w-full">
         {/* Text Section */}
-        <div className="flex items-center justify-between w-full p-8">
-          <div className="flex flex-col items-start gap-8">
-            <h2 className="text-3xl font-bold text-white md:text-4xl">
+        <div className="flex items-center justify-between w-full px-8 mb-8">
+          <div className="flex flex-col items-start gap-4">
+            <h2 className="text-4xl font-bold font-[Poppins]">
               Discover More Cards
             </h2>
-            <p className="text-sm text-white md:text-base">
+            <p className="text-base text-[#808080] font-[Nunito]">
               Explore New Trending Cards
             </p>
           </div>
-          <button className="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 transition-colors">
+          <button className="bg-[#A259FF] text-white px-4 py-2 rounded-md hover:bg-[#8c44e6] transition-colors font-[Poppins]">
             See All
           </button>
         </div>
 
         {/* Cards Grid */}
-        <div className="grid gap-6 md:grid-cols-3 w-full px-8">
+        <div className="grid gap-6 md:grid-cols-3 px-8">
           {discoverData.map((card) => (
             <div
               key={card.id}
-              className="w-full flex flex-col items-start gap-[15px] shadow-xl rounded-lg transition-transform hover:scale-[1.02]"
+              className="w-full flex flex-col items-start gap-4 bg-[#3B3B3B] rounded-2xl shadow-xl transition-transform hover:scale-[1.02]"
             >
-              <figure className="w-full">
+              <figure className="w-full rounded-t-2xl overflow-hidden">
                 {card.image ? (
                   <img
                     src={card.image}
                     alt={card.title}
-                    className="w-full rounded-t-lg"
+                    className="w-full h-[260px] object-cover"
                   />
                 ) : (
-                  <div className="w-full h-[200px] flex items-center justify-center bg-[#3B3B3B] text-gray-400 rounded-t-lg"></div>
+                  <div className="w-full h-[260px] flex items-center justify-center bg-[#3B3B3B] text-gray-400 rounded-t-2xl"></div>
                 )}
               </figure>
-              <div className="p-4 flex flex-col gap-4 w-full">
-                <h3 className="text-xl font-bold text-white">{card.title}</h3>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm text-gray-400">
-                      {card.creator}
-                    </span>
-                  </div>
-                  <span className="text-sm text-gray-400">{card.price}</span>
-                </div>
+              <div className="p-6 flex flex-col items-start gap-2 w-full">
+                <h3 className="text-2xl font-bold text-white font-[Poppins]">
+                  {card.title}
+                </h3>
+                <span className="text-base text-[#808080] font-[Nunito]">
+                  {card.creator}
+                </span>
+                <span className="text-base text-[#808080] font-[Nunito]">
+                  {card.price}
+                </span>
               </div>
             </div>
           ))}

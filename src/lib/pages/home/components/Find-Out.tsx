@@ -41,7 +41,7 @@ export const OnboardingSteps = () => {
   ];
 
   return (
-    <div className="bg-[#2A2A2A] text-white py-12 md:py-16 px-4 sm:px-6 md:px-20">
+    <div className="bg-[#2B2B2B] text-white py-12 md:py-16 px-4 sm:px-6 md:px-20">
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-10">
         <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-center md:text-left w-full md:w-auto mb-8 md:mb-0">
           Find Out <br className="hidden md:block" /> How To Get Started
