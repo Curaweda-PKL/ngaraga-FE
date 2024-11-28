@@ -1,30 +1,21 @@
-// todo :
-// check anything needed, fix it, and clean up
-// change the image type if not development for dynamic ability
 export const TrendingCards = () => {
   const trendingData = [
     {
       id: 1,
       title: "DSGN Animals",
       creator: "MrFox",
-      avatar:
-        "https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg",
       image: "/src/assets/img/dogpng.png",
     },
     {
       id: 2,
       title: "Magic Mushroom",
       creator: "Shroomie",
-      avatar:
-        "https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg",
       image: "/src/assets/img/mushroom.png",
     },
     {
       id: 3,
       title: "Disco Machines",
       creator: "BeKind2Robots",
-      avatar:
-        "https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg",
       image: "/src/assets/img/robotai.png",
     },
   ];
@@ -65,11 +56,6 @@ export const TrendingCards = () => {
               <div className="p-4 flex flex-col gap-4">
                 <h3 className="text-xl font-bold text-white">{card.title}</h3>
                 <div className="flex items-center gap-2">
-                  <img
-                    src={card.avatar}
-                    alt={card.creator}
-                    className="h-6 w-6 rounded-full object-cover"
-                  />
                   <span className="text-sm text-gray-400">{card.creator}</span>
                 </div>
               </div>

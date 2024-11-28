@@ -1,22 +1,9 @@
-import React from "react";
-
-interface Card {
-  id: number;
-  title: string;
-  creator: string;
-  avatar: string;
-  image: string;
-  price: string;
-}
-
-export const DiscoverMoreCards: React.FC = () => {
-  const discoverData: Card[] = [
+export const DiscoverMoreCards = () => {
+  const discoverData = [
     {
       id: 1,
       title: "Distant Galaxy",
       creator: "MoonDancer",
-      avatar:
-        "https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg",
       image: "/src/assets/img/Distant-Galaxy.png",
       price: "Rp. 200.000",
     },
@@ -24,8 +11,6 @@ export const DiscoverMoreCards: React.FC = () => {
       id: 2,
       title: "Life On Edena",
       creator: "NebulaKid",
-      avatar:
-        "https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg",
       image: "/src/assets/img/LifeonEdena.png",
       price: "Rp. 300.000",
     },
@@ -33,8 +18,6 @@ export const DiscoverMoreCards: React.FC = () => {
       id: 3,
       title: "AstroFiction",
       creator: "Spaceone",
-      avatar:
-        "https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg",
       image: "/src/assets/img/AstroFiction.png",
       price: "Rp. 200.000",
     },
@@ -80,11 +63,6 @@ export const DiscoverMoreCards: React.FC = () => {
                 <h3 className="text-xl font-bold text-white">{card.title}</h3>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <img
-                      src={card.avatar}
-                      alt={card.creator}
-                      className="h-6 w-6 rounded-full object-cover"
-                    />
                     <span className="text-sm text-gray-400">
                       {card.creator}
                     </span>

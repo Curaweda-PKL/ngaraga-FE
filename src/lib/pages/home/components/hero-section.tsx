@@ -1,51 +1,47 @@
-import type React from "react";
 import {RiRocketFill} from "react-icons/ri";
-import heroImage from "@/assets/img/astroheropng.png"
-// todo :
-//  -- make all necessary use type data
-// clean up unnecesarry css
-// resposnive image card
-export const HeroFrame: React.FC = () => {
+import heroImage from "@/assets/img/astroheropng.png";
+
+export const HeroFrame = () => {
   return (
-    <div className="flex items-center justify-center min-h-screen text-white p-8 ">
-      <div className="flex flex-col lg:flex-row items-center bg-transparent border border-transparent gap-8 max-w-6xl w-full  rounded-xl overflow-hidden">
+    <div className="flex items-center justify-center min-h-screen text-white p-8">
+      <div className="flex flex-col lg:flex-row items-center bg-transparent border border-transparent gap-8 max-w-6xl w-full rounded-2xl overflow-hidden">
         {/* Left Section (Hero Section) */}
         <div className="flex flex-col items-center lg:items-start gap-8 w-full lg:w-1/2 p-8">
-          <h1 className="text-4xl font-bold text-center lg:text-left">
+          <h1 className="text-6xl font-bold text-center lg:text-left font-[Poppins]">
             Discover Digital Art & Collect NFTs
           </h1>
-          <p className="text-lg leading-relaxed text-center lg:text-left">
+          <p className="text-2xl leading-relaxed text-center lg:text-left ">
             NFT Marketplace UI Created With Anima For Figma. Collect, Buy, and
             Sell Art From More Than 20k NFT Artists.
           </p>
-          <button className="bg-[#A259FF] text-white py-2 px-6 rounded-lg text-lg font-medium flex items-center gap-2 hover:opacity-90">
-            <RiRocketFill className="text-2xl" />
+          <button className="bg-[#A259FF] text-white py-3 px-10 rounded-2xl text-lg font-medium flex items-center gap-4 hover:opacity-90">
+            <RiRocketFill className="text-4xl" />
             Get Started
           </button>
           <div className="flex gap-8 justify-center lg:justify-start">
             <div className="text-center">
-              <h3 className="text-2xl font-bold">
+              <h3 className="text-3xl font-bold font-[Poppins]">
                 <span className="font-mono">240k+</span>
               </h3>
-              <p className="text-gray-400">Cards</p>
+              <p className="text-[#808080] font-[Nunito]">Cards</p>
             </div>
             <div className="text-center">
-              <h3 className="text-2xl font-bold">
+              <h3 className="text-3xl font-bold font-[Poppins]">
                 <span className="font-mono">100k+</span>
               </h3>
-              <p className="text-gray-400">Collectors</p>
+              <p className="text-[#808080] font-[Nunito]">Collectors</p>
             </div>
             <div className="text-center">
-              <h3 className="text-2xl font-bold">
+              <h3 className="text-3xl font-bold font-[Poppins]">
                 <span className="font-mono">240k+</span>
               </h3>
-              <p className="text-gray-400">Categories</p>
+              <p className="text-[#808080] font-[Nunito]">Categories</p>
             </div>
           </div>
         </div>
 
         {/* Right Section (Card) */}
-        <div className="card bg-background-secondary w-96 shadow-xl flex flex-col items-start justify-start lg:h-[400px] flex-1 sm:h-auto sm:w-auto p-0">
+        <div className="card bg-background-secondary w-full max-w-[570px] lg:h-[570px] shadow-xl flex flex-col items-start justify-start flex-1 sm:h-auto sm:w-auto p-0 overflow-hidden">
           <figure className="w-full h-full mb-0 relative">
             <img
               src={heroImage}
@@ -54,17 +50,10 @@ export const HeroFrame: React.FC = () => {
             />
           </figure>
           <div className="flex flex-col items-start gap-4 p-6">
-            <h2 className="text-2xl font-semibold text-white">
+            <h2 className="text-3xl font-semibold text-white font-[Poppins]">
               Space Walking
             </h2>
-            <div className="flex items-center gap-4">
-              <img
-                src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp"
-                alt="Avatar"
-                className="w-12 h-12 rounded-full object-cover"
-              />
-              <span className="text-gray-400">Animakid</span>
-            </div>
+            <span className="text-[#808080] font-[Nunito]">Animakid</span>
           </div>
         </div>
       </div>
