@@ -2,27 +2,51 @@ export const BrowseCategories = () => {
   const trendingData = [
     {
       id: 1,
-      title: 'DSGN Animals',
+      title: 'Art',
       image: '/src/assets/img/lumba.png',
       svgPath: '/src/assets/svg/PaintBrush.svg',
     },
     {
       id: 2,
-      title: 'Abstract Art',
+      title: 'Collectibles',
       image: '/src/assets/img/monkey.png',
       svgPath: '/src/assets/svg/Swatches.svg',
     },
     {
       id: 3,
-      title: 'Nature',
+      title: 'Music',
       image: '/src/assets/img/gitar.png',
       svgPath: '/src/assets/svg/MusicNotes.svg',
     },
     {
       id: 4,
-      title: 'Modern Art',
+      title: 'Photography',
       image: '/src/assets/img/oldman.png',
       svgPath: '/src/assets/svg/Camera.svg',
+    },
+    {
+      id: 5,
+      title: 'Video',
+      image: '/src/assets/img/magic-futuristic.png',
+      svgPath: '/src/assets/svg/VideoCamera.svg',
+    },
+    {
+      id: 6,
+      title: 'Utility',
+      image: '/src/assets/img/key-isolated.png',
+      svgPath: '/src/assets/svg/MagicWand.svg',
+    },
+    {
+      id: 7,
+      title: 'Sport',
+      image: '/src/assets/img/basketball.png',
+      svgPath: '/src/assets/svg/Basketball.svg',
+    },
+    {
+      id: 8,
+      title: 'Virtual World',
+      image: '/src/assets/img/cyberpunk-city.png',
+      svgPath: '/src/assets/svg/Planet.svg',
     },
   ];
 
@@ -31,7 +55,7 @@ export const BrowseCategories = () => {
       <div className="flex flex-col items-center bg-transparent border border-transparent gap-8 max-w-6xl w-full rounded-xl overflow-hidden">
         {/* Text Section */}
         <div className="flex flex-col items-center lg:items-start gap-8 w-full p-8">
-          <h2 className="text-3xl font-bold text-center lg:text-left text-white md:text-4xl">
+          <h2 className="text-4xl font-bold text-center lg:text-left text-white md:text-4xl">
             Browse Categories
           </h2>
         </div>

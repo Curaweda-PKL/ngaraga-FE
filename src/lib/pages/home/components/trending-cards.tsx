@@ -1,35 +1,22 @@
-// todo :
-// check anything needed, fix it, and clean up
-import dog from '@/assets/img/dogpng.png';
-import mushfroom from '@/assets/img/mushroom.png';
-import robotai from '@/assets/img/robotai.png';
-
-// change the image type if not development for dynamic ability
 export const TrendingCards = () => {
   const trendingData = [
     {
       id: 1,
       title: 'DSGN Animals',
       creator: 'MrFox',
-      avatar:
-        'https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg',
-      image: dog,
+      image: '/src/assets/img/dogpng.png',
     },
     {
       id: 2,
-      title: 'DSGN Animals',
-      creator: 'MrFox',
-      avatar:
-        'https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg',
-      image: mushfroom,
+      title: 'Magic Mushroom',
+      creator: 'Shroomie',
+      image: '/src/assets/img/mushroom.png',
     },
     {
       id: 3,
-      title: 'DSGN Animals',
-      creator: 'MrFox',
-      avatar:
-        'https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg',
-      image: robotai,
+      title: 'Disco Machines',
+      creator: 'BeKind2Robots',
+      image: '/src/assets/img/robotai.png',
     },
   ];
 
@@ -38,10 +25,10 @@ export const TrendingCards = () => {
       <div className="flex flex-col items-center bg-transparent border border-transparent gap-8 max-w-6xl w-full rounded-xl overflow-hidden">
         {/* Text Section */}
         <div className="flex flex-col items-center lg:items-start gap-8 w-full p-8">
-          <h2 className="text-3xl font-bold text-center lg:text-left text-white md:text-4xl">
+          <h2 className="text-4xl font-bold text-center lg:text-left text-white md:text-4xl">
             Trending Cards
           </h2>
-          <p className="text-sm text-center lg:text-left text-white md:text-base">
+          <p className="text-2xl text-center lg:text-left text-white md:text-base">
             Checkout Our Weekly Updated Trending Collection.
           </p>
         </div>
@@ -69,11 +56,6 @@ export const TrendingCards = () => {
               <div className="p-4 flex flex-col gap-4">
                 <h3 className="text-xl font-bold text-white">{card.title}</h3>
                 <div className="flex items-center gap-2">
-                  <img
-                    src={card.avatar}
-                    alt={card.creator}
-                    className="h-6 w-6 rounded-full object-cover"
-                  />
                   <span className="text-sm text-gray-400">{card.creator}</span>
                 </div>
               </div>

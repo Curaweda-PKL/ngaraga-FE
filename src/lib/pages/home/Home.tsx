@@ -1,6 +1,6 @@
 import { BrowseCategories } from './components/browse-categories';
 import { DiscoverMoreCards } from './components/discover-mores';
-import { OnboardingSteps } from './components/find-out';
+import { HowItWorks } from './components/find-out';
 import { HeroFrame } from './components/hero-section';
 import { CollectorCards } from './components/top-collectors';
 import { TrendingCards } from './components/trending-cards';
@@ -14,7 +14,7 @@ const Home = () => {
       <CollectorCards />
       <BrowseCategories />
       <DiscoverMoreCards />
-      <OnboardingSteps />
+      <HowItWorks />
       <WeeklyUpdateForm />
     </div>
   );

@@ -20,7 +20,7 @@ export const Layout = ({ children }: LayoutProps) => {
 
       {/* Main Content */}
       <main className="flex-grow w-full">
-        <div className=" mx-auto w-full ">{children}</div>
+        <div className="mx-auto w-full ">{children}</div>
       </main>
 
       {/* Footer */}

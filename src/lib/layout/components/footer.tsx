@@ -1,12 +1,18 @@
-import { Instagram, Twitter, Youtube } from 'lucide-react';
 import type React from 'react';
-import { FaStore } from 'react-icons/fa';
+import {
+  FaDiscord,
+  FaInstagram,
+  FaStore,
+  FaTwitter,
+  FaYoutube,
+} from 'react-icons/fa';
 
 export const Footer: React.FC = () => {
   const socialLinks = [
-    { icon: <Youtube className="h-5 w-5" />, href: '#' },
-    { icon: <Twitter className="h-5 w-5" />, href: '#' },
-    { icon: <Instagram className="h-5 w-5" />, href: '#' },
+    { icon: <FaDiscord className="h-5 w-5" />, href: '#' },
+    { icon: <FaYoutube className="h-5 w-5" />, href: '#' },
+    { icon: <FaTwitter className="h-5 w-5" />, href: '#' },
+    { icon: <FaInstagram className="h-5 w-5" />, href: '#' },
   ];
 
   return (
@@ -16,7 +22,7 @@ export const Footer: React.FC = () => {
         <div className="grid gap-4 text-center md:text-left">
           {/* Logo */}
           <div className="flex items-center justify-center md:justify-start gap-2">
-            <a className="btn btn-ghost text-xl flex items-center">
+            <a className="btn btn-ghost text-xl flex items-center font-bold text-white">
               <FaStore size={24} color="#A259FF" className="mr-2" />
               Ngaraga
             </a>
@@ -48,10 +54,16 @@ export const Footer: React.FC = () => {
         <div className="grid gap-4 text-center md:text-left">
           <h3 className="text-xl font-bold text-white">Explore</h3>
           <div className="grid gap-3">
-            <a href="#" className="text-sm text-[#858584] hover:text-white">
+            <a
+              href="#"
+              className="text-sm text-[#858584] hover:text-white transition-colors"
+            >
               Marketplace
             </a>
-            <a href="#" className="text-sm text-[#858584] hover:text-white">
+            <a
+              href="#"
+              className="text-sm text-[#858584] hover:text-white transition-colors"
+            >
               Rankings
             </a>
           </div>
