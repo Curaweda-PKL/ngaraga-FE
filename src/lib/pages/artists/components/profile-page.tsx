@@ -7,7 +7,7 @@ import {
   FaYoutube,
 } from "react-icons/fa";
 
-const ProfilePage: React.FC = () => {
+export const ProfilePage: React.FC = () => {
   return (
     <div className="w-screen h-screen flex flex-col">
       {/* Background Section (Banner) */}
@@ -126,4 +126,3 @@ const ProfilePage: React.FC = () => {
   );
 };
 
-export default ProfilePage;
