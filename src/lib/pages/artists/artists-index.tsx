@@ -10,4 +10,3 @@ export const Artists: React.FC = () => {
   );
 };
 
-export default Artists;

@@ -1,7 +1,7 @@
 import React from "react";
 import mushroom from "../../../../assets/img/mushroom.png";
 
-export const Event = () => {
+export const Event: React.FC = () => {
   return (
     <div
       className="relative flex justify-center items-end self-stretch h-screen"
