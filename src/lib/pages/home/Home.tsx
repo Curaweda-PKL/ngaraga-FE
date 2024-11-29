@@ -5,6 +5,7 @@ import { HeroFrame } from './components/hero-section';
 import { CollectorCards } from './components/top-collectors';
 import { TrendingCards } from './components/trending-cards';
 import { WeeklyUpdateForm } from './components/weekly-update';
+import { Event } from './components/event';
 
 const Home = () => {
   return (
@@ -16,6 +17,7 @@ const Home = () => {
       <DiscoverMoreCards />
       <HowItWorks />
       <WeeklyUpdateForm />
+      <Event/>
     </div>
   );
 };
