@@ -46,8 +46,12 @@ export const HowItWorks = () => {
           <div className="mx-auto space-y-12">
             {/* Title Section */}
             <div className="relative">
-              <h1 className="text-4xl font-bold text-white mb-4">How It Works</h1>
-              <p className="text-2xl text-gray-400">Find Out How To Get Started</p>
+              <h1 className="text-4xl font-bold text-white mb-4">
+                How It Works
+              </h1>
+              <p className="text-2xl text-gray-400">
+                Find Out How To Get Started
+              </p>
             </div>
 
             {/* Cards Grid */}
