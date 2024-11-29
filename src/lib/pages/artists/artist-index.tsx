@@ -10,8 +10,8 @@ import {
 const ProfilePage: React.FC = () => {
   return (
     <div className="w-screen h-screen flex flex-col">
-      {/* Background Section */}
-      <section className="relative flex-grow">
+      {/* Background Section (Banner) */}
+      <section className="relative h-48">
         <div
           className="absolute top-0 w-full h-full bg-center bg-cover"
           style={{
@@ -24,21 +24,21 @@ const ProfilePage: React.FC = () => {
       </section>
 
       {/* Profile Section */}
-      <div className="relative bg-gray-900 text-white w-full shadow-xl p-8">
+      <div className="relative text-white w-full shadow-xl p-8">
         <div className="container mx-auto flex flex-col lg:flex-row items-center lg:items-start lg:justify-between">
           {/* Profile Image */}
           <div className="relative mb-4 lg:mb-0 lg:mr-8 order-1 lg:order-none">
-            <div className="relative w-24 h-24 mx-auto lg:mx-0 -mt-20 lg:-mt-16 ">
+            <div className="relative w-24 h-24 mx-auto lg:mx-0 -mt-12 lg:-mt-16">
               <img
                 src="https://demos.creative-tim.com/notus-js/assets/img/team-2-800x800.jpg"
                 alt="Profile"
-                className="absolute  w-full h-full shadow-xl rounded-2xl border-4 border-gray-800 object-cover"
+                className="absolute w-full h-full shadow-xl rounded-2xl border-4 border-gray-800 object-cover"
               />
             </div>
           </div>
 
           {/* Profile Content */}
-          <div className="flex-grow text-center lg:text-left order-3 lg:order-none ">
+          <div className="flex-grow text-center lg:text-left order-3 lg:order-none">
             {/* Profile Name */}
             <h2 className="text-2xl font-bold mb-4 lg:mb-6">Animakid</h2>
 
@@ -60,7 +60,7 @@ const ProfilePage: React.FC = () => {
 
             {/* Bio */}
             <div className="text-center lg:text-left mb-6">
-              <h3 className="text-lg font-bold text-gray-200 mb-2">Bio</h3>
+              <h3 className="text-lg font-bold text-[#858584] mb-2">Bio</h3>
               <p className="text-gray-300">
                 The Internet's Friendliest Designer Kid.
               </p>
@@ -68,42 +68,42 @@ const ProfilePage: React.FC = () => {
 
             {/* Links */}
             <div>
-              <h3 className="text-lg font-bold text-gray-200 mb-2">Links</h3>
+              <h3 className="text-lg font-bold text-[#858584] mb-2">Links</h3>
               <div className="flex justify-center lg:justify-start space-x-6 text-2xl">
                 <a
                   href="https://example.com"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <FaGlobe className="hover:text-white" />
+                  <FaGlobe className="text-[#858584] hover:text-white" />
                 </a>
                 <a
                   href="https://discord.com"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <FaDiscord className="hover:text-white" />
+                  <FaDiscord className="text-[#858584] hover:text-white" />
                 </a>
                 <a
                   href="https://youtube.com"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <FaYoutube className="hover:text-white" />
+                  <FaYoutube className="text-[#858584] hover:text-white" />
                 </a>
                 <a
                   href="https://twitter.com"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <FaTwitter className="hover:text-white" />
+                  <FaTwitter className="text-[#858584] hover:text-white" />
                 </a>
                 <a
                   href="https://instagram.com"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <FaInstagram className="hover:text-white" />
+                  <FaInstagram className="text-[#858584] hover:text-white" />
                 </a>
               </div>
             </div>
@@ -111,11 +111,13 @@ const ProfilePage: React.FC = () => {
 
           {/* Buttons */}
           <div className="mt-6 lg:mt-0 flex justify-center lg:justify-end space-x-4 order-2 lg:order-none">
-            <button className="bg-purple-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-purple-600">
-              + Scan QR
+            <button className="bg-transparent border-2 border-call-to-action  font-bold py-2 px-6 rounded-lg flex items-center space-x-2 hover:bg-[#858584] hover:text-white">
+              <span>+</span>
+              <span>Scan QR</span>
             </button>
-            <button className="bg-purple-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-purple-600">
-              + Follow
+            <button className="bg-transparent border-2 border-call-to-action  font-bold py-2 px-6 rounded-lg flex items-center space-x-2 hover:bg-[#858584] hover:text-white">
+              <span>+</span>
+              <span>Follow</span>
             </button>
           </div>
         </div>
