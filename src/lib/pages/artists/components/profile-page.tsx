@@ -9,7 +9,7 @@ import {
 
 export const ProfilePage: React.FC = () => {
   return (
-    <div className="w-screen h-screen flex flex-col">
+    <div className="flex flex-col">
       {/* Background Section (Banner) */}
       <section className="relative h-48">
         <div
@@ -24,7 +24,7 @@ export const ProfilePage: React.FC = () => {
       </section>
 
       {/* Profile Section */}
-      <div className="relative text-white w-full shadow-xl p-8">
+      <div className="relative text-white w-full  p-8">
         <div className="container mx-auto flex flex-col lg:flex-row items-center lg:items-start lg:justify-between">
           {/* Profile Image */}
           <div className="relative mb-4 lg:mb-0 lg:mr-8 order-1 lg:order-none">

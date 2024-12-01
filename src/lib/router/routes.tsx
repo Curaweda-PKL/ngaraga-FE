@@ -1,11 +1,12 @@
 import React from 'react';
 import type { PathRouteProps } from 'react-router-dom';
-import { MarketHeader } from '../pages/marketplace/marketplace-index';
 
 const Home = React.lazy(() => import('@/lib/pages/home/home'));
 const Register = React.lazy(() => import('@/lib/pages/auth/login/register'));
 const Login = React.lazy(() => import('@/lib/pages/auth/login/login'));
 const Artists = React.lazy(() => import('@/lib/pages/artists/artists-index'));
+const Marketplace = React.lazy(() => import ('@/lib/pages/marketplace/marketplace-index'))
+import TopCollectors from '@/lib/pages/top-players/top-players';
 
 export const routes: Array<PathRouteProps> = [
   {
@@ -26,8 +27,12 @@ export const routes: Array<PathRouteProps> = [
   },
   {
     path: '/marketplace',
-    element: <MarketHeader/>
+    element: <Marketplace/>
   },
+  {
+    path: '/top-collectors',
+    element: <TopCollectors/>
+  }
 ];
 
 export const privateRoutes: Array<PathRouteProps> = [];

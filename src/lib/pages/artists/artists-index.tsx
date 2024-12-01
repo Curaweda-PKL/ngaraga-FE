@@ -1,11 +1,12 @@
 import React from "react";
 import { ProfilePage } from "./components/profile-page";
+import { CardContentSection } from "./components/card-sections";
 
-// give any styling u want sal
 const Artists: React.FC = () => {
   return (
     <div>
       <ProfilePage />
+      <CardContentSection />
     </div>
   );
 };
