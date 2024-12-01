@@ -15,9 +15,9 @@ const Home = () => {
       <CollectorCards />
       <BrowseCategories />
       <DiscoverMoreCards />
+      <Event/>
       <HowItWorks />
       <WeeklyUpdateForm />
-      <Event/>
     </div>
   );
 };
