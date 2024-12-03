@@ -26,40 +26,39 @@ export const ProfilePage: React.FC = () => {
       {/* Profile Section */}
       <div className="relative text-white w-full  p-8">
         <div className="container mx-auto flex flex-col lg:flex-row items-center lg:items-start lg:justify-between">
-          {/* Profile Image */}
-          <div className="relative mb-4 lg:mb-0 lg:mr-8 order-1 lg:order-none">
-            <div className="relative w-24 h-24 mx-auto lg:mx-0 -mt-12 lg:-mt-16">
-              <img
-                src="https://demos.creative-tim.com/notus-js/assets/img/team-2-800x800.jpg"
-                alt="Profile"
-                className="absolute w-full h-full shadow-xl rounded-2xl border-4 border-gray-800 object-cover"
-              />
-            </div>
-          </div>
-
           {/* Profile Content */}
-          <div className="flex-grow text-center lg:text-left order-3 lg:order-none">
+          <div className="flex-grow order-3 lg:order-none lg:mr-8">
+            {/* Profile Image */}
+            <div className="relative mb-4 lg:mb-0 order-1 lg:order-none">
+              <div className="relative w-24 h-24 mx-auto lg:mx-0 -mt-12 lg:-mt-16">
+                <img
+                  src="https://demos.creative-tim.com/notus-js/assets/img/team-2-800x800.jpg"
+                  alt="Profile"
+                  className="absolute w-full h-full shadow-xl rounded-2xl border-4 border-gray-800 object-cover"
+                />
+              </div>
+            </div>
             {/* Profile Name */}
             <h2 className="text-2xl font-bold mb-4 lg:mb-6">Animakid</h2>
 
             {/* Stats */}
-            <div className="flex justify-center lg:justify-start space-x-8 mb-6">
-              <div className="text-center">
+            <div className="flex justify-start space-x-8 mb-6">
+              <div className="text-left">
                 <span className="text-xl font-bold">250k+</span>
                 <p className="text-sm text-gray-400">Cards</p>
               </div>
-              <div className="text-center">
+              <div className="text-left">
                 <span className="text-xl font-bold">50+</span>
                 <p className="text-sm text-gray-400">Special Cards</p>
               </div>
-              <div className="text-center">
+              <div className="text-left">
                 <span className="text-xl font-bold">3000+</span>
                 <p className="text-sm text-gray-400">Followers</p>
               </div>
             </div>
 
             {/* Bio */}
-            <div className="text-center lg:text-left mb-6">
+            <div className="text-left mb-6">
               <h3 className="text-lg font-bold text-[#858584] mb-2">Bio</h3>
               <p className="text-gray-300">
                 The Internet's Friendliest Designer Kid.
@@ -69,7 +68,7 @@ export const ProfilePage: React.FC = () => {
             {/* Links */}
             <div>
               <h3 className="text-lg font-bold text-[#858584] mb-2">Links</h3>
-              <div className="flex justify-center lg:justify-start space-x-6 text-2xl">
+              <div className="flex justify-start space-x-6 text-2xl">
                 <a
                   href="https://example.com"
                   target="_blank"
@@ -125,4 +124,3 @@ export const ProfilePage: React.FC = () => {
     </div>
   );
 };
-

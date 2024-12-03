@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, {useState} from "react";
 
 const cardData = [
   {
@@ -51,7 +51,8 @@ export const CardContentSection = () => {
           }`}
           onClick={() => setActiveTab("cards")}
         >
-          Card <span className="text-sm text-gray-500">({cardData.length})</span>
+          Card{" "}
+          <span className="text-sm text-gray-500">({cardData.length})</span>
         </button>
         <button
           className={`text-lg font-semibold ${
