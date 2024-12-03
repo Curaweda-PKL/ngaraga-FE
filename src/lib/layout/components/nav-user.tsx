@@ -1,12 +1,19 @@
-import type React from 'react';
-import { useState } from 'react';
-import { FaBars, FaStore, FaTimes, FaUserFriends } from 'react-icons/fa';
+import type React from "react";
+import {useState} from "react";
+import {FaBars, FaStore, FaTimes, FaUserFriends} from "react-icons/fa";
+import {useNavigate} from "react-router-dom";
 
 export const Navbar: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const navigate = useNavigate();
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
+  };
+
+  const navigateToPage = (page: string) => {
+    navigate(`/${page}`);
+    toggleSidebar();
   };
 
   return (
@@ -27,8 +34,15 @@ export const Navbar: React.FC = () => {
           </div>
 
           {/* Logo button */}
-          <a className="btn btn-ghost text-xl flex lg:ml-3">
-            <FaStore size={24} color="#A259FF" />
+          <a
+            className="btn btn-ghost text-xl flex lg:ml-3"
+            onClick={() => navigateToPage("/")}
+          >
+            <img
+              src="/src/assets/img/LOGO.png"
+              alt="Ngaraga Logo"
+              className="w-8 h-8 mr-2"
+            />
             Ngaraga
           </a>
         </div>
@@ -38,15 +52,18 @@ export const Navbar: React.FC = () => {
           {/* Menu for larger screens */}
           <ul className="hidden lg:flex menu menu-horizontal px-1 mr-4 gap-4">
             <li>
-              <a>Marketplace</a>
+              <a onClick={() => navigateToPage("marketplace")}>Marketplace</a>
             </li>
             <li>
-              <a>Rankings</a>
+              <a onClick={() => navigateToPage("rankings")}>Rankings</a>
             </li>
           </ul>
 
           {/* Sign-up button for desktop */}
-          <a className="btn bg-call-to-action border-transparent rounded-lg text-white ml-4 items-center gap-2 sm:mr-0 md:mr-0 lg:mr-10 hidden lg:flex">
+          <a
+            className="btn bg-call-to-action border-transparent rounded-lg text-white ml-4 items-center gap-2 sm:mr-0 md:mr-0 lg:mr-10 hidden lg:flex"
+            onClick={() => navigateToPage("register")}
+          >
             <FaUserFriends />
             Sign up
           </a>
@@ -56,32 +73,48 @@ export const Navbar: React.FC = () => {
       {/* Sliding Sidebar for Mobile */}
       <div
         className={`fixed inset-y-0 left-0 z-50 w-64 bg-base-100 transform transition-transform duration-300 ease-in-out 
-        ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} 
+        ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} 
         lg:hidden`}
       >
         <div className="flex justify-between items-center p-4 border-b">
           <div className="flex items-center text-xl">
-            <FaStore size={24} color="#A259FF" className="mr-2" />
+            <img
+              src="/src/assets/img/LOGO.png"
+              alt="Ngaraga Logo"
+              className="w-8 h-8 mr-2"
+            />
             Ngaraga
           </div>
-          <button onClick={toggleSidebar} className="btn btn-ghost">
+          <button
+            onClick={toggleSidebar}
+            className="btn btn-ghost"
+          >
             <FaTimes size={20} />
           </button>
         </div>
 
         <ul className="menu p-4 space-y-2">
           <li>
-            <a className="flex items-center" onClick={toggleSidebar}>
+            <a
+              className="flex items-center"
+              onClick={() => navigateToPage("marketplace")}
+            >
               Marketplace
             </a>
           </li>
           <li>
-            <a className="flex items-center" onClick={toggleSidebar}>
+            <a
+              className="flex items-center"
+              onClick={() => navigateToPage("rankings")}
+            >
               Rankings
             </a>
           </li>
           <li>
-            <a className="flex items-center gap-2" onClick={toggleSidebar}>
+            <a
+              className="flex items-center gap-2"
+              onClick={() => navigateToPage("register")}
+            >
               <FaUserFriends />
               Sign up
             </a>

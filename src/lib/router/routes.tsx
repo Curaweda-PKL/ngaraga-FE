@@ -34,7 +34,7 @@ export const routes: Array<PathRouteProps> = [
     element: <Marketplace />,
   },
   {
-    path: "/top-collectors",
+    path: "/rankings",
     element: <TopCollectors />,
   },
 ];
