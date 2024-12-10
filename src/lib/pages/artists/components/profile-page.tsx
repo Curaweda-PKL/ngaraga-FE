@@ -24,7 +24,7 @@ export const ProfilePage: React.FC = () => {
       </section>
 
       {/* Profile Section */}
-      <div className="relative text-white w-full  p-8">
+      <div className="relative  w-full  p-8">
         <div className="container mx-auto flex flex-col lg:flex-row items-center lg:items-start lg:justify-between">
           {/* Profile Content */}
           <div className="flex-grow order-3 lg:order-none lg:mr-8">
@@ -39,35 +39,37 @@ export const ProfilePage: React.FC = () => {
               </div>
             </div>
             {/* Profile Name */}
-            <h2 className="text-2xl font-bold mb-4 lg:mb-6">Animakid</h2>
+            <h2 className="text-2xl font-bold text-[#171717] mb-4 lg:mb-6">
+              Animakid
+            </h2>
 
             {/* Stats */}
             <div className="flex justify-start space-x-8 mb-6">
               <div className="text-left">
-                <span className="text-xl font-bold">250k+</span>
-                <p className="text-sm text-gray-400">Cards</p>
+                <span className="text-xl text-[#262626] font-bold">250k+</span>
+                <p className="text-sm text-[#525252]">Cards</p>
               </div>
               <div className="text-left">
-                <span className="text-xl font-bold">50+</span>
-                <p className="text-sm text-gray-400">Special Cards</p>
+                <span className="text-xl text-[#262626] font-bold">50+</span>
+                <p className="text-sm text-[#525252]">Special Cards</p>
               </div>
               <div className="text-left">
-                <span className="text-xl font-bold">3000+</span>
-                <p className="text-sm text-gray-400">Followers</p>
+                <span className="text-xl text-[#262626] font-bold">3000+</span>
+                <p className="text-sm text-[#525252]">Followers</p>
               </div>
             </div>
 
             {/* Bio */}
             <div className="text-left mb-6">
-              <h3 className="text-lg font-bold text-[#858584] mb-2">Bio</h3>
-              <p className="text-gray-300">
+              <h3 className="text-lg font-bold text-[#171717] mb-2">Bio</h3>
+              <p className="text-[#525252]">
                 The Internet's Friendliest Designer Kid.
               </p>
             </div>
 
             {/* Links */}
             <div>
-              <h3 className="text-lg font-bold text-[#858584] mb-2">Links</h3>
+              <h3 className="text-lg font-bold text-[#525252] mb-2">Links</h3>
               <div className="flex justify-start space-x-6 text-2xl">
                 <a
                   href="https://example.com"

@@ -1,18 +1,12 @@
-import type React from 'react';
-import {
-  FaDiscord,
-  FaInstagram,
-  FaStore,
-  FaTwitter,
-  FaYoutube,
-} from 'react-icons/fa';
+import type React from "react";
+import {FaDiscord, FaInstagram, FaTwitter, FaYoutube} from "react-icons/fa";
 
 export const Footer: React.FC = () => {
   const socialLinks = [
-    { icon: <FaDiscord className="h-5 w-5" />, href: '#' },
-    { icon: <FaYoutube className="h-5 w-5" />, href: '#' },
-    { icon: <FaTwitter className="h-5 w-5" />, href: '#' },
-    { icon: <FaInstagram className="h-5 w-5" />, href: '#' },
+    {icon: <FaDiscord className="h-5 w-5" />, href: "#"},
+    {icon: <FaYoutube className="h-5 w-5" />, href: "#"},
+    {icon: <FaTwitter className="h-5 w-5" />, href: "#"},
+    {icon: <FaInstagram className="h-5 w-5" />, href: "#"},
   ];
 
   return (
@@ -22,8 +16,12 @@ export const Footer: React.FC = () => {
         <div className="grid gap-4 text-center md:text-left">
           {/* Logo */}
           <div className="flex items-center justify-center md:justify-start gap-2">
-            <a className="btn btn-ghost text-xl flex items-center font-bold text-white">
-              <FaStore size={24} color="#A259FF" className="mr-2" />
+            <a className="btn btn-ghost text-xl flex lg:ml-3">
+              <img
+                src="/src/assets/img/LOGO.png"
+                alt="Ngaraga Logo"
+                className="w-8 h-8 mr-2"
+              />
               Ngaraga
             </a>
           </div>

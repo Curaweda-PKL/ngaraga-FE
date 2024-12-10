@@ -1,6 +1,5 @@
-import type React from "react";
 import {useState} from "react";
-import {FaBars, FaStore, FaTimes, FaUserFriends} from "react-icons/fa";
+import {FaBars, FaTimes, FaUserFriends} from "react-icons/fa";
 import {useNavigate} from "react-router-dom";
 
 export const Navbar: React.FC = () => {
@@ -19,7 +18,7 @@ export const Navbar: React.FC = () => {
   return (
     <>
       {/* Main Navbar */}
-      <div className="navbar text-white relative">
+      <div className="navbar text-[#262626] relative">
         {/* Navbar start */}
         <div className="navbar-start flex items-center mt-3">
           {/* Hamburger menu for small screens */}
@@ -36,14 +35,14 @@ export const Navbar: React.FC = () => {
           {/* Logo button */}
           <a
             className="btn btn-ghost text-xl flex lg:ml-3"
-            onClick={() => navigateToPage("/")}
+            onClick={() => navigate("/")}
           >
             <img
               src="/src/assets/img/LOGO.png"
               alt="Ngaraga Logo"
               className="w-8 h-8 mr-2"
             />
-            Ngaraga
+            NGARAGA
           </a>
         </div>
 
@@ -65,7 +64,14 @@ export const Navbar: React.FC = () => {
             onClick={() => navigateToPage("register")}
           >
             <FaUserFriends />
-            Sign up
+            Sign In
+          </a>
+          <a
+            className="btn bg-call-to-action border-transparent rounded-lg text-white items-center gap-2 sm:mr-0 md:mr-0 lg:mr-10 hidden lg:flex"
+            onClick={() => navigateToPage("login")}
+          >
+            <FaUserFriends />
+            Sign Up
           </a>
         </div>
       </div>
@@ -116,7 +122,14 @@ export const Navbar: React.FC = () => {
               onClick={() => navigateToPage("register")}
             >
               <FaUserFriends />
-              Sign up
+              Sign In
+            </a>
+            <a
+              className="flex items-center gap-2"
+              onClick={() => navigateToPage("register")}
+            >
+              <FaUserFriends />
+              Sign Up
             </a>
           </li>
         </ul>

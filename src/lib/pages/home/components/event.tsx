@@ -1,10 +1,30 @@
-import React from "react";
+import React, {useState, useEffect} from "react";
 import mushroom from "../../../../assets/img/mushroom.png";
 
 export const Event: React.FC = () => {
+  const [timeRemaining, setTimeRemaining] = useState(3600); // 1 jam dalam detik
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTimeRemaining((prevTime) => prevTime - 1);
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const formatTime = (seconds: number) => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const remainingSeconds = seconds % 60;
+
+    return `${hours.toString().padStart(2, "0")}:${minutes
+      .toString()
+      .padStart(2, "0")}:${remainingSeconds.toString().padStart(2, "0")}`;
+  };
+
   return (
     <div
-      className="relative flex justify-center items-end self-stretch h-screen"
+      className="relative mt-24 flex justify-center items-end self-stretch h-screen"
       style={{
         backgroundImage: `linear-gradient(180deg, rgba(162, 89, 255, 0.00) 0%, #A259FF 100%), url(${mushroom})`,
         backgroundSize: "cover",
@@ -64,11 +84,7 @@ export const Event: React.FC = () => {
               lineHeight: "1.4",
             }}
           >
-            <span>59</span>
-            <span>:</span>
-            <span>59</span>
-            <span>:</span>
-            <span>59</span>
+            <span>{formatTime(timeRemaining)}</span>
           </div>
         </div>
       </div>

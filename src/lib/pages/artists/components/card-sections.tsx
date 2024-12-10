@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import {useState} from "react";
 
 const cardData = [
   {
@@ -40,30 +40,30 @@ export const CardContentSection = () => {
   const currentData = activeTab === "cards" ? cardData : specialCardData;
 
   return (
-    <div className="w-full bg-[#2B2B2B] text-white py-12">
+    <div className="w-full py-12">
       {/* Tabs */}
       <div className="flex justify-center space-x-8 border-b border-gray-700 pb-4 mb-8">
         <button
           className={`text-lg font-semibold ${
             activeTab === "cards"
-              ? "text-white border-b-2 border-purple-500"
+              ? "text-[#A3A3A3] border-b-2 border-purple-500"
               : "text-gray-400"
           }`}
           onClick={() => setActiveTab("cards")}
         >
           Card{" "}
-          <span className="text-sm text-gray-500">({cardData.length})</span>
+          <span className="text-sm text-[#A3A3A3]">({cardData.length})</span>
         </button>
         <button
           className={`text-lg font-semibold ${
             activeTab === "specialCards"
-              ? "text-white border-b-2 border-purple-500"
+              ? "text-[#A3A3A3] border-b-2 border-purple-500"
               : "text-gray-400"
           }`}
           onClick={() => setActiveTab("specialCards")}
         >
           Special Card{" "}
-          <span className="text-sm text-gray-500">
+          <span className="text-sm text-[#A3A3A3]">
             ({specialCardData.length})
           </span>
         </button>
@@ -74,7 +74,7 @@ export const CardContentSection = () => {
         {currentData.map((card) => (
           <div
             key={card.id}
-            className="w-full flex flex-col items-start gap-4 bg-[#3B3B3B] rounded-2xl shadow-xl transition-transform hover:scale-[1.02]"
+            className="w-full flex flex-col items-start gap-4 bg-[#F2F2F2] rounded-2xl shadow-xl transition-transform hover:scale-[1.02]"
           >
             <figure className="w-full rounded-t-2xl overflow-hidden">
               {card.image ? (
@@ -88,13 +88,13 @@ export const CardContentSection = () => {
               )}
             </figure>
             <div className="p-6 flex flex-col items-start gap-2 w-full">
-              <h3 className="text-2xl font-bold text-white font-[Poppins]">
+              <h3 className="text-2xl font-bold text-[#171717] font-[Poppins]">
                 {card.title}
               </h3>
-              <span className="text-base text-[#808080] font-[Nunito]">
+              <span className="text-base text-[#404040] font-[Nunito]">
                 {card.creator}
               </span>
-              <span className="text-base text-[#808080] font-[Nunito]">
+              <span className="text-base text-[#404040] font-[Nunito]">
                 {card.price}
               </span>
             </div>

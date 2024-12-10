@@ -1,21 +1,21 @@
-import { BrowseCategories } from './components/browse-categories';
-import { DiscoverMoreCards } from './components/discover-mores';
-import { HowItWorks } from './components/find-out';
-import { HeroFrame } from './components/hero-section';
-import { CollectorCards } from './components/top-collectors';
-import { TrendingCards } from './components/trending-cards';
-import { WeeklyUpdateForm } from './components/weekly-update';
-import { Event } from './components/event';
+import {BrowseCategories} from "./components/browse-categories";
+import {DiscoverMoreCards} from "./components/discover-mores";
+import {HowItWorks} from "./components/Find-Out";
+import {HeroFrame} from "./components/hero-section";
+import {CollectorCards} from "./components/top-collectors";
+import {TrendingCards} from "./components/trending-cards";
+import {WeeklyUpdateForm} from "./components/weekly-update";
+import {Event} from "./components/event";
 
 const Home = () => {
   return (
-    <div className="text-white">
+    <div className="text-[#262626]">
       <HeroFrame />
       <TrendingCards />
       <CollectorCards />
       <BrowseCategories />
       <DiscoverMoreCards />
-      <Event/>
+      <Event />
       <HowItWorks />
       <WeeklyUpdateForm />
     </div>

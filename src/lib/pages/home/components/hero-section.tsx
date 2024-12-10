@@ -1,16 +1,16 @@
-import heroImage from '@/assets/img/astroheropng.png';
-import { RiRocketFill } from 'react-icons/ri';
+import heroImage from "@/assets/img/astroheropng.png";
+import {RiRocketFill} from "react-icons/ri";
 
 export const HeroFrame = () => {
   return (
-    <div className="flex items-center justify-center min-h-screen text-white p-8">
+    <div className="flex items-center justify-center min-h-screen p-8">
       <div className="flex flex-col lg:flex-row items-center bg-transparent border border-transparent gap-8 max-w-6xl w-full rounded-2xl overflow-hidden">
         {/* Left Section (Hero Section) */}
         <div className="flex flex-col items-center lg:items-start gap-8 w-full lg:w-1/2 p-8">
-          <h1 className="text-6xl font-bold text-center lg:text-left font-[Poppins]">
+          <h1 className="text-6xl font-bold text-[#171717] text-center lg:text-left font-[Poppins]">
             Discover Digital Art & Collect NFTs
           </h1>
-          <p className="text-2xl leading-relaxed text-center lg:text-left ">
+          <p className="text-2xl text-[#404040] leading-relaxed text-center lg:text-left ">
             NFT Marketplace UI Created With Anima For Figma. Collect, Buy, and
             Sell Art From More Than 20k NFT Artists.
           </p>
@@ -21,21 +21,21 @@ export const HeroFrame = () => {
           <div className="flex gap-8 justify-center lg:justify-start">
             <div className="text-center">
               <h3 className="text-3xl font-bold font-[Poppins]">
-                <span className="font-mono">240k+</span>
+                <span className="text-[#404040] font-mono">240k+</span>
               </h3>
-              <p className="text-[#808080] font-[Nunito]">Cards</p>
+              <p className="text-[#404040] font-[Nunito]">Cards</p>
             </div>
             <div className="text-center">
               <h3 className="text-3xl font-bold font-[Poppins]">
-                <span className="font-mono">100k+</span>
+                <span className="text-[#404040] font-mono">100k+</span>
               </h3>
-              <p className="text-[#808080] font-[Nunito]">Collectors</p>
+              <p className="text-[#404040] font-[Nunito]">Collectors</p>
             </div>
             <div className="text-center">
               <h3 className="text-3xl font-bold font-[Poppins]">
-                <span className="font-mono">240k+</span>
+                <span className="text-[#404040] font-mono">240k+</span>
               </h3>
-              <p className="text-[#808080] font-[Nunito]">Categories</p>
+              <p className="text-[#404040] font-[Nunito]">Categories</p>
             </div>
           </div>
         </div>
@@ -50,10 +50,10 @@ export const HeroFrame = () => {
             />
           </figure>
           <div className="flex flex-col items-start gap-4 p-6">
-            <h2 className="text-3xl font-semibold text-white font-[Poppins]">
+            <h2 className="text-3xl font-semibold text-[#171717] font-[Poppins]">
               Space Walking
             </h2>
-            <span className="text-[#808080] font-[Nunito]">Animakid</span>
+            <span className="text-[#171717] font-[Nunito]">Animakid</span>
           </div>
         </div>
       </div>

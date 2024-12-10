@@ -1,13 +1,13 @@
-import type { ReactNode } from 'react';
-import { Footer } from './components/footer';
-import { Meta } from './components/meta';
-import { Navbar } from './components/nav-user';
+import type {ReactNode} from "react";
+import {Footer} from "./components/footer";
+import {Meta} from "./components/meta";
+import {Navbar} from "./components/nav-user";
 
 type LayoutProps = {
   children: ReactNode;
 };
 
-export const Layout = ({ children }: LayoutProps) => {
+export const Layout = ({children}: LayoutProps) => {
   return (
     <div className="flex flex-col min-h-screen w-full overflow-hidden">
       {/* Meta tags for SEO */}

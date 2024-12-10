@@ -2,37 +2,37 @@ export const DiscoverMoreCards = () => {
   const discoverData = [
     {
       id: 1,
-      title: 'Distant Galaxy',
-      creator: 'MoonDancer',
-      image: '/src/assets/img/Distant-Galaxy.png',
-      price: 'Rp. 200.000',
+      title: "Distant Galaxy",
+      creator: "MoonDancer",
+      image: "/src/assets/img/Distant-Galaxy.png",
+      price: "Rp. 200.000",
     },
     {
       id: 2,
-      title: 'Life On Edena',
-      creator: 'NebulaKid',
-      image: '/src/assets/img/LifeonEdena.png',
-      price: 'Rp. 300.000',
+      title: "Life On Edena",
+      creator: "NebulaKid",
+      image: "/src/assets/img/LifeonEdena.png",
+      price: "Rp. 300.000",
     },
     {
       id: 3,
-      title: 'AstroFiction',
-      creator: 'Spaceone',
-      image: '/src/assets/img/AstroFiction.png',
-      price: 'Rp. 200.000',
+      title: "AstroFiction",
+      creator: "Spaceone",
+      image: "/src/assets/img/AstroFiction.png",
+      price: "Rp. 200.000",
     },
   ];
 
   return (
-    <div className="flex items-center justify-center bg-[#2B2B2B] text-white pt-24">
+    <div className="flex items-center justify-center bg-background-primary pt-24">
       <div className="max-w-6xl w-full">
         {/* Text Section */}
         <div className="flex items-center justify-between w-full px-8 mb-8">
           <div className="flex flex-col items-start gap-4">
-            <h2 className="text-4xl font-bold font-[Poppins]">
+            <h2 className="text-[#171717] text-4xl font-bold font-[Poppins]">
               Discover More Cards
             </h2>
-            <p className="text-2xl text-[#808080] font-[Nunito]">
+            <p className="text-2xl text-[#404040] font-[Nunito]">
               Explore New Trending Cards
             </p>
           </div>
@@ -46,7 +46,7 @@ export const DiscoverMoreCards = () => {
           {discoverData.map((card) => (
             <div
               key={card.id}
-              className="w-full flex flex-col items-start gap-4 bg-[#3B3B3B] rounded-2xl shadow-xl transition-transform hover:scale-[1.02]"
+              className="w-full flex flex-col items-start gap-4 bg-[#F2F2F2] rounded-2xl shadow-xl transition-transform hover:scale-[1.02]"
             >
               <figure className="w-full rounded-t-2xl overflow-hidden">
                 {card.image ? (
@@ -60,13 +60,13 @@ export const DiscoverMoreCards = () => {
                 )}
               </figure>
               <div className="p-6 flex flex-col items-start gap-2 w-full">
-                <h3 className="text-2xl font-bold text-white font-[Poppins]">
+                <h3 className="text-2xl font-bold text-[#262626] font-[Poppins]">
                   {card.title}
                 </h3>
-                <span className="text-base text-[#808080] font-[Nunito]">
+                <span className="text-base text-[#404040] font-[Nunito]">
                   {card.creator}
                 </span>
-                <span className="text-base text-[#808080] font-[Nunito]">
+                <span className="text-base text-[#262626] font-[Nunito]">
                   {card.price}
                 </span>
               </div>

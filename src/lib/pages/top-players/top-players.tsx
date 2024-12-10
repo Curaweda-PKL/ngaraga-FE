@@ -130,81 +130,48 @@ const TopCollectors: React.FC = () => {
   const collectors = getCollectors();
 
   return (
-    <div className="text-white px-20 py-16 rounded-lg min-h-screen w-screen">
-      <h1 className="text-2xl font-bold">Top Collectors</h1>
-      <p className="text-gray-400 mt-2">
+    <div className="px-20 py-16 rounded-lg min-h-screen w-screen">
+      <h1 className="text-2xl text-[#171717] font-bold">Top Collectors</h1>
+      <p className="text-[#404040] mt-2">
         Check out top ranking Card Collectors on the Card Marketplace.
       </p>
 
-      <div className="mt-6">
-        <div className="flex justify-between border-b border-gray-700 pb-2">
-          <button
-            className={`text-white border-b-2 ${
-              activeTab === "Today" ? "border-white" : "border-transparent"
-            } pb-1`}
-            onClick={() => handleTabClick("Today")}
-          >
-            Today
-          </button>
-          <button
-            className={`text-gray-400 ${
-              activeTab === "This Week" ? "border-b-2 border-white pb-1" : ""
-            }`}
-            onClick={() => handleTabClick("This Week")}
-          >
-            This Week
-          </button>
-          <button
-            className={`text-gray-400 ${
-              activeTab === "This Month" ? "border-b-2 border-white pb-1" : ""
-            }`}
-            onClick={() => handleTabClick("This Month")}
-          >
-            This Month
-          </button>
-          <button
-            className={`text-gray-400 ${
-              activeTab === "All Time" ? "border-b-2 border-white pb-1" : ""
-            }`}
-            onClick={() => handleTabClick("All Time")}
-          >
-            All Time
-          </button>
-        </div>
-
-        <div className="mt-4">
-          <div className="grid grid-cols-5 text-gray-400 border-2 border-background-secondary rounded-xl bg text-sm py-2">
-            <div className="flex items-center">
-              <span className="ml-4">#</span>
-              <span>Collector</span>
-            </div>
-            <div className="text-right">Card</div>
-            <div className="text-right">Special Card</div>
-            <div className="text-right">Follower</div>
+      <div className="mt-6 ">
+        <div className="grid text-[#404040] grid-cols-5 border-2 bg-[#D4D4D4] border-background-secondary rounded-xl bg text-sm py-2">
+          <div className="flex items-center">
+            <span className="ml-4">#</span>
+            <span>Collector</span>
           </div>
-
-          {collectors.map((collector, index) => (
-            <div
-              key={collector.id}
-              className="grid grid-cols-5 items-center bg-background-secondary p-4 rounded-lg mt-4"
-            >
-              <div className="flex items-center">
-                <span className="mr-2">{index + 1}</span>
-                <div className="flex items-center">
-                  <img
-                    src={collector.avatar}
-                    alt="Avatar"
-                    className="w-8 h-8 rounded-full mr-3"
-                  />
-                  {collector.name}
-                </div>
-              </div>
-              <div className="text-right text-green-400">{collector.card}</div>
-              <div className="text-right">{collector.specialCard}</div>
-              <div className="text-right">{collector.followers}</div>
-            </div>
-          ))}
+          <div className="text-right">Card</div>
+          <div className="text-right">Special Card</div>
+          <div className="text-right">Follower</div>
         </div>
+
+        {collectors.map((collector, index) => (
+          <div
+            key={collector.id}
+            className="grid grid-cols-5 items-center border-2 p-4 rounded-lg mt-4"
+          >
+            <div className="flex text-[#262626] items-center">
+              <span className="mr-2">{index + 1}</span>
+              <div className="flex items-center">
+                <img
+                  src={collector.avatar}
+                  alt="Avatar"
+                  className="w-8 h-8 rounded-full mr-3"
+                />
+                {collector.name}
+              </div>
+            </div>
+            <div className="text-right text-green-400">{collector.card}</div>
+            <div className="text-right text-[#171717]">
+              {collector.specialCard}
+            </div>
+            <div className="text-right text-[#171717]">
+              {collector.followers}
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
