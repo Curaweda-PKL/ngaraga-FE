@@ -1,12 +1,7 @@
 import React, {useState} from "react";
 
 const TopCollectors: React.FC = () => {
-  const [activeTab, setActiveTab] = useState("Today");
-
-  const handleTabClick = (tab: string) => {
-    setActiveTab(tab);
-  };
-
+  const [activeTab] = useState("Today");
   const todayCollectors = [
     {
       id: 1,
