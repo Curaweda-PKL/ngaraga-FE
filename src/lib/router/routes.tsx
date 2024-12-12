@@ -12,6 +12,7 @@ const TopCollectors = React.lazy(
   () => import("@/lib/pages/top-players/top-players")
 );
 const Detail = React.lazy(() => import("@/lib/pages/detail-card/detail-index"));
+const Cart = React.lazy(() => import("@/lib/pages/cart/mycart"));
 
 export const routes: Array<PathRouteProps> = [
   {
@@ -41,6 +42,10 @@ export const routes: Array<PathRouteProps> = [
   {
     path: "/detail",
     element: <Detail />,
+  },
+  {
+    path: "/cart",
+    element: <Cart />,
   },
 ];
 
