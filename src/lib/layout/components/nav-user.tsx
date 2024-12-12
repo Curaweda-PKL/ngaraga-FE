@@ -73,10 +73,10 @@ export const Navbar: React.FC = () => {
 
           {/* Sign-in and Sign-up buttons */}
           <a
-            className="btn bg-call-to-action border-transparent rounded-lg text-white ml-4 items-center gap-2 sm:mr-0 md:mr-0 lg:mr-4 hidden lg:flex"
+            className="btn bg-white border-call-to-action rounded-lg text-yellow-300 ml-4 items-center gap-2 sm:mr-0 md:mr-0 lg:mr-4 hidden lg:flex"
             onClick={() => navigateToPage("login")}
           >
-            <FaUserFriends />
+   
             Sign In
           </a>
           <a

@@ -95,7 +95,7 @@ export const CardContentSection = () => {
                 {card.creator}
               </span>
               <span className="text-base text-[#404040] font-[Nunito]">
-                {card.price}
+                  {card.price}
               </span>
             </div>
           </div>

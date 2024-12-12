@@ -81,7 +81,7 @@ export const Footer: React.FC = () => {
               placeholder="Enter your email here"
               className="flex-1 px-4 py-3 text-sm bg-white text-gray-500 outline-none"
             />
-            <button className="bg-[#A259FF] px-6 py-3 text-sm text-white transition-colors hover:bg-[#8839FF]">
+            <button className="bg-call-to-action px-6 py-3 text-sm text-white transition-colors hover:bg-[#8839FF]">
               Subscribe
             </button>
           </div>

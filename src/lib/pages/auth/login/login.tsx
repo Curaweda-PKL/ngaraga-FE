@@ -2,9 +2,9 @@ import space from '@/assets/img/spacestarry.png';
 
 const Login = () => {
   return (
-    <div className="flex h-screen bg-[#2B2B2B]">
+    <div className="flex h-screen  ">
       {/* Left Section - Image */}
-      <div className="hidden md:flex flex-1 justify-center items-center">
+      <div className="hidden md:flex flex-1 ">
         <img
           src={space}
           alt="Decorative"
@@ -15,10 +15,10 @@ const Login = () => {
       {/* Right Section - Login Form */}
       <div className="flex-1 flex justify-center my-32 md:mr-28 px-4 sm:px-0">
         <div className="bg-transparent rounded-lg p-8 w-full max-w-md">
-          <h1 className="text-3xl sm:text-5xl text-white font-bold mb-6 text-center">
+          <h1 className="text-3xl sm:text-5xl text-black font-bold mb-6 text-center">
             Create Account
           </h1>
-          <p className="text-white mb-6 text-base sm:text-xl">
+          <p className="text-black mb-6 text-base sm:text-xl">
             Welcome! Enter Your Details And Start Creating, Collecting Cards
           </p>
           <form>
@@ -40,7 +40,7 @@ const Login = () => {
             </div>
             <button
               type="submit"
-              className="bg-indigo-500 hover:bg-indigo-600 text-white font-medium py-2 px-4 rounded-full w-full"
+              className="bg-yellow-500 hover:bg-indigo-600 text-white font-medium py-2 px-4 rounded-full w-full"
             >
               Create account
             </button>
