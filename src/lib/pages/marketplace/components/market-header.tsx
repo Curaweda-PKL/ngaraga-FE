@@ -5,8 +5,10 @@ export const MarketHeader: React.FC = () => {
     <div className="flex flex-col items-center gap-10 bg-background-color w-full max-w-[1280px] px-5 py-20 mx-auto">
       {/* Title and Subtitle */}
       <div className="text-center">
-        <h1 className="text-4xl font-bold text-white">Browse Marketplace</h1>
-        <p className="mt-2 text-lg text-gray-400">
+        <h1 className="text-4xl font-bold text-[#171717]">
+          Browse Marketplace
+        </h1>
+        <p className="mt-2 text-lg text-[#404040]">
           Browse through more than 50k Cards on the Card Marketplace.
         </p>
       </div>
@@ -16,7 +18,7 @@ export const MarketHeader: React.FC = () => {
         <input
           type="text"
           placeholder="Search your favourite NFTs"
-          className="w-full rounded-full  text-gray-200 py-3 px-5 pl-5 pr-14 outline-none placeholder-gray-500"
+          className="w-full rounded-full bg-white text-[#404040] border-2 py-3 px-5 pl-5 pr-14 outline-none placeholder-gray-500"
         />
         <button
           type="button"
@@ -41,4 +43,3 @@ export const MarketHeader: React.FC = () => {
     </div>
   );
 };
-

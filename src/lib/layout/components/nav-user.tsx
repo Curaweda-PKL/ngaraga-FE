@@ -1,5 +1,5 @@
 import {useState} from "react";
-import {FaBars, FaTimes, FaUserFriends} from "react-icons/fa";
+import {FaBars, FaTimes, FaUserFriends, FaShoppingCart} from "react-icons/fa";
 import {useNavigate} from "react-router-dom";
 
 export const Navbar: React.FC = () => {
@@ -34,7 +34,7 @@ export const Navbar: React.FC = () => {
 
           {/* Logo button */}
           <a
-            className="btn btn-ghost text-xl flex lg:ml-3"
+            className="btn btn-ghost text-xl flex"
             onClick={() => navigate("/")}
           >
             <img
@@ -46,29 +46,42 @@ export const Navbar: React.FC = () => {
           </a>
         </div>
 
-        {/* Navbar end */}
-        <div className="navbar-end flex items-center">
-          {/* Menu for larger screens */}
-          <ul className="hidden lg:flex menu menu-horizontal px-1 mr-4 gap-4">
+        {/* Navbar center */}
+        <div className="navbar-center hidden lg:flex">
+          <ul className="menu menu-horizontal px-1 gap-8">
             <li>
               <a onClick={() => navigateToPage("marketplace")}>Marketplace</a>
             </li>
             <li>
               <a onClick={() => navigateToPage("rankings")}>Rankings</a>
             </li>
+            <li>
+              <a onClick={() => navigateToPage("events")}>Events</a>
+            </li>
           </ul>
+        </div>
 
-          {/* Sign-up button for desktop */}
+        {/* Navbar end */}
+        <div className="navbar-end flex items-center">
+          {/* Cart Icon */}
           <a
-            className="btn bg-call-to-action border-transparent rounded-lg text-white ml-4 items-center gap-2 sm:mr-0 md:mr-0 lg:mr-10 hidden lg:flex"
-            onClick={() => navigateToPage("register")}
+            className="mr-4 cursor-pointer"
+            onClick={() => navigateToPage("cart")}
+          >
+            <FaShoppingCart />
+          </a>
+
+          {/* Sign-in and Sign-up buttons */}
+          <a
+            className="btn bg-call-to-action border-transparent rounded-lg text-white ml-4 items-center gap-2 sm:mr-0 md:mr-0 lg:mr-4 hidden lg:flex"
+            onClick={() => navigateToPage("login")}
           >
             <FaUserFriends />
             Sign In
           </a>
           <a
-            className="btn bg-call-to-action border-transparent rounded-lg text-white items-center gap-2 sm:mr-0 md:mr-0 lg:mr-10 hidden lg:flex"
-            onClick={() => navigateToPage("login")}
+            className="btn bg-call-to-action border-transparent rounded-lg text-white items-center gap-2 sm:mr-0 md:mr-0 lg:mr-10 lg:flex"
+            onClick={() => navigateToPage("register")}
           >
             <FaUserFriends />
             Sign Up
@@ -87,9 +100,9 @@ export const Navbar: React.FC = () => {
             <img
               src="/src/assets/img/LOGO.png"
               alt="Ngaraga Logo"
-              className="w-8 h-8 mr-2"
+              className="w-4 h-4"
             />
-            Ngaraga
+            NGARAGA
           </div>
           <button
             onClick={toggleSidebar}
@@ -118,8 +131,16 @@ export const Navbar: React.FC = () => {
           </li>
           <li>
             <a
+              className="flex items-center"
+              onClick={() => navigateToPage("events")}
+            >
+              Events
+            </a>
+          </li>
+          <li>
+            <a
               className="flex items-center gap-2"
-              onClick={() => navigateToPage("register")}
+              onClick={() => navigateToPage("login")}
             >
               <FaUserFriends />
               Sign In
