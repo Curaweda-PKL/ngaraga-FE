@@ -11,97 +11,25 @@ export const CollectorCards = () => {
       rank: 1,
     },
     {
-      id: 2,
-      username: "Vegetta",
+      id: 1,
+      username: "Kakarotto",
       avatar:
         "https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg",
       totalCards: 25,
-      rank: 2,
-    },
-    {
-      id: 3,
-      username: "Trunks",
+      rank: 1,
+    },    {
+      id: 1,
+      username: "Kakarotto",
       avatar:
         "https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg",
       totalCards: 25,
-      rank: 3,
+      rank: 1,
     },
-    {
-      id: 4,
-      username: "Frieza",
-      avatar:
-        "https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg",
-      totalCards: 25,
-      rank: 12,
-    },
-    {
-      id: 5,
-      username: "Gohan",
-      avatar:
-        "https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg",
-      totalCards: 25,
-      rank: 5,
-    },
-    {
-      id: 6,
-      username: "Goten",
-      avatar:
-        "https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg",
-      totalCards: 25,
-      rank: 6,
-    },
-    {
-      id: 7,
-      username: "Krilin",
-      avatar:
-        "https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg",
-      totalCards: 25,
-      rank: 7,
-    },
-    {
-      id: 8,
-      username: "Bulma",
-      avatar:
-        "https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg",
-      totalCards: 25,
-      rank: 8,
-    },
-    {
-      id: 9,
-      username: "Chi-Chi",
-      avatar:
-        "https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg",
-      totalCards: 25,
-      rank: 9,
-    },
-    {
-      id: 10,
-      username: "Piccolo",
-      avatar:
-        "https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg",
-      totalCards: 25,
-      rank: 10,
-    },
-    {
-      id: 11,
-      username: "Android 17",
-      avatar:
-        "https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg",
-      totalCards: 25,
-      rank: 11,
-    },
-    {
-      id: 12,
-      username: "Android 18",
-      avatar:
-        "https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg",
-      totalCards: 25,
-      rank: 12,
-    },
+
   ];
 
   return (
-    <div className="flex items-center justify-center p-8 m-10">
+    <div className="flex items-center justify-center m-10">
       <div className="flex flex-col items-center bg-transparent border border-transparent gap-8 max-w-6xl w-full rounded-xl overflow-hidden">
         {/* Header Section */}
         <div className="flex flex-col lg:flex-row items-center lg:items-start gap-8 w-full p-8 justify-between">
@@ -122,7 +50,7 @@ export const CollectorCards = () => {
         </div>
 
         {/* Cards Section */}
-        <div className="grid gap-8 md:grid-cols-4 w-full px-12">
+        <div className="grid gap-8 md:grid-cols-4 w-full lg:ml-20 ml-20 ">
           {trendingData.map((card) => (
             <div
               key={card.id}

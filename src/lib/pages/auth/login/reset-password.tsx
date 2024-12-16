@@ -1,15 +1,17 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { FaEnvelope } from "react-icons/fa";
+import { FaLock } from "react-icons/fa";
 import ForgotPasswordImage from "@/assets/img/spacestarry.png";
 
-type ForgotPasswordFormData = {
-  email: string;
+type ResetPasswordFormData = {
+  newPassword: string;
+  confirmNewPassword: string;
 };
 
-const ForgotPassword: React.FC = () => {
-  const [formData, setFormData] = useState<ForgotPasswordFormData>({
-    email: "",
+const ResetPassword: React.FC = () => {
+  const [formData, setFormData] = useState<ResetPasswordFormData>({
+    newPassword: "",
+    confirmNewPassword: "",
   });
   const [error, setError] = useState<{ [key: string]: string }>({});
   const [loading, setLoading] = useState<boolean>(false);
@@ -32,9 +34,15 @@ const ForgotPassword: React.FC = () => {
     let valid = true;
     const newError: { [key: string]: string } = {};
 
-    // Email validation
-    if (!formData.email) {
-      newError.email = "Email cannot be empty!";
+    // New password validation
+    if (!formData.newPassword) {
+      newError.newPassword = "New password cannot be empty!";
+      valid = false;
+    }
+
+    // Confirm new password validation
+    if (formData.newPassword !== formData.confirmNewPassword) {
+      newError.confirmNewPassword = "Passwords do not match!";
       valid = false;
     }
 
@@ -54,7 +62,7 @@ const ForgotPassword: React.FC = () => {
 
     setTimeout(() => {
       setLoading(false);
-      alert("Reset instructions sent to your email!");
+      alert("Password has been successfully reset!");
     }, 1000);
   };
 
@@ -78,7 +86,7 @@ const ForgotPassword: React.FC = () => {
       <div className="lg:grid lg:min-h-screen lg:grid-cols-12">
         <section className="relative flex h-32 items-end bg-gray-900 lg:col-span-5 lg:h-full xl:col-span-6">
           <img
-            alt="forgot-password"
+            alt="reset-password"
             src={ForgotPasswordImage}
             loading="lazy"
             className="absolute inset-0 h-full w-full object-cover opacity-80"
@@ -99,41 +107,62 @@ const ForgotPassword: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4, duration: 0.7 }}
             >
-              {/* Title and Description */}
+              {/* Title */}
               <div className="col-span-6 text-center">
                 <h2 className="text-3xl font-bold text-gray-800 mb-4">
-                  Forgot Password
+                  Reset your password
                 </h2>
-                <p className="text-lg text-gray-500 ">
-                  Enter your email to receive instructions to reset your
-                  password.
-                </p>
               </div>
 
-              {/* Email */}
+              {/* New Password */}
               <div className="col-span-6 relative">
                 <div
                   className={`mt-1 flex items-center border rounded-md bg-white py-3 px-4 shadow-sm ${
-                    error.email
+                    error.newPassword
                       ? "border-[#D22424]"
                       : "focus-within:border-[var(--typing)]"
                   }`}
                 >
-                  <FaEnvelope className="text-gray-500 mr-2 text-sm" />
+                  <FaLock className="text-gray-500 mr-2 text-sm" />
                   <input
-                    type="email"
-                    id="Email"
-                    name="email"
-                    value={formData.email}
+                    type="password"
+                    id="newPassword"
+                    name="newPassword"
+                    value={formData.newPassword}
                     onChange={handleChange}
-                    placeholder="Email"
+                    placeholder="New Password"
                     className="w-full border-none bg-transparent text-lg text-gray-500 focus:outline-none focus:ring-0"
-                    autoComplete="email"
                     required
                   />
                 </div>
-                {error.email && (
-                  <p className="text-[#D22424] text-sm">{error.email}</p>
+                {error.newPassword && (
+                  <p className="text-[#D22424] text-sm">{error.newPassword}</p>
+                )}
+              </div>
+
+              {/* Confirm New Password */}
+              <div className="col-span-6 relative">
+                <div
+                  className={`mt-1 flex items-center border rounded-md bg-white py-3 px-4 shadow-sm ${
+                    error.confirmNewPassword
+                      ? "border-[#D22424]"
+                      : "focus-within:border-[var(--typing)]"
+                  }`}
+                >
+                  <FaLock className="text-gray-500 mr-2 text-sm" />
+                  <input
+                    type="password"
+                    id="confirmNewPassword"
+                    name="confirmNewPassword"
+                    value={formData.confirmNewPassword}
+                    onChange={handleChange}
+                    placeholder="Confirm New Password"
+                    className="w-full border-none bg-transparent text-lg text-gray-500 focus:outline-none focus:ring-0"
+                    required
+                  />
+                </div>
+                {error.confirmNewPassword && (
+                  <p className="text-[#D22424] text-sm">{error.confirmNewPassword}</p>
                 )}
               </div>
 
@@ -144,7 +173,7 @@ const ForgotPassword: React.FC = () => {
                   className="w-full inline-block shrink-0 rounded-md bg-call-to-action px-12 py-3 text-lg font-semibold text-white transition-all duration-200 ease-in-out hover:bg-orange-500 hover:text-white focus:outline-none focus:ring focus:ring-blue-600"
                   disabled={loading}
                 >
-                  {loading ? "Sending..." : "Send Reset Instructions"}
+                  {loading ? "Resetting..." : "Reset Password"}
                 </button>
               </div>
             </motion.form>
@@ -155,4 +184,4 @@ const ForgotPassword: React.FC = () => {
   );
 };
 
-export default ForgotPassword;
+export default ResetPassword;

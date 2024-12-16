@@ -36,13 +36,14 @@ export const DiscoverMoreCards = () => {
               Explore New Trending Cards
             </p>
           </div>
-          <button className="bg-[#A259FF] text-white px-4 py-2 rounded-md hover:bg-[#8c44e6] transition-colors font-[Poppins]">
+          {/* Button for Large Screens */}
+          <button className="hidden lg:block bg-call-to-action text-white px-4 py-2 rounded-md hover:bg-[#8c44e6] transition-colors font-[Poppins]">
             See All
           </button>
         </div>
 
         {/* Cards Grid */}
-        <div className="grid gap-6 md:grid-cols-3 px-8">
+        <div className="grid gap-6 md:grid-cols-3 px-8 mb-8">
           {discoverData.map((card) => (
             <div
               key={card.id}
@@ -72,6 +73,13 @@ export const DiscoverMoreCards = () => {
               </div>
             </div>
           ))}
+        </div>
+
+        {/* Button for Small and Medium Screens */}
+        <div className="flex justify-center lg:hidden px-8">
+          <button className="bg-call-to-action text-white px-6 py-3 rounded-md hover:bg-[#8c44e6] transition-colors font-[Poppins]">
+            See All
+          </button>
         </div>
       </div>
     </div>

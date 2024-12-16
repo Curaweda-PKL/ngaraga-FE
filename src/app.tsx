@@ -7,7 +7,7 @@ const AppContent = () => {
   const location = useLocation();
 
   // List of routes to exclude from the layout
-  const excludedRoutes = ['/login', '/signup', '/forgot-password'];
+  const excludedRoutes = ['/login', '/signup', '/forgot-password', '/reset-password'];
 
   // Conditionally render the Layout component
   return excludedRoutes.includes(location.pathname) ? (

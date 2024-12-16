@@ -21,7 +21,7 @@ export const TrendingCards = () => {
   ];
 
   return (
-    <div className="flex items-center justify-center">
+    <div className="flex items-center justify-center px-4 sm:px-6">
       <div className="flex flex-col items-center bg-transparent border border-transparent gap-8 max-w-6xl w-full rounded-xl overflow-hidden">
         {/* Text Section */}
         <div className="flex flex-col items-center lg:items-start gap-8 w-full p-8">
@@ -34,11 +34,11 @@ export const TrendingCards = () => {
         </div>
 
         {/* Cards Grid */}
-        <div className="grid gap-6 md:grid-cols-3 w-full px-8">
+        <div className="grid gap-6 md:grid-cols-3 w-full sm:px-6 px-4">
           {trendingData.map((card) => (
             <div
               key={card.id}
-              className="w-[330px] flex flex-col items-start gap-[15px] flex-shrink-0 shadow-xl rounded-lg transition-transform hover:scale-[1.02]"
+              className="w-full max-w-[330px] flex flex-col items-start gap-[15px] flex-shrink-0 shadow-xl rounded-lg transition-transform hover:scale-[1.02] mx-auto"
             >
               <figure className="w-full">
                 {card.image ? (
