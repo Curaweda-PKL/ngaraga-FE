@@ -1,12 +1,12 @@
 import React from "react";
-import {ProfilePage} from "./components/profile-page";
-import {CardContentSection} from "../artists/components/card-sections";
+import {ProfilePage} from "./components/detail-card";
+import {MoreCards} from "./components/more-card";
 
 const Artists: React.FC = () => {
   return (
     <div>
       <ProfilePage />
-      <CardContentSection />
+      <MoreCards />
     </div>
   );
 };
