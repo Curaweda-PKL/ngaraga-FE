@@ -13,6 +13,12 @@ const TopCollectors = React.lazy(
 );
 const Detail = React.lazy(() => import("@/lib/pages/detail-card/detail-index"));
 const Cart = React.lazy(() => import("@/lib/pages/cart/mycart"));
+const BrowseEvents = React.lazy(
+  () => import("@/lib/pages/events/browse-event")
+);
+const EventDetail = React.lazy(
+  () => import("@/lib/pages/event-detail/detail-events")
+);
 
 export const routes: Array<PathRouteProps> = [
   {
@@ -46,6 +52,14 @@ export const routes: Array<PathRouteProps> = [
   {
     path: "/cart",
     element: <Cart />,
+  },
+  {
+    path: "/events",
+    element: <BrowseEvents />,
+  },
+  {
+    path: "/detailevents",
+    element: <EventDetail />,
   },
 ];
 
