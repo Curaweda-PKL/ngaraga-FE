@@ -1,6 +1,6 @@
-import {useState} from "react";
-import {FaBars, FaTimes, FaUserFriends, FaShoppingCart} from "react-icons/fa";
-import {useNavigate} from "react-router-dom";
+import { useState } from "react";
+import { FaBars, FaTimes, FaUserFriends, FaShoppingCart } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 export const Navbar: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -18,11 +18,11 @@ export const Navbar: React.FC = () => {
   return (
     <>
       {/* Main Navbar */}
-      <div className="navbar text-[#262626] relative">
+      <div className="navbar relative text-black">
         {/* Navbar start */}
-        <div className="navbar-start flex items-center mt-3">
+        <div className="navbar-start flex items-center space-x-4">
           {/* Hamburger menu for small screens */}
-          <div className="dropdown lg:hidden sm:mr-1 md:mr-3">
+          <div className="dropdown lg:hidden sm:mr-2 md:mr-3">
             <div
               role="button"
               className="btn btn-ghost"
@@ -34,7 +34,7 @@ export const Navbar: React.FC = () => {
 
           {/* Logo button */}
           <a
-            className="btn btn-ghost text-xl flex"
+            className="btn btn-ghost text-xl flex items-center text-black"
             onClick={() => navigate("/")}
           >
             <img
@@ -48,7 +48,7 @@ export const Navbar: React.FC = () => {
 
         {/* Navbar center */}
         <div className="navbar-center hidden lg:flex">
-          <ul className="menu menu-horizontal px-1 gap-8">
+          <ul className="menu menu-horizontal px-4 gap-8 text-black">
             <li>
               <a onClick={() => navigateToPage("marketplace")}>Marketplace</a>
             </li>
@@ -62,28 +62,27 @@ export const Navbar: React.FC = () => {
         </div>
 
         {/* Navbar end */}
-        <div className="navbar-end flex items-center">
+        <div className="navbar-end flex items-center space-x-4 mr-5">
           {/* Cart Icon */}
           <a
-            className="mr-4 cursor-pointer"
+            className="cursor-pointer text-black flex items-center"
             onClick={() => navigateToPage("cart")}
           >
-            <FaShoppingCart />
+            <FaShoppingCart size={20} />
           </a>
 
           {/* Sign-in and Sign-up buttons */}
           <a
-            className="btn bg-white border-call-to-action rounded-lg text-yellow-300 ml-4 items-center gap-2 sm:mr-0 md:mr-0 lg:mr-4 hidden lg:flex"
+            className="btn bg-white border-call-to-action rounded-lg text-black hidden lg:flex items-center gap-2"
             onClick={() => navigateToPage("login")}
           >
-   
             Sign In
           </a>
           <a
-            className="btn bg-call-to-action border-transparent rounded-lg text-white items-center gap-2 sm:mr-0 md:mr-0 lg:mr-10 lg:flex"
+            className="btn bg-call-to-action border-transparent rounded-lg text-black hidden lg:flex items-center gap-2"
             onClick={() => navigateToPage("register")}
           >
-            <FaUserFriends />
+            <FaUserFriends size={18} />
             Sign Up
           </a>
         </div>
@@ -93,26 +92,23 @@ export const Navbar: React.FC = () => {
       <div
         className={`fixed inset-y-0 left-0 z-50 w-64 bg-base-100 transform transition-transform duration-300 ease-in-out 
         ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} 
-        lg:hidden`}
+        lg:hidden text-black`}
       >
         <div className="flex justify-between items-center p-4 border-b">
-          <div className="flex items-center text-xl">
+          <div className="flex items-center text-xl text-black">
             <img
               src="/src/assets/img/LOGO.png"
               alt="Ngaraga Logo"
-              className="w-4 h-4"
+              className="w-4 h-4 mr-2"
             />
             NGARAGA
           </div>
-          <button
-            onClick={toggleSidebar}
-            className="btn btn-ghost"
-          >
+          <button onClick={toggleSidebar} className="btn btn-ghost text-black">
             <FaTimes size={20} />
           </button>
         </div>
 
-        <ul className="menu p-4 space-y-2">
+        <ul className="menu p-4 space-y-4 text-black">
           <li>
             <a
               className="flex items-center"
@@ -135,22 +131,6 @@ export const Navbar: React.FC = () => {
               onClick={() => navigateToPage("events")}
             >
               Events
-            </a>
-          </li>
-          <li>
-            <a
-              className="flex items-center gap-2"
-              onClick={() => navigateToPage("login")}
-            >
-              <FaUserFriends />
-              Sign In
-            </a>
-            <a
-              className="flex items-center gap-2"
-              onClick={() => navigateToPage("register")}
-            >
-              <FaUserFriends />
-              Sign Up
             </a>
           </li>
         </ul>

@@ -1,45 +1,45 @@
 import type React from "react";
-import {FaDiscord, FaInstagram, FaTwitter, FaYoutube} from "react-icons/fa";
+import { FaDiscord, FaInstagram, FaTwitter, FaYoutube } from "react-icons/fa";
 
 export const Footer: React.FC = () => {
   const socialLinks = [
-    {icon: <FaDiscord className="h-5 w-5" />, href: "#"},
-    {icon: <FaYoutube className="h-5 w-5" />, href: "#"},
-    {icon: <FaTwitter className="h-5 w-5" />, href: "#"},
-    {icon: <FaInstagram className="h-5 w-5" />, href: "#"},
+    { icon: <FaDiscord className="h-5 w-5" />, href: "#" },
+    { icon: <FaYoutube className="h-5 w-5" />, href: "#" },
+    { icon: <FaTwitter className="h-5 w-5" />, href: "#" },
+    { icon: <FaInstagram className="h-5 w-5" />, href: "#" },
   ];
 
   return (
-    <footer className="bg-[#3B3B3B] px-4 py-8 sm:px-6 md:px-8 lg:px-16 xl:px-24">
+    <footer className="bg-[#3B3B3B] px-4 py-8 sm:px-6 md:px-8 lg:px-16 xl:px-24 text-white">
       <div className="grid gap-8 sm:gap-10 md:grid-cols-3 md:gap-12">
         {/* Left Column - About */}
         <div className="grid gap-4 text-center md:text-left">
           {/* Logo */}
           <div className="flex items-center justify-center md:justify-start gap-2">
-            <a className="btn btn-ghost text-xl flex lg:ml-3">
+            <a className="btn btn-ghost text-xl flex lg:ml-3 text-white">
               <img
                 src="/src/assets/img/LOGO.png"
                 alt="Ngaraga Logo"
-                className="w-8 h-8 mr-2"
+                className="w-8 h-8 mr-2 filter invert"
               />
               Ngaraga
             </a>
           </div>
 
           {/* Description */}
-          <p className="text-sm text-[#858584] max-w-xs mx-auto md:mx-0">
+          <p className="text-sm text-white max-w-xs mx-auto md:mx-0">
             Lorem ipsum dolor amet lorem ipsum dolor amet
           </p>
 
           {/* Community Section */}
           <div className="grid gap-4">
-            <p className="text-sm text-[#858584]">Join our community</p>
+            <p className="text-sm text-white">Join our community</p>
             <div className="flex gap-3 justify-center md:justify-start">
               {socialLinks.map((social, index) => (
                 <a
                   key={index}
                   href={social.href}
-                  className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#3B3B3B] text-[#858584] transition-colors hover:bg-[#A259FF] hover:text-white"
+                  className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#3B3B3B] text-white transition-colors hover:bg-[#A259FF] hover:text-white"
                 >
                   {social.icon}
                 </a>
@@ -54,13 +54,13 @@ export const Footer: React.FC = () => {
           <div className="grid gap-3">
             <a
               href="#"
-              className="text-sm text-[#858584] hover:text-white transition-colors"
+              className="text-sm text-white hover:text-white transition-colors"
             >
               Marketplace
             </a>
             <a
               href="#"
-              className="text-sm text-[#858584] hover:text-white transition-colors"
+              className="text-sm text-white hover:text-white transition-colors"
             >
               Rankings
             </a>
@@ -72,7 +72,7 @@ export const Footer: React.FC = () => {
           <h3 className="text-xl font-bold text-white">
             Join Our Weekly Update
           </h3>
-          <p className="text-sm text-[#858584] max-w-xs mx-auto md:mx-0">
+          <p className="text-sm text-white max-w-xs mx-auto md:mx-0">
             Get exclusive promotions & updates straight to your inbox.
           </p>
           <div className="flex overflow-hidden rounded-full bg-white">
@@ -90,7 +90,7 @@ export const Footer: React.FC = () => {
 
       {/* Copyright */}
       <div className="mt-8 sm:mt-10 md:mt-12 border-t pt-6 sm:pt-8">
-        <p className="text-sm text-[#858584] text-center md:text-left">
+        <p className="text-sm text-white text-center md:text-left">
           © Ngaraga by Dolanan yuk x Curaweda
         </p>
       </div>

@@ -1,22 +1,27 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { FaLock, FaEnvelope } from "react-icons/fa";
+import { FaUser, FaLock, FaEnvelope } from "react-icons/fa";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import LoginImage from "@/assets/img/spacestarry.png";
 
-type LoginFormData = {
+type SignUpFormData = {
+  username: string;
   email: string;
   password: string;
+  confirmPassword: string;
 };
 
-const Login: React.FC = () => {
-  const [formData, setFormData] = useState<LoginFormData>({
+const SignUp: React.FC = () => {
+  const [formData, setFormData] = useState<SignUpFormData>({
+    username: "",
     email: "",
     password: "",
+    confirmPassword: "",
   });
   const [error, setError] = useState<{ [key: string]: string }>({});
   const [loading, setLoading] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false);
 
   // Handle form input changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -36,6 +41,15 @@ const Login: React.FC = () => {
     let valid = true;
     const newError: { [key: string]: string } = {};
 
+    // Username validation
+    if (!formData.username) {
+      newError.username = "Username cannot be empty!";
+      valid = false;
+    } else if (formData.username.length < 3) {
+      newError.username = "Username must be at least 3 characters!";
+      valid = false;
+    }
+
     // Email validation
     if (!formData.email) {
       newError.email = "Email cannot be empty!";
@@ -43,8 +57,20 @@ const Login: React.FC = () => {
     }
 
     // Password validation
+    const passwordPattern =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
     if (!formData.password) {
       newError.password = "Password cannot be empty!";
+      valid = false;
+    } else if (!passwordPattern.test(formData.password)) {
+      newError.password =
+        "Password must contain at least one uppercase, one lowercase, one number, and one special character!";
+      valid = false;
+    }
+
+    // Confirm Password validation
+    if (formData.password !== formData.confirmPassword) {
+      newError.confirmPassword = "Passwords do not match!";
       valid = false;
     }
 
@@ -64,12 +90,14 @@ const Login: React.FC = () => {
 
     setTimeout(() => {
       setLoading(false);
-      alert("Logged in successfully!");
+      alert("Account created successfully!");
     }, 1000);
   };
 
-  // Toggle visibility for password
+  // Toggle visibility for password and confirm password
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
+  const toggleConfirmPasswordVisibility = () =>
+    setShowConfirmPassword(!showConfirmPassword);
 
   // Animation variants for arise effect
   const ariseVariant = {
@@ -91,7 +119,7 @@ const Login: React.FC = () => {
       <div className="lg:grid lg:min-h-screen lg:grid-cols-12">
         <section className="relative flex h-32 items-end bg-gray-900 lg:col-span-5 lg:h-full xl:col-span-6">
           <img
-            alt="login"
+            alt="signup"
             src={LoginImage}
             loading="lazy"
             className="absolute inset-0 h-full w-full object-cover opacity-80"
@@ -114,12 +142,35 @@ const Login: React.FC = () => {
             >
               {/* Title and Description */}
               <div className="col-span-6">
-                <h2 className="text-3xl font-bold text-gray-800 mb-2">
-                  Log In
-                </h2>
-                <p className="text-lg text-gray-500">
-                  Welcome back! Please log in to your account.
-                </p>
+                <h2 className="text-3xl font-bold text-gray-800 mb-2">Sign Up</h2>
+                <p className="text-lg text-gray-500">Create an account to start using our service.</p>
+              </div>
+
+              {/* Username */}
+              <div className="col-span-6 relative">
+                <div
+                  className={`mt-1 flex items-center border rounded-md bg-white py-3 px-4 shadow-sm ${
+                    error.username
+                      ? "border-[#D22424]"
+                      : "focus-within:border-[var(--typing)]"
+                  }`}
+                >
+                  <FaUser className="text-gray-500 mr-2 text-sm" />
+                  <input
+                    type="text"
+                    id="Username"
+                    name="username"
+                    value={formData.username}
+                    onChange={handleChange}
+                    placeholder="Username"
+                    className="w-full border-none bg-transparent text-lg text-gray-500 focus:outline-none focus:ring-0"
+                    autoComplete="username"
+                    required
+                  />
+                </div>
+                {error.username && (
+                  <p className="text-[#D22424] text-sm">{error.username}</p>
+                )}
               </div>
 
               {/* Email */}
@@ -167,33 +218,52 @@ const Login: React.FC = () => {
                     onChange={handleChange}
                     placeholder="Password"
                     className="w-full border-none bg-transparent text-lg text-gray-500 focus:outline-none focus:ring-0"
-                    autoComplete="current-password"
+                    autoComplete="new-password"
                     required
                   />
                   <div
                     className="text-gray-500 ml-2 cursor-pointer text-sm"
                     onClick={togglePasswordVisibility}
                   >
-                    {showPassword ? (
-                      <AiOutlineEyeInvisible />
-                    ) : (
-                      <AiOutlineEye />
-                    )}
+                    {showPassword ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
                   </div>
                 </div>
                 {error.password && (
                   <p className="text-[#D22424] text-sm">{error.password}</p>
                 )}
+              </div>
 
-                {/* Forgot Password Link */}
-                <div className="mt-4 text-right">
-                  <a
-                    href="/forgot-password"
-                    className="text-black text-sm underline"
+              {/* Confirm Password */}
+              <div className="col-span-6 relative">
+                <div
+                  className={`mt-1 flex items-center border rounded-md bg-white py-3 px-4 shadow-sm ${
+                    error.confirmPassword
+                      ? "border-[#D22424]"
+                      : "focus-within:border-[var(--typing)]"
+                  }`}
+                >
+                  <FaLock className="text-gray-500 mr-2 text-sm" />
+                  <input
+                    type={showConfirmPassword ? "text" : "password"}
+                    id="ConfirmPassword"
+                    name="confirmPassword"
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                    placeholder="Confirm Password"
+                    className="w-full border-none bg-transparent text-lg text-gray-500 focus:outline-none focus:ring-0"
+                    autoComplete="new-password"
+                    required
+                  />
+                  <div
+                    className="text-gray-500 ml-2 cursor-pointer text-sm"
+                    onClick={toggleConfirmPasswordVisibility}
                   >
-                    Forgot your password?
-                  </a>
+                    {showConfirmPassword ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
+                  </div>
                 </div>
+                {error.confirmPassword && (
+                  <p className="text-[#D22424] text-sm">{error.confirmPassword}</p>
+                )}
               </div>
 
               {/* Submit Button */}
@@ -203,19 +273,16 @@ const Login: React.FC = () => {
                   className="w-full inline-block shrink-0 rounded-md bg-call-to-action px-12 py-3 text-lg font-semibold text-white transition-all duration-200 ease-in-out hover:bg-orange-500 hover:text-white focus:outline-none focus:ring focus:ring-blue-600"
                   disabled={loading}
                 >
-                  {loading ? "Logging in..." : "Log In"}
+                  {loading ? "Signing up..." : "Sign Up"}
                 </button>
               </div>
 
-              {/* Sign Up Link */}
+              {/* Sign In Link */}
               <div className="col-span-6 text-center mt-4">
                 <p className="text-gray-600">
-                  Don't have an account?{" "}
-                  <a
-                    href="/signup"
-                    className="text-orange-500 hover:text-orange-600"
-                  >
-                    Sign up
+                  Already have an account?{" "}
+                  <a href="/login" className="text-orange-500 hover:text-orange-600">
+                    Sign in
                   </a>
                 </p>
               </div>
@@ -227,4 +294,4 @@ const Login: React.FC = () => {
   );
 };
 
-export default Login;
+export default SignUp;

@@ -2,7 +2,7 @@ import React from "react";
 import type {PathRouteProps} from "react-router-dom";
 
 const Home = React.lazy(() => import("@/lib/pages/home/Home"));
-const Register = React.lazy(() => import("@/lib/pages/auth/login/register"));
+const Signup = React.lazy(() => import("@/lib/pages/auth/login/signup"));
 const Login = React.lazy(() => import("@/lib/pages/auth/login/login"));
 const Artists = React.lazy(() => import("@/lib/pages/artists/artists-index"));
 const Marketplace = React.lazy(
@@ -20,8 +20,8 @@ export const routes: Array<PathRouteProps> = [
     element: <Home />,
   },
   {
-    path: "/register",
-    element: <Register />,
+    path: "/signup",
+    element: <Signup />,
   },
   {
     path: "/login",
