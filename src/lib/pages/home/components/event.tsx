@@ -1,8 +1,8 @@
-import React, {useState, useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import mushroom from "../../../../assets/img/mushroom.png";
 
 export const Event: React.FC = () => {
-  const [timeRemaining, setTimeRemaining] = useState(3600); // 1 jam dalam detik
+  const [timeRemaining, setTimeRemaining] = useState(3600); // 1 hour in seconds
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -26,7 +26,7 @@ export const Event: React.FC = () => {
     <div
       className="relative mt-24 flex justify-center items-end self-stretch h-screen"
       style={{
-        backgroundImage: `linear-gradient(180deg, rgba(162, 89, 255, 0.00) 0%, #A259FF 100%), url(${mushroom})`,
+        backgroundImage: `linear-gradient(180deg, rgba(221, 177, 31, 0.00) 0%, rgba(221, 177, 31, 0.50) 100%), url(${mushroom})`,
         backgroundSize: "cover",
         backgroundPosition: "center",
       }}
@@ -56,7 +56,7 @@ export const Event: React.FC = () => {
           <h1 className="text-5xl font-bold">Magic Mushrooms</h1>
 
           {/* CTA Button */}
-          <button className="py-3 px-8 bg-white text-purple-700 font-medium rounded-lg shadow-md hover:bg-gray-100 transition w-36">
+          <button className="py-3 px-8 bg-call-to-action text-white font-medium rounded-lg shadow-md hover:bg-gray-100 transition w-36">
             See Card
           </button>
         </div>
