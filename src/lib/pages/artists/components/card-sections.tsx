@@ -43,31 +43,44 @@ export const CardContentSection = () => {
     <div className="w-full mb-10">
       {/* Tabs */}
       <div className="flex justify-center space-x-8 border-b border-gray-700 pb-4 mb-8">
-        <button
-          className={`text-lg font-semibold ${
-            activeTab === "cards"
-              ? "text-[#A3A3A3] border-b-2 border-purple-500"
-              : "text-gray-400"
-          }`}
-          onClick={() => setActiveTab("cards")}
-        >
-          Card{" "}
-          <span className="text-sm text-[#A3A3A3]">({cardData.length})</span>
-        </button>
-        <button
-          className={`text-lg font-semibold ${
-            activeTab === "specialCards"
-              ? "text-[#A3A3A3] border-b-2 border-purple-500"
-              : "text-gray-400"
-          }`}
-          onClick={() => setActiveTab("specialCards")}
-        >
-          Special Card{" "}
-          <span className="text-sm text-[#A3A3A3]">
-            ({specialCardData.length})
-          </span>
-        </button>
-      </div>
+  <button
+    className={`text-lg font-semibold ${
+      activeTab === "cards" ? "text-[#2B2B2B]" : "text-gray-400"
+    }`}
+    onClick={() => setActiveTab("cards")}
+  >
+    Card{" "}
+    <span
+      className={`text-lg px-3 py-1 rounded-full ${
+        activeTab === "cards"
+          ? "bg-[--old-primary] text-white" // Active: background + white text
+          : "bg-gray-400 text-gray-800" // Inactive: gray background + dark text
+      }`}
+    >
+      ({cardData.length})
+    </span>
+  </button>
+
+  <button
+    className={`text-lg font-semibold ${
+      activeTab === "specialCards" ? "text-[#2B2B2B]" : "text-gray-400"
+    }`}
+    onClick={() => setActiveTab("specialCards")}
+  >
+    Special Card{" "}
+    <span
+      className={`text-lg px-3 py-1 rounded-full ${
+        activeTab === "specialCards"
+          ? "bg-[--old-primary] text-white"
+          : "bg-gray-400 text-gray-800"
+      }`}
+    >
+      ({specialCardData.length})
+    </span>
+  </button>
+</div>
+
+
 
       {/* Cards Grid */}
       <div className="grid gap-6 px-6 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4">

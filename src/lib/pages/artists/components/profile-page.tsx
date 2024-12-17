@@ -24,7 +24,7 @@ export const ProfilePage: React.FC = () => {
         <div className="container mx-auto flex flex-col lg:flex-row items-center lg:items-start lg:justify-between">
           {/* Profile Content */}
           <div className="flex-grow order-3 lg:order-none lg:mr-8 ml-4 lg:ml-8">
-            {/* Profile Image - Centered on sm and md */}
+            {/* Profile Image */}
             <div className="relative mb-8 lg:mb-12 order-1 lg:order-none">
               <div className="relative w-24 h-24 mx-auto lg:mx-0 -mt-12 lg:-mt-16">
                 <img
@@ -35,13 +35,13 @@ export const ProfilePage: React.FC = () => {
               </div>
             </div>
 
-            {/* Buttons - 2-column grid layout for sm and md */}
+            {/* Buttons */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 lg:hidden">
-              <button className="bg-transparent border-2 border-call-to-action font-bold py-2 px-6 rounded-lg flex items-center justify-center space-x-2 hover:bg-[#858584] hover:text-white">
+              <button className="transition duration-300 transform border-2 border-call-to-action font-bold py-2 px-6 rounded-lg flex items-center justify-center space-x-2 hover:bg-[#858584] hover:text-white hover:scale-105 shadow-md hover:shadow-xl">
                 <span>+</span>
                 <span>Scan QR</span>
               </button>
-              <button className="bg-transparent border-2 border-call-to-action font-bold py-2 px-6 rounded-lg flex items-center justify-center space-x-2 hover:bg-[#858584] hover:text-white">
+              <button className="transition duration-300 transform border-2 border-call-to-action font-bold py-2 px-6 rounded-lg flex items-center justify-center space-x-2 hover:bg-[#858584] hover:text-white hover:scale-105 shadow-md hover:shadow-xl">
                 <span>+</span>
                 <span>Follow</span>
               </button>
@@ -78,32 +78,57 @@ export const ProfilePage: React.FC = () => {
             <div className="mb-8">
               <h3 className="text-lg font-bold text-[#525252] mb-2">Links</h3>
               <div className="flex justify-center lg:justify-start space-x-6 text-2xl">
-                <a href="https://example.com" target="_blank" rel="noopener noreferrer">
-                  <FaGlobe className="text-[#858584] hover:text-white" />
+                <a
+                  href="https://example.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="transition transform duration-300 text-[#858584] hover:text-[#ff9800] hover:scale-110"
+                >
+                  <FaGlobe />
                 </a>
-                <a href="https://discord.com" target="_blank" rel="noopener noreferrer">
-                  <FaDiscord className="text-[#858584] hover:text-white" />
+                <a
+                  href="https://discord.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="transition transform duration-300 text-[#858584] hover:text-[#5865F2] hover:scale-110"
+                >
+                  <FaDiscord />
                 </a>
-                <a href="https://youtube.com" target="_blank" rel="noopener noreferrer">
-                  <FaYoutube className="text-[#858584] hover:text-white" />
+                <a
+                  href="https://youtube.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="transition transform duration-300 text-[#858584] hover:text-[#FF0000] hover:scale-110"
+                >
+                  <FaYoutube />
                 </a>
-                <a href="https://twitter.com" target="_blank" rel="noopener noreferrer">
-                  <FaTwitter className="text-[#858584] hover:text-white" />
+                <a
+                  href="https://twitter.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="transition transform duration-300 text-[#858584] hover:text-[#1DA1F2] hover:scale-110"
+                >
+                  <FaTwitter />
                 </a>
-                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer">
-                  <FaInstagram className="text-[#858584] hover:text-white" />
+                <a
+                  href="https://instagram.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="transition transform duration-300 text-[#858584] hover:text-[#E1306C] hover:scale-110"
+                >
+                  <FaInstagram />
                 </a>
               </div>
             </div>
           </div>
 
-          {/* Buttons - Shown only on lg */}
+          {/* Buttons for lg */}
           <div className="hidden lg:flex mt-6 lg:mt-0 justify-end space-x-4 order-2 lg:order-none">
-            <button className="bg-transparent border-2 border-call-to-action font-bold py-2 px-6 rounded-lg flex items-center space-x-2 hover:bg-[#858584] hover:text-white">
+            <button className="transition duration-300 transform border-2 border-call-to-action font-bold py-2 px-6 rounded-lg flex items-center space-x-2 hover:bg-[#858584] hover:text-white hover:scale-105 shadow-md hover:shadow-xl">
               <span>+</span>
               <span>Scan QR</span>
             </button>
-            <button className="bg-transparent border-2 border-call-to-action font-bold py-2 px-6 rounded-lg flex items-center space-x-2 hover:bg-[#858584] hover:text-white">
+            <button className="transition duration-300 transform border-2 border-call-to-action font-bold py-2 px-6 rounded-lg flex items-center space-x-2 hover:bg-[#858584] hover:text-white hover:scale-105 shadow-md hover:shadow-xl">
               <span>+</span>
               <span>Follow</span>
             </button>
