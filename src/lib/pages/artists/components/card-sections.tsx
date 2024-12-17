@@ -1,4 +1,4 @@
-import {useState} from "react";
+import { useState } from "react";
 
 const cardData = [
   {
@@ -40,7 +40,7 @@ export const CardContentSection = () => {
   const currentData = activeTab === "cards" ? cardData : specialCardData;
 
   return (
-    <div className="w-full ">
+    <div className="w-full mb-10">
       {/* Tabs */}
       <div className="flex justify-center space-x-8 border-b border-gray-700 pb-4 mb-8">
         <button
@@ -70,11 +70,11 @@ export const CardContentSection = () => {
       </div>
 
       {/* Cards Grid */}
-      <div className="grid gap-6 px-6 md:grid-cols-3">
+      <div className="grid gap-6 px-6 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4">
         {currentData.map((card) => (
           <div
             key={card.id}
-            className="w-full flex flex-col items-start gap-4 bg-[#F2F2F2] rounded-2xl shadow-xl transition-transform hover:scale-[1.02]"
+            className="w-full flex flex-col items-start gap-4 bg-[#F2F2F2] rounded-2xl shadow-xl transition-transform hover:scale-[1.02] lg:w-[90%] md:w-full sm:w-full"
           >
             <figure className="w-full rounded-t-2xl overflow-hidden">
               {card.image ? (
@@ -95,7 +95,7 @@ export const CardContentSection = () => {
                 {card.creator}
               </span>
               <span className="text-base text-[#404040] font-[Nunito]">
-                  {card.price}
+                {card.price}
               </span>
             </div>
           </div>
