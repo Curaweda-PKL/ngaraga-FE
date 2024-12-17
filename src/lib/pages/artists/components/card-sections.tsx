@@ -40,7 +40,7 @@ export const CardContentSection = () => {
   const currentData = activeTab === "cards" ? cardData : specialCardData;
 
   return (
-    <div className="w-full py-12">
+    <div className="w-full ">
       {/* Tabs */}
       <div className="flex justify-center space-x-8 border-b border-gray-700 pb-4 mb-8">
         <button
