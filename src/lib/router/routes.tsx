@@ -1,5 +1,6 @@
 import React from "react";
 import type {PathRouteProps} from "react-router-dom";
+import { Dashboard } from "../admin-pages/dashboard/dashboard-index";
 
 const ForgotPassword = React.lazy(() => import("@/lib/pages/auth/login/forgot-password"))
 const ResetPassword = React.lazy(() => import("@/lib/pages/auth/login/reset-password"))
@@ -63,7 +64,11 @@ export const routes: Array<PathRouteProps> = [
     path: "/detailevents",
     element: <EventDetail />,
   },
-
+  {
+    path: "/admin/dashboard",
+    element: <Dashboard/>
+  }
+  
 ];
 
 export const privateRoutes: Array<PathRouteProps> = [];
