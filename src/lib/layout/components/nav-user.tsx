@@ -68,19 +68,19 @@ export const Navbar: React.FC = () => {
             className="cursor-pointer text-black flex items-center"
             onClick={() => navigateToPage("cart")}
           >
-            <FaShoppingCart size={20} />
+            <FaShoppingCart size={24}  className="lg:mr-5"/>
           </a>
 
           {/* Sign-in and Sign-up buttons */}
           <a
-            className="btn bg-white border-call-to-action rounded-lg text-black hidden lg:flex items-center gap-2"
+            className="btn bg-white border-call-to-action rounded-lg text-orange-300 hidden lg:flex items-center gap-2"
             onClick={() => navigateToPage("login")}
           >
             Sign In
           </a>
           <a
-            className="btn bg-call-to-action border-transparent rounded-lg text-black hidden lg:flex items-center gap-2"
-            onClick={() => navigateToPage("register")}
+            className="btn bg-call-to-action border-transparent rounded-lg text-white hidden lg:flex items-center gap-2"
+            onClick={() => navigateToPage("signup")}
           >
             <FaUserFriends size={18} />
             Sign Up

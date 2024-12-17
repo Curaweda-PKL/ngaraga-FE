@@ -38,7 +38,7 @@ export const TrendingCards = () => {
           {trendingData.map((card) => (
             <div
               key={card.id}
-              className="w-full max-w-[330px] flex flex-col items-start gap-[15px] flex-shrink-0 shadow-xl rounded-lg transition-transform hover:scale-[1.02] mx-auto"
+              className="w-full max-w-[330px] flex flex-col items-start gap-[15px] flex-shrink-0  rounded-lg transition-transform hover:scale-[1.02] mx-auto"
             >
               <figure className="w-full">
                 {card.image ? (

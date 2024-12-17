@@ -40,7 +40,7 @@ export const HowItWorks = () => {
   ];
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-background-primary ">
+    <div className="flex items-center justify-center min-h-screen bg-background-primary mt-20 lg:mt-0 ">
       <div className="flex flex-col lg:flex-row items-center bg-transparent  gap-8 max-w-6xl w-full rounded-2xl overflow-hidden">
         <div className="text-[#404040] ">
           <div className="mx-auto space-y-12">

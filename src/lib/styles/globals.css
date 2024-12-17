@@ -4,13 +4,16 @@
 
 html,
 body {
-  background-color: #ffffff;
   --background-secondary: #f2f2f2;
   --call-to-action: #ddb11f;
   --background-primary: #ffffff;
 
+  --var-gold: #DDB11F;
+
   --typing : #FFF9B1;
   --error-type : #D22424;
+
+  --call-to-action-hover: #c69e17;
 }
 
 @layer base {

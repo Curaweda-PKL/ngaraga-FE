@@ -1,5 +1,6 @@
 import React from "react";
 import type {PathRouteProps} from "react-router-dom";
+
 const ForgotPassword = React.lazy(() => import("@/lib/pages/auth/login/forgot-password"))
 const ResetPassword = React.lazy(() => import("@/lib/pages/auth/login/reset-password"))
 const Home = React.lazy(() => import("@/lib/pages/home/Home"));
@@ -10,12 +11,8 @@ const Marketplace = React.lazy(() => import("@/lib/pages/marketplace/marketplace
 const TopCollectors = React.lazy(() => import("@/lib/pages/top-players/top-players"));
 const Detail = React.lazy(() => import("@/lib/pages/detail-card/detail-index"));
 const Cart = React.lazy(() => import("@/lib/pages/cart/mycart"));
-const BrowseEvents = React.lazy(
-  () => import("@/lib/pages/events/browse-event")
-);
-const EventDetail = React.lazy(
-  () => import("@/lib/pages/event-detail/detail-events")
-);
+const BrowseEvents = React.lazy(() => import("@/lib/pages/events/browse-event"));
+const EventDetail = React.lazy(() => import("@/lib/pages/event-detail/detail-events"));
 
 export const routes: Array<PathRouteProps> = [
   {

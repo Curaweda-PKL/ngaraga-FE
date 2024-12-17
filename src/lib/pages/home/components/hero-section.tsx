@@ -14,7 +14,7 @@ export const HeroFrame = () => {
             NFT Marketplace UI Created With Anima For Figma. Collect, Buy, and
             Sell Art From More Than 20k NFT Artists.
           </p>
-          <button className="bg-[#A259FF] text-white py-3 px-8 sm:px-10 rounded-2xl text-lg font-medium flex items-center gap-3 sm:gap-4 hover:opacity-90">
+          <button className="bg-call-to-action text-white py-3 px-8 sm:px-10 rounded-2xl text-lg font-medium flex items-center gap-3 sm:gap-4 hover:opacity-90">
             <RiRocketFill className="text-3xl sm:text-4xl" />
             Get Started
           </button>

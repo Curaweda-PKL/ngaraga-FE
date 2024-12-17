@@ -1,4 +1,4 @@
-import {FaRocket} from "react-icons/fa";
+import { FaRocket } from "react-icons/fa";
 
 export const CollectorCards = () => {
   const trendingData = [
@@ -24,8 +24,28 @@ export const CollectorCards = () => {
         "https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg",
       totalCards: 25,
       rank: 1,
+    },    {
+      id: 1,
+      username: "Kakarotto",
+      avatar:
+        "https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg",
+      totalCards: 25,
+      rank: 1,
+    },    {
+      id: 1,
+      username: "Kakarotto",
+      avatar:
+        "https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg",
+      totalCards: 25,
+      rank: 1,
+    },    {
+      id: 1,
+      username: "Kakarotto",
+      avatar:
+        "https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg",
+      totalCards: 25,
+      rank: 1,
     },
-
   ];
 
   return (
@@ -50,14 +70,14 @@ export const CollectorCards = () => {
         </div>
 
         {/* Cards Section */}
-        <div className="grid gap-8 md:grid-cols-4 w-full lg:ml-20 ml-20 ">
+        <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-[30px] w-full p-8">
           {trendingData.map((card) => (
             <div
               key={card.id}
-              className="relative flex flex-col items-center gap-6 w-[240px] h-[238px] rounded-xl bg-[#F2F2F2] p-6 shadow-xl transition-transform hover:scale-105"
+              className="relative flex flex-col items-center gap-6 w-full h-[238px] rounded-xl bg-[#F2F2F2] p-6 shadow-xl transition-transform hover:scale-105"
             >
               {/* Rank Badge */}
-              <div className="absolute left-2 top-2  bg-black text-[#FFFFFF] text-xs font-bold py-1 px-2 rounded-full">
+              <div className="absolute left-2 top-2 bg-black text-[#FFFFFF] text-xs font-bold py-1 px-2 rounded-full">
                 {card.rank}
               </div>
 
@@ -76,7 +96,6 @@ export const CollectorCards = () => {
                 <div className="flex justify-center items-center space-x-1 text-[#A3A3A3]">
                   <p>Total Cards:</p>
                   <p className="text-sm font-mono text-[#404040]">
-                    {" "}
                     {card.totalCards} cards
                   </p>
                 </div>
