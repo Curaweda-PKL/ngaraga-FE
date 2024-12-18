@@ -1,19 +1,32 @@
 import React from "react";
 import type {PathRouteProps} from "react-router-dom";
-import { Dashboard } from "../admin-pages/dashboard/dashboard-index";
+import {Dashboard} from "../admin-pages/dashboard-index";
+import {OrderDetail} from "../admin-pages/detail-order";
 
-const ForgotPassword = React.lazy(() => import("@/lib/pages/auth/login/forgot-password"))
-const ResetPassword = React.lazy(() => import("@/lib/pages/auth/login/reset-password"))
+const ForgotPassword = React.lazy(
+  () => import("@/lib/pages/auth/login/forgot-password")
+);
+const ResetPassword = React.lazy(
+  () => import("@/lib/pages/auth/login/reset-password")
+);
 const Home = React.lazy(() => import("@/lib/pages/home/Home"));
 const Signup = React.lazy(() => import("@/lib/pages/auth/login/signup"));
 const Login = React.lazy(() => import("@/lib/pages/auth/login/login"));
 const Artists = React.lazy(() => import("@/lib/pages/artists/artists-index"));
-const Marketplace = React.lazy(() => import("@/lib/pages/marketplace/marketplace-index"));
-const TopCollectors = React.lazy(() => import("@/lib/pages/top-players/top-players"));
+const Marketplace = React.lazy(
+  () => import("@/lib/pages/marketplace/marketplace-index")
+);
+const TopCollectors = React.lazy(
+  () => import("@/lib/pages/top-players/top-players")
+);
 const Detail = React.lazy(() => import("@/lib/pages/detail-card/detail-index"));
 const Cart = React.lazy(() => import("@/lib/pages/cart/mycart"));
-const BrowseEvents = React.lazy(() => import("@/lib/pages/events/browse-event"));
-const EventDetail = React.lazy(() => import("@/lib/pages/event-detail/detail-events"));
+const BrowseEvents = React.lazy(
+  () => import("@/lib/pages/events/browse-event")
+);
+const EventDetail = React.lazy(
+  () => import("@/lib/pages/event-detail/detail-events")
+);
 
 export const routes: Array<PathRouteProps> = [
   {
@@ -30,11 +43,11 @@ export const routes: Array<PathRouteProps> = [
   },
   {
     path: "/forgot-password",
-    element: <ForgotPassword/>
+    element: <ForgotPassword />,
   },
   {
     path: "/reset-password",
-    element: <ResetPassword/>
+    element: <ResetPassword />,
   },
   {
     path: "/artists",
@@ -66,9 +79,12 @@ export const routes: Array<PathRouteProps> = [
   },
   {
     path: "/admin/dashboard",
-    element: <Dashboard/>
-  }
-  
+    element: <Dashboard />,
+  },
+  {
+    path: "/admin/order",
+    element: <OrderDetail />,
+  },
 ];
 
 export const privateRoutes: Array<PathRouteProps> = [];
