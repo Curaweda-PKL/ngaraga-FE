@@ -8,20 +8,6 @@ const cardData = [
     image: "/src/assets/img/Distant-Galaxy.png",
     price: "Rp. 200.000",
   },
-  {
-    id: 2,
-    title: "Life On Edena",
-    creator: "Animakid",
-    image: "/src/assets/img/LifeonEdena.png",
-    price: "Rp. 300.000",
-  },
-  {
-    id: 3,
-    title: "AstroFiction",
-    creator: "Animakid",
-    image: "/src/assets/img/AstroFiction.png",
-    price: "Rp. 200.000",
-  },
 ];
 
 const specialCardData = [
@@ -29,8 +15,7 @@ const specialCardData = [
     id: 1,
     title: "Cosmic Symphony",
     creator: "NebulaKid",
-    image: "/src/assets/img/Cosmic-Symphony.png",
-    price: "Rp. 500.000",
+    image: "/src/assets/img/Distant-Galaxy.png",
   },
 ];
 
@@ -43,74 +28,84 @@ export const CardContentSection = () => {
     <div className="w-full mb-10">
       {/* Tabs */}
       <div className="flex justify-center space-x-8 border-b border-gray-700 pb-4 mb-8">
-  <button
-    className={`text-lg font-semibold ${
-      activeTab === "cards" ? "text-[#2B2B2B]" : "text-gray-400"
-    }`}
-    onClick={() => setActiveTab("cards")}
-  >
-    Card{" "}
-    <span
-      className={`text-lg px-3 py-1 rounded-full ${
-        activeTab === "cards"
-          ? "bg-[--old-primary] text-white" // Active: background + white text
-          : "bg-gray-400 text-gray-800" // Inactive: gray background + dark text
-      }`}
-    >
-      ({cardData.length})
-    </span>
-  </button>
+        <button
+          className={`text-lg font-semibold ${
+            activeTab === "cards" ? "text-[#2B2B2B]" : "text-gray-400"
+          }`}
+          onClick={() => setActiveTab("cards")}
+        >
+          Card{" "}
+          <span
+            className={`text-lg px-3 py-1 rounded-full ${
+              activeTab === "cards"
+                ? "bg-[--old-primary] text-white"
+                : "bg-gray-400 text-gray-800"
+            }`}
+          >
+            ({cardData.length})
+          </span>
+        </button>
 
-  <button
-    className={`text-lg font-semibold ${
-      activeTab === "specialCards" ? "text-[#2B2B2B]" : "text-gray-400"
-    }`}
-    onClick={() => setActiveTab("specialCards")}
-  >
-    Special Card{" "}
-    <span
-      className={`text-lg px-3 py-1 rounded-full ${
-        activeTab === "specialCards"
-          ? "bg-[--old-primary] text-white"
-          : "bg-gray-400 text-gray-800"
-      }`}
-    >
-      ({specialCardData.length})
-    </span>
-  </button>
-</div>
-
-
+        <button
+          className={`text-lg font-semibold ${
+            activeTab === "specialCards" ? "text-[#2B2B2B]" : "text-gray-400"
+          }`}
+          onClick={() => setActiveTab("specialCards")}
+        >
+          Special Card{" "}
+          <span
+            className={`text-lg px-3 py-1 rounded-full ${
+              activeTab === "specialCards"
+                ? "bg-[--old-primary] text-white"
+                : "bg-gray-400 text-gray-800"
+            }`}
+          >
+            ({specialCardData.length})
+          </span>
+        </button>
+      </div>
 
       {/* Cards Grid */}
       <div className="grid gap-6 px-6 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4">
         {currentData.map((card) => (
           <div
             key={card.id}
-            className="w-full flex flex-col items-start gap-4 bg-[#F2F2F2] rounded-2xl shadow-xl transition-transform hover:scale-[1.02] lg:w-[90%] md:w-full sm:w-full"
+            className="w-full h-[400px] flex flex-col items-start gap-4 bg-[#F2F2F2] rounded-2xl shadow-xl transition-transform hover:scale-[1.02] lg:w-[90%] md:w-full sm:w-full"
           >
-            <figure className="w-full rounded-t-2xl overflow-hidden">
+            <figure className="w-full h-[260px] rounded-t-2xl overflow-hidden">
               {card.image ? (
                 <img
                   src={card.image}
                   alt={card.title}
-                  className="w-full h-[260px] object-cover"
+                  className="w-full h-full object-cover"
                 />
               ) : (
-                <div className="w-full h-[260px] flex items-center justify-center bg-[#3B3B3B] text-gray-400 rounded-t-2xl" />
+                <div className="w-full h-full flex items-center justify-center bg-[#3B3B3B] text-gray-400 rounded-t-2xl" />
               )}
             </figure>
-            <div className="p-6 flex flex-col items-start gap-2 w-full">
+            <div className="p-6 flex flex-col items-start gap-2 w-full flex-grow">
               <h3 className="text-2xl font-bold text-[#171717] font-[Poppins]">
                 {card.title}
               </h3>
               <span className="text-base text-[#404040] font-[Nunito]">
                 {card.creator}
               </span>
-              <span className="text-base text-[#404040] font-[Nunito]">
-                {card.price}
-              </span>
+              {activeTab === "cards" && (
+                <span className="text-base text-[#404040] font-[Nunito]">
+                  {card.price}
+                </span>
+              )}
             </div>
+            {activeTab === "specialCards" && (
+              <div className="w-full px-4 pb-4 flex justify-between items-center">
+                <span className="text-sm text-gray-800 font-semibold bg-white px-3 py-1 rounded-lg shadow">
+                  0/4
+                </span>
+                <button className="bg-[#1E90FF] text-white text-sm font-semibold px-4 py-2 rounded-lg shadow hover:bg-[#1C86EE]">
+                  Achieve
+                </button>
+              </div>
+            )}
           </div>
         ))}
       </div>
