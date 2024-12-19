@@ -37,18 +37,18 @@ export const ProfilePage: React.FC = () => {
 
             {/* Buttons */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 lg:hidden">
-              <button className="transition duration-300 transform border-2 border-call-to-action font-bold py-2 px-6 rounded-lg flex items-center justify-center space-x-2 hover:bg-[#858584] hover:text-white hover:scale-105 shadow-md hover:shadow-xl">
+              <button className="transition duration-300 text-white bg-call-to-action transform border-2 border-call-to-action font-bold py-2 px-6 rounded-lg flex items-center justify-center space-x-2 hover:bg-call-to-shadow hover:text-white hover:scale-105 shadow-md hover:shadow-xl">
                 <span>+</span>
                 <span>Scan QR</span>
               </button>
-              <button className="transition duration-300 transform border-2 border-call-to-action font-bold py-2 px-6 rounded-lg flex items-center justify-center space-x-2 hover:bg-[#858584] hover:text-white hover:scale-105 shadow-md hover:shadow-xl">
+              <button className="transition duration-300 text-white bg-call-to-action transform border-2 border-call-to-action font-bold py-2 px-6 rounded-lg flex items-center justify-center space-x-2 hover:bg-call-to-shadow hover:text-white hover:scale-105 shadow-md hover:shadow-xl">
                 <span>+</span>
                 <span>Follow</span>
               </button>
             </div>
 
             {/* Profile Name */}
-            <h2 className="text-2xl font-bold text-[#171717] mb-4 lg:mb-6 text-center lg:text-left">
+            <h2 className="text-4xl font-bold text-[#171717] mb-4 lg:mb-8 text-center lg:text-left">
               Animakid
             </h2>
 
@@ -56,28 +56,28 @@ export const ProfilePage: React.FC = () => {
             <div className="flex justify-center lg:justify-start space-x-8 mb-6">
               <div>
                 <span className="text-xl font-bold text-[#262626]">250k+</span>
-                <p className="text-sm text-[#525252]">Cards</p>
+                <p className="text-base text-[#525252]">Cards</p>
               </div>
               <div>
                 <span className="text-xl font-bold text-[#262626]">50+</span>
-                <p className="text-sm text-[#525252]">Special Cards</p>
+                <p className="text-base text-[#525252]">Special Cards</p>
               </div>
               <div>
                 <span className="text-xl font-bold text-[#262626]">3000+</span>
-                <p className="text-sm text-[#525252]">Followers</p>
+                <p className="text-base text-[#525252]">Followers</p>
               </div>
             </div>
 
             {/* Bio */}
             <div className="text-left mb-8">
-              <h3 className="text-lg font-bold text-[#171717] mb-2">Bio</h3>
-              <p className="text-[#525252]">The Internet's Friendliest Designer Kid.</p>
+              <h3 className="text-xl font-bold text-[#525252] mb-2">Bio</h3>
+              <p className="text-base text-[#525252]">The Internet's Friendliest Designer Kid.</p>
             </div>
 
             {/* Links */}
             <div className="mb-8">
-              <h3 className="text-lg font-bold text-[#525252] mb-2">Links</h3>
-              <div className="flex justify-center lg:justify-start space-x-6 text-2xl">
+              <h3 className="text-xl font-bold text-[#525252] mb-2">Links</h3>
+              <div className="flex justify-center lg:justify-start space-x-6 text-3xl">
                 <a
                   href="https://example.com"
                   target="_blank"
@@ -124,11 +124,11 @@ export const ProfilePage: React.FC = () => {
 
           {/* Buttons for lg */}
           <div className="hidden lg:flex mt-6 lg:mt-0 justify-end space-x-4 order-2 lg:order-none">
-            <button className="transition duration-300 transform border-2 border-call-to-action font-bold py-2 px-6 rounded-lg flex items-center space-x-2 hover:bg-[#858584] hover:text-white hover:scale-105 shadow-md hover:shadow-xl">
+            <button className="text-white bg-call-to-action transition duration-300 transform border-2 border-call-to-action font-bold py-2 px-6 rounded-lg flex items-center space-x-2 hover:bg-[#cda41e] hover:text-white hover:scale-105 shadow-md hover:shadow-xl">
               <span>+</span>
               <span>Scan QR</span>
             </button>
-            <button className="transition duration-300 transform border-2 border-call-to-action font-bold py-2 px-6 rounded-lg flex items-center space-x-2 hover:bg-[#858584] hover:text-white hover:scale-105 shadow-md hover:shadow-xl">
+            <button className="text-white bg-call-to-action transition duration-300 transform border-2 border-call-to-action font-bold py-2 px-6 rounded-lg flex items-center space-x-2 hover:bg-[#cda41e] hover:text-white hover:scale-105 shadow-md hover:shadow-xl">
               <span>+</span>
               <span>Follow</span>
             </button>

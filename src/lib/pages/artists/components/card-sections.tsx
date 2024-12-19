@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 
 const cardData = [
   {
@@ -21,15 +21,33 @@ const specialCardData = [
 
 export const CardContentSection = () => {
   const [activeTab, setActiveTab] = useState<"cards" | "specialCards">("cards");
+  const [underlineStyle, setUnderlineStyle] = useState({ width: 0, left: 0 });
+  const tabsRef = useRef<HTMLDivElement>(null);
 
   const currentData = activeTab === "cards" ? cardData : specialCardData;
+
+  useEffect(() => {
+    const activeButton = tabsRef.current?.querySelector(
+      activeTab === "cards" ? ".tab-cards" : ".tab-specialCards"
+    ) as HTMLButtonElement;
+
+    if (activeButton) {
+      setUnderlineStyle({
+        width: activeButton.offsetWidth,
+        left: activeButton.offsetLeft - 35, 
+      });
+    }
+  }, [activeTab]);
 
   return (
     <div className="w-full mb-10">
       {/* Tabs */}
-      <div className="flex justify-center space-x-8 border-b border-gray-700 pb-4 mb-8">
+      <div
+        className="relative flex items-center justify-start pl-16 space-x-8 border-b border-gray-700 pb-4 mb-8"
+        ref={tabsRef}
+      >
         <button
-          className={`text-lg font-semibold ${
+          className={`tab-cards text-lg font-semibold ${
             activeTab === "cards" ? "text-[#2B2B2B]" : "text-gray-400"
           }`}
           onClick={() => setActiveTab("cards")}
@@ -47,7 +65,7 @@ export const CardContentSection = () => {
         </button>
 
         <button
-          className={`text-lg font-semibold ${
+          className={`tab-specialCards text-lg font-semibold ${
             activeTab === "specialCards" ? "text-[#2B2B2B]" : "text-gray-400"
           }`}
           onClick={() => setActiveTab("specialCards")}
@@ -63,6 +81,12 @@ export const CardContentSection = () => {
             ({specialCardData.length})
           </span>
         </button>
+
+        {/* Dynamic Underline */}
+        <div
+          className="absolute bottom-0 h-[2px] bg-[#2B2B2B] transition-all duration-300"
+          style={{ width: underlineStyle.width, left: underlineStyle.left }}
+        />
       </div>
 
       {/* Cards Grid */}
