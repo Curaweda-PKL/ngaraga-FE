@@ -8,14 +8,13 @@ body {
   --call-to-action: #ddb11f;
   --background-primary: #ffffff;
 
+  --old-primary: #2b2b2b;
+  --old-secondary: #3b3b3b;
 
-  --old-primary: #2B2B2B;
-  --old-secondary: #3B3B3B;
+  --var-gold: #ddb11f;
 
-  --var-gold: #DDB11F;
-
-  --typing : #FFF9B1;
-  --error-type : #D22424;
+  --typing: #fff9b1;
+  --error-type: #d22424;
 
   --call-to-action-hover: #c69e17;
 }

@@ -1,5 +1,4 @@
-"use client";
-
+//   nyerah no shadcn shadcn jek 19 dec 2024
 import * as React from "react";
 import {
   AudioWaveform,

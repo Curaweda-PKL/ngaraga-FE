@@ -1,3 +1,6 @@
+import {MdEdit, MdDelete} from "react-icons/md";
+import {GrView} from "react-icons/gr";
+
 const orders = [
   {
     date: "25 Oct 2024 14:30",
@@ -152,13 +155,13 @@ export const OrderDetail = () => {
                 </td>
                 <td className="p-4 flex gap-2">
                   <button className="btn btn-xs btn-circle btn-ghost">
-                    Edit
+                    <MdEdit />
                   </button>
                   <button className="btn btn-xs btn-circle btn-ghost">
-                    View
+                    <GrView />
                   </button>
                   <button className="btn btn-xs btn-circle btn-ghost text-red-600">
-                    Delete
+                    <MdDelete />
                   </button>
                 </td>
               </tr>
