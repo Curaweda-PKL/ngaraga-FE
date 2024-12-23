@@ -15,7 +15,7 @@ export const Footer: React.FC = () => {
         {/* Left Column - About */}
         <div className="grid gap-4 text-center md:text-left">
           {/* Logo */}
-          <div className="flex items-center justify-center md:justify-start gap-2">
+          <div className="flex items-center justify-center md:justify-start gap-2 lg:-ml-7">
             <a className="btn btn-ghost text-xl flex lg:ml-3 text-white">
               <img
                 src="/src/assets/img/LOGO.png"
@@ -28,18 +28,18 @@ export const Footer: React.FC = () => {
 
           {/* Description */}
           <p className="text-sm text-white max-w-xs mx-auto md:mx-0">
-            Lorem ipsum dolor amet lorem ipsum dolor amet
+            Welcome to Ngaraga, your go-to marketplace for rare and collectible cards. Join our community of passionate collectors and experience the world of trading like never before!
           </p>
 
           {/* Community Section */}
           <div className="grid gap-4">
-            <p className="text-sm text-white">Join our community</p>
+            <p className="text-sm text-white">Join our vibrant community</p>
             <div className="flex gap-3 justify-center md:justify-start">
               {socialLinks.map((social, index) => (
                 <a
                   key={index}
                   href={social.href}
-                  className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#3B3B3B] text-white transition-colors hover:bg-[#A259FF] hover:text-white"
+                  className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#3B3B3B] text-white transition-transform duration-300 hover:bg-[#FFC107] hover:text-black hover:scale-105"
                 >
                   {social.icon}
                 </a>
@@ -54,15 +54,27 @@ export const Footer: React.FC = () => {
           <div className="grid gap-3">
             <a
               href="#"
-              className="text-sm text-white hover:text-white transition-colors"
+              className="text-sm text-white transition-colors duration-300 hover:text-[#FFC107] hover:underline"
             >
               Marketplace
             </a>
             <a
               href="#"
-              className="text-sm text-white hover:text-white transition-colors"
+              className="text-sm text-white transition-colors duration-300 hover:text-[#FFC107] hover:underline"
             >
               Rankings
+            </a>
+            <a
+              href="#"
+              className="text-sm text-white transition-colors duration-300 hover:text-[#FFC107] hover:underline"
+            >
+              Card Releases
+            </a>
+            <a
+              href="#"
+              className="text-sm text-white transition-colors duration-300 hover:text-[#FFC107] hover:underline"
+            >
+              FAQs
             </a>
           </div>
         </div>
@@ -70,18 +82,18 @@ export const Footer: React.FC = () => {
         {/* Right Column - Newsletter */}
         <div className="grid gap-4 text-center md:text-left">
           <h3 className="text-xl font-bold text-white">
-            Join Our Weekly Update
+            Stay Updated with Ngaraga
           </h3>
           <p className="text-sm text-white max-w-xs mx-auto md:mx-0">
-            Get exclusive promotions & updates straight to your inbox.
+            Sign up for our newsletter and get exclusive card drops, promotions, and community updates delivered straight to your inbox.
           </p>
-          <div className="flex overflow-hidden rounded-full bg-white">
+          <div className="flex overflow-hidden rounded-full bg-[#2b2b2b] border">
             <input
               type="email"
               placeholder="Enter your email here"
-              className="flex-1 px-4 py-3 text-sm bg-white text-gray-500 outline-none"
+              className="flex-1 px-4 py-3 text-sm bg-[#2b2b2b] text-gray-500 outline-none"
             />
-            <button className="bg-call-to-action px-6 py-3 text-sm text-white transition-colors hover:bg-[#8839FF]">
+            <button className="bg-call-to-action px-6 py-3 text-sm text-white transition-all duration-300 hover:bg-[#FFC107] hover:text-black ">
               Subscribe
             </button>
           </div>
@@ -89,9 +101,9 @@ export const Footer: React.FC = () => {
       </div>
 
       {/* Copyright */}
-      <div className="mt-8 sm:mt-10 md:mt-12 border-t pt-6 sm:pt-8">
+      <div className="mt-8 sm:mt-10 md:mt-12 border-t pt-6 sm:pt-8" style={{ borderTop: "1px solid var(--old-secondary)" }}>
         <p className="text-sm text-white text-center md:text-left">
-          © Ngaraga by Dolanan yuk x Curaweda
+          © 2024 Ngaraga. All rights reserved. Powered by Dolanan Yuk x Curaweda.
         </p>
       </div>
     </footer>

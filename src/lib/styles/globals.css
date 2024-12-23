@@ -18,6 +18,8 @@ body {
   --error-type: #d22424;
 
   --call-to-action-hover: #c69e17;
+
+  --light-cream: #FFFFEF;
 }
 
 @layer base {

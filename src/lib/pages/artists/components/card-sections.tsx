@@ -1,6 +1,15 @@
 import { useState, useRef, useEffect } from "react";
+import { FaCrown } from "react-icons/fa";
 
-const cardData = [
+type Card = {
+  id: number;
+  title: string;
+  creator: string;
+  image: string;
+  price?: string;
+}
+
+const cardData:Card[] = [
   {
     id: 1,
     title: "Distant Galaxy",
@@ -10,7 +19,7 @@ const cardData = [
   },
 ];
 
-const specialCardData = [
+const specialCardData:Card[] = [
   {
     id: 1,
     title: "Cosmic Symphony",
@@ -34,7 +43,7 @@ export const CardContentSection = () => {
     if (activeButton) {
       setUnderlineStyle({
         width: activeButton.offsetWidth,
-        left: activeButton.offsetLeft - 35, 
+        left: activeButton.offsetLeft - 35,
       });
     }
   }, [activeTab]);
@@ -122,10 +131,11 @@ export const CardContentSection = () => {
             </div>
             {activeTab === "specialCards" && (
               <div className="w-full px-4 pb-4 flex justify-between items-center">
-                <span className="text-sm text-gray-800 font-semibold bg-white px-3 py-1 rounded-lg shadow">
+                <span className="text-sm text-gray-800 font-semibold px-3 py-1">
                   0/4
                 </span>
-                <button className="bg-[#1E90FF] text-white text-sm font-semibold px-4 py-2 rounded-lg shadow hover:bg-[#1C86EE]">
+                <button className="border-2 border-call-to-action text-call-to-action text-sm font-semibold px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-call-to-action hover:text-white transition">
+                  <FaCrown size={16} />
                   Achieve
                 </button>
               </div>

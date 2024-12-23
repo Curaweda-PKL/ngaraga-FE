@@ -1,5 +1,5 @@
 import React from "react";
-import { FaDiscord, FaGlobe, FaInstagram, FaTwitter, FaYoutube } from "react-icons/fa";
+import { FaDiscord, FaGlobe, FaInstagram, FaTwitter, FaYoutube, FaQrcode, FaPlus } from "react-icons/fa";
 
 export const ProfilePage: React.FC = () => {
   return (
@@ -37,12 +37,12 @@ export const ProfilePage: React.FC = () => {
 
             {/* Buttons */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 lg:hidden">
-              <button className="transition duration-300 text-white bg-call-to-action transform border-2 border-call-to-action font-bold py-2 px-6 rounded-lg flex items-center justify-center space-x-2 hover:bg-call-to-shadow hover:text-white hover:scale-105 shadow-md hover:shadow-xl">
-                <span>+</span>
+              <button className="transition duration-300 text-white bg-call-to-action transform border-2 border-call-to-action font-bold py-2 px-6 rounded-lg flex items-center justify-center space-x-2 hover:bg-[#333333] hover:text-white shadow-md hover:shadow-xl">
+                <FaQrcode />
                 <span>Scan QR</span>
               </button>
-              <button className="transition duration-300 text-white bg-call-to-action transform border-2 border-call-to-action font-bold py-2 px-6 rounded-lg flex items-center justify-center space-x-2 hover:bg-call-to-shadow hover:text-white hover:scale-105 shadow-md hover:shadow-xl">
-                <span>+</span>
+              <button className="transition duration-300 text-white bg-call-to-action transform border-2 border-call-to-action font-bold py-2 px-6 rounded-lg flex items-center justify-center space-x-2 hover:bg-[#333333] hover:text-white shadow-md hover:shadow-xl">
+                <FaPlus />
                 <span>Follow</span>
               </button>
             </div>
@@ -82,7 +82,7 @@ export const ProfilePage: React.FC = () => {
                   href="https://example.com"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="transition transform duration-300 text-[#858584] hover:text-[#ff9800] hover:scale-110"
+                  className="transition transform duration-300 text-[#858584] hover:text-[#ff9800]"
                 >
                   <FaGlobe />
                 </a>
@@ -90,7 +90,7 @@ export const ProfilePage: React.FC = () => {
                   href="https://discord.com"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="transition transform duration-300 text-[#858584] hover:text-[#5865F2] hover:scale-110"
+                  className="transition transform duration-300 text-[#858584] hover:text-[#5865F2]"
                 >
                   <FaDiscord />
                 </a>
@@ -98,7 +98,7 @@ export const ProfilePage: React.FC = () => {
                   href="https://youtube.com"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="transition transform duration-300 text-[#858584] hover:text-[#FF0000] hover:scale-110"
+                  className="transition transform duration-300 text-[#858584] hover:text-[#FF0000]"
                 >
                   <FaYoutube />
                 </a>
@@ -106,7 +106,7 @@ export const ProfilePage: React.FC = () => {
                   href="https://twitter.com"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="transition transform duration-300 text-[#858584] hover:text-[#1DA1F2] hover:scale-110"
+                  className="transition transform duration-300 text-[#858584] hover:text-[#1DA1F2]"
                 >
                   <FaTwitter />
                 </a>
@@ -114,7 +114,7 @@ export const ProfilePage: React.FC = () => {
                   href="https://instagram.com"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="transition transform duration-300 text-[#858584] hover:text-[#E1306C] hover:scale-110"
+                  className="transition transform duration-300 text-[#858584] hover:text-[#E1306C]"
                 >
                   <FaInstagram />
                 </a>
@@ -124,12 +124,12 @@ export const ProfilePage: React.FC = () => {
 
           {/* Buttons for lg */}
           <div className="hidden lg:flex mt-6 lg:mt-0 justify-end space-x-4 order-2 lg:order-none">
-            <button className="text-white bg-call-to-action transition duration-300 transform border-2 border-call-to-action font-bold py-2 px-6 rounded-lg flex items-center space-x-2 hover:bg-[#cda41e] hover:text-white hover:scale-105 shadow-md hover:shadow-xl">
-              <span>+</span>
+            <button className="text-white bg-call-to-action transition duration-300 transform border-2 border-call-to-action font-bold py-2 px-6 rounded-lg flex items-center space-x-2 hover:bg-[#333333] hover:text-white shadow-md hover:shadow-xl">
+              <FaQrcode />
               <span>Scan QR</span>
             </button>
-            <button className="text-white bg-call-to-action transition duration-300 transform border-2 border-call-to-action font-bold py-2 px-6 rounded-lg flex items-center space-x-2 hover:bg-[#cda41e] hover:text-white hover:scale-105 shadow-md hover:shadow-xl">
-              <span>+</span>
+            <button className="text-white bg-call-to-action transition duration-300 transform border-2 border-call-to-action font-bold py-2 px-6 rounded-lg flex items-center space-x-2 hover:bg-[#333333] hover:text-white shadow-md hover:shadow-xl">
+              <FaPlus />
               <span>Follow</span>
             </button>
           </div>

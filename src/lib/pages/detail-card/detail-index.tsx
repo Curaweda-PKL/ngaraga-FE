@@ -1,14 +1,16 @@
 import React from "react";
-import {ProfilePage} from "./components/detail-card";
-import {MoreCards} from "./components/more-card";
+import { ProfilePage } from "@/lib/pages/artists/components/profile-page";
+import {CardCollection} from "./components/more-card";
+import { DetailBio } from "./components/detail-card";
 
 const Artists: React.FC = () => {
   return (
     <div>
       <ProfilePage />
-      <MoreCards />
+      <CardCollection />
+      <DetailBio/>
     </div>
   );
-};
+};  
 
 export default Artists;
