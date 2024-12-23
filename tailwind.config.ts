@@ -12,6 +12,7 @@ export default {
         "background-primary": "#FFFFFF",
         "background-secondary": "var(--background-secondary)",
         "call-to-action": "var(--call-to-action)",
+        "call-to-shadow" : "var(--call-to-shadow)",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         card: {
