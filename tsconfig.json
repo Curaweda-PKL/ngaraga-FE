@@ -28,7 +28,7 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src"],
+  "include": ["src", "src/lib/admin-pages/.tsx"],
   "exclude": ["node_modules"],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  "references": [{"path": "./tsconfig.node.json"}]
 }
