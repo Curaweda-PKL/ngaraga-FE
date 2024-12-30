@@ -89,5 +89,10 @@ export default {
       },
     },
   },
-  plugins: [tailwindTypography, daisyui, require("tailwindcss-animate")],
+  plugins: [
+    tailwindTypography,
+    daisyui,
+    require("tailwindcss-animate"),
+    require("flowbite/plugin"),
+  ],
 } satisfies Config;

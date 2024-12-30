@@ -1,7 +1,20 @@
 import React from "react";
 import type {PathRouteProps} from "react-router-dom";
+
 import {Dashboard} from "../admin-pages/dashboard-index";
 import {OrderDetail} from "../admin-pages/detail-order";
+import {Card} from "../admin-pages/card";
+import {SpecialCard} from "../admin-pages/spceial-card";
+import {Categories} from "../admin-pages/categories";
+import {Tag} from "../admin-pages/tag";
+import {Events} from "../admin-pages/events";
+import {Coupon} from "../admin-pages/coupon";
+import {Creator} from "../admin-pages/creator";
+import {Member} from "../admin-pages/member";
+import {Subscription} from "../admin-pages/subscription";
+import {Shipping} from "../admin-pages/shipping";
+import {Payment} from "../admin-pages/payment";
+import {Admin} from "../admin-pages/admin";
 import DetailSpecial from "@/lib/pages/detail-card/detail-special-index";
 import DetailCards from "../pages/detail-card/detail-cards";
 
@@ -32,6 +45,62 @@ const EventDetail = React.lazy(
  
 
 export const routes: Array<PathRouteProps> = [
+  {
+    path: "/admin/dashboard",
+    element: <Dashboard />,
+  },
+  {
+    path: "/admin/order",
+    element: <OrderDetail />,
+  },
+  {
+    path: "/admin/card",
+    element: <Card />,
+  },
+  {
+    path: "/admin/special",
+    element: <SpecialCard />,
+  },
+  {
+    path: "/admin/categories",
+    element: <Categories />,
+  },
+  {
+    path: "/admin/tag",
+    element: <Tag />,
+  },
+  {
+    path: "/admin/event",
+    element: <Events />,
+  },
+  {
+    path: "/admin/coupon",
+    element: <Coupon />,
+  },
+  {
+    path: "/admin/creator",
+    element: <Creator />,
+  },
+  {
+    path: "/admin/member",
+    element: <Member />,
+  },
+  {
+    path: "/admin/subscription",
+    element: <Subscription />,
+  },
+  {
+    path: "/admin/shipping",
+    element: <Shipping />,
+  },
+  {
+    path: "/admin/payment",
+    element: <Payment />,
+  },
+  {
+    path: "/admin",
+    element: <Admin />,
+  },
   {
     path: "/",
     element: <Home />,
@@ -83,14 +152,6 @@ export const routes: Array<PathRouteProps> = [
   {
     path: "/detailevents",
     element: <EventDetail />,
-  },
-  {
-    path: "/admin/dashboard",
-    element: <Dashboard />,
-  },
-  {
-    path: "/admin/order",
-    element: <OrderDetail />,
   },
 ];
 

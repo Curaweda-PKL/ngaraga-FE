@@ -2,16 +2,19 @@ import React from "react";
 import Navbar from "./components/nav-admin";
 import Sidebar from "./components/side-admin";
 
-// interface LayoutProps {
-//   children: React.ReactNode;
-// }
-
 export default function AdminLayout({children}: {children: React.ReactNode}) {
   return (
-    <div>
+    <div className="flex">
+      {/* Navbar */}
       <Navbar />
+
+      {/* Sidebar */}
       <Sidebar />
-      <main className="ml-64 mt-12 bg-gray-100 min-h-screen">{children}</main>
+
+      {/* Main Content */}
+      <main className="ml-64 mt-16 bg-white min-h-screen overflow-hidden w-full p-4">
+        {children}
+      </main>
     </div>
   );
 }
