@@ -1,7 +1,7 @@
 import React from "react";
 import type {PathRouteProps} from "react-router-dom";
 
-import {Dashboard} from "../admin-pages/dashboard-index";
+import Dashboard from "../admin-pages/dashboard";
 import {OrderDetail} from "../admin-pages/detail-order";
 import {Card} from "../admin-pages/card";
 import {SpecialCard} from "../admin-pages/spceial-card";
@@ -15,8 +15,6 @@ import {Subscription} from "../admin-pages/subscription";
 import {Shipping} from "../admin-pages/shipping";
 import {Payment} from "../admin-pages/payment";
 import {Admin} from "../admin-pages/admin";
-import DetailSpecial from "@/lib/pages/detail-card/detail-special-index";
-import DetailCards from "../pages/detail-card/detail-cards";
 
 const ForgotPassword = React.lazy(
   () => import("@/lib/pages/auth/login/forgot-password")
@@ -41,8 +39,8 @@ const BrowseEvents = React.lazy(
 const EventDetail = React.lazy(
   () => import("@/lib/pages/event-detail/detail-events")
 );
-
- 
+import DetailSpecial from "@/lib/pages/detail-card/detail-special-index";
+import DetailCards from "../pages/detail-card/detail-cards";
 
 export const routes: Array<PathRouteProps> = [
   {
@@ -139,7 +137,7 @@ export const routes: Array<PathRouteProps> = [
   },
   {
     path: "detail-cards",
-    element: <DetailCards/>
+    element: <DetailCards />,
   },
   {
     path: "/cart",

@@ -1,3 +1,5 @@
+import {Edit3, Eye, Trash2, Plus} from "lucide-react";
+
 export const Card = () => {
   const cards = [
     {
@@ -76,7 +78,10 @@ export const Card = () => {
     <div className="p-6">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-semibold">Card</h1>
-        <button className="btn btn-primary">+ Add Card</button>
+        <button className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg flex items-center gap-2">
+          <Plus className="w-4 h-4" />
+          <span>Add Member</span>
+        </button>
       </div>
       <div className="overflow-x-auto">
         <table className="table w-full">
@@ -112,14 +117,14 @@ export const Card = () => {
                 <td>Rp {card.price.toLocaleString()}</td>
                 <td>
                   <div className="flex items-center gap-2">
-                    <button className="btn btn-circle btn-sm btn-outline">
-                      <span className="material-icons">visibility</span>
+                    <button className="p-2 hover:bg-gray-100 rounded-lg text-gray-600">
+                      <Edit3 className="w-4 h-4" />
                     </button>
-                    <button className="btn btn-circle btn-sm btn-outline">
-                      <span className="material-icons">edit</span>
+                    <button className="p-2 hover:bg-gray-100 rounded-lg text-gray-600">
+                      <Eye className="w-4 h-4" />
                     </button>
-                    <button className="btn btn-circle btn-sm btn-outline text-red-600">
-                      <span className="material-icons">delete</span>
+                    <button className="p-2 hover:bg-gray-100 rounded-lg text-red-500">
+                      <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
                 </td>

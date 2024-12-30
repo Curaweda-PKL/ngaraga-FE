@@ -2,11 +2,9 @@ import {useState} from "react";
 import {Search, Edit3, Eye, Trash2, Plus} from "lucide-react";
 
 export const Admin = () => {
-  // 👉 State management for selections and search
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
 
-  // 👉 Sample data - In a real app, this would come from an API
   const users = [
     {
       fullName: "EmmaTaylor",
@@ -25,7 +23,6 @@ export const Admin = () => {
     // ... Add more user data to match the mockup
   ];
 
-  // 👉 Handlers for checkbox selections
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
       setSelectedUsers(users.map((user) => user.email));
