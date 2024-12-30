@@ -15,6 +15,8 @@ import {Subscription} from "../admin-pages/subscription";
 import {Shipping} from "../admin-pages/shipping";
 import {Payment} from "../admin-pages/payment";
 import {Admin} from "../admin-pages/admin";
+import DetailSpecial from "@/lib/pages/detail-card/detail-special-index";
+import DetailCards from "../pages/detail-card/detail-cards";
 
 const ForgotPassword = React.lazy(
   () => import("@/lib/pages/auth/login/forgot-password")
@@ -32,7 +34,6 @@ const Marketplace = React.lazy(
 const TopCollectors = React.lazy(
   () => import("@/lib/pages/top-players/top-players")
 );
-const Detail = React.lazy(() => import("@/lib/pages/detail-card/detail-index"));
 const Cart = React.lazy(() => import("@/lib/pages/cart/mycart"));
 const BrowseEvents = React.lazy(
   () => import("@/lib/pages/events/browse-event")
@@ -40,6 +41,8 @@ const BrowseEvents = React.lazy(
 const EventDetail = React.lazy(
   () => import("@/lib/pages/event-detail/detail-events")
 );
+
+ 
 
 export const routes: Array<PathRouteProps> = [
   {
@@ -131,8 +134,12 @@ export const routes: Array<PathRouteProps> = [
     element: <TopCollectors />,
   },
   {
-    path: "/detail",
-    element: <Detail />,
+    path: "/detail-special-card",
+    element: <DetailSpecial />,
+  },
+  {
+    path: "detail-cards",
+    element: <DetailCards/>
   },
   {
     path: "/cart",

@@ -1,7 +1,41 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
+import { FaCrown } from "react-icons/fa";
 
-const cardData = [
+type Card = {
+  id: number;
+  title: string;
+  creator: string;
+  image: string;
+  price?: string;
+}
+
+const cardData:Card[] = [
   {
+    id: 1,
+    title: "Distant Galaxy",
+    creator: "Animakid",
+    image: "/src/assets/img/Distant-Galaxy.png",
+    price: "Rp. 200.000",
+  },
+  {
+    id: 1,
+    title: "Distant Galaxy",
+    creator: "Animakid",
+    image: "/src/assets/img/Distant-Galaxy.png",
+    price: "Rp. 200.000",
+  },  {
+    id: 1,
+    title: "Distant Galaxy",
+    creator: "Animakid",
+    image: "/src/assets/img/Distant-Galaxy.png",
+    price: "Rp. 200.000",
+  },  {
+    id: 1,
+    title: "Distant Galaxy",
+    creator: "Animakid",
+    image: "/src/assets/img/Distant-Galaxy.png",
+    price: "Rp. 200.000",
+  },  {
     id: 1,
     title: "Distant Galaxy",
     creator: "Animakid",
@@ -10,7 +44,7 @@ const cardData = [
   },
 ];
 
-const specialCardData = [
+const specialCardData:Card[] = [
   {
     id: 1,
     title: "Cosmic Symphony",
@@ -21,15 +55,33 @@ const specialCardData = [
 
 export const CardContentSection = () => {
   const [activeTab, setActiveTab] = useState<"cards" | "specialCards">("cards");
+  const [underlineStyle, setUnderlineStyle] = useState({ width: 0, left: 0 });
+  const tabsRef = useRef<HTMLDivElement>(null);
 
   const currentData = activeTab === "cards" ? cardData : specialCardData;
+
+  useEffect(() => {
+    const activeButton = tabsRef.current?.querySelector(
+      activeTab === "cards" ? ".tab-cards" : ".tab-specialCards"
+    ) as HTMLButtonElement;
+
+    if (activeButton) {
+      setUnderlineStyle({
+        width: activeButton.offsetWidth,
+        left: activeButton.offsetLeft - 35,
+      });
+    }
+  }, [activeTab]);
 
   return (
     <div className="w-full mb-10">
       {/* Tabs */}
-      <div className="flex justify-center space-x-8 border-b border-gray-700 pb-4 mb-8">
+      <div
+        className="relative flex items-center justify-start pl-16 space-x-8 border-b border-gray-700 pb-4 mb-8"
+        ref={tabsRef}
+      >
         <button
-          className={`text-lg font-semibold ${
+          className={`tab-cards text-lg font-semibold ${
             activeTab === "cards" ? "text-[#2B2B2B]" : "text-gray-400"
           }`}
           onClick={() => setActiveTab("cards")}
@@ -47,7 +99,7 @@ export const CardContentSection = () => {
         </button>
 
         <button
-          className={`text-lg font-semibold ${
+          className={`tab-specialCards text-lg font-semibold ${
             activeTab === "specialCards" ? "text-[#2B2B2B]" : "text-gray-400"
           }`}
           onClick={() => setActiveTab("specialCards")}
@@ -63,6 +115,12 @@ export const CardContentSection = () => {
             ({specialCardData.length})
           </span>
         </button>
+
+        {/* Dynamic Underline */}
+        <div
+          className="absolute bottom-0 h-[2px] bg-[#2B2B2B] transition-all duration-300"
+          style={{ width: underlineStyle.width, left: underlineStyle.left }}
+        />
       </div>
 
       {/* Cards Grid */}
@@ -98,10 +156,11 @@ export const CardContentSection = () => {
             </div>
             {activeTab === "specialCards" && (
               <div className="w-full px-4 pb-4 flex justify-between items-center">
-                <span className="text-sm text-gray-800 font-semibold bg-white px-3 py-1 rounded-lg shadow">
+                <span className="text-sm text-gray-800 font-semibold px-3 py-1">
                   0/4
                 </span>
-                <button className="bg-[#1E90FF] text-white text-sm font-semibold px-4 py-2 rounded-lg shadow hover:bg-[#1C86EE]">
+                <button className="border-2 border-call-to-action text-call-to-action text-sm font-semibold px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-call-to-action hover:text-white transition">
+                  <FaCrown size={16} />
                   Achieve
                 </button>
               </div>
