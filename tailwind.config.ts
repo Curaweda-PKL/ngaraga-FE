@@ -1,7 +1,7 @@
 import tailwindTypography from "@tailwindcss/typography";
 import daisyui from "daisyui";
-import type {Config} from "tailwindcss";
-import {fontFamily} from "tailwindcss/defaultTheme";
+import type { Config } from "tailwindcss";
+import { fontFamily } from "tailwindcss/defaultTheme";
 
 export default {
   darkMode: ["class"],
@@ -12,8 +12,21 @@ export default {
         "background-primary": "#FFFFFF",
         "background-secondary": "var(--background-secondary)",
         "call-to-action": "var(--call-to-action)",
-        "call-to-shadow" : "var(--call-to-shadow)",
+        "call-to-actions": {
+          100: "var(--call-to-actions-100)",
+          200: "var(--call-to-actions-200)",
+          300: "var(--call-to-actions-300)",
+          400: "var(--call-to-actions-400)",
+          500: "var(--call-to-actions-500)",
+          600: "var(--call-to-actions-600)",
+          700: "var(--call-to-actions-700)",
+          800: "var(--call-to-actions-800)",
+          900: "var(--call-to-actions-900)",
+          950: "var(--call-to-actions-950)",
+        },
+        "call-to-shadow": "var(--call-to-shadow)",
         "light-cream": "var(--light-cream)",
+
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         card: {

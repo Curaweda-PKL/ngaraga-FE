@@ -17,6 +17,31 @@ const cardData:Card[] = [
     image: "/src/assets/img/Distant-Galaxy.png",
     price: "Rp. 200.000",
   },
+  {
+    id: 1,
+    title: "Distant Galaxy",
+    creator: "Animakid",
+    image: "/src/assets/img/Distant-Galaxy.png",
+    price: "Rp. 200.000",
+  },  {
+    id: 1,
+    title: "Distant Galaxy",
+    creator: "Animakid",
+    image: "/src/assets/img/Distant-Galaxy.png",
+    price: "Rp. 200.000",
+  },  {
+    id: 1,
+    title: "Distant Galaxy",
+    creator: "Animakid",
+    image: "/src/assets/img/Distant-Galaxy.png",
+    price: "Rp. 200.000",
+  },  {
+    id: 1,
+    title: "Distant Galaxy",
+    creator: "Animakid",
+    image: "/src/assets/img/Distant-Galaxy.png",
+    price: "Rp. 200.000",
+  },
 ];
 
 const specialCardData:Card[] = [

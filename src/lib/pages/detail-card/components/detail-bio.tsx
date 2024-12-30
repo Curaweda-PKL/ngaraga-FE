@@ -6,7 +6,7 @@ export const DetailBio: React.FC = () => {
       {/* Header */}
       <div className="flex items-center space-x-4 mb-6">
         <img
-          src="/path-to-image/orbitian-logo.png" // Replace with the correct logo image path
+          src="/path-to-image/orbitian-logo.png" 
           alt="Orbitian Logo"
           className="w-10 h-10 rounded-full"
         />

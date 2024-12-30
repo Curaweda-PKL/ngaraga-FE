@@ -1,12 +1,12 @@
 import React from "react";
 import { MarketHeader } from "./components/market-header";
-import { CardContentSection } from "../artists/components/card-sections";
+import { MarketplaceCardSection } from "./components/marketplace-card-section";
 
 const Marketplace: React.FC = () => {
   return (
     <div>
       <MarketHeader />
-      <CardContentSection/>
+      <MarketplaceCardSection/>
     </div>
   );
 };

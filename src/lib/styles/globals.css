@@ -5,7 +5,24 @@
 html,
 body {
   --background-secondary: #f2f2f2;
+
   --call-to-action: #ddb11f;
+
+  /* new use s */
+  --call-to-actions-100: #FFFFEF;
+  --call-to-actions-200: #FFF9B1;
+  --call-to-actions-300: #FFF288;
+  --call-to-actions-400: #FFE344;
+  --call-to-actions-500: #FEEC40;
+  --call-to-actions-600: #FED700;
+  --call-to-actions-700: #F2C301;
+  --call-to-actions-800: #D3AF37;
+  --call-to-actions-900: #DDB11F;
+  --call-to-actions-950: #CFA519;
+
+  /*  */
+  
+
   --background-primary: #ffffff;
   --call-to-shadow: #cda41e;
 
@@ -21,6 +38,21 @@ body {
 
   --light-cream: #FFFFEF;
 }
+
+.hover-border-call-to-actions {
+    border: 2px solid transparent; /* Example color */
+}
+
+.hover-border-call-to-actions:hover {
+  border-color: #DDB11F; 
+  background-color: #FFFFEF;
+}
+
+.a:hover {
+  border-color: #DDB11F; 
+  background-color: #FFFFEF;
+}
+
 
 @layer base {
   /* Fullscreen container */

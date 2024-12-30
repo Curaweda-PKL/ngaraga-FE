@@ -1,4 +1,5 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
+import { FaTrash } from "react-icons/fa";
 
 const Cart: React.FC = () => {
   const [cartItems, setCartItems] = useState([
@@ -8,47 +9,7 @@ const Cart: React.FC = () => {
       price: 200000,
       quantity: 1,
       isSpecial: true,
-      image: "https://via.placeholder.com/100",
-    },
-    {
-      id: 2,
-      name: "Dancing Robot 0512",
-      price: 200000,
-      quantity: 3,
-      isSpecial: false,
-      image: "https://via.placeholder.com/100",
-    },
-    {
-      id: 3,
-      name: "Dancing Robot 0512",
-      price: 200000,
-      quantity: 1,
-      isSpecial: true,
-      image: "https://via.placeholder.com/100",
-    },
-    {
-      id: 4,
-      name: "Dancing Robot 0512",
-      price: 200000,
-      quantity: 5,
-      isSpecial: false,
-      image: "https://via.placeholder.com/100",
-    },
-    {
-      id: 5,
-      name: "Dancing Robot 0512",
-      price: 200000,
-      quantity: 1,
-      isSpecial: true,
-      image: "https://via.placeholder.com/100",
-    },
-    {
-      id: 6,
-      name: "Dancing Robot 0512",
-      price: 100000,
-      quantity: 1,
-      isSpecial: false,
-      image: "https://via.placeholder.com/100",
+      image: "https://sillyrobotcards.ams3.cdn.digitaloceanspaces.com/generated-cards/798bb4b5-4e1f-4d6b-bf4d-63969a2ccb07/3778c5d0-99f1-4e22-9f22-e50af27b4b5b",
     },
   ]);
 
@@ -56,79 +17,62 @@ const Cart: React.FC = () => {
   const [selectAll, setSelectAll] = useState(false);
 
   const handleQuantityChange = (id: number, delta: number) => {
-    setCartItems((prevItems) =>
-      prevItems.map((item) =>
-        item.id === id
-          ? {...item, quantity: Math.max(1, item.quantity + delta)}
-          : item
+    setCartItems((items) =>
+      items.map((item) =>
+        item.id === id ? { ...item, quantity: Math.max(1, item.quantity + delta) } : item
       )
     );
   };
 
   const handleDeleteItem = (id: number) => {
-    setCartItems((prevItems) => prevItems.filter((item) => item.id !== id));
-    setSelectedItems((prevSelected) =>
-      prevSelected.filter((itemId) => itemId !== id)
-    );
+    setCartItems((items) => items.filter((item) => item.id !== id));
+    setSelectedItems((items) => items.filter((itemId) => itemId !== id));
   };
 
-  const handleSelectAll = () => {
-    if (selectAll) {
-      setSelectedItems([]);
-    } else {
-      setSelectedItems(cartItems.map((item) => item.id));
-    }
+  const toggleSelectAll = () => {
     setSelectAll(!selectAll);
+    setSelectedItems(!selectAll ? cartItems.map((item) => item.id) : []);
   };
 
-  const handleSelectItem = (id: number) => {
-    if (selectedItems.includes(id)) {
-      setSelectedItems((prevSelected) =>
-        prevSelected.filter((itemId) => itemId !== id)
-      );
-    } else {
-      setSelectedItems((prevSelected) => [...prevSelected, id]);
-    }
-  };
-
-  const handleDeleteSelected = () => {
-    setCartItems((prevItems) =>
-      prevItems.filter((item) => !selectedItems.includes(item.id))
+  const toggleSelectItem = (id: number) => {
+    setSelectedItems((items) =>
+      items.includes(id) ? items.filter((itemId) => itemId !== id) : [...items, id]
     );
+  };
+
+  const deleteSelected = () => {
+    setCartItems((items) => items.filter((item) => !selectedItems.includes(item.id)));
     setSelectedItems([]);
     setSelectAll(false);
   };
 
-  const subtotal = cartItems.reduce(
-    (total, item) => total + item.price * item.quantity,
-    0
-  );
+  const subtotal = cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
 
   return (
     <div className="ml-16 p-4 md:p-8 min-h-screen">
       <h1 className="text-2xl text-[#171717] font-bold mb-2">My Cart</h1>
       <p className="text-[#404040] mb-6">
-        Review your selected items, adjust quantities, and proceed to checkout
-        seamlessly.
+        Review your selected items, adjust quantities, and proceed to checkout seamlessly.
       </p>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="col-span-2">
-          <div className="flex items-center bg-[#D4D4D4] border-2 rounded-xl py-3 px-5 justify-between mb-4">
+          <div className="flex items-center border border-#D4D4D4 border-2 rounded-xl py-3 px-5 justify-between mb-4">
             <div className="flex items-center space-x-2">
               <input
                 type="checkbox"
                 className="w-4 h-4"
                 checked={selectAll}
-                onChange={handleSelectAll}
+                onChange={toggleSelectAll}
               />
               <label className="text-[#404040]">Select All</label>
             </div>
             <button
-              className="btn bg-call-to-action border-transparent rounded-lg text-white items-center"
-              onClick={handleDeleteSelected}
+              className="btn bg-call-to-action border-transparent rounded-lg text-white flex items-center space-x-2"
+              onClick={deleteSelected}
             >
-              Delete
+              <FaTrash />
+              <span>Delete</span>
             </button>
           </div>
 
@@ -142,7 +86,7 @@ const Cart: React.FC = () => {
                   type="checkbox"
                   className="w-4 h-4"
                   checked={selectedItems.includes(item.id)}
-                  onChange={() => handleSelectItem(item.id)}
+                  onChange={() => toggleSelectItem(item.id)}
                 />
                 <img
                   src={item.image}
@@ -165,10 +109,10 @@ const Cart: React.FC = () => {
                 </p>
                 <div className="flex items-center space-x-2">
                   <button
-                    className="text-red-600"
+                    className="text-gray-300 flex items-center space-x-1"
                     onClick={() => handleDeleteItem(item.id)}
                   >
-                    &#128465;
+                    <FaTrash className="mr-2" />
                   </button>
                   <button
                     className="px-2 py-1 text-gray-700 bg-gray-200 rounded-md"
@@ -189,10 +133,8 @@ const Cart: React.FC = () => {
           ))}
         </div>
 
-        <div className="p-4 h-80 bg-[#D4D4D4] mr-24 rounded-lg shadow-md">
-          <h2 className="text-lg font-bold mb-4 text-[#171717] ">
-            Summary Order
-          </h2>
+        <div className="p-4 h-80 border border-#D4D4D4 mr-24 rounded-lg shadow-md">
+          <h2 className="text-lg font-bold mb-4 text-[#171717] ">Summary Order</h2>
           <div className="border-t border-b py-4">
             <div className="flex items-center justify-between mb-4">
               <span className="text-[#262626]">Subtotal</span>
@@ -209,8 +151,9 @@ const Cart: React.FC = () => {
           <button className="w-full py-2 text-white bg-yellow-500 rounded-md mb-4">
             Apply
           </button>
-          <button className="w-full py-2 text-white bg-yellow-600 rounded-md">
-            Checkout Now ({cartItems.length} items)
+          <button className="w-full py-2 text-white bg-yellow-600 rounded-md flex items-center justify-center space-x-2">
+            <FaTrash />
+            <span>Checkout Now ({cartItems.length} items)</span>
           </button>
         </div>
       </div>

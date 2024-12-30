@@ -1,9 +1,9 @@
 import React from "react";
 import { ProfilePage } from "@/lib/pages/artists/components/profile-page";
 import {CardCollection} from "./components/more-card";
-import { DetailBio } from "./components/detail-card";
+import { DetailBio } from "./components/detail-bio";
 
-const Artists: React.FC = () => {
+const DetailSpecial: React.FC = () => {
   return (
     <div>
       <ProfilePage />
@@ -13,4 +13,4 @@ const Artists: React.FC = () => {
   );
 };  
 
-export default Artists;
+export default DetailSpecial;
