@@ -1,12 +1,14 @@
 import React from "react";
 import type {PathRouteProps} from "react-router-dom";
 
-import Dashboard from "../admin-pages/dashboard";
+import Dashboard from "../admin-pages/components/index-admin";
 import {OrderDetail} from "../admin-pages/detail-order";
-import {Card} from "../admin-pages/card";
-import {SpecialCard} from "../admin-pages/spceial-card";
-import {Categories} from "../admin-pages/categories";
-import {Tag} from "../admin-pages/tag";
+import {Card} from "../admin-pages/marketplace/card";
+import {SpecialCard} from "../admin-pages/marketplace/special-card";
+import {Master} from "../admin-pages/marketplace/master";
+import {Series} from "../admin-pages/marketplace/series";
+import {Categories} from "../admin-pages/marketplace/categories";
+import {Tag} from "../admin-pages/marketplace/tag";
 import {Events} from "../admin-pages/events";
 import {Coupon} from "../admin-pages/coupon";
 import {Creator} from "../admin-pages/creator";
@@ -58,6 +60,14 @@ export const routes: Array<PathRouteProps> = [
   {
     path: "/admin/special",
     element: <SpecialCard />,
+  },
+  {
+    path: "/admin/master",
+    element: <Master />,
+  },
+  {
+    path: "/admin/series",
+    element: <Series />,
   },
   {
     path: "/admin/categories",
@@ -136,7 +146,7 @@ export const routes: Array<PathRouteProps> = [
     element: <DetailSpecial />,
   },
   {
-    path: "detail-cards",
+    path: "/detail-cards",
     element: <DetailCards />,
   },
   {

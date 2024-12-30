@@ -2,58 +2,7 @@ import {useState} from "react";
 import ReactApexChart from "react-apexcharts";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import {Package, Truck, CreditCard, CheckCircle} from "lucide-react";
 import {ApexOptions} from "apexcharts";
-
-const statCards = [
-  {
-    title: "Revenue Today",
-    value: "Rp 2.000.000",
-  },
-  {
-    title: "Orders Today",
-    value: "18",
-  },
-  {
-    title: "Total Revenue",
-    value: "Rp 5.000.000",
-  },
-  {
-    title: "Total Orders",
-    value: "131",
-  },
-];
-
-const statusCards = [
-  {
-    label: "Payment",
-    value: "20",
-    icon: CreditCard,
-    color: "rgb(254, 226, 226)",
-    textColor: "rgb(185, 28, 28)",
-  },
-  {
-    label: "Packaging",
-    value: "8",
-    icon: Package,
-    color: "rgb(254, 249, 195)",
-    textColor: "rgb(161, 98, 7)",
-  },
-  {
-    label: "Shipping",
-    value: "3",
-    icon: Truck,
-    color: "rgb(219, 234, 254)",
-    textColor: "rgb(29, 78, 216)",
-  },
-  {
-    label: "Delivered",
-    value: "100",
-    icon: CheckCircle,
-    color: "rgb(220, 252, 231)",
-    textColor: "rgb(21, 128, 61)",
-  },
-];
 
 const metricCards = [
   {
@@ -79,7 +28,7 @@ const metricCards = [
   },
 ];
 
-export default function Dashboard() {
+export default function Sales() {
   const [timeRange, setTimeRange] = useState("7 Days");
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
   const [endDate, setEndDate] = useState<Date | undefined>(undefined);
@@ -183,44 +132,6 @@ export default function Dashboard() {
 
   return (
     <div className="p-6 space-y-6">
-      {/* Stats Grid */}
-      <div className="grid grid-cols-4 gap-4">
-        {statCards.map((stat, i) => (
-          <div
-            key={i}
-            className="bg-white rounded-lg p-4 shadow-sm border"
-          >
-            <h3 className="text-sm text-gray-500 mb-2">{stat.title}</h3>
-            <p className="text-2xl font-bold">{stat.value}</p>
-          </div>
-        ))}
-      </div>
-
-      {/* Status Cards */}
-      <div className="grid grid-cols-4 gap-4">
-        {statusCards.map((status, i) => (
-          <div
-            key={i}
-            className="p-4 rounded-lg flex justify-between items-center"
-            style={{backgroundColor: status.color}}
-          >
-            <div className="flex items-center gap-2">
-              <status.icon
-                size={20}
-                style={{color: status.textColor}}
-              />
-              <span style={{color: status.textColor}}>{status.label}</span>
-            </div>
-            <span
-              className="text-2xl font-bold"
-              style={{color: status.textColor}}
-            >
-              {status.value}
-            </span>
-          </div>
-        ))}
-      </div>
-
       {/* Chart and Metrics Section */}
       <div className="grid grid-cols-3 gap-4">
         {/* Chart Section */}
