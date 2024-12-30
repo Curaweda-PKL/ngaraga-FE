@@ -1,5 +1,7 @@
 import { useState } from "react";
-import { FaBars, FaTimes, FaUserFriends, FaShoppingCart } from "react-icons/fa";
+import { FaBars, FaTimes, FaUserFriends,  } from "react-icons/fa";
+import { CiShoppingCart } from "react-icons/ci";
+
 import { useNavigate } from "react-router-dom";
 
 export const Navbar: React.FC = () => {
@@ -65,15 +67,15 @@ export const Navbar: React.FC = () => {
         <div className="navbar-end flex items-center space-x-4 mr-5">
           {/* Cart Icon */}
           <a
-            className="cursor-pointer text-black flex items-center"
+            className="cursor-pointer flex items-center"
             onClick={() => navigateToPage("cart")}
           >
-            <FaShoppingCart size={24} className="lg:mr-5" />
+            <CiShoppingCart  size={31} className="lg:mr-3" />
           </a>
 
           {/* Sign-in and Sign-up buttons */}
           <a
-            className="btn bg-white border-call-to-action rounded-lg text-orange-300 hidden lg:flex items-center gap-2 hover:bg-gray-800 hover:text-white transition"
+            className="btn bg-white border-call-to-action rounded-lg text-orange-300 hidden lg:flex items-center gap-2 hover:bg-call-to-actions-800 hover:text-white transition"
             onClick={() => navigateToPage("login")}
           >
             Sign In
@@ -81,7 +83,7 @@ export const Navbar: React.FC = () => {
 
           {/* Sign-up Button */}
           <a
-            className="btn bg-call-to-action border-transparent rounded-lg text-white hidden lg:flex items-center gap-2 hover:bg-gray-800 transition"
+            className="btn bg-call-to-action border-transparent rounded-lg text-white hidden lg:flex items-center gap-2 hover:bg-call-to-actions-800 transition"
             onClick={() => navigateToPage("signup")}
           >
             <FaUserFriends size={18} />
