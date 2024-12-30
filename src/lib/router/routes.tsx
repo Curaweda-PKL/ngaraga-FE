@@ -16,6 +16,7 @@ import {Subscription} from "../admin-pages/subscription";
 import {Shipping} from "../admin-pages/shipping";
 import {Payment} from "../admin-pages/payment";
 import {Admin} from "../admin-pages/admin";
+
 const DetailSpecial = React.lazy(() => import("@/lib/pages/detail-card/detail-special-index"));
 const DetailCards = React.lazy(() => import("../pages/detail-card/detail-cards"));
 const ForgotPassword = React.lazy(() => import("@/lib/pages/auth/login/forgot-password"));
