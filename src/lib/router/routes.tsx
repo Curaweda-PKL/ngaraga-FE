@@ -17,6 +17,7 @@ import {Subscription} from "../admin-pages/subscription";
 import {Shipping} from "../admin-pages/shipping";
 import {Payment} from "../admin-pages/payment";
 import {Admin} from "../admin-pages/admin";
+import {ProfileSettings} from "../admin-pages/admin-profile";
 
 const ForgotPassword = React.lazy(
   () => import("@/lib/pages/auth/login/forgot-password")
@@ -108,6 +109,10 @@ export const routes: Array<PathRouteProps> = [
   {
     path: "/admin",
     element: <Admin />,
+  },
+  {
+    path: "/admin/profile",
+    element: <ProfileSettings />,
   },
   {
     path: "/",

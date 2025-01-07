@@ -142,6 +142,22 @@ const SidebarComponent = () => {
                     </li>
                     <li>
                       <a
+                        href="/admin/master"
+                        className="flex items-center p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+                      >
+                        Master
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        href="/admin/series"
+                        className="flex items-center p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+                      >
+                        Series
+                      </a>
+                    </li>
+                    <li>
+                      <a
                         href="/admin/categories"
                         className="flex items-center p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
                       >

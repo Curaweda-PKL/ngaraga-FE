@@ -66,26 +66,26 @@ const Navbar = () => {
                   className="py-2"
                   role="none"
                 >
-                  <button
+                  <a
+                    href="/admin/profile"
                     onClick={() => {
-                      // Handle settings navigation
                       setIsProfileOpen(false);
                     }}
-                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white"
                     role="menuitem"
                   >
                     Settings
-                  </button>
-                  <button
+                  </a>
+                  <a
+                    href="/logout"
                     onClick={() => {
-                      // Handle logout
                       setIsProfileOpen(false);
                     }}
-                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white"
                     role="menuitem"
                   >
                     Logout
-                  </button>
+                  </a>
                 </div>
               </div>
             )}
