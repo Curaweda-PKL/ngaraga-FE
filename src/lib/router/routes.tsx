@@ -5,8 +5,6 @@ import Dashboard from "../admin-pages/components/index-admin";
 import {OrderDetail} from "../admin-pages/detail-order";
 import {Card} from "../admin-pages/marketplace/card";
 import {SpecialCard} from "../admin-pages/marketplace/special-card";
-import {Master} from "../admin-pages/marketplace/master";
-import {Series} from "../admin-pages/marketplace/series";
 import {Categories} from "../admin-pages/marketplace/categories";
 import {Tag} from "../admin-pages/marketplace/tag";
 import {Events} from "../admin-pages/events";
@@ -17,8 +15,13 @@ import {Subscription} from "../admin-pages/subscription";
 import {Shipping} from "../admin-pages/shipping";
 import {Payment} from "../admin-pages/payment";
 import {Admin} from "../admin-pages/admin";
-import {ProfileSettings} from "../admin-pages/admin-profile";
 
+const DetailSpecial = React.lazy(
+  () => import("@/lib/pages/detail-card/detail-special-index")
+);
+const DetailCards = React.lazy(
+  () => import("../pages/detail-card/detail-cards")
+);
 const ForgotPassword = React.lazy(
   () => import("@/lib/pages/auth/login/forgot-password")
 );
@@ -42,130 +45,35 @@ const BrowseEvents = React.lazy(
 const EventDetail = React.lazy(
   () => import("@/lib/pages/event-detail/detail-events")
 );
-import DetailSpecial from "@/lib/pages/detail-card/detail-special-index";
-import DetailCards from "../pages/detail-card/detail-cards";
 
 export const routes: Array<PathRouteProps> = [
-  {
-    path: "/admin/dashboard",
-    element: <Dashboard />,
-  },
-  {
-    path: "/admin/order",
-    element: <OrderDetail />,
-  },
-  {
-    path: "/admin/card",
-    element: <Card />,
-  },
-  {
-    path: "/admin/special",
-    element: <SpecialCard />,
-  },
-  {
-    path: "/admin/master",
-    element: <Master />,
-  },
-  {
-    path: "/admin/series",
-    element: <Series />,
-  },
-  {
-    path: "/admin/categories",
-    element: <Categories />,
-  },
-  {
-    path: "/admin/tag",
-    element: <Tag />,
-  },
-  {
-    path: "/admin/event",
-    element: <Events />,
-  },
-  {
-    path: "/admin/coupon",
-    element: <Coupon />,
-  },
-  {
-    path: "/admin/creator",
-    element: <Creator />,
-  },
-  {
-    path: "/admin/member",
-    element: <Member />,
-  },
-  {
-    path: "/admin/subscription",
-    element: <Subscription />,
-  },
-  {
-    path: "/admin/shipping",
-    element: <Shipping />,
-  },
-  {
-    path: "/admin/payment",
-    element: <Payment />,
-  },
-  {
-    path: "/admin",
-    element: <Admin />,
-  },
-  {
-    path: "/admin/profile",
-    element: <ProfileSettings />,
-  },
-  {
-    path: "/",
-    element: <Home />,
-  },
-  {
-    path: "/signup",
-    element: <Signup />,
-  },
-  {
-    path: "/login",
-    element: <Login />,
-  },
-  {
-    path: "/forgot-password",
-    element: <ForgotPassword />,
-  },
-  {
-    path: "/reset-password",
-    element: <ResetPassword />,
-  },
-  {
-    path: "/artists",
-    element: <Artists />,
-  },
-  {
-    path: "/marketplace",
-    element: <Marketplace />,
-  },
-  {
-    path: "/rankings",
-    element: <TopCollectors />,
-  },
-  {
-    path: "/detail-special-card",
-    element: <DetailSpecial />,
-  },
-  {
-    path: "/detail-cards",
-    element: <DetailCards />,
-  },
-  {
-    path: "/cart",
-    element: <Cart />,
-  },
-  {
-    path: "/events",
-    element: <BrowseEvents />,
-  },
-  {
-    path: "/detailevents",
-    element: <EventDetail />,
-  },
+  {path: "/admin/dashboard", element: <Dashboard />},
+  {path: "/admin/order", element: <OrderDetail />},
+  {path: "/admin/card", element: <Card />},
+  {path: "/admin/special", element: <SpecialCard />},
+  {path: "/admin/categories", element: <Categories />},
+  {path: "/admin/tag", element: <Tag />},
+  {path: "/admin/event", element: <Events />},
+  {path: "/admin/coupon", element: <Coupon />},
+  {path: "/admin/creator", element: <Creator />},
+  {path: "/admin/member", element: <Member />},
+  {path: "/admin/subscription", element: <Subscription />},
+  {path: "/admin/shipping", element: <Shipping />},
+  {path: "/admin/payment", element: <Payment />},
+  {path: "/admin", element: <Admin />},
+  {path: "/", element: <Home />},
+  {path: "/signup", element: <Signup />},
+  {path: "/login", element: <Login />},
+  {path: "/forgot-password", element: <ForgotPassword />},
+  {path: "/reset-password", element: <ResetPassword />},
+  {path: "/artists", element: <Artists />},
+  {path: "/marketplace", element: <Marketplace />},
+  {path: "/rankings", element: <TopCollectors />},
+  {path: "/detail-special-card", element: <DetailSpecial />},
+  {path: "/detail-cards", element: <DetailCards />},
+  {path: "/cart", element: <Cart />},
+  {path: "/events", element: <BrowseEvents />},
+  {path: "/detailevents", element: <EventDetail />},
 ];
 
 export const privateRoutes: Array<PathRouteProps> = [];
