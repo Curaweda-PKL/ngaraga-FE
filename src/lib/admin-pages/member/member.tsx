@@ -168,7 +168,7 @@ export const Member = () => {
                 <td className="p-4">
                   <div className="flex gap-2">
                     <button className="p-2 hover:bg-gray-100 rounded-full">
-                      🔍
+                      <a href="/admin/detail-member">🔍</a>
                     </button>
                     <button className="p-2 hover:bg-gray-100 rounded-full">
                       👁️

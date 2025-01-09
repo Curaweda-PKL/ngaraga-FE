@@ -1,20 +1,24 @@
 import React from "react";
 import type {PathRouteProps} from "react-router-dom";
 
-import Dashboard from "../admin-pages/components/index-admin";
-import {OrderDetail} from "../admin-pages/detail-order";
+import Dashboard from "../admin-pages/dashboard/index-admin";
+import {OrderDetail} from "../admin-pages/order";
 import {Card} from "../admin-pages/marketplace/card";
 import {SpecialCard} from "../admin-pages/marketplace/special-card";
 import {Categories} from "../admin-pages/marketplace/categories";
+import {Master} from "../admin-pages/marketplace/master";
+import {Series} from "../admin-pages/marketplace/series";
 import {Tag} from "../admin-pages/marketplace/tag";
-import {Events} from "../admin-pages/events";
-import {Coupon} from "../admin-pages/coupon";
+import {Events} from "../admin-pages/event/events";
+import {Coupon} from "../admin-pages/coupon/coupon";
 import {Creator} from "../admin-pages/creator";
-import {Member} from "../admin-pages/member";
+import {Member} from "../admin-pages/member/member";
+import {MemberDetails} from "../admin-pages/member/detail-member";
 import {Subscription} from "../admin-pages/subscription";
 import {Shipping} from "../admin-pages/shipping";
 import {Payment} from "../admin-pages/payment";
-import {Admin} from "../admin-pages/admin";
+import {Admin} from "../admin-pages/admin/admin";
+import {ProfileSettings} from "../admin-pages/admin-profile";
 
 const DetailSpecial = React.lazy(
   () => import("@/lib/pages/detail-card/detail-special-index")
@@ -51,16 +55,20 @@ export const routes: Array<PathRouteProps> = [
   {path: "/admin/order", element: <OrderDetail />},
   {path: "/admin/card", element: <Card />},
   {path: "/admin/special", element: <SpecialCard />},
+  {path: "/admin/master", element: <Master />},
+  {path: "/admin/series", element: <Series />},
   {path: "/admin/categories", element: <Categories />},
   {path: "/admin/tag", element: <Tag />},
   {path: "/admin/event", element: <Events />},
   {path: "/admin/coupon", element: <Coupon />},
   {path: "/admin/creator", element: <Creator />},
   {path: "/admin/member", element: <Member />},
+  {path: "/admin/detail-member", element: <MemberDetails />},
   {path: "/admin/subscription", element: <Subscription />},
   {path: "/admin/shipping", element: <Shipping />},
   {path: "/admin/payment", element: <Payment />},
   {path: "/admin", element: <Admin />},
+  {path: "/admin/profile", element: <ProfileSettings />},
   {path: "/", element: <Home />},
   {path: "/signup", element: <Signup />},
   {path: "/login", element: <Login />},

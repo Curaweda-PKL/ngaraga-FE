@@ -69,15 +69,15 @@ export const ProfileSettings = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-6">
+    <div className="max-w-7xl mx-auto">
+      <h1 className="text-2xl font-bold mb-6">{formData.fullName}</h1>
       <div className="card shadow-lg bg-white border-2 p-6">
-        <h1 className="text-2xl font-bold mb-6">{formData.fullName}</h1>
         <div className="space-y-6">
           {/* Upload Area */}
           <div>
             <label className="block mb-2 font-medium">Member Image *</label>
             <div
-              className="border-2 border-dashed border-gray-300 p-6 rounded-lg flex flex-col items-center justify-center"
+              className="border-2 border-dashed border-gray-300 p-6 w-[18vw] h-[10vw] rounded-lg justify-start"
               onDragOver={handleDragOver}
               onDrop={handleDrop}
             >
@@ -86,29 +86,24 @@ export const ProfileSettings = () => {
                   <img
                     src={formData.profileImage.toString()}
                     alt="Profile"
-                    className="w-24 h-24 rounded-full object-cover"
+                    className="w-32 h-32 rounded-2xl object-cover"
                   />
                 </div>
               ) : (
                 <>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    id="profileImage"
-                    onChange={handleImageUpload}
-                  />
-                  <label
-                    htmlFor="profileImage"
-                    className="cursor-pointer"
-                  >
-                    <button className="btn btn-warning text-white">
-                      Browse
-                    </button>
-                    <p className="mt-2 text-sm text-red-500">
-                      Click to Upload or Drag & Drop
-                    </p>
+                  <label className="btn cursor-pointer text-white bg-yellow-300 rounded-xl">
+                    Browse
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      id="profileImage"
+                      onChange={handleImageUpload}
+                    />
                   </label>
+                  <p className="mt-4 text-sm text-red-500">
+                    Click to Upload or Drag & Drop
+                  </p>
                 </>
               )}
             </div>
@@ -123,7 +118,7 @@ export const ProfileSettings = () => {
                 name="fullName"
                 value={formData.fullName}
                 onChange={handleInputChange}
-                className="input input-bordered w-full"
+                className="input input-bordered w-full bg-white"
               />
             </div>
             <div>
@@ -133,7 +128,7 @@ export const ProfileSettings = () => {
                 name="username"
                 value={formData.username}
                 onChange={handleInputChange}
-                className="input input-bordered w-full"
+                className="input input-bordered w-full bg-white"
               />
             </div>
             <div>
@@ -143,7 +138,7 @@ export const ProfileSettings = () => {
                 name="email"
                 value={formData.email}
                 onChange={handleInputChange}
-                className="input input-bordered w-full"
+                className="input input-bordered w-full bg-white"
               />
             </div>
             <div>
@@ -153,7 +148,7 @@ export const ProfileSettings = () => {
                   name="countryCode"
                   value={formData.countryCode}
                   onChange={handleInputChange}
-                  className="select select-bordered w-20"
+                  className="select select-bordered w-20 bg-white"
                 >
                   <option value="+62">+62</option>
                 </select>
@@ -162,7 +157,7 @@ export const ProfileSettings = () => {
                   name="phoneNumber"
                   value={formData.phoneNumber}
                   onChange={handleInputChange}
-                  className="input input-bordered w-full"
+                  className="input input-bordered w-full bg-white"
                 />
               </div>
             </div>
@@ -175,11 +170,6 @@ export const ProfileSettings = () => {
           >
             Reset Password
           </button>
-        </div>
-
-        <div className="flex justify-end mt-6 space-x-4">
-          <button className="btn btn-outline">Cancel</button>
-          <button className="btn btn-warning text-white">Update</button>
         </div>
       </div>
 
@@ -230,6 +220,10 @@ export const ProfileSettings = () => {
           </div>
         </div>
       )}
+      <div className="flex justify-end mt-6 space-x-4">
+        <button className="btn btn-outline">Cancel</button>
+        <button className="btn btn-warning text-white">Update</button>
+      </div>
     </div>
   );
 };
