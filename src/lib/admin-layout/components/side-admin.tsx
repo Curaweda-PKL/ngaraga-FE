@@ -130,7 +130,7 @@ const SidebarComponent = () => {
                   <ul className="mt-1 ml-4 space-y-1">
                     {[
                       "Card",
-                      "Special",
+                      "Special Card",
                       "Master",
                       "Series",
                       "Categories",

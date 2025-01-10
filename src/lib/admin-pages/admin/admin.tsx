@@ -56,7 +56,10 @@ export const Admin = () => {
         {/* Add button */}
         <button className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg flex items-center gap-2">
           <Plus className="w-4 h-4" />
-          <span>Add Member</span>
+          <span>
+            {" "}
+            <a href="/admin/add-member">Add Member</a>
+          </span>
         </button>
 
         {/* Search input */}

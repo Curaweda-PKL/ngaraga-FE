@@ -67,7 +67,9 @@ export const Member = () => {
       <div className="flex justify-between items-center mb-6">
         <button className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg flex items-center gap-2">
           <FaPlus className="w-4 h-4" />
-          <span>Add Member</span>
+          <span>
+            <a href="/admin/add-member">Add Member</a>
+          </span>
         </button>
 
         <div className="flex items-center gap-4 ml-auto">
