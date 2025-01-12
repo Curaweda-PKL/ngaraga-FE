@@ -1,4 +1,12 @@
-import {FiEdit2, FiEye, FiTrash2, FiSearch, FiPlusCircle} from "react-icons/fi";
+import React, {useState} from "react";
+import {
+  FiEdit2,
+  FiEye,
+  FiTrash2,
+  FiSearch,
+  FiPlusCircle,
+  FiX,
+} from "react-icons/fi";
 import {
   FaPalette,
   FaMusic,
@@ -12,7 +20,145 @@ import {
   FaMicrochip,
 } from "react-icons/fa";
 
+interface CategoryData {
+  master: string;
+  series: string;
+  category: string;
+  Icon: React.ComponentType;
+}
+
+interface EditModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  data: CategoryData | null;
+}
+
+const EditModal: React.FC<EditModalProps> = ({isOpen, onClose}) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+      <div className="bg-white rounded-lg w-full max-w-md">
+        {/* Modal Header */}
+        <div className="flex justify-between items-center p-4 border-b">
+          <h2 className="text-lg font-medium">Edit Categories</h2>
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-600"
+          >
+            <FiX className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Modal Content */}
+        <div className="p-4">
+          <div className="space-y-4">
+            {/* Series Selection */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Select Series*
+              </label>
+              <div className="relative">
+                <select className="w-full border rounded-lg px-3 py-2 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-yellow-500">
+                  <option>Choose a Series</option>
+                  <option selected>Series 3</option>
+                  {/* Add other series options */}
+                </select>
+                <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                  <svg
+                    className="w-4 h-4 text-gray-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </div>
+              </div>
+              {/* Selected Series Tag */}
+              <div className="mt-2">
+                <div className="inline-flex items-center bg-yellow-50 rounded-lg px-3 py-1">
+                  <span className="text-sm text-yellow-800">Series 3</span>
+                  <button className="ml-2 text-yellow-600 hover:text-yellow-800">
+                    <FiX className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Categories Icon */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Categories Icon*
+              </label>
+              <div className="flex items-center gap-4">
+                <input
+                  type="text"
+                  value="Art.svg"
+                  className="flex-grow border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                />
+                <div className="flex gap-2">
+                  <button className="p-2 text-gray-400 hover:text-gray-600 border rounded-lg">
+                    <FaPalette className="w-5 h-5" />
+                  </button>
+                  <button className="p-2 text-gray-400 hover:text-gray-600 border rounded-lg">
+                    <FiEye className="w-5 h-5" />
+                  </button>
+                  <button className="p-2 text-red-400 hover:text-red-600 border rounded-lg">
+                    <FiTrash2 className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+              <p className="mt-1 text-sm text-gray-500">SVG Only</p>
+            </div>
+
+            {/* Category Name */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Category Name*
+              </label>
+              <input
+                type="text"
+                defaultValue="Art"
+                className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Modal Footer */}
+        <div className="flex justify-end gap-2 p-4 border-t">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 border rounded-lg text-gray-600 hover:bg-gray-50"
+          >
+            Cancel
+          </button>
+          <button className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600">
+            Update
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export const Categories = () => {
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingCategory, setEditingCategory] = useState<CategoryData | null>(
+    null
+  );
+
+  const handleEdit = (category: CategoryData) => {
+    setEditingCategory(category);
+    setIsEditModalOpen(true);
+  };
+
   const tableData = [
     {master: "Master 1", series: "Series 1", category: "Art", Icon: FaPalette},
     {
@@ -60,7 +206,6 @@ export const Categories = () => {
       Icon: FaMicrochip,
     },
   ];
-
   return (
     <div className="p-6">
       {/* Breadcrumb */}
@@ -115,7 +260,10 @@ export const Categories = () => {
                 </td>
                 <td className="p-4">
                   <div className="flex justify-center gap-4">
-                    <button className="text-gray-400 hover:text-gray-600">
+                    <button
+                      onClick={() => handleEdit(item)}
+                      className="text-gray-400 hover:text-gray-600"
+                    >
                       <FiEdit2 className="w-5 h-5" />
                     </button>
                     <button className="text-gray-400 hover:text-gray-600">
@@ -130,7 +278,6 @@ export const Categories = () => {
             ))}
           </tbody>
         </table>
-
         {/* Pagination */}
         <div className="flex justify-end p-4 border-t">
           <div className="flex items-center gap-2">
@@ -150,6 +297,17 @@ export const Categories = () => {
           </div>
         </div>
       </div>
+
+      <EditModal
+        isOpen={isEditModalOpen}
+        onClose={() => {
+          setIsEditModalOpen(false);
+          setEditingCategory(null);
+        }}
+        data={editingCategory}
+      />
     </div>
   );
 };
+
+export default Categories;

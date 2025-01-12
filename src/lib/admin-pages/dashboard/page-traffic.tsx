@@ -1,112 +1,107 @@
-import {Calendar} from "lucide-react";
+import {useState} from "react";
+import {BsCalendar} from "react-icons/bs"; // Import React Icon
+import {GrView} from "react-icons/gr";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
-const topProducts = [
-  {
-    id: 1,
-    name: "Galactic Explorer",
-    soldOut: 100,
-    revenue: "Rp 6.000.000",
-    image: "https://via.placeholder.com/50", // Ganti dengan URL gambar Anda
-  },
-  {
-    id: 2,
-    name: "Cosmic Navigator",
-    soldOut: 90,
-    revenue: "Rp 4.000.000",
-    image: "https://via.placeholder.com/50",
-  },
-  {
-    id: 3,
-    name: "Nebula Explorer",
-    soldOut: 80,
-    revenue: "Rp 3.000.000",
-    image: "https://via.placeholder.com/50",
-  },
-  {
-    id: 4,
-    name: "Starship Commander",
-    soldOut: 70,
-    revenue: "Rp 2.000.000",
-    image: "https://via.placeholder.com/50",
-  },
-  {
-    id: 5,
-    name: "Asteroid Hunter",
-    soldOut: 50,
-    revenue: "Rp 800.000",
-    image: "https://via.placeholder.com/50",
-  },
+const topPages = [
+  {id: 1, name: "ngaraga.co.id", visitors: 13005},
+  {id: 2, name: "name-page", visitors: 12004},
+  {id: 3, name: "name-page", visitors: 10899},
+  {id: 4, name: "name-page", visitors: 8674},
+  {id: 5, name: "name-page", visitors: 500},
 ];
 
-const topMembers = [
-  {
-    id: 1,
-    collector: "Dish Studio",
-    card: 2300,
-    specialCard: 602,
-    follower: "12k",
-    image: "https://via.placeholder.com/50", // Ganti dengan URL gambar Anda
-  },
-  {
-    id: 2,
-    collector: "Dish Studio",
-    card: 2300,
-    specialCard: 602,
-    follower: "12k",
-    image: "https://via.placeholder.com/50",
-  },
-  {
-    id: 3,
-    collector: "Dish Studio",
-    card: 2300,
-    specialCard: 602,
-    follower: "12k",
-    image: "https://via.placeholder.com/50",
-  },
-  {
-    id: 4,
-    collector: "Dish Studio",
-    card: 2300,
-    specialCard: 602,
-    follower: "12k",
-    image: "https://via.placeholder.com/50",
-  },
-  {
-    id: 5,
-    collector: "Dish Studio",
-    card: 2300,
-    specialCard: 602,
-    follower: "12k",
-    image: "https://via.placeholder.com/50",
-  },
+const visitorsByCity = [
+  {id: 1, city: "Jakarta", visitors: 13005},
+  {id: 2, city: "Malang", visitors: 12004},
+  {id: 3, city: "Bandung", visitors: 10899},
+  {id: 4, city: "Makassar", visitors: 8674},
+  {id: 5, city: "Palembang", visitors: 500},
 ];
 
 export default function PageTraffic() {
+  const [startDate, setStartDate] = useState<Date | undefined>(undefined);
+  const [endDate, setEndDate] = useState<Date | undefined>(undefined);
+  const [filter, setFilter] = useState("7D"); // Default filter is 7 Days
+
+  const handleDateChange = (date: Date | null, dateType: "start" | "end") => {
+    if (dateType === "start") {
+      setStartDate(date || undefined);
+    } else {
+      setEndDate(date || undefined);
+    }
+  };
+
+  const handleFilterChange = (filter: string) => {
+    setFilter(filter);
+    const today = new Date();
+    if (filter === "7D") {
+      setStartDate(new Date(today.setDate(today.getDate() - 7)));
+      setEndDate(new Date());
+    } else if (filter === "30D") {
+      setStartDate(new Date(today.setDate(today.getDate() - 30)));
+      setEndDate(new Date());
+    } else if (filter === "1Y") {
+      setStartDate(new Date(today.setFullYear(today.getFullYear() - 1)));
+      setEndDate(new Date());
+    }
+  };
+
   return (
-    <div className="grid grid-cols-2 gap-6 mt-6">
-      {/* Top Product */}
-      <div className="bg-white rounded-lg p-6 border">
-        <h2 className="text-lg font-semibold mb-4">Top Product</h2>
-        <div className="flex items-center gap-4 mb-4">
-          <button className="px-3 py-1 text-white bg-yellow-500 rounded-md">
+    <div className="grid grid-cols-2 gap-8 mt-6">
+      {/* Page Traffic */}
+      <div className="bg-white rounded-lg p-6 shadow-lg border">
+        <h2 className="text-xl font-semibold mb-6">Page Traffic</h2>
+        <div className="flex items-center gap-4 mb-6">
+          <button
+            onClick={() => handleFilterChange("7D")}
+            className={`px-4 py-2 rounded-md ${
+              filter === "7D" ? "bg-yellow-500 text-white" : "bg-gray-200"
+            }`}
+          >
             7D
           </button>
-          <button className="px-3 py-1 text-gray-500 bg-gray-200 rounded-md">
+          <button
+            onClick={() => handleFilterChange("30D")}
+            className={`px-4 py-2 rounded-md ${
+              filter === "30D" ? "bg-yellow-500 text-white" : "bg-gray-200"
+            }`}
+          >
             30D
           </button>
-          <button className="px-3 py-1 text-gray-500 bg-gray-200 rounded-md">
-            12M
+          <button
+            onClick={() => handleFilterChange("1Y")}
+            className={`px-4 py-2 rounded-md ${
+              filter === "1Y" ? "bg-yellow-500 text-white" : "bg-gray-200"
+            }`}
+          >
+            1Y
           </button>
           <div className="flex items-center gap-2 ml-auto">
-            <Calendar size={20} />
-            <input
-              type="date"
-              className="border p-2 rounded-md text-gray-600"
+            <BsCalendar
+              className="text-gray-500"
+              size={20}
             />
-            <span>-</span>
-            <input
-              type="date"
-              className="border p-2 rounded-md text-gray-600"
+            <DatePicker
+              selected={startDate}
+              onChange={(date) => handleDateChange(date, "start")}
+              selectsStart
+              startDate={startDate}
+              endDate={endDate}
+              placeholderText="From"
+              className="bg-gray-50 border border-gray-300 text-sm rounded-lg w-28 p-2.5"
+            />
+            <span className="text-gray-500">-</span>
+            <DatePicker
+              selected={endDate}
+              onChange={(date) => handleDateChange(date, "end")}
+              selectsEnd
+              startDate={startDate}
+              endDate={endDate}
+              minDate={startDate}
+              placeholderText="To"
+              className="bg-gray-50 border border-gray-300 text-sm rounded-lg w-28 p-2.5"
             />
           </div>
         </div>
@@ -114,57 +109,84 @@ export default function PageTraffic() {
           <thead className="bg-gray-50 text-gray-700">
             <tr>
               <th>#</th>
-              <th>Product Name</th>
-              <th>Sold Out</th>
-              <th>Revenue</th>
+              <th>Page Name</th>
+              <th>Total Visitors</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody>
-            {topProducts.map((product) => (
+            {topPages.map((page) => (
               <tr
-                key={product.id}
+                key={page.id}
                 className="border-b"
               >
-                <td>{product.id}</td>
-                <td className="flex items-center gap-2">
-                  <img
-                    src={product.image}
-                    alt={product.name}
-                    className="w-10 h-10 rounded-md"
-                  />
-                  {product.name}
+                <td>{page.id}</td>
+                <td>{page.name}</td>
+                <td>{page.visitors}</td>
+                <td>
+                  <button className="text-blue-500 hover:underline">
+                    <GrView />
+                  </button>
                 </td>
-                <td>{product.soldOut}</td>
-                <td>{product.revenue}</td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
 
-      {/* Top Member */}
-      <div className="bg-white rounded-lg p-6 border">
-        <h2 className="text-lg font-semibold mb-4">Top Member</h2>
-        <div className="flex items-center gap-4 mb-4">
-          <button className="px-3 py-1 text-white bg-yellow-500 rounded-md">
+      {/* Visitors by City */}
+      <div className="bg-white rounded-lg p-6 shadow-lg border">
+        <h2 className="text-xl font-semibold mb-6">Visitors by City</h2>
+        <div className="flex items-center gap-4 mb-6">
+          {/* Reuse buttons and datepicker */}
+          <button
+            onClick={() => handleFilterChange("7D")}
+            className={`px-4 py-2 rounded-md ${
+              filter === "7D" ? "bg-yellow-500 text-white" : "bg-gray-200"
+            }`}
+          >
             7D
           </button>
-          <button className="px-3 py-1 text-gray-500 bg-gray-200 rounded-md">
+          <button
+            onClick={() => handleFilterChange("30D")}
+            className={`px-4 py-2 rounded-md ${
+              filter === "30D" ? "bg-yellow-500 text-white" : "bg-gray-200"
+            }`}
+          >
             30D
           </button>
-          <button className="px-3 py-1 text-gray-500 bg-gray-200 rounded-md">
-            12M
+          <button
+            onClick={() => handleFilterChange("1Y")}
+            className={`px-4 py-2 rounded-md ${
+              filter === "1Y" ? "bg-yellow-500 text-white" : "bg-gray-200"
+            }`}
+          >
+            1Y
           </button>
           <div className="flex items-center gap-2 ml-auto">
-            <Calendar size={20} />
-            <input
-              type="date"
-              className="border p-2 rounded-md text-gray-600"
+            <BsCalendar
+              className="text-gray-500"
+              size={20}
             />
-            <span>-</span>
-            <input
-              type="date"
-              className="border p-2 rounded-md text-gray-600"
+            <DatePicker
+              selected={startDate}
+              onChange={(date) => handleDateChange(date, "start")}
+              selectsStart
+              startDate={startDate}
+              endDate={endDate}
+              placeholderText="From"
+              className="bg-gray-50 border border-gray-300 text-sm rounded-lg w-28 p-2.5"
+            />
+            <span className="text-gray-500">-</span>
+            <DatePicker
+              selected={endDate}
+              onChange={(date) => handleDateChange(date, "end")}
+              selectsEnd
+              startDate={startDate}
+              endDate={endDate}
+              minDate={startDate}
+              placeholderText="To"
+              className="bg-gray-50 border border-gray-300 text-sm rounded-lg w-28 p-2.5"
             />
           </div>
         </div>
@@ -172,30 +194,19 @@ export default function PageTraffic() {
           <thead className="bg-gray-50 text-gray-700">
             <tr>
               <th>#</th>
-              <th>Collector</th>
-              <th>Card</th>
-              <th>Special Card</th>
-              <th>Follower</th>
+              <th>City</th>
+              <th>Total Visitors</th>
             </tr>
           </thead>
           <tbody>
-            {topMembers.map((member) => (
+            {visitorsByCity.map((city) => (
               <tr
-                key={member.id}
+                key={city.id}
                 className="border-b"
               >
-                <td>{member.id}</td>
-                <td className="flex items-center gap-2">
-                  <img
-                    src={member.image}
-                    alt={member.collector}
-                    className="w-10 h-10 rounded-full"
-                  />
-                  {member.collector}
-                </td>
-                <td>{member.card}</td>
-                <td>{member.specialCard}</td>
-                <td>{member.follower}</td>
+                <td>{city.id}</td>
+                <td>{city.city}</td>
+                <td>{city.visitors}</td>
               </tr>
             ))}
           </tbody>

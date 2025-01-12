@@ -142,7 +142,9 @@ export const Events = () => {
                       <MessageSquare className="w-4 h-4" />
                     </button>
                     <button className="p-2 hover:bg-gray-100 rounded-lg text-gray-600">
-                      <Edit className="w-4 h-4" />
+                      <a href="/admin/add-event">
+                        <Edit className="w-4 h-4" />
+                      </a>
                     </button>
                     <button className="p-2 hover:bg-gray-100 rounded-lg text-gray-600">
                       <Eye className="w-4 h-4" />
