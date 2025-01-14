@@ -1,7 +1,7 @@
-import React, {useState} from "react";
+import {useState} from "react";
 import {Pencil, Eye, Trash2, Search, X} from "lucide-react";
 
-interface MasterModalProps {
+interface SeriesModalProps {
   isOpen: boolean;
   onClose: () => void;
   title: string;
@@ -9,7 +9,7 @@ interface MasterModalProps {
   initialValue?: string;
 }
 
-export const Series: React.FC<MasterModalProps> = ({
+const SeriesModal: React.FC<SeriesModalProps> = ({
   isOpen,
   onClose,
   title,
@@ -37,7 +37,7 @@ export const Series: React.FC<MasterModalProps> = ({
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Master Name*
+                Series Name*
               </label>
               <input
                 type="text"
@@ -65,24 +65,24 @@ export const Series: React.FC<MasterModalProps> = ({
   );
 };
 
-export const Master = () => {
+export const Series = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [editingMaster, setEditingMaster] = useState("");
+  const [editingSeries, setEditingSeries] = useState("");
 
-  const masterList = [
-    "Master 1",
-    "Master 2",
-    "Master 3",
-    "Master 4",
-    "Master 5",
-    "Master 6",
-    "Master 7",
-    "Master 8",
+  const seriesList = [
+    "Series 1",
+    "Series 2",
+    "Series 3",
+    "Series 4",
+    "Series 5",
+    "Series 6",
+    "Series 7",
+    "Series 8",
   ];
 
-  const handleEdit = (master: string) => {
-    setEditingMaster(master);
+  const handleEdit = (series: string) => {
+    setEditingSeries(series);
     setIsEditModalOpen(true);
   };
 
@@ -92,18 +92,18 @@ export const Master = () => {
       <div className="flex items-center gap-2 text-sm text-gray-500 mb-4">
         <span>Marketplace</span>
         <span>/</span>
-        <span className="text-gray-700">Master</span>
+        <span className="text-gray-700">Series</span>
       </div>
 
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold">Master</h1>
+        <h1 className="text-2xl font-semibold">Series</h1>
         <div className="flex gap-4">
           <button
             onClick={() => setIsAddModalOpen(true)}
             className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
           >
-            <span className="text-xl">+</span> Add Master
+            <span className="text-xl">+</span> Add Series
           </button>
           <div className="relative">
             <input
@@ -116,19 +116,19 @@ export const Master = () => {
         </div>
       </div>
 
-      {/* Master Grid */}
+      {/* Series Grid */}
       <div className="grid grid-cols-2 gap-4">
-        {masterList.map((master, index) => (
+        {seriesList.map((series, index) => (
           <div
             key={index}
             className="bg-white rounded-lg p-4 flex items-center justify-between border border-gray-100"
           >
             <div className="flex items-center">
-              <span className="font-medium text-gray-700">{master}</span>
+              <span className="font-medium text-gray-700">{series}</span>
             </div>
             <div className="flex items-center gap-4">
               <button
-                onClick={() => handleEdit(master)}
+                onClick={() => handleEdit(series)}
                 className="text-gray-400 hover:text-gray-600"
               >
                 <Pencil className="w-5 h-5" />
@@ -144,24 +144,24 @@ export const Master = () => {
         ))}
       </div>
 
-      {/* Add Master Modal */}
-      <Series
+      {/* Add Series Modal */}
+      <SeriesModal
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
-        title="Add Master"
+        title="Add Series"
         submitText="Save"
       />
 
-      {/* Edit Master Modal */}
-      <Series
+      {/* Edit Series Modal */}
+      <SeriesModal
         isOpen={isEditModalOpen}
         onClose={() => {
           setIsEditModalOpen(false);
-          setEditingMaster("");
+          setEditingSeries("");
         }}
-        title="Edit Master"
+        title="Edit Series"
         submitText="Update"
-        initialValue={editingMaster}
+        initialValue={editingSeries}
       />
     </div>
   );

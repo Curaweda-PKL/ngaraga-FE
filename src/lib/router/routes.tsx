@@ -2,7 +2,8 @@ import React from "react";
 import type {PathRouteProps} from "react-router-dom";
 
 import Dashboard from "../admin-pages/dashboard/index-admin";
-import {OrderDetail} from "../admin-pages/order";
+import {Order} from "../admin-pages/order/order";
+import {DetailsOrder} from "../admin-pages/order/details-order";
 import {Card} from "../admin-pages/marketplace/card/card";
 import {EditCard} from "../admin-pages/marketplace/card/edit-card";
 import {AddCard} from "../admin-pages/marketplace/card/add-card";
@@ -61,7 +62,8 @@ const EventDetail = React.lazy(
 
 export const routes: Array<PathRouteProps> = [
   {path: "/admin/dashboard", element: <Dashboard />},
-  {path: "/admin/order", element: <OrderDetail />},
+  {path: "/admin/order", element: <Order />},
+  {path: "/admin/detail-order", element: <DetailsOrder />},
   {path: "/admin/card", element: <Card />},
   {path: "/admin/edit-card", element: <EditCard />},
   {path: "/admin/add-card", element: <AddCard />},

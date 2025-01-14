@@ -195,5 +195,3 @@ export const Master = () => {
     </div>
   );
 };
-
-export default Master;

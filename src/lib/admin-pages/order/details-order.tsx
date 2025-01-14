@@ -10,7 +10,7 @@ import {MdLocationOn} from "react-icons/md";
 import {HiMail} from "react-icons/hi";
 import {BsTelephone} from "react-icons/bs";
 
-export const OrderDetails = () => {
+export const DetailsOrder = () => {
   const orderStages = [
     {label: "Payment", icon: <FaMoneyBill />, active: true},
     {label: "Packaging", icon: <BiPackage />, active: false},
