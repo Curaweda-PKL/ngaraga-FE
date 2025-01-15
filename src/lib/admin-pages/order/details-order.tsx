@@ -1,288 +1,233 @@
-import {useState} from "react";
-import {FaBox, FaTruck, FaCheckCircle} from "react-icons/fa";
-import {BiMoney} from "react-icons/bi";
-import {MdEdit, MdContentCopy, MdLocationOn} from "react-icons/md";
+import {
+  FaCreditCard,
+  FaBox,
+  FaTruck,
+  FaCheck,
+  FaEdit,
+  FaPhone,
+  FaEnvelope,
+  FaMapMarkerAlt,
+  FaCheckCircle,
+} from "react-icons/fa";
 
 export const DetailsOrder = () => {
-  const [isEditingShipment, setIsEditingShipment] = useState(false);
-  const [isEditingAddress, setIsEditingAddress] = useState(false);
+  const orderStages = [
+    {icon: <FaCreditCard size={20} />, label: "Payment", active: true},
+    {icon: <FaBox size={20} />, label: "Packaging", active: false},
+    {icon: <FaTruck size={20} />, label: "Shipping", active: false},
+    {icon: <FaCheck size={20} />, label: "Delivered", active: false},
+  ];
+
+  const orderItems = [
+    {id: 1, name: "Dancing Robot 0512", type: "Orbilum", price: 200000, qty: 1},
+    {id: 2, name: "Dancing Robot 0512", type: "Orbilum", price: 200000, qty: 1},
+    {id: 3, name: "Dancing Robot 0512", type: "Orbilum", price: 200000, qty: 1},
+  ];
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
+    <div className="p-6 max-w-6xl mx-auto">
       {/* Order Stages */}
       <div className="mb-8">
-        <div className="relative flex justify-between mb-2">
-          <div className="flex items-center">
-            <div className="bg-yellow-400 rounded-full p-3">
-              <BiMoney className="text-white text-xl" />
+        <div className="flex justify-between items-center relative">
+          {orderStages.map((stage, index) => (
+            <div
+              key={index}
+              className="flex flex-col items-center z-10"
+            >
+              <div
+                className={`rounded-full p-4 ${
+                  stage.active ? "bg-blue-500 text-white" : "bg-gray-200"
+                }`}
+              >
+                {stage.icon}
+              </div>
+              <span className="mt-2 text-sm">{stage.label}</span>
             </div>
-            <span className="ml-2 font-medium">Payment</span>
-          </div>
-          <div className="flex items-center">
-            <div className="bg-gray-200 rounded-full p-3">
-              <FaBox className="text-gray-500 text-xl" />
-            </div>
-            <span className="ml-2 font-medium">Packaging</span>
-          </div>
-          <div className="flex items-center">
-            <div className="bg-gray-200 rounded-full p-3">
-              <FaTruck className="text-gray-500 text-xl" />
-            </div>
-            <span className="ml-2 font-medium">Shipping</span>
-          </div>
-          <div className="flex items-center">
-            <div className="bg-gray-200 rounded-full p-3">
-              <FaCheckCircle className="text-gray-500 text-xl" />
-            </div>
-            <span className="ml-2 font-medium">Delivered</span>
-          </div>
-        </div>
-        <div className="relative w-full h-2 bg-gray-200 rounded-full">
-          <div className="absolute left-0 w-1/4 h-full bg-yellow-400 rounded-full"></div>
+          ))}
+          <div className="absolute top-8 left-0 w-full h-0.5 bg-gray-200" />
         </div>
       </div>
 
       <div className="grid grid-cols-2 gap-6">
-        {/* Left Column - Order Summary */}
-        <div className="bg-white rounded-lg p-6 shadow">
-          <h2 className="text-lg font-semibold mb-4">Summary Order</h2>
-          <div className="text-sm text-gray-600 mb-4">
-            Order ID: ORD123456789
-          </div>
+        {/* Left Section - Order Summary */}
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <div className="mb-6">
+            <h2 className="font-semibold mb-4">Summary Order</h2>
+            <div className="text-sm text-gray-600 mb-2">
+              Order ID: ORD123456789
+            </div>
 
-          {/* Order Items */}
-          {[1, 2, 3].map((item) => (
-            <div
-              key={item}
-              className="flex items-center mb-4 border-b pb-4"
-            >
-              <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg mr-4"></div>
-              <div className="flex-1">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="font-medium">Dancing Robot 0512</h3>
-                    <p className="text-sm text-gray-600">Oxidium</p>
+            {orderItems.map((item) => (
+              <div
+                key={item.id}
+                className="mb-4 border-b pb-4"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg" />
+                  <div className="flex-1">
+                    <div className="font-medium">{item.name}</div>
+                    <div className="text-sm text-gray-600">{item.type}</div>
+                    <div className="flex justify-between items-center mt-2">
+                      <div className="flex items-center gap-2">
+                        <span>Qty: {item.qty}</span>
+                      </div>
+                      <div>Rp {item.price.toLocaleString()}</div>
+                    </div>
                   </div>
-                  <span className="font-medium">Rp 200,000</span>
-                </div>
-                <div className="flex items-center mt-2">
-                  <span className="text-sm">Qty: 1</span>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
 
-          {/* Order Summary */}
-          <div className="space-y-2 text-sm">
-            <div className="flex justify-between">
-              <span>Subtotal</span>
-              <span>Rp 500,000</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Shipping</span>
-              <span>Rp 15,000</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Discount</span>
-              <span className="text-red-500">-Rp 100,000</span>
-            </div>
-            <div className="flex justify-between">
-              <span>VAT 11%</span>
-              <span>Rp 45,650</span>
-            </div>
-            <div className="flex justify-between font-semibold pt-2 border-t">
-              <span>Total</span>
-              <span>Rp 460,650</span>
+            <div className="space-y-2">
+              <div className="flex justify-between">
+                <span>Subtotal</span>
+                <span>Rp 500,000</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Shipping</span>
+                <span>Rp 15,000</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Discount</span>
+                <span>-Rp 100,000</span>
+              </div>
+              <div className="flex justify-between">
+                <span>VAT 11%</span>
+                <span>Rp 45,650</span>
+              </div>
+              <div className="flex justify-between font-semibold pt-2 border-t">
+                <span>Total</span>
+                <span>Rp 460,650</span>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Right Column - Shipping Details */}
-        <div className="space-y-6">
+        {/* Right Section */}
+        <div className="bg-white rounded-lg shadow-md p-6">
           {/* Payment Section */}
-          <div className="bg-white rounded-lg p-6 shadow">
-            <h2 className="text-lg font-semibold mb-4">Payment</h2>
-            <div className="flex items-center">
-              <img
-                src="/api/placeholder/40/40"
-                alt="BCA Bank"
-                className="mr-3"
-              />
+          <div className="bg-white rounded-lg mb-4">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="font-semibold">Payment</h2>
+              <FaEdit className="w-4 h-4 text-gray-500 cursor-pointer" />
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-blue-100 rounded flex items-center justify-center">
+                <span className="text-blue-600 font-bold">B</span>
+              </div>
               <span>Bank BCA</span>
             </div>
           </div>
 
           {/* Shipment Section */}
-          <div className="bg-white rounded-lg p-6 shadow">
+          <div className="bg-white rounded-lg mb-6">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-semibold">Shipment</h2>
-              <button
-                onClick={() => setIsEditingShipment(!isEditingShipment)}
-                className="text-blue-500 hover:text-blue-600"
-              >
-                <MdEdit size={20} />
-              </button>
+              <h2 className="font-semibold">Shipment</h2>
+              <FaEdit className="w-4 h-4 text-gray-500 cursor-pointer" />
             </div>
-            {isEditingShipment ? (
-              <div className="space-y-4">
-                <select className="w-full border rounded-lg p-2">
-                  <option>Anter Aja</option>
-                  <option>JNE</option>
-                  <option>SiCepat</option>
-                </select>
-                <button
-                  onClick={() => setIsEditingShipment(false)}
-                  className="bg-blue-500 text-white px-4 py-2 rounded-lg"
-                >
-                  Save
-                </button>
-              </div>
-            ) : (
-              <div className="flex items-center">
-                <img
-                  src="/api/placeholder/40/40"
-                  alt="Anter Aja"
-                  className="mr-3"
-                />
-                <div>
-                  <div className="font-medium">Anter Aja</div>
-                  <div className="text-sm text-gray-600">
-                    Estimated Delivery: 3-4 Days
-                  </div>
+            <div className="flex items-center gap-2 mb-4">
+              <FaBox className="w-5 h-5 text-pink-500" />
+              <div>
+                <div>Anter Aja</div>
+                <div className="text-sm text-gray-600">
+                  Estimated Delivery: 3-4 Days
                 </div>
               </div>
-            )}
+            </div>
+            <div className="text-sm text-gray-600">
+              Receipt: BDG123456789JKT
+            </div>
           </div>
 
           {/* Shipping Information */}
-          <div className="bg-white rounded-lg p-6 shadow">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-semibold">Shipping Information</h2>
-              <button
-                onClick={() => setIsEditingAddress(!isEditingAddress)}
-                className="text-blue-500 hover:text-blue-600"
-              >
-                <MdEdit size={20} />
-              </button>
+          <div>
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="font-semibold">Shipping Information</h2>
+              <FaEdit className="w-4 h-4 text-gray-500 cursor-pointer" />
             </div>
-            {isEditingAddress ? (
-              <div className="space-y-4">
-                <input
-                  type="text"
-                  placeholder="Name"
-                  className="w-full border rounded-lg p-2"
-                  defaultValue="Animakid"
-                />
-                <input
-                  type="email"
-                  placeholder="Email"
-                  className="w-full border rounded-lg p-2"
-                  defaultValue="animakid@gmail.com"
-                />
-                <input
-                  type="tel"
-                  placeholder="Phone"
-                  className="w-full border rounded-lg p-2"
-                  defaultValue="+62 854 5565 6745"
-                />
-                <textarea
-                  placeholder="Address"
-                  className="w-full border rounded-lg p-2"
-                  defaultValue="Jl. Medan Merdeka Barat No.12, Gambir, Kecamatan Gambir, Kota Jakarta Pusat, Daerah Khusus Ibukota Jakarta 10110"
-                  rows={3}
-                />
-                <button
-                  onClick={() => setIsEditingAddress(false)}
-                  className="bg-blue-500 text-white px-4 py-2 rounded-lg"
-                >
-                  Save
-                </button>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                <div className="flex items-center">
-                  <span className="font-medium">Animakid</span>
-                  <button className="ml-2 text-gray-500">
-                    <MdContentCopy size={16} />
-                  </button>
-                </div>
-                <div className="flex items-center text-gray-600">
+
+            <div className="space-y-6">
+              <div>
+                <div className="font-medium">Animakid</div>
+                <div className="flex items-center gap-2 text-sm text-gray-600 mt-2">
+                  <FaEnvelope className="w-4 h-4" />
                   <span>animakid@gmail.com</span>
-                  <button className="ml-2 text-gray-500">
-                    <MdContentCopy size={16} />
-                  </button>
                 </div>
-                <div className="flex items-center text-gray-600">
+                <div className="flex items-center gap-2 text-sm text-gray-600 mt-2">
+                  <FaPhone className="w-4 h-4" />
                   <span>+62 854 5565 6745</span>
-                  <button className="ml-2 text-gray-500">
-                    <MdContentCopy size={16} />
-                  </button>
                 </div>
-                <div className="flex items-start text-gray-600">
-                  <MdLocationOn
-                    size={20}
-                    className="mr-2 mt-1 flex-shrink-0"
-                  />
-                  <span>
+              </div>
+
+              <div>
+                <div className="flex items-center gap-2">
+                  <FaMapMarkerAlt className="w-4 h-4 text-gray-500 flex-shrink-0" />
+                  <span className="text-sm text-gray-600">
                     Jl. Medan Merdeka Barat No.12, Gambir, Kecamatan Gambir,
                     Kota Jakarta Pusat, Daerah Khusus Ibukota Jakarta 10110
                   </span>
                 </div>
               </div>
-            )}
-          </div>
 
-          {/* Order Tracking */}
-          <div className="bg-white rounded-lg p-6 shadow">
-            <h2 className="text-lg font-semibold mb-4">Order Tracking</h2>
-            <div className="space-y-4">
-              {[
-                {
-                  date: "10 Dec 2024 17:20",
-                  status: "Delivered",
-                  icon: <FaCheckCircle />,
-                },
-                {
-                  date: "10 Dec 2024 15:53",
-                  status: "The order is in transit for delivery",
-                },
-                {
-                  date: "10 Dec 2024 06:24",
-                  status: "Pesanan dipindai di lokal transit JAKARTA",
-                },
-                {
-                  date: "09 Dec 2024 20:51",
-                  status:
-                    "The order was dispatched from the sorting facility in JAKARTA",
-                },
-                {
-                  date: "09 Dec 2024 20:51",
-                  status:
-                    "The order was received by the JAKARTA agent for processing",
-                },
-                {date: "09 Dec 2024 16:00", status: "Preparing to ship"},
-                {
-                  date: "09 Dec 2024 13:07",
-                  status: "Courier assigned to pick up the order",
-                },
-                {date: "09 Dec 2024 12:54", status: "Order placed"},
-              ].map((event, index) => (
-                <div
-                  key={index}
-                  className="flex"
-                >
-                  <div className="mr-4">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                    {index !== 7 && (
-                      <div className="w-0.5 h-full bg-gray-200 mx-auto"></div>
-                    )}
-                  </div>
-                  <div className="flex-1">
-                    <div className="text-sm text-gray-500">{event.date}</div>
-                    <div className="font-medium">{event.status}</div>
-                  </div>
+              <div>
+                <h3 className="font-medium mb-4">Order Tracking</h3>
+                <div className="space-y-4">
+                  {[
+                    {
+                      date: "10 Dec 2024 17:20",
+                      icon: <FaCheckCircle />,
+                      status: "Delivered",
+                    },
+                    {
+                      date: "10 Dec 2024 15:53",
+                      status: "The order is in transit for delivery",
+                    },
+                    {
+                      date: "10 Dec 2024 06:24",
+                      status: "Pesanan dipindai di lokal transit JAKARTA",
+                    },
+                    {
+                      date: "09 Dec 2024 20:51",
+                      status:
+                        "The order was dispatched from the sorting facility in JAKARTA",
+                    },
+                    {
+                      date: "09 Dec 2024 20:51",
+                      status:
+                        "The order was received by the JAKARTA agent for processing",
+                    },
+                    {date: "09 Dec 2024 16:00", status: "Preparing to ship"},
+                    {
+                      date: "09 Dec 2024 13:07",
+                      status: "Courier assigned to pick up the order",
+                    },
+                    {date: "09 Dec 2024 12:54", status: "Order placed"},
+                  ].map((event, index) => (
+                    <div
+                      key={index}
+                      className="flex items-start gap-4"
+                    >
+                      {/* Date on the left */}
+                      <div className="text-sm text-gray-500 w-32">
+                        {event.date}
+                      </div>
+
+                      {/* Circle and status */}
+                      <div className="flex items-start">
+                        <div className="relative">
+                          <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                          {index !== 7 && (
+                            <div className="absolute top-2 left-1/2 transform -translate-x-1/2 w-0.5 h-full bg-gray-200"></div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Status on the right */}
+                      <div className="flex-1 font-medium">{event.status}</div>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              </div>
             </div>
           </div>
         </div>

@@ -1,6 +1,6 @@
-import React, { useState } from "react";
-import { PiPackageLight } from "react-icons/pi";
-import { TbTruckDelivery } from "react-icons/tb";
+import React, {useState} from "react";
+import {PiPackageLight} from "react-icons/pi";
+import {TbTruckDelivery} from "react-icons/tb";
 
 interface Item {
   title: string;
@@ -65,8 +65,8 @@ const Checkout: React.FC = () => {
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
     >
   ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    const {name, value} = e.target;
+    setFormData((prev) => ({...prev, [name]: value}));
   };
 
   const formatCurrency = (value: number): string =>
@@ -115,7 +115,7 @@ const Checkout: React.FC = () => {
         </div>
 
         {/* Information Form */}
-        <div className="mt-5 space-y-4 mt-10">
+        <div className="mt-10 space-y-4">
           <div className="flex gap-5 items-center mb-3">
             <button className="btn bg-call-to-actions-100 border border-call-to-actions-900 rounded-lg hover:bg-white text-call-to-actions-900 ">
               <TbTruckDelivery size={18} />
@@ -135,7 +135,6 @@ const Checkout: React.FC = () => {
             onChange={handleFormChange}
             placeholder="Full Name"
             className="w-full border border-neutral-colors-500 rounded-lg p-3"
-            
           />
 
           <input

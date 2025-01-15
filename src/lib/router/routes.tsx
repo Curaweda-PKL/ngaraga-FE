@@ -46,19 +46,21 @@ const Home = React.lazy(() => import("@/lib/pages/home/Home"));
 const Signup = React.lazy(() => import("@/lib/pages/auth/login/signup"));
 const Login = React.lazy(() => import("@/lib/pages/auth/login/login"));
 const Artists = React.lazy(() => import("@/lib/pages/artists/artists-index"));
-<<<<<<< HEAD
 const Marketplace = React.lazy(
   () => import("@/lib/pages/marketplace/marketplace-index")
 );
 const TopCollectors = React.lazy(
   () => import("@/lib/pages/top-players/top-players")
 );
-const Cart = React.lazy(() => import("@/lib/pages/cart/mycart"));
+const Cart = React.lazy(() => import("@/lib/pages/cart/cart-index"));
 const BrowseEvents = React.lazy(
   () => import("@/lib/pages/events/browse-event")
 );
 const EventDetail = React.lazy(
   () => import("@/lib/pages/event-detail/detail-events")
+);
+const Checkout = React.lazy(
+  () => import("@/lib/pages/checkout/checkout-index")
 );
 
 export const routes: Array<PathRouteProps> = [
@@ -96,6 +98,7 @@ export const routes: Array<PathRouteProps> = [
   {path: "/login", element: <Login />},
   {path: "/forgot-password", element: <ForgotPassword />},
   {path: "/reset-password", element: <ResetPassword />},
+
   {path: "/artists", element: <Artists />},
   {path: "/marketplace", element: <Marketplace />},
   {path: "/rankings", element: <TopCollectors />},
@@ -104,47 +107,7 @@ export const routes: Array<PathRouteProps> = [
   {path: "/cart", element: <Cart />},
   {path: "/events", element: <BrowseEvents />},
   {path: "/detailevents", element: <EventDetail />},
-=======
-const Marketplace = React.lazy(() => import("@/lib/pages/marketplace/marketplace-index"));
-const TopCollectors = React.lazy(() => import("@/lib/pages/top-players/top-players"));
-const Cart = React.lazy(() => import("@/lib/pages/cart/cart-index"));
-const BrowseEvents = React.lazy(() => import("@/lib/pages/events/browse-event"));
-const EventDetail = React.lazy(() => import("@/lib/pages/event-detail/detail-events"));
-const Checkout = React.lazy(() => import("@/lib/pages/checkout/checkout-index"));
-
-export const routes: Array<PathRouteProps> = [
-  { path: "/admin/dashboard", element: <Dashboard /> },
-  { path: "/admin/order", element: <OrderDetail /> },
-  { path: "/admin/card", element: <Card /> },
-  { path: "/admin/special", element: <SpecialCard /> },
-  { path: "/admin/categories", element: <Categories /> },
-  { path: "/admin/tag", element: <Tag /> },
-  { path: "/admin/event", element: <Events /> },
-  { path: "/admin/coupon", element: <Coupon /> },
-  { path: "/admin/creator", element: <Creator /> },
-  { path: "/admin/member", element: <Member /> },
-  { path: "/admin/subscription", element: <Subscription /> },
-  { path: "/admin/shipping", element: <Shipping /> },
-  { path: "/admin/payment", element: <Payment /> },
-  { path: "/admin", element: <Admin /> },
-
-
-  { path: "/", element: <Home /> },
-  { path: "/signup", element: <Signup /> },
-  { path: "/login", element: <Login /> },
-  { path: "/forgot-password", element: <ForgotPassword /> },
-  { path: "/reset-password", element: <ResetPassword /> },
-
-  { path: "/artists", element: <Artists /> },
-  { path: "/marketplace", element: <Marketplace /> },
-  { path: "/rankings", element: <TopCollectors /> },
-  { path: "/detail-special-card", element: <DetailSpecial /> },
-  { path: "/detail-cards", element: <DetailCards /> },
-  { path: "/cart", element: <Cart /> },
-  { path: "/events", element: <BrowseEvents /> },
-  { path: "/detailevents", element: <EventDetail /> },
-  { path: "/checkout", element: <Checkout/>}
->>>>>>> 3703a326a099fa6c7438fb4a910bfa161874305b
+  {path: "/checkout", element: <Checkout />},
 ];
 
 export const privateRoutes: Array<PathRouteProps> = [];
