@@ -1,5 +1,21 @@
 import {useState, useEffect} from "react";
 import {Menu, X, ChevronDown, ChevronUp} from "lucide-react";
+import {RiCoupon3Fill, RiPencilRuler2Fill} from "react-icons/ri";
+import {
+  FaHome,
+  FaUsers,
+  FaStar,
+  FaTags,
+  FaBox,
+  FaShoppingCart,
+  FaClipboardList,
+  FaMoneyCheckAlt,
+  FaUserShield,
+  FaSignInAlt,
+  FaSignOutAlt,
+  FaCalendarAlt,
+  FaShippingFast,
+} from "react-icons/fa";
 
 const SidebarComponent = () => {
   const [screenSize, setScreenSize] = useState("desktop");
@@ -65,21 +81,15 @@ const SidebarComponent = () => {
 
       {/* Sidebar */}
       <aside
-        className={`
-          fixed top-0 left-0 z-50 h-screen
-          ${sidebarWidth}
-          ${
-            screenSize === "mobile" && !isSidebarOpen
-              ? "-translate-x-full"
-              : "translate-x-0"
-          }
-          transition-all duration-300 ease-in-out
-          bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700
-        `}
+        className={`fixed top-0 left-0 z-50 h-screen ${sidebarWidth} ${
+          screenSize === "mobile" && !isSidebarOpen
+            ? "-translate-x-full"
+            : "translate-x-0"
+        } transition-all duration-300 ease-in-out bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-500`}
       >
-        <div className="h-full flex flex-col overflow-y-auto">
+        <div className="h-full flex flex-col overflow-y-auto bg-[#FAFAFA] border-[#EBEBEB]">
           {/* Logo */}
-          <div className="flex items-center gap-3 px-6 py-5 border-b border-gray-200 dark:border-gray-700">
+          <div className="flex items-center gap-3 px-6 py-5 dark:border-gray-600">
             <img
               src="/src/assets/img/LOGO.png"
               alt="Logo"
@@ -99,6 +109,7 @@ const SidebarComponent = () => {
                   href="/admin/dashboard"
                   className="flex items-center gap-3 px-4 py-3 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
                 >
+                  <FaHome />
                   Dashboard
                 </a>
               </li>
@@ -109,6 +120,7 @@ const SidebarComponent = () => {
                   href="/admin/order"
                   className="flex items-center gap-3 px-4 py-3 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
                 >
+                  <FaClipboardList />
                   Orders
                 </a>
               </li>
@@ -119,7 +131,10 @@ const SidebarComponent = () => {
                   onClick={() => setMarketplaceOpen(!isMarketplaceOpen)}
                   className="flex items-center justify-between w-full px-4 py-3 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
                 >
-                  <span>Marketplace</span>
+                  <span className="flex items-center gap-3">
+                    <FaShoppingCart />
+                    Marketplace
+                  </span>
                   {isMarketplaceOpen ? (
                     <ChevronUp size={20} />
                   ) : (
@@ -129,21 +144,22 @@ const SidebarComponent = () => {
                 {isMarketplaceOpen && (
                   <ul className="mt-1 ml-4 space-y-1">
                     {[
-                      "Card",
-                      "Special Card",
-                      "Master",
-                      "Series",
-                      "Categories",
-                      "Tag",
-                    ].map((item) => (
-                      <li key={item}>
+                      {name: "Card", icon: <FaBox />},
+                      {name: "Special Card", icon: <FaStar />},
+                      {name: "Master", icon: <FaTags />},
+                      {name: "Series", icon: <FaTags />},
+                      {name: "Categories", icon: <FaTags />},
+                      {name: "Tag", icon: <FaTags />},
+                    ].map(({name, icon}) => (
+                      <li key={name}>
                         <a
-                          href={`/admin/${item
+                          href={`/admin/${name
                             .toLowerCase()
                             .replace(" ", "-")}`}
-                          className="flex items-center px-4 py-2 text-sm text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+                          className="flex items-center gap-3 px-4 py-2 text-sm text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
                         >
-                          {item}
+                          {icon}
+                          {name}
                         </a>
                       </li>
                     ))}
@@ -157,7 +173,10 @@ const SidebarComponent = () => {
                   onClick={() => setPagesOpen(!isPagesOpen)}
                   className="flex items-center justify-between w-full px-4 py-3 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
                 >
-                  <span>Pages</span>
+                  <span className="flex items-center gap-3">
+                    <FaSignInAlt />
+                    Pages
+                  </span>
                   {isPagesOpen ? (
                     <ChevronUp size={20} />
                   ) : (
@@ -167,21 +186,22 @@ const SidebarComponent = () => {
                 {isPagesOpen && (
                   <ul className="mt-1 ml-4 space-y-1">
                     {[
-                      "SignIn",
-                      "SignUp",
-                      "Home",
-                      "Marketplace",
-                      "Rankings",
-                      "Events",
-                    ].map((item) => (
-                      <li key={item}>
+                      {name: "SignIn", icon: <FaSignInAlt />},
+                      {name: "SignUp", icon: <FaSignOutAlt />},
+                      {name: "Home", icon: <FaHome />},
+                      {name: "Marketplace", icon: <FaShoppingCart />},
+                      {name: "Rankings", icon: <FaStar />},
+                      {name: "Events", icon: <FaCalendarAlt />},
+                    ].map(({name, icon}) => (
+                      <li key={name}>
                         <a
-                          href={`/admin/${item
+                          href={`/admin/${name
                             .toLowerCase()
                             .replace(" ", "-")}`}
-                          className="flex items-center px-4 py-2 text-sm text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+                          className="flex items-center gap-3 px-4 py-2 text-sm text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
                         >
-                          {item}
+                          {icon}
+                          {name}
                         </a>
                       </li>
                     ))}
@@ -191,21 +211,22 @@ const SidebarComponent = () => {
 
               {/* Regular Items */}
               {[
-                "Event",
-                "Coupon",
-                "Creator",
-                "Member",
-                "Subscription",
-                "Shipping",
-                "Payment",
-                "Admin",
-              ].map((item) => (
-                <li key={item}>
+                {name: "Event", icon: <FaCalendarAlt />},
+                {name: "Coupon", icon: <RiCoupon3Fill />},
+                {name: "Creator", icon: <RiPencilRuler2Fill />},
+                {name: "Member", icon: <FaUsers />},
+                {name: "Subscription", icon: <FaBox />},
+                {name: "Shipping", icon: <FaShippingFast />},
+                {name: "Payment", icon: <FaMoneyCheckAlt />},
+                {name: "Admin", icon: <FaUserShield />},
+              ].map(({name, icon}) => (
+                <li key={name}>
                   <a
-                    href={`/admin/${item.toLowerCase()}`}
+                    href={`/admin/${name.toLowerCase()}`}
                     className="flex items-center gap-3 px-4 py-3 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
                   >
-                    {item}
+                    {icon}
+                    {name}
                   </a>
                 </li>
               ))}
