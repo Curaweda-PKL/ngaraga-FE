@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FaBars, FaTimes, FaUserFriends,  } from "react-icons/fa";
+import { FaBars, FaTimes, FaUserFriends } from "react-icons/fa";
 import { CiShoppingCart } from "react-icons/ci";
 
 import { useNavigate } from "react-router-dom";
@@ -36,8 +36,8 @@ export const Navbar: React.FC = () => {
 
           {/* Logo button */}
           <a
+            href="/"
             className="btn btn-ghost text-xl flex items-center text-black"
-            onClick={() => navigate("/")}
           >
             <img
               src="/src/assets/img/LOGO.png"
@@ -70,7 +70,7 @@ export const Navbar: React.FC = () => {
             className="cursor-pointer flex items-center"
             onClick={() => navigateToPage("cart")}
           >
-            <CiShoppingCart  size={31} className="lg:mr-3" />
+            <CiShoppingCart size={31} className="lg:mr-3" />
           </a>
 
           {/* Sign-in and Sign-up buttons */}
@@ -99,14 +99,14 @@ export const Navbar: React.FC = () => {
         lg:hidden text-black`}
       >
         <div className="flex justify-between items-center p-4 border-b">
-          <div className="flex items-center text-xl text-black">
+          <a href="/" className="flex items-center text-xl text-black">
             <img
               src="/src/assets/img/LOGO.png"
               alt="Ngaraga Logo"
-              className="w-4 h-4 mr-2"
+              className="w-8 h-8 mr-2"
             />
             NGARAGA
-          </div>
+          </a>
           <button onClick={toggleSidebar} className="btn btn-ghost text-black">
             <FaTimes size={20} />
           </button>

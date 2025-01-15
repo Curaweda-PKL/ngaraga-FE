@@ -9,7 +9,6 @@ const Cart: React.FC = () => {
       name: "Dancing Robot 0512",
       price: 200000,
       quantity: 1,
-      isSpecial: true,
       image:
         "https://sillyrobotcards.ams3.cdn.digitaloceanspaces.com/generated-cards/798bb4b5-4e1f-4d6b-bf4d-63969a2ccb07/3778c5d0-99f1-4e22-9f22-e50af27b4b5b",
     },
@@ -106,11 +105,6 @@ const Cart: React.FC = () => {
                   className="w-16 h-16 rounded-md"
                 />
                 <div>
-                  {item.isSpecial && (
-                    <span className="px-2 py-1 text-xs text-yellow-800 bg-yellow-200 rounded-md">
-                      Special Card
-                    </span>
-                  )}
                   <h2 className="font-semibold text-gray-800">{item.name}</h2>
                   <p className="text-gray-500 text-sm">Orbitian</p>
                 </div>
@@ -135,14 +129,18 @@ const Cart: React.FC = () => {
                     </button>
                     <input
                       type="number"
-                      className="w-8 text-center py-1 px-1 border-none bg-gray-200 appereance-none -webkit-appearance-none -moz-appearance-none" 
+                      className="w-8 text-center py-1 px-1 border-none bg-gray-200 appereance-none -webkit-appearance-none -moz-appearance-none"
                       value={item.quantity}
-                      onChange={(e) =>
-                        handleQuantityChange(
-                          item.id,
-                          parseInt(e.target.value, 10) - item.quantity
-                        )
-                      }
+                      onChange={(e) => {
+                        const newQuantity = parseInt(e.target.value, 10);
+
+                        if (!isNaN(newQuantity) && newQuantity > 0) {
+                          handleQuantityChange(
+                            item.id,
+                            newQuantity - item.quantity
+                          );
+                        }
+                      }}
                     />
                     <button
                       className="px-2 py-1 text-gray-700"
