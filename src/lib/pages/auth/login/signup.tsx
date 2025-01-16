@@ -3,9 +3,10 @@ import { motion } from "framer-motion";
 import { FaUser, FaLock, FaEnvelope } from "react-icons/fa";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import LoginImage from "@/assets/img/spacestarry.png";
+import axios from "axios";
 
 type SignUpFormData = {
-  username: string;
+  name: string;
   email: string;
   password: string;
   confirmPassword: string;
@@ -13,7 +14,7 @@ type SignUpFormData = {
 
 const SignUp: React.FC = () => {
   const [formData, setFormData] = useState<SignUpFormData>({
-    username: "",
+    name: "",
     email: "",
     password: "",
     confirmPassword: "",
@@ -41,12 +42,12 @@ const SignUp: React.FC = () => {
     let valid = true;
     const newError: { [key: string]: string } = {};
 
-    // Username validation
-    if (!formData.username) {
-      newError.username = "Username cannot be empty!";
+    // name validation
+    if (!formData.name) {
+      newError.name = "name cannot be empty!";
       valid = false;
-    } else if (formData.username.length < 3) {
-      newError.username = "Username must be at least 3 characters!";
+    } else if (formData.name.length < 3) {
+      newError.name = "name must be at least 3 characters!";
       valid = false;
     }
 
@@ -79,19 +80,47 @@ const SignUp: React.FC = () => {
   };
 
   // Handle form submission
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-
+  
     if (!validateForm()) {
       setLoading(false);
       return;
     }
-
-    setTimeout(() => {
+  
+    try {
+      const response = await axios.post(
+        "http://localhost:3000/api/register-user",
+        {
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+          confirmPassword: formData.confirmPassword,
+        },
+        { withCredentials: true }
+      );
+  
+      if (response.status === 201) {
+        alert("Account created successfully!");
+        setFormData({
+          name: "",
+          email: "",
+          password: "",
+          confirmPassword: "",
+        });
+      }
+    } catch (error: any) {
+      if (error.response && error.response.data) {
+        const { message, errors } = error.response.data;
+        setError(errors || {});
+        alert(message || "An error occurred while creating the account.");
+      } else {
+        alert("Something went wrong. Please try again later.");
+      }
+    } finally {
       setLoading(false);
-      alert("Account created successfully!");
-    }, 1000);
+    }
   };
 
   // Toggle visibility for password and confirm password
@@ -146,11 +175,11 @@ const SignUp: React.FC = () => {
                 <p className="text-lg text-gray-500">Create an account to start using our service.</p>
               </div>
 
-              {/* Username */}
+              {/* name */}
               <div className="col-span-6 relative">
                 <div
                   className={`mt-1 flex items-center border rounded-md bg-white py-3 px-4 shadow-sm ${
-                    error.username
+                    error.name
                       ? "border-[#D22424]"
                       : "focus-within:border-[var(--typing)]"
                   }`}
@@ -158,18 +187,18 @@ const SignUp: React.FC = () => {
                   <FaUser className="text-gray-500 mr-2 text-sm" />
                   <input
                     type="text"
-                    id="Username"
-                    name="username"
-                    value={formData.username}
+                    id="name"
+                    name="name"
+                    value={formData.name}
                     onChange={handleChange}
                     placeholder="Username"
                     className="w-full border-none bg-transparent text-lg text-gray-500 focus:outline-none focus:ring-0"
-                    autoComplete="username"
+                    autoComplete="name"
                     required
                   />
                 </div>
-                {error.username && (
-                  <p className="text-[#D22424] text-sm">{error.username}</p>
+                {error.name && (
+                  <p className="text-[#D22424] text-sm">{error.name}</p>
                 )}
               </div>
 
