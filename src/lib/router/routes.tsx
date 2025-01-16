@@ -72,7 +72,7 @@ export const routes: Array<PathRouteProps> = [
   {path: "/admin/add-card", element: <AddCard />},
   {path: "/admin/special-card", element: <SpecialCard />},
   {path: "/admin/edit-special", element: <EditSpecialCard />},
-  {path: "/admin/edit-special", element: <AddSpecialCard />},
+  {path: "/admin/add-special", element: <AddSpecialCard />},
   {path: "/admin/master", element: <Master />},
   {path: "/admin/series", element: <Series />},
   {path: "/admin/categories", element: <Categories />},

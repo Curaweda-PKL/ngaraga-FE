@@ -1,3 +1,4 @@
+import {useState} from "react";
 import {
   FaCreditCard,
   FaBox,
@@ -8,9 +9,179 @@ import {
   FaEnvelope,
   FaMapMarkerAlt,
   FaCheckCircle,
+  FaTimes,
 } from "react-icons/fa";
 
+interface ShippingInfo {
+  fullName: string;
+  email: string;
+  phoneNumber: string;
+  countryCode: string;
+  country: string;
+  state: string;
+  city: string;
+}
+
+interface EditShippingModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onUpdate: (data: ShippingInfo) => void;
+}
+
+const EditShippingModal: React.FC<EditShippingModalProps> = ({
+  isOpen,
+  onClose,
+  onUpdate,
+}) => {
+  const [formData, setFormData] = useState<ShippingInfo>({
+    fullName: "Animakid",
+    email: "animakid@gmail.com",
+    phoneNumber: "854 5565 6745",
+    countryCode: "+62",
+    country: "Indonesia",
+    state: "",
+    city: "",
+  });
+
+  const handleSubmit = (e: {preventDefault: () => void}) => {
+    e.preventDefault();
+    onUpdate(formData);
+    onClose();
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-lg p-6 w-full max-w-md">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-lg font-semibold">Edit Shipping Information</h2>
+          <button
+            onClick={onClose}
+            className="text-gray-500 hover:text-gray-700"
+          >
+            <FaTimes />
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit}>
+          <div className="space-y-4">
+            {/* Full Name */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Full Name *
+              </label>
+              <input
+                type="text"
+                value={formData.fullName}
+                onChange={(e) =>
+                  setFormData({...formData, fullName: e.target.value})
+                }
+                className="w-full px-3 py-2 border rounded-lg focus:ring-1 focus:ring-yellow-500 focus:border-yellow-500"
+                required
+              />
+            </div>
+
+            {/* Email */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Email *
+              </label>
+              <input
+                type="email"
+                value={formData.email}
+                onChange={(e) =>
+                  setFormData({...formData, email: e.target.value})
+                }
+                className="w-full px-3 py-2 border rounded-lg focus:ring-1 focus:ring-yellow-500 focus:border-yellow-500"
+                required
+              />
+            </div>
+
+            {/* Phone Number */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Phone Number *
+              </label>
+              <div className="flex gap-2">
+                <select
+                  value={formData.countryCode}
+                  onChange={(e) =>
+                    setFormData({...formData, countryCode: e.target.value})
+                  }
+                  className="px-3 py-2 border rounded-lg focus:ring-1 focus:ring-yellow-500 focus:border-yellow-500"
+                >
+                  <option value="+62">🇮🇩 +62</option>
+                  <option value="+1">🇺🇸 +1</option>
+                  <option value="+44">🇬🇧 +44</option>
+                </select>
+                <input
+                  type="tel"
+                  value={formData.phoneNumber}
+                  onChange={(e) =>
+                    setFormData({...formData, phoneNumber: e.target.value})
+                  }
+                  className="flex-1 px-3 py-2 border rounded-lg focus:ring-1 focus:ring-yellow-500 focus:border-yellow-500"
+                  required
+                />
+              </div>
+            </div>
+
+            {/* Country */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Country *
+              </label>
+              <select
+                value={formData.country}
+                onChange={(e) =>
+                  setFormData({...formData, country: e.target.value})
+                }
+                className="w-full px-3 py-2 border rounded-lg focus:ring-1 focus:ring-yellow-500 focus:border-yellow-500"
+                required
+              >
+                <option value="Indonesia">🇮🇩 Indonesia</option>
+                <option value="United States">🇺🇸 United States</option>
+                <option value="United Kingdom">🇬🇧 United Kingdom</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="flex justify-end gap-3 mt-6">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="px-4 py-2 text-sm bg-yellow-500 text-white rounded-lg hover:bg-yellow-600"
+            >
+              Update
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
 export const DetailsOrder = () => {
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [shippingInfo, setShippingInfo] = useState({
+    fullName: "Animakid",
+    email: "animakid@gmail.com",
+    phoneNumber: "854 5565 6745",
+    countryCode: "+62",
+  });
+
+  const handleUpdateShipping = (newInfo: ShippingInfo) => {
+    setShippingInfo(newInfo);
+  };
+
+  // Rest of the existing code remains the same until the Shipping Information section
   const orderStages = [
     {icon: <FaCreditCard size={20} />, label: "Payment", active: true},
     {icon: <FaBox size={20} />, label: "Packaging", active: false},
@@ -143,19 +314,26 @@ export const DetailsOrder = () => {
           <div>
             <div className="flex justify-between items-center mb-6">
               <h2 className="font-semibold">Shipping Information</h2>
-              <FaEdit className="w-4 h-4 text-gray-500 cursor-pointer" />
+              <button
+                onClick={() => setIsEditModalOpen(true)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <FaEdit className="w-4 h-4" />
+              </button>
             </div>
 
             <div className="space-y-6">
               <div>
-                <div className="font-medium">Animakid</div>
+                <div className="font-medium">{shippingInfo.fullName}</div>
                 <div className="flex items-center gap-2 text-sm text-gray-600 mt-2">
                   <FaEnvelope className="w-4 h-4" />
-                  <span>animakid@gmail.com</span>
+                  <span>{shippingInfo.email}</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm text-gray-600 mt-2">
                   <FaPhone className="w-4 h-4" />
-                  <span>+62 854 5565 6745</span>
+                  <span>
+                    {shippingInfo.countryCode} {shippingInfo.phoneNumber}
+                  </span>
                 </div>
               </div>
 
@@ -232,6 +410,13 @@ export const DetailsOrder = () => {
           </div>
         </div>
       </div>
+
+      {/* Edit Shipping Modal */}
+      <EditShippingModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        onUpdate={handleUpdateShipping}
+      />
     </div>
   );
 };
