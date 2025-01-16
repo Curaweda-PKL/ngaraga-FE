@@ -1,15 +1,39 @@
 import {useState, useEffect} from "react";
+import {Menu, X, ChevronDown, ChevronUp} from "lucide-react";
+import {RiCoupon3Fill, RiPencilRuler2Fill} from "react-icons/ri";
+import {
+  FaHome,
+  FaUsers,
+  FaStar,
+  FaTags,
+  FaBox,
+  FaShoppingCart,
+  FaClipboardList,
+  FaMoneyCheckAlt,
+  FaUserShield,
+  FaSignInAlt,
+  FaSignOutAlt,
+  FaCalendarAlt,
+  FaShippingFast,
+} from "react-icons/fa";
 
 const SidebarComponent = () => {
-  const [isMobile, setIsMobile] = useState(false);
-  const [isSidebarOpen, setSidebarOpen] = useState(false);
+  const [screenSize, setScreenSize] = useState("desktop");
+  const [isSidebarOpen, setSidebarOpen] = useState(true);
   const [isMarketplaceOpen, setMarketplaceOpen] = useState(false);
   const [isPagesOpen, setPagesOpen] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth < 640);
-      if (window.innerWidth >= 640) {
+      const width = window.innerWidth;
+      if (width < 640) {
+        setScreenSize("mobile");
+        setSidebarOpen(false);
+      } else if (width < 1024) {
+        setScreenSize("tablet");
+        setSidebarOpen(true);
+      } else {
+        setScreenSize("desktop");
         setSidebarOpen(true);
       }
     };
@@ -20,142 +44,125 @@ const SidebarComponent = () => {
   }, []);
 
   const toggleSidebar = () => {
-    if (isMobile) {
-      setSidebarOpen(!isSidebarOpen);
-    }
+    setSidebarOpen(!isSidebarOpen);
   };
 
   const closeSidebar = () => {
-    if (isMobile) {
+    if (screenSize === "mobile") {
       setSidebarOpen(false);
     }
   };
 
+  const sidebarWidth = {
+    mobile: "w-full max-w-[280px]",
+    tablet: "w-72",
+    desktop: "w-64",
+  }[screenSize];
+
   return (
     <div className="relative">
-      {/* Burger Menu */}
-      {isMobile && (
+      {/* Toggle Button */}
+      {screenSize === "mobile" && (
         <button
           onClick={toggleSidebar}
-          type="button"
-          className="fixed top-4 left-4 z-50 p-2 text-white bg-gray-700 rounded-full hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-200"
-          aria-controls="logo-sidebar"
+          className="fixed top-4 left-4 z-50 p-2 rounded-lg bg-gray-800 text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-200"
         >
-          <span className="sr-only">Open sidebar</span>
-          <svg
-            className="w-6 h-6"
-            fill="currentColor"
-            viewBox="0 0 20 20"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              clipRule="evenodd"
-              fillRule="evenodd"
-              d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zm0 10.5a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 01-.75-.75zM2 10a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 10z"
-            />
-          </svg>
+          {isSidebarOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
       )}
 
       {/* Backdrop */}
-      {isMobile && isSidebarOpen && (
+      {screenSize === "mobile" && isSidebarOpen && (
         <div
           onClick={closeSidebar}
-          className="fixed inset-0 z-40 bg-black bg-opacity-50"
+          className="fixed inset-0 z-40 bg-black/50 transition-opacity duration-300"
         />
       )}
 
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 z-50 w-64 h-screen transition-transform duration-300 
-          ${isMobile && !isSidebarOpen ? "-translate-x-full" : "translate-x-0"}
-          bg-white border-r border-gray-200 dark:bg-gray-800 dark:border-gray-700`}
+        className={`fixed top-0 left-0 z-50 h-screen ${sidebarWidth} ${
+          screenSize === "mobile" && !isSidebarOpen
+            ? "-translate-x-full"
+            : "translate-x-0"
+        } transition-all duration-300 ease-in-out bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-500`}
       >
-        <div className="h-full overflow-y-auto bg-white dark:bg-gray-800">
-          {/* Logo section */}
-          <div className="flex items-center justify-start px-4 py-3 border-gray-200 dark:border-gray-700">
+        <div className="h-full flex flex-col overflow-y-auto bg-[#FAFAFA] border-[#EBEBEB]">
+          {/* Logo */}
+          <div className="flex items-center gap-3 px-6 py-5 dark:border-gray-600">
             <img
               src="/src/assets/img/LOGO.png"
-              alt="NGARAGA Logo"
-              className="h-8 mr-3"
+              alt="Logo"
+              className="h-8 w-8"
             />
             <span className="text-xl font-semibold dark:text-white">
               NGARAGA
             </span>
           </div>
 
-          {/* Navigation Items */}
-          <div className="py-4 px-3">
-            <ul className="space-y-2">
+          {/* Navigation */}
+          <nav className="flex-1 p-4">
+            <ul className="space-y-1">
+              {/* Dashboard */}
               <li>
                 <a
                   href="/admin/dashboard"
-                  className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+                  className="flex items-center gap-3 px-4 py-3 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
                 >
-                  <span>Dashboard</span>
+                  <FaHome />
+                  Dashboard
                 </a>
               </li>
+
+              {/* Orders */}
               <li>
                 <a
                   href="/admin/order"
-                  className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+                  className="flex items-center gap-3 px-4 py-3 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
                 >
-                  <span>Orders</span>
+                  <FaClipboardList />
+                  Orders
                 </a>
               </li>
 
               {/* Marketplace Dropdown */}
               <li>
                 <button
-                  type="button"
-                  className="flex items-center w-full p-2 text-base text-gray-900 transition duration-75 rounded-lg group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
                   onClick={() => setMarketplaceOpen(!isMarketplaceOpen)}
+                  className="flex items-center justify-between w-full px-4 py-3 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
                 >
-                  <span className="flex-1 text-left">Marketplace</span>
-                  <svg
-                    className={`w-4 h-4 transition-transform ${
-                      isMarketplaceOpen ? "rotate-180" : ""
-                    }`}
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
-                  </svg>
+                  <span className="flex items-center gap-3">
+                    <FaShoppingCart />
+                    Marketplace
+                  </span>
+                  {isMarketplaceOpen ? (
+                    <ChevronUp size={20} />
+                  ) : (
+                    <ChevronDown size={20} />
+                  )}
                 </button>
                 {isMarketplaceOpen && (
-                  <ul className="py-2 space-y-2">
-                    <li>
-                      <a
-                        href="/admin/card"
-                        className="flex items-center p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-                      >
-                        Card
-                      </a>
-                    </li>
-                    <li>
-                      <a
-                        href="/admin/special"
-                        className="flex items-center p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-                      >
-                        Special Card
-                      </a>
-                    </li>
-                    <li>
-                      <a
-                        href="/admin/categories"
-                        className="flex items-center p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-                      >
-                        Categories
-                      </a>
-                    </li>
-                    <li>
-                      <a
-                        href="/admin/tag"
-                        className="flex items-center p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-                      >
-                        Tag
-                      </a>
-                    </li>
+                  <ul className="mt-1 ml-4 space-y-1">
+                    {[
+                      {name: "Card", icon: <FaBox />},
+                      {name: "Special Card", icon: <FaStar />},
+                      {name: "Master", icon: <FaTags />},
+                      {name: "Series", icon: <FaTags />},
+                      {name: "Categories", icon: <FaTags />},
+                      {name: "Tag", icon: <FaTags />},
+                    ].map(({name, icon}) => (
+                      <li key={name}>
+                        <a
+                          href={`/admin/${name
+                            .toLowerCase()
+                            .replace(" ", "-")}`}
+                          className="flex items-center gap-3 px-4 py-2 text-sm text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+                        >
+                          {icon}
+                          {name}
+                        </a>
+                      </li>
+                    ))}
                   </ul>
                 )}
               </li>
@@ -163,142 +170,68 @@ const SidebarComponent = () => {
               {/* Pages Dropdown */}
               <li>
                 <button
-                  type="button"
-                  className="flex items-center w-full p-2 text-base text-gray-900 transition duration-75 rounded-lg group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
                   onClick={() => setPagesOpen(!isPagesOpen)}
+                  className="flex items-center justify-between w-full px-4 py-3 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
                 >
-                  <span className="flex-1 text-left">Pages</span>
-                  <svg
-                    className={`w-4 h-4 transition-transform ${
-                      isPagesOpen ? "rotate-180" : ""
-                    }`}
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
-                  </svg>
+                  <span className="flex items-center gap-3">
+                    <FaSignInAlt />
+                    Pages
+                  </span>
+                  {isPagesOpen ? (
+                    <ChevronUp size={20} />
+                  ) : (
+                    <ChevronDown size={20} />
+                  )}
                 </button>
                 {isPagesOpen && (
-                  <ul className="py-2 space-y-2">
-                    <li>
-                      <a
-                        href="#"
-                        className="flex items-center p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-                      >
-                        Sign In
-                      </a>
-                    </li>
-                    <li>
-                      <a
-                        href="#"
-                        className="flex items-center p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-                      >
-                        Sign Up
-                      </a>
-                    </li>
-                    <li>
-                      <a
-                        href="#"
-                        className="flex items-center p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-                      >
-                        Home
-                      </a>
-                    </li>
-                    <li>
-                      <a
-                        href="#"
-                        className="flex items-center p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-                      >
-                        Marketplace
-                      </a>
-                    </li>
-                    <li>
-                      <a
-                        href="#"
-                        className="flex items-center p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-                      >
-                        Rankings
-                      </a>
-                    </li>
-                    <li>
-                      <a
-                        href="#"
-                        className="flex items-center p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-                      >
-                        Events
-                      </a>
-                    </li>
+                  <ul className="mt-1 ml-4 space-y-1">
+                    {[
+                      {name: "SignIn", icon: <FaSignInAlt />},
+                      {name: "SignUp", icon: <FaSignOutAlt />},
+                      {name: "Home", icon: <FaHome />},
+                      {name: "Marketplace", icon: <FaShoppingCart />},
+                      {name: "Rankings", icon: <FaStar />},
+                      {name: "Events", icon: <FaCalendarAlt />},
+                    ].map(({name, icon}) => (
+                      <li key={name}>
+                        <a
+                          href={`/admin/${name
+                            .toLowerCase()
+                            .replace(" ", "-")}`}
+                          className="flex items-center gap-3 px-4 py-2 text-sm text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+                        >
+                          {icon}
+                          {name}
+                        </a>
+                      </li>
+                    ))}
                   </ul>
                 )}
               </li>
 
               {/* Regular Items */}
-              <li>
-                <a
-                  href="/admin/event"
-                  className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
-                >
-                  <span>Events</span>
-                </a>
-              </li>
-              <li>
-                <a
-                  href="/admin/coupon"
-                  className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
-                >
-                  <span>Coupon</span>
-                </a>
-              </li>
-              <li>
-                <a
-                  href="/admin/creator"
-                  className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
-                >
-                  <span>Creator</span>
-                </a>
-              </li>
-              <li>
-                <a
-                  href="/admin/member"
-                  className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
-                >
-                  <span>Member</span>
-                </a>
-              </li>
-              <li>
-                <a
-                  href="/admin/subscription"
-                  className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
-                >
-                  <span>Subscription</span>
-                </a>
-              </li>
-              <li>
-                <a
-                  href="/admin/shipping"
-                  className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
-                >
-                  <span>Shipping</span>
-                </a>
-              </li>
-              <li>
-                <a
-                  href="/admin/payment"
-                  className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
-                >
-                  <span>Payment</span>
-                </a>
-              </li>
-              <li>
-                <a
-                  href="/admin"
-                  className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
-                >
-                  <span>Admin</span>
-                </a>
-              </li>
+              {[
+                {name: "Event", icon: <FaCalendarAlt />},
+                {name: "Coupon", icon: <RiCoupon3Fill />},
+                {name: "Creator", icon: <RiPencilRuler2Fill />},
+                {name: "Member", icon: <FaUsers />},
+                {name: "Subscription", icon: <FaBox />},
+                {name: "Shipping", icon: <FaShippingFast />},
+                {name: "Payment", icon: <FaMoneyCheckAlt />},
+                {name: "Admin", icon: <FaUserShield />},
+              ].map(({name, icon}) => (
+                <li key={name}>
+                  <a
+                    href={`/admin/${name.toLowerCase()}`}
+                    className="flex items-center gap-3 px-4 py-3 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+                  >
+                    {icon}
+                    {name}
+                  </a>
+                </li>
+              ))}
             </ul>
-          </div>
+          </nav>
         </div>
       </aside>
     </div>

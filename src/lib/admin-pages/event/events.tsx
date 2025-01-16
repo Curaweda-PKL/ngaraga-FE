@@ -72,7 +72,10 @@ export const Events = () => {
       <div className="flex justify-between items-center mb-6">
         <button className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg flex items-center gap-2">
           <Plus className="w-4 h-4" />
-          <span>Add Events</span>
+          <span>
+            {" "}
+            <a href="/admin/add-event">Add Events</a>
+          </span>
         </button>
 
         <div className="relative">
@@ -139,7 +142,9 @@ export const Events = () => {
                       <MessageSquare className="w-4 h-4" />
                     </button>
                     <button className="p-2 hover:bg-gray-100 rounded-lg text-gray-600">
-                      <Edit className="w-4 h-4" />
+                      <a href="/admin/add-event">
+                        <Edit className="w-4 h-4" />
+                      </a>
                     </button>
                     <button className="p-2 hover:bg-gray-100 rounded-lg text-gray-600">
                       <Eye className="w-4 h-4" />

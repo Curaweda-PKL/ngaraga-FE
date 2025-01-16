@@ -98,7 +98,7 @@ const statusColors: Record<OrderStatus, string> = {
   Delivered: "bg-green-100 text-green-700",
 };
 
-export const OrderDetail = () => {
+export const Order = () => {
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
   const [endDate, setEndDate] = useState<Date | undefined>(undefined);
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -318,7 +318,9 @@ export const OrderDetail = () => {
                 </td>
                 <td className="p-4 flex gap-2">
                   <button className="btn btn-xs btn-circle btn-ghost">
-                    <MdEdit />
+                    <a href="/admin/detail-order">
+                      <MdEdit />
+                    </a>
                   </button>
                   <button className="btn btn-xs btn-circle btn-ghost">
                     <GrView />
