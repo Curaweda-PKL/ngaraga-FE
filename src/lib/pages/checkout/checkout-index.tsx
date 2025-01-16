@@ -1,6 +1,9 @@
 import React, { useState } from "react";
+import { AiOutlineUser } from "react-icons/ai";
+import { MdOutlineMail } from "react-icons/md";
 import { PiPackageLight } from "react-icons/pi";
 import { TbTruckDelivery } from "react-icons/tb";
+import PhoneInput from "./components/PhoneInput";
 
 interface Item {
   title: string;
@@ -52,9 +55,9 @@ const Checkout: React.FC = () => {
     phoneCode: "+62",
     phoneNumber: "",
     country: "Indonesia",
-    state: "",
-    city: "",
-    subdistrict: "",
+    state: "State/Province",
+    city: "City/Regency",
+    subdistrict: "Subdistrict",
     postalCode: "",
     addressDetails: "",
     notes: "",
@@ -91,31 +94,31 @@ const Checkout: React.FC = () => {
         <div className="checkout-header">
           <h1 className="font-bold text-2xl mb-2">Checkout</h1>
           <div className="flex items-center">
-            <div className="w-10 h-10 bg-call-to-actions-900 rounded-lg text-white flex items-center justify-center mt-2">
+            <div className="w-8 h-8 bg-call-to-actions-900 rounded-lg text-white flex items-center justify-center mt-2">
               <span className="text-white font-bold">1</span>
             </div>
-            <span className="text-yellow-500 text-lg text-center mx-4">
+            <span className="text-yellow-500 text-md text-center mx-4">
               Information
             </span>
 
-            <div className="w-10 h-10 border border-gray-500 rounded-lg flex items-center justify-center mt-2 mx-4">
+            <div className="w-8 h-8 border border-gray-500 rounded-lg flex items-center justify-center mt-2 mx-4">
               <span className="text-gray-500 font-bold">2</span>
             </div>
-            <span className="text-gray-500 text-lg text-center mx-1">
+            <span className="text-gray-500 text-md text-center mx-1">
               Payment
             </span>
 
-            <div className="w-10 h-10 border border-gray-500 rounded-lg flex items-center justify-center mt-2 mx-4">
+            <div className="w-8 h-8 border border-gray-500 rounded-lg flex items-center justify-center mt-2 mx-4">
               <span className="text-gray-500 font-bold">3</span>
             </div>
-            <span className="text-gray-500 text-lg text-center mx-2">
+            <span className="text-gray-500 text-md text-center mx-2">
               Complete Orders
             </span>
           </div>
         </div>
 
         {/* Information Form */}
-        <div className="mt-5 space-y-4 mt-10">
+        <div className="mt-10 space-y-4 ">
           <div className="flex gap-5 items-center mb-3">
             <button className="btn bg-call-to-actions-100 border border-call-to-actions-900 rounded-lg hover:bg-white text-call-to-actions-900 ">
               <TbTruckDelivery size={18} />
@@ -128,50 +131,50 @@ const Checkout: React.FC = () => {
             </button>
           </div>
 
-          <input
-            type="text"
-            name="fullName"
-            value={formData.fullName}
-            onChange={handleFormChange}
-            placeholder="Full Name"
-            className="w-full border border-neutral-colors-500 rounded-lg p-3"
-            
-          />
-
-          <input
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleFormChange}
-            placeholder="Email"
-            className="w-full border border-neutral-colors-500 rounded-lg p-3"
-          />
-          <div className="flex gap-2">
-            <select
-              name="phoneCode"
-              value={formData.phoneCode}
-              onChange={handleFormChange}
-              className="w-1/3 border border-neutral-colors-500 rounded-lg p-3"
-            >
-              <option value="+62">+62</option>
-            </select>
+          <div className="relative w-full mb-4">
+            <AiOutlineUser
+              className="absolute text-neutral-colors-500 left-3 top-1/2 transform -translate-y-1/2"
+              size={23}
+            />
             <input
               type="text"
-              name="phoneNumber"
-              value={formData.phoneNumber}
+              name="fullName"
+              value={formData.fullName}
               onChange={handleFormChange}
-              placeholder="Enter Phone Number"
-              className="w-2/3 border border-neutral-colors-500 rounded-lg p-3"
+              placeholder="Full Name"
+              className="w-full border border-neutral-colors-500 rounded-lg p-3 pl-11"
             />
           </div>
-          <select
-            name="country"
-            value={formData.country}
-            onChange={handleFormChange}
-            className="w-full border border-neutral-colors-500  rounded-lg p-3"
-          >
-            <option value="Indonesia">Indonesia</option>
-          </select>
+
+          <div className="relative w-full mb-4">
+            <MdOutlineMail
+              className="absolute text-neutral-colors-500 left-3 top-1/2 transform -translate-y-1/2"
+              size={23}
+            />
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleFormChange}
+              placeholder="Email"
+              className="w-full border border-neutral-colors-500 rounded-lg p-3 pl-11"
+            />
+          </div>
+
+          <div className="flex ">
+            <PhoneInput />
+          </div>
+
+            <select
+              name="country"
+              value={formData.country}
+              onChange={handleFormChange}
+              className="w-full border border-neutral-colors-500  rounded-lg p-3"
+            >
+              <option value="Indonesia">Indonesia</option>
+            </select>
+
+
           <div className="grid grid-cols-2 gap-4">
             <select
               name="state"
@@ -179,7 +182,7 @@ const Checkout: React.FC = () => {
               onChange={handleFormChange}
               className="border border-neutral-colors-500  rounded-lg p-3"
             >
-              <option value="">State/Province</option>
+              <option value="State/Province">State/Province</option>
             </select>
             <select
               name="city"
@@ -187,7 +190,7 @@ const Checkout: React.FC = () => {
               onChange={handleFormChange}
               className="border border-neutral-colors-500  rounded-lg p-3"
             >
-              <option value="">City/Regency</option>
+              <option value="City/Regency">City/Regency</option>
             </select>
             <select
               name="subdistrict"
@@ -195,7 +198,7 @@ const Checkout: React.FC = () => {
               onChange={handleFormChange}
               className="border border-neutral-colors-500  rounded-lg p-3"
             >
-              <option value="">Subdistrict</option>
+              <option value="Subdistrict">Subdistrict</option>
             </select>
             <input
               type="text"
@@ -212,6 +215,7 @@ const Checkout: React.FC = () => {
             onChange={handleFormChange}
             placeholder="Address Details"
             className="w-full border border-neutral-colors-500  rounded-lg p-3"
+            
           ></textarea>
           <textarea
             name="notes"
