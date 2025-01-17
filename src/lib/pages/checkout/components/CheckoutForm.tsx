@@ -1,7 +1,6 @@
-import React, { useState } from "react";
-import { AiOutlineUser } from "react-icons/ai";
-import { MdOutlineMail } from "react-icons/md";
-
+import React from "react";
+import {AiOutlineUser} from "react-icons/ai";
+import {MdOutlineMail} from "react-icons/md";
 
 interface FormData {
   fullName: string;
@@ -50,10 +49,13 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
         </div>
       </div>
 
-      <div className="mt-5 space-y-4 mt-10">
+      <div className="space-y-4 mt-10">
         {/* Form Fields */}
         <div className="relative w-full mb-4">
-          <AiOutlineUser className="absolute text-neutral-colors-500 left-3 top-1/2 transform -translate-y-1/2" size={23} />
+          <AiOutlineUser
+            className="absolute text-neutral-colors-500 left-3 top-1/2 transform -translate-y-1/2"
+            size={23}
+          />
           <input
             type="text"
             name="fullName"
@@ -64,7 +66,10 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
           />
         </div>
         <div className="relative w-full mb-4">
-          <MdOutlineMail className="absolute text-neutral-colors-500 left-3 top-1/2 transform -translate-y-1/2" size={23} />
+          <MdOutlineMail
+            className="absolute text-neutral-colors-500 left-3 top-1/2 transform -translate-y-1/2"
+            size={23}
+          />
           <input
             type="email"
             name="email"

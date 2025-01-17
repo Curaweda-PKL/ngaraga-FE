@@ -30,7 +30,10 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
       <h2 className="font-bold text-lg mb-2">Summary Order</h2>
       <div className="border-b border-neutral-colors-400 mb-5"></div>
       {items.map((item, index) => (
-        <div key={index} className="flex items-center justify-between border pb-4 bg-neutral-colors-100 border-neutral-colors-300 rounded-lg mb-4">
+        <div
+          key={index}
+          className="flex items-center justify-between border pb-4 bg-neutral-colors-100 border-neutral-colors-300 rounded-lg mb-4"
+        >
           <div className="flex items-center p-2 rounded-lg">
             <img
               src={item.image}
@@ -42,7 +45,9 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
               <p>{item.author}</p>
               <p>
                 Qty: {item.quantity}{" "}
-                <span className="ml-4 font-bold">{formatCurrency(item.price)}</span>
+                <span className="ml-4 font-bold">
+                  {formatCurrency(item.price)}
+                </span>
               </p>
             </div>
           </div>
@@ -67,7 +72,7 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
         </div>
       </div>
       <button className="w-full bg-call-to-actions-900 text-white rounded-lg py-3 mt-6 font-bold hover:bg-call-to-actions-800">
-        Pay Now
+        <a href="/payment">Pay Now</a>
       </button>
     </div>
   );

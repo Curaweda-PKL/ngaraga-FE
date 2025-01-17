@@ -54,19 +54,19 @@ const Artists = React.lazy(() => import("@/lib/pages/artists/artists-index"));
 const Marketplace = React.lazy(
   () => import("@/lib/pages/marketplace/marketplace-index")
 );
-const TopCollectors = React.lazy(
-  () => import("@/lib/pages/top-players/top-players")
-);
-const Cart = React.lazy(() => import("@/lib/pages/cart/cart-index"));
+const TopCollectors = React.lazy(() => import("@/lib/pages/top-players"));
+const Cart = React.lazy(() => import("@/lib/pages/cart"));
 const BrowseEvents = React.lazy(
   () => import("@/lib/pages/events/browse-event")
 );
 const EventDetail = React.lazy(
-  () => import("@/lib/pages/event-detail/detail-events")
+  () => import("@/lib/pages/events/detail-events")
 );
 const Checkout = React.lazy(
   () => import("@/lib/pages/checkout/checkout-index")
 );
+const PaymentPage = React.lazy(() => import("@/lib/pages/payment/payment"));
+const OrderComplete = React.lazy(() => import("@/lib/pages/payment/complete"));
 
 export const routes: Array<PathRouteProps> = [
   {path: "/admin/dashboard", element: <Dashboard />},
@@ -118,6 +118,8 @@ export const routes: Array<PathRouteProps> = [
   {path: "/events", element: <BrowseEvents />},
   {path: "/detailevents", element: <EventDetail />},
   {path: "/checkout", element: <Checkout />},
+  {path: "/payment", element: <PaymentPage />},
+  {path: "/complete", element: <OrderComplete />},
 ];
 
 export const privateRoutes: Array<PathRouteProps> = [];

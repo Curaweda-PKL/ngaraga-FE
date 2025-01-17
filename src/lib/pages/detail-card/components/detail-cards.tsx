@@ -1,5 +1,5 @@
 import React from "react";
-import { CiShoppingCart } from "react-icons/ci";
+import {CiShoppingCart} from "react-icons/ci";
 
 export const DetailCards: React.FC = () => {
   return (
@@ -28,14 +28,16 @@ export const DetailCards: React.FC = () => {
             Add to Cart
           </button>
           <button className="border border-call-to-actions-900 text-call-to-action px-4 py-2 rounded-full transition">
-            Checkout
+            <a href="/checkout">Checkout</a>
           </button>
         </div>
 
         {/* Product Name */}
         <h1 className="text-2xl font-bold text-gray-900 mb-2">Product Name</h1>
         <div className="flex items-center mb-6">
-          <h2 className="text-lg text-gray-700">Minted on: December 25, 2024</h2>
+          <h2 className="text-lg text-gray-700">
+            Minted on: December 25, 2024
+          </h2>
         </div>
 
         {/* DetailBio Content */}
@@ -48,7 +50,9 @@ export const DetailCards: React.FC = () => {
               className="w-10 h-10 rounded-full"
             />
             <div>
-              <h2 className="text-lg font-semibold text-gray-800">Created By</h2>
+              <h2 className="text-lg font-semibold text-gray-800">
+                Created By
+              </h2>
               <p className="text-gray-500">Orbitian</p>
             </div>
           </div>
@@ -56,19 +60,22 @@ export const DetailCards: React.FC = () => {
           {/* Description */}
           <h3 className="text-xl text-gray-900 mb-4">Description</h3>
           <p className="text-gray-700 text-sm leading-relaxed mb-4 break-words">
-            The Orbitians is a collection of 10,000 unique NFTs on the Ethereum blockchain.
+            The Orbitians is a collection of 10,000 unique NFTs on the Ethereum
+            blockchain.
           </p>
           <p className="text-gray-700 text-sm leading-relaxed mb-4 break-words">
-            There are all sorts of beings in the NFT Universe. The most advanced and friendly
-            of the bunch are Orbitians.
+            There are all sorts of beings in the NFT Universe. The most advanced
+            and friendly of the bunch are Orbitians.
           </p>
           <p className="text-gray-700 text-sm leading-relaxed mb-4 break-words">
-            They live in metal space machines, high up in the sky and only have one foot on
-            Earth. These Orbitians are a peaceful race, but they have been at war with a group
-            of invaders for many generations. The invaders are called Upside-Downs, because of
-            their inverted bodies that live on the ground, yet do not know any other way to be.
-            Upside-Downs believe that they will be able to win this war if they could only get
-            an eye into Orbitian territory, so they’ve taken to make human beings their target.
+            They live in metal space machines, high up in the sky and only have
+            one foot on Earth. These Orbitians are a peaceful race, but they
+            have been at war with a group of invaders for many generations. The
+            invaders are called Upside-Downs, because of their inverted bodies
+            that live on the ground, yet do not know any other way to be.
+            Upside-Downs believe that they will be able to win this war if they
+            could only get an eye into Orbitian territory, so they’ve taken to
+            make human beings their target.
           </p>
 
           {/* Details */}
