@@ -16,6 +16,7 @@ import {Subscription} from "../admin-pages/subscription";
 import {Shipping} from "../admin-pages/shipping";
 import {Payment} from "../admin-pages/payment";
 import {Admin} from "../admin-pages/admin";
+import PaymentUser from "../pages/payment/payment";
 
 const DetailSpecial = React.lazy(() => import("@/lib/pages/detail-card/detail-special-index"));
 const DetailCards = React.lazy(() => import("../pages/detail-card/detail-cards"));
@@ -63,7 +64,9 @@ export const routes: Array<PathRouteProps> = [
   { path: "/cart", element: <Cart /> },
   { path: "/events", element: <BrowseEvents /> },
   { path: "/detailevents", element: <EventDetail /> },
-  { path: "/checkout", element: <Checkout/>}
+  { path: "/checkout", element: <Checkout/>},
+  { path: "/payment", element: <PaymentUser/>},
+
 ];
 
 export const privateRoutes: Array<PathRouteProps> = [];

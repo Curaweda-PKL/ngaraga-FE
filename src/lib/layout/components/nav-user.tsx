@@ -70,7 +70,7 @@ export const Navbar: React.FC = () => {
             className="cursor-pointer flex items-center"
             onClick={() => navigateToPage("cart")}
           >
-            <CiShoppingCart size={31} className="lg:mr-3" />
+            <CiShoppingCart size={31} className="lg:mr-3 ShoppingCartIcon" />
           </a>
 
           {/* Sign-in and Sign-up buttons */}

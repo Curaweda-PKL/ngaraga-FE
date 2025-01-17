@@ -1,4 +1,4 @@
-import heroImage from "@/assets/img/astroheropng.png";
+import heroImage from "@/assets/img/MATANGAJI LEGEND.jpg";
 import {RiRocketFill} from "react-icons/ri";
 
 export const HeroFrame = () => {
@@ -46,7 +46,7 @@ export const HeroFrame = () => {
             <img
               src={heroImage}
               alt="a futuristic image"
-              className="w-full h-full object-cover"
+              className="w-full h-full object-contain"
             />
           </figure>
           <div className="flex flex-col items-start gap-4 p-4 sm:p-6">
