@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { FaLock, FaEnvelope } from "react-icons/fa";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import LoginImage from "@/assets/img/spacestarry.png";
+import axios from "axios";
 
 type LoginFormData = {
   email: string;
@@ -53,21 +54,40 @@ const Login: React.FC = () => {
   };
 
   // Handle form submission
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-
+  
     if (!validateForm()) {
       setLoading(false);
       return;
     }
-
-    setTimeout(() => {
-      setLoading(false);
+  
+    try {
+      const response = await axios.post(
+        "http://localhost:3000/api/login",
+        {
+          email: formData.email,
+          password: formData.password,
+        },
+        {
+          withCredentials: true, 
+        }
+      );
+  
+      // Handle successful login
       alert("Logged in successfully!");
-    }, 1000);
+      console.log("Login Response:", response.data);
+  
+      // Optionally redirect the user
+      window.location.href = "/";
+    } catch (error: any) {
+      console.error("Error during login:", error);
+      setError({ general: error.response?.data?.message || "Login failed!" });
+    } finally {
+      setLoading(false);
+    }
   };
-
   // Toggle visibility for password
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
 
