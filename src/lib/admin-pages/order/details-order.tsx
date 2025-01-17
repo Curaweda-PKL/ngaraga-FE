@@ -1,9 +1,9 @@
 import {useState} from "react";
 import {
   FaCreditCard,
-  FaBox,
   FaTruck,
   FaCheck,
+  FaBox,
   FaEdit,
   FaPhone,
   FaEnvelope,
@@ -11,6 +11,14 @@ import {
   FaCheckCircle,
   FaTimes,
 } from "react-icons/fa";
+
+interface ShippingOption {
+  id: string;
+  name: string;
+  logo: string;
+  estimatedDelivery: string;
+  price: number;
+}
 
 interface ShippingInfo {
   fullName: string;
@@ -22,18 +30,189 @@ interface ShippingInfo {
   city: string;
 }
 
+interface ChangeShippingModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: (option: ShippingOption) => void;
+  selectedOptionId: string;
+  shippingOptions: ShippingOption[];
+}
+
+const ChangeShippingModal: React.FC<ChangeShippingModalProps> = ({
+  isOpen,
+  onClose,
+  onConfirm,
+  selectedOptionId,
+  shippingOptions,
+}) => {
+  const [selectedId, setSelectedId] = useState(selectedOptionId);
+
+  const handleConfirm = () => {
+    const selectedOption = shippingOptions.find(
+      (option) => option.id === selectedId
+    );
+    if (selectedOption) {
+      onConfirm(selectedOption);
+      onClose();
+    }
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white p-6 rounded-lg w-96">
+        <h2 className="text-xl font-bold mb-4">Change Shipping</h2>
+        <ul className="space-y-4">
+          {shippingOptions.map((option) => (
+            <li
+              key={option.id}
+              className={`flex items-center p-2 border rounded-lg cursor-pointer ${
+                selectedId === option.id ? "border-blue-500" : "border-gray-300"
+              }`}
+              onClick={() => setSelectedId(option.id)}
+            >
+              <img
+                src={option.logo}
+                alt={option.name}
+                className="w-10 h-10 mr-4"
+              />
+              <div>
+                <h3 className="font-semibold">{option.name}</h3>
+                <p className="text-sm text-gray-500">
+                  {option.estimatedDelivery}
+                </p>
+                <p className="text-sm text-gray-700">
+                  Rp {option.price.toLocaleString()}
+                </p>
+              </div>
+            </li>
+          ))}
+        </ul>
+        <div className="mt-4 flex justify-end space-x-4">
+          <button
+            className="px-4 py-2 bg-gray-200 rounded"
+            onClick={onClose}
+          >
+            Cancel
+          </button>
+          <button
+            className="px-4 py-2 bg-blue-500 text-white rounded"
+            onClick={handleConfirm}
+          >
+            Confirm
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 interface EditShippingModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onUpdate: (data: ShippingInfo) => void;
+  onUpdate: (info: ShippingInfo) => void;
+  shippingInfo: ShippingInfo;
 }
 
 const EditShippingModal: React.FC<EditShippingModalProps> = ({
   isOpen,
   onClose,
   onUpdate,
+  shippingInfo,
 }) => {
-  const [formData, setFormData] = useState<ShippingInfo>({
+  const [form, setForm] = useState(shippingInfo);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const {name, value} = e.target;
+    setForm((prev) => ({...prev, [name]: value}));
+  };
+
+  const handleSubmit = () => {
+    onUpdate(form);
+    onClose();
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white p-6 rounded-lg w-96">
+        <h2 className="text-xl font-bold mb-4">Edit Shipping Info</h2>
+        <div className="space-y-4">
+          <input
+            type="text"
+            name="fullName"
+            value={form.fullName}
+            onChange={handleChange}
+            placeholder="Full Name"
+            className="w-full p-2 border rounded"
+          />
+          <input
+            type="email"
+            name="email"
+            value={form.email}
+            onChange={handleChange}
+            placeholder="Email"
+            className="w-full p-2 border rounded"
+          />
+          <input
+            type="text"
+            name="phoneNumber"
+            value={form.phoneNumber}
+            onChange={handleChange}
+            placeholder="Phone Number"
+            className="w-full p-2 border rounded"
+          />
+          <input
+            type="text"
+            name="country"
+            value={form.country}
+            onChange={handleChange}
+            placeholder="Country"
+            className="w-full p-2 border rounded"
+          />
+          <input
+            type="text"
+            name="city"
+            value={form.city}
+            onChange={handleChange}
+            placeholder="City"
+            className="w-full p-2 border rounded"
+          />
+        </div>
+        <div className="mt-4 flex justify-end space-x-4">
+          <button
+            className="px-4 py-2 bg-gray-200 rounded"
+            onClick={onClose}
+          >
+            Cancel
+          </button>
+          <button
+            className="px-4 py-2 bg-blue-500 text-white rounded"
+            onClick={handleSubmit}
+          >
+            Save
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export const DetailsOrder: React.FC = () => {
+  const [isShippingModalOpen, setIsShippingModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+  const [selectedShipping, setSelectedShipping] = useState<ShippingOption>({
+    id: "anteraja",
+    name: "Anter Aja",
+    logo: "/api/placeholder/40/40",
+    estimatedDelivery: "3-4 Days",
+    price: 15000,
+  });
+
+  const [shippingInfo, setShippingInfo] = useState<ShippingInfo>({
     fullName: "Animakid",
     email: "animakid@gmail.com",
     phoneNumber: "854 5565 6745",
@@ -43,156 +222,52 @@ const EditShippingModal: React.FC<EditShippingModalProps> = ({
     city: "",
   });
 
-  const handleSubmit = (e: {preventDefault: () => void}) => {
-    e.preventDefault();
-    onUpdate(formData);
-    onClose();
-  };
-
-  if (!isOpen) return null;
-
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 w-full max-w-md">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-lg font-semibold">Edit Shipping Information</h2>
-          <button
-            onClick={onClose}
-            className="text-gray-500 hover:text-gray-700"
-          >
-            <FaTimes />
-          </button>
-        </div>
-
-        <form onSubmit={handleSubmit}>
-          <div className="space-y-4">
-            {/* Full Name */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Full Name *
-              </label>
-              <input
-                type="text"
-                value={formData.fullName}
-                onChange={(e) =>
-                  setFormData({...formData, fullName: e.target.value})
-                }
-                className="w-full px-3 py-2 border rounded-lg focus:ring-1 focus:ring-yellow-500 focus:border-yellow-500"
-                required
-              />
-            </div>
-
-            {/* Email */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Email *
-              </label>
-              <input
-                type="email"
-                value={formData.email}
-                onChange={(e) =>
-                  setFormData({...formData, email: e.target.value})
-                }
-                className="w-full px-3 py-2 border rounded-lg focus:ring-1 focus:ring-yellow-500 focus:border-yellow-500"
-                required
-              />
-            </div>
-
-            {/* Phone Number */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Phone Number *
-              </label>
-              <div className="flex gap-2">
-                <select
-                  value={formData.countryCode}
-                  onChange={(e) =>
-                    setFormData({...formData, countryCode: e.target.value})
-                  }
-                  className="px-3 py-2 border rounded-lg focus:ring-1 focus:ring-yellow-500 focus:border-yellow-500"
-                >
-                  <option value="+62">🇮🇩 +62</option>
-                  <option value="+1">🇺🇸 +1</option>
-                  <option value="+44">🇬🇧 +44</option>
-                </select>
-                <input
-                  type="tel"
-                  value={formData.phoneNumber}
-                  onChange={(e) =>
-                    setFormData({...formData, phoneNumber: e.target.value})
-                  }
-                  className="flex-1 px-3 py-2 border rounded-lg focus:ring-1 focus:ring-yellow-500 focus:border-yellow-500"
-                  required
-                />
-              </div>
-            </div>
-
-            {/* Country */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Country *
-              </label>
-              <select
-                value={formData.country}
-                onChange={(e) =>
-                  setFormData({...formData, country: e.target.value})
-                }
-                className="w-full px-3 py-2 border rounded-lg focus:ring-1 focus:ring-yellow-500 focus:border-yellow-500"
-                required
-              >
-                <option value="Indonesia">🇮🇩 Indonesia</option>
-                <option value="United States">🇺🇸 United States</option>
-                <option value="United Kingdom">🇬🇧 United Kingdom</option>
-              </select>
-            </div>
-          </div>
-
-          <div className="flex justify-end gap-3 mt-6">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="px-4 py-2 text-sm bg-yellow-500 text-white rounded-lg hover:bg-yellow-600"
-            >
-              Update
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  );
-};
-
-export const DetailsOrder = () => {
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [shippingInfo, setShippingInfo] = useState({
-    fullName: "Animakid",
-    email: "animakid@gmail.com",
-    phoneNumber: "854 5565 6745",
-    countryCode: "+62",
-  });
+  const shippingOptions: ShippingOption[] = [
+    {
+      id: "anteraja",
+      name: "Anter Aja",
+      logo: "/api/placeholder/40/40",
+      estimatedDelivery: "3-4 Days",
+      price: 15000,
+    },
+    {
+      id: "idexpress",
+      name: "ID Express",
+      logo: "/api/placeholder/40/40",
+      estimatedDelivery: "3-4 Days",
+      price: 15000,
+    },
+    {
+      id: "jne",
+      name: "JNE",
+      logo: "/api/placeholder/40/40",
+      estimatedDelivery: "3-4 Days",
+      price: 15000,
+    },
+    {
+      id: "jt",
+      name: "J&T",
+      logo: "/api/placeholder/40/40",
+      estimatedDelivery: "3-4 Days",
+      price: 15000,
+    },
+  ];
 
   const handleUpdateShipping = (newInfo: ShippingInfo) => {
     setShippingInfo(newInfo);
   };
 
-  // Rest of the existing code remains the same until the Shipping Information section
+  const orderItems = [
+    {id: 1, name: "Dancing Robot 0512", type: "Orbilum", price: 200000, qty: 1},
+    {id: 2, name: "Dancing Robot 0512", type: "Orbilum", price: 200000, qty: 1},
+    {id: 3, name: "Dancing Robot 0512", type: "Orbilum", price: 200000, qty: 1},
+  ];
+
   const orderStages = [
     {icon: <FaCreditCard size={20} />, label: "Payment", active: true},
     {icon: <FaBox size={20} />, label: "Packaging", active: false},
     {icon: <FaTruck size={20} />, label: "Shipping", active: false},
     {icon: <FaCheck size={20} />, label: "Delivered", active: false},
-  ];
-
-  const orderItems = [
-    {id: 1, name: "Dancing Robot 0512", type: "Orbilum", price: 200000, qty: 1},
-    {id: 2, name: "Dancing Robot 0512", type: "Orbilum", price: 200000, qty: 1},
-    {id: 3, name: "Dancing Robot 0512", type: "Orbilum", price: 200000, qty: 1},
   ];
 
   return (
@@ -216,6 +291,31 @@ export const DetailsOrder = () => {
             </div>
           ))}
           <div className="absolute top-8 left-0 w-full h-0.5 bg-gray-200" />
+        </div>
+      </div>
+
+      {/* Shipment Section */}
+      <div className="flex items-center gap-6">
+        <div
+          className="flex flex-col items-center cursor-pointer"
+          onClick={() => setIsShippingModalOpen(true)}
+        >
+          <FaTruck
+            size={30}
+            className="text-yellow-500"
+          />
+          <div className="mt-2 text-sm text-gray-600">Change Shipping</div>
+        </div>
+
+        <div
+          className="flex flex-col items-center cursor-pointer"
+          onClick={() => setIsEditModalOpen(true)}
+        >
+          <FaEdit
+            size={30}
+            className="text-yellow-500"
+          />
+          <div className="mt-2 text-sm text-gray-600">Edit Info</div>
         </div>
       </div>
 
@@ -411,12 +511,26 @@ export const DetailsOrder = () => {
         </div>
       </div>
 
+      {/* Change Shipping Modal */}
+      {isShippingModalOpen && (
+        <ChangeShippingModal
+          isOpen={isShippingModalOpen}
+          onClose={() => setIsShippingModalOpen(false)}
+          onConfirm={setSelectedShipping}
+          selectedOptionId={selectedShipping.id}
+          shippingOptions={shippingOptions}
+        />
+      )}
+
       {/* Edit Shipping Modal */}
-      <EditShippingModal
-        isOpen={isEditModalOpen}
-        onClose={() => setIsEditModalOpen(false)}
-        onUpdate={handleUpdateShipping}
-      />
+      {isEditModalOpen && (
+        <EditShippingModal
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+          onUpdate={handleUpdateShipping}
+          shippingInfo={shippingInfo}
+        />
+      )}
     </div>
   );
 };

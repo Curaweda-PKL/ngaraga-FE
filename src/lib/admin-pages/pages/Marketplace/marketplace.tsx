@@ -1,15 +1,15 @@
 import React, {useState} from "react";
 
-export const RankingsForm: React.FC = () => {
-  const [title, setTitle] = useState("Top Collectors");
+export const MarketplaceForm: React.FC = () => {
+  const [title, setTitle] = useState("Browse Marketplace");
   const [description, setDescription] = useState(
-    "Check out top ranking Card Collectors on the Card Marketplace."
+    "Browse through more than 50k Cards on the Card Marketplace."
   );
 
   const handleCancel = () => {
-    setTitle("Top Collectors");
+    setTitle("Browse Marketplace");
     setDescription(
-      "Check out top ranking Card Collectors on the Card Marketplace."
+      "Browse through more than 50k Cards on the Card Marketplace."
     );
   };
 
@@ -21,7 +21,7 @@ export const RankingsForm: React.FC = () => {
     <div className="p-6 bg-gray-100 min-h-screen">
       <div className="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-lg">
         {/* Header */}
-        <h1 className="text-2xl font-bold text-gray-700 mb-4">Rankings</h1>
+        <h1 className="text-2xl font-bold text-gray-700 mb-4">Marketplace</h1>
 
         {/* Form Fields */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">

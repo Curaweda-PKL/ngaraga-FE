@@ -186,8 +186,8 @@ const SidebarComponent = () => {
                 {isPagesOpen && (
                   <ul className="mt-1 ml-4 space-y-1">
                     {[
-                      {name: "SignIn", icon: <FaSignInAlt />},
-                      {name: "SignUp", icon: <FaSignOutAlt />},
+                      {name: "Sign-In", icon: <FaSignInAlt />},
+                      {name: "Sign-Up", icon: <FaSignOutAlt />},
                       {name: "Home", icon: <FaHome />},
                       {name: "Marketplace", icon: <FaShoppingCart />},
                       {name: "Rankings", icon: <FaStar />},
