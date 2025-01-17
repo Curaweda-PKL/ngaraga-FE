@@ -2,7 +2,7 @@ import {useState} from "react";
 import {CheckCircle2, Copy} from "lucide-react";
 
 const PaymentPage = () => {
-  const [activeTab, setActiveTab] = useState("ATM"); // State to manage active tab
+  const [activeTab, setActiveTab] = useState("ATM");
 
   const steps = [
     {number: 1, label: "Information", completed: true},

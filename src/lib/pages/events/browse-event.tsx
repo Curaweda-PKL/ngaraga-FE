@@ -148,18 +148,20 @@ const BrowseEvents: React.FC = () => {
       </div>
 
       {/* Event Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {eventCards.map((event, index) => (
-          <EventCard
-            key={index}
-            title={event.title}
-            time={event.time}
-            date={event.date}
-            location={event.location}
-            imageUrl={event.imageUrl}
-          />
-        ))}
-      </div>
+      <a href="/detail-events">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {eventCards.map((event, index) => (
+            <EventCard
+              key={index}
+              title={event.title}
+              time={event.time}
+              date={event.date}
+              location={event.location}
+              imageUrl={event.imageUrl}
+            />
+          ))}
+        </div>
+      </a>
     </div>
   );
 };

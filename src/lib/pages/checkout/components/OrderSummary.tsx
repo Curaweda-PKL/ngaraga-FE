@@ -70,10 +70,12 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
           <span>Total</span>
           <span>{formatCurrency(total)}</span>
         </div>
+        <a href="/payment">
+          <button className="w-full bg-call-to-actions-900 text-white rounded-lg py-3 mt-6 font-bold hover:bg-call-to-actions-800">
+            Pay Now
+          </button>
+        </a>
       </div>
-      <button className="w-full bg-call-to-actions-900 text-white rounded-lg py-3 mt-6 font-bold hover:bg-call-to-actions-800">
-        <a href="/payment">Pay Now</a>
-      </button>
     </div>
   );
 };

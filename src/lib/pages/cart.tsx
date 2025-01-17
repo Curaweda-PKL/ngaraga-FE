@@ -1,6 +1,6 @@
-import React, { useState } from "react";
-import { FaTrash } from "react-icons/fa";
-import { FaTag } from "react-icons/fa";
+import React, {useState} from "react";
+import {FaTrash} from "react-icons/fa";
+import {FaTag} from "react-icons/fa";
 
 const Cart: React.FC = () => {
   const [cartItems, setCartItems] = useState([
@@ -21,7 +21,7 @@ const Cart: React.FC = () => {
     setCartItems((items) =>
       items.map((item) =>
         item.id === id
-          ? { ...item, quantity: Math.max(1, item.quantity + delta) }
+          ? {...item, quantity: Math.max(1, item.quantity + delta)}
           : item
       )
     );
@@ -68,7 +68,7 @@ const Cart: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="col-span-2">
-          <div className="flex items-center border border-#D4D4D4 border-2 rounded-xl py-3 px-5 justify-between mb-4">
+          <div className="flex items-center border-[#D4D4D4] border-2 rounded-xl py-3 px-5 justify-between mb-4">
             <div className="flex items-center space-x-2">
               <input
                 type="checkbox"

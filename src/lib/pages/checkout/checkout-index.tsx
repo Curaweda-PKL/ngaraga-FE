@@ -1,8 +1,8 @@
-import React, { useState } from "react";
-import { AiOutlineUser } from "react-icons/ai";
-import { MdOutlineMail } from "react-icons/md";
-import { PiPackageLight } from "react-icons/pi";
-import { TbTruckDelivery } from "react-icons/tb";
+import React, {useState} from "react";
+import {AiOutlineUser} from "react-icons/ai";
+import {MdOutlineMail} from "react-icons/md";
+import {PiPackageLight} from "react-icons/pi";
+import {TbTruckDelivery} from "react-icons/tb";
 import PhoneInput from "./components/PhoneInput";
 
 interface Item {
@@ -68,8 +68,8 @@ const Checkout: React.FC = () => {
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
     >
   ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    const {name, value} = e.target;
+    setFormData((prev) => ({...prev, [name]: value}));
   };
 
   const formatCurrency = (value: number): string =>
@@ -165,15 +165,14 @@ const Checkout: React.FC = () => {
             <PhoneInput />
           </div>
 
-            <select
-              name="country"
-              value={formData.country}
-              onChange={handleFormChange}
-              className="w-full border border-neutral-colors-500  rounded-lg p-3"
-            >
-              <option value="Indonesia">Indonesia</option>
-            </select>
-
+          <select
+            name="country"
+            value={formData.country}
+            onChange={handleFormChange}
+            className="w-full border border-neutral-colors-500  rounded-lg p-3"
+          >
+            <option value="Indonesia">Indonesia</option>
+          </select>
 
           <div className="grid grid-cols-2 gap-4">
             <select
@@ -215,7 +214,6 @@ const Checkout: React.FC = () => {
             onChange={handleFormChange}
             placeholder="Address Details"
             className="w-full border border-neutral-colors-500  rounded-lg p-3"
-            
           ></textarea>
           <textarea
             name="notes"
@@ -333,9 +331,11 @@ const Checkout: React.FC = () => {
             <span>{formatCurrency(total)}</span>
           </div>
         </div>
-        <button className="w-full bg-call-to-actions-900 text-white rounded-lg py-3 mt-6 font-bold hover:bg-call-to-actions-800">
-          Pay Now
-        </button>
+        <a href="/payment">
+          <button className="w-full bg-call-to-actions-900 text-white rounded-lg py-3 mt-6 font-bold hover:bg-call-to-actions-800">
+            Pay Now
+          </button>
+        </a>
       </div>
     </div>
   );
