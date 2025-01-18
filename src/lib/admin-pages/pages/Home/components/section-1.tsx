@@ -14,7 +14,7 @@ export const HeroBanner = () => {
   });
 
   return (
-    <div className="p-6 bg-white min-h-screen">
+    <div className="p-6 bg-white">
       <div className="mb-4">
         <span className="text-gray-500 text-sm">Pages / Home</span>
         <h1 className="text-2xl font-semibold mt-2">Home</h1>

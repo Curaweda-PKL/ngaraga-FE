@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import {useState} from "react";
 import {SiShopee, SiGojek} from "react-icons/si";
 import {BsBank, BsWallet2} from "react-icons/bs";
 
@@ -9,7 +9,7 @@ interface PaymentMethod {
   isActive: boolean;
 }
 
-export const Payment: React.FC = () => {
+export const Payment = () => {
   const initialPayments: PaymentMethod[] = [
     {
       id: 1,

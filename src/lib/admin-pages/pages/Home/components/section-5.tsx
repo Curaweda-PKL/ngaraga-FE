@@ -17,7 +17,7 @@ export const SectionFiveForm = () => {
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 p-6">
-      <h2 className="text-lg font-medium mb-6">Section 2</h2>
+      <h2 className="text-lg font-medium mb-6">Section 5</h2>
 
       <div className="space-y-6">
         {/* Title */}
