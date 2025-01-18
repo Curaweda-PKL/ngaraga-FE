@@ -47,7 +47,7 @@ export const Event: React.FC = () => {
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold">Magic Mushrooms</h1>
 
           {/* CTA Button */}
-          <button className="py-2 px-6 sm:py-3 sm:px-8 bg-call-to-action text-white font-medium rounded-lg shadow-md hover:bg-gray-100 transition w-28 sm:w-36 md:w-40 lg:w-44">
+          <button className="py-2 px-6 sm:py-3 sm:px-8 bg-call-to-action text-white font-medium rounded-lg shadow-md hover:bg-call-to-actions-700 transition w-28 sm:w-36 md:w-40 lg:w-44">
             See Card
           </button>
         </div>

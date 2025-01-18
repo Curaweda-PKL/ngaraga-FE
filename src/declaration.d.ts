@@ -11,3 +11,4 @@ declare module '*.ico';
 declare module '*.mp4';
 declare module '*.webm';
 declare module '*.mov';
+declare module '*.js';

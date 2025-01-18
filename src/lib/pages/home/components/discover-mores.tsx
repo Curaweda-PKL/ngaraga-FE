@@ -37,7 +37,7 @@ export const DiscoverMoreCards = () => {
             </p>
           </div>
           {/* Button for Large Screens */}
-          <button className="hidden lg:block bg-call-to-action text-white px-4 py-2 rounded-md hover:bg-[#8c44e6] transition-colors font-[Poppins]">
+          <button className="hidden lg:block bg-call-to-action text-white px-4 py-2 rounded-md hover:bg-call-to-actions-800 transition-colors font-[Poppins]">
             See All
           </button>
         </div>
@@ -77,7 +77,7 @@ export const DiscoverMoreCards = () => {
 
         {/* Button for Small and Medium Screens */}
         <div className="flex justify-center lg:hidden px-8">
-          <button className="bg-call-to-action text-white px-6 py-3 rounded-md hover:bg-[#8c44e6] transition-colors font-[Poppins]">
+          <button className="bg-call-to-action text-white px-6 py-3 rounded-md hover:bg-call-to-actions-800 transition-colors font-[Poppins]">
             See All
           </button>
         </div>

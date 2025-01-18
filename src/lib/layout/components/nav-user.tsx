@@ -1,12 +1,16 @@
 import { useState } from "react";
 import { FaBars, FaTimes, FaUserFriends } from "react-icons/fa";
 import { CiShoppingCart } from "react-icons/ci";
-
 import { useNavigate } from "react-router-dom";
 
 export const Navbar: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const navigate = useNavigate();
+
+  // Mock user authentication state (you should replace this with actual authentication logic)
+  const isAuthenticated = true; // Change this based on your authentication state
+  const userAvatarUrl = "https://www.gravatar.com/avatar/abc123"; // Replace with actual user avatar URL
+  const username = "JohnDoe"; // Replace with the actual username
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -42,7 +46,7 @@ export const Navbar: React.FC = () => {
             <img
               src="/src/assets/img/LOGO.png"
               alt="Ngaraga Logo"
-              className="w-8 h-8 mr-2"
+              className="w-8 h-8 mr-2 -ml-8 lg:ml-0"
             />
             NGARAGA
           </a>
@@ -70,36 +74,62 @@ export const Navbar: React.FC = () => {
             className="cursor-pointer flex items-center"
             onClick={() => navigateToPage("cart")}
           >
-            <CiShoppingCart size={31} className="lg:mr-3" />
+            <CiShoppingCart size={31} className="lg:mr-3 ShoppingCartIcon" />
           </a>
 
-          {/* Sign-in and Sign-up buttons */}
-          <a
-            className="btn bg-white border-call-to-action rounded-lg text-orange-300 hidden lg:flex items-center gap-2 hover:bg-call-to-actions-800 hover:text-white transition"
-            onClick={() => navigateToPage("login")}
-          >
-            Sign In
-          </a>
+          {/* Conditional rendering for Sign In / Sign Up buttons or Avatar */}
+          {!isAuthenticated ? (
+            <>
+              {/* Sign-in Button */}
+              <a
+                className="btn bg-white border-call-to-action rounded-lg text-orange-300 sm:flex lg:flex items-center gap-2 lg:mr-2 ml-2 hover:bg-call-to-actions-800 hover:text-white transition"
+                onClick={() => navigateToPage("login")}
+              >
+                Sign In
+              </a>
 
-          {/* Sign-up Button */}
-          <a
-            className="btn bg-call-to-action border-transparent rounded-lg text-white hidden lg:flex items-center gap-2 hover:bg-call-to-actions-800 transition"
-            onClick={() => navigateToPage("signup")}
-          >
-            <FaUserFriends size={18} />
-            Sign Up
-          </a>
+              {/* Sign-up Button */}
+              <a
+                className="btn bg-call-to-action border-transparent rounded-lg text-white hidden lg:flex items-center gap-2 hover:bg-call-to-actions-800 transition"
+                onClick={() => navigateToPage("signup")}
+              >
+                <FaUserFriends size={18} />
+                Sign Up
+              </a>
+            </>
+          ) : (
+            // Logged in
+            <div className="flex items-center space-x-2">
+              <span className="hidden sm:block text-sm font-medium ml-2">
+                {username}
+              </span>
+              <button
+                className="avatar btn btn-ghost"
+                onClick={() => navigateToPage("user")}
+              >
+                <div className="w-8 h-8 rounded-full">
+                  <img src={userAvatarUrl} alt="User Avatar" />
+                </div>
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
       {/* Sliding Sidebar for Mobile */}
       <div
-        className={`fixed inset-y-0 left-0 z-50 w-64 bg-base-100 transform transition-transform duration-300 ease-in-out 
+        className={`fixed inset-y-0 left-0 z-50 w-full bg-base-100 transform transition-transform duration-500 ease-in-out 
         ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} 
-        lg:hidden text-black`}
+        lg:hidden text-black overflow-x-hidden`}
       >
+        {/* Sidebar header */}
         <div className="flex justify-between items-center p-4 border-b">
-          <a href="/" className="flex items-center text-xl text-black">
+          <button onClick={toggleSidebar} className="btn btn-ghost text-black">
+            <FaTimes size={20} />
+          </button>
+
+          {/* Logo at flex start */}
+          <a href="/" className="flex items-center text-xl text-black ml-4">
             <img
               src="/src/assets/img/LOGO.png"
               alt="Ngaraga Logo"
@@ -107,11 +137,50 @@ export const Navbar: React.FC = () => {
             />
             NGARAGA
           </a>
-          <button onClick={toggleSidebar} className="btn btn-ghost text-black">
-            <FaTimes size={20} />
-          </button>
+
+          <div className="flex items-center space-x-4 ml-auto">
+            {!isAuthenticated ? (
+              <>
+                {/* Sign-in Button */}
+                <a
+                  className="btn bg-white border-call-to-action rounded-lg text-orange-300 sm:flex lg:flex items-center gap-2 hover:bg-call-to-actions-800 hover:text-white transition"
+                  onClick={() => navigateToPage("login")}
+                >
+                  Sign In
+                </a>
+
+                {/* Sign-up Button */}
+                <a
+                  className="btn bg-call-to-action border-transparent rounded-lg text-white hidden lg:flex items-center gap-2 hover:bg-call-to-actions-800 transition"
+                  onClick={() => navigateToPage("signup")}
+                >
+                  <FaUserFriends size={18} />
+                  Sign Up
+                </a>
+              </>
+            ) : (
+              // Logged in - Avatar and Cart
+              <div className="flex items-center justify-between space-x-4">
+                <a
+                  className="cursor-pointer"
+                  onClick={() => navigateToPage("cart")}
+                >
+                  <CiShoppingCart size={31} />
+                </a>
+                <button
+                  className="avatar btn btn-ghost"
+                  onClick={() => navigateToPage("user")}
+                >
+                  <div className="w-8 h-8 rounded-full">
+                    <img src={userAvatarUrl} alt="User Avatar" />
+                  </div>
+                </button>
+              </div>
+            )}
+          </div>
         </div>
 
+        {/* Sidebar menu */}
         <ul className="menu p-4 space-y-4 text-black">
           <li>
             <a

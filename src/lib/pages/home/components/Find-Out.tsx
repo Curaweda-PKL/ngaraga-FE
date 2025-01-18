@@ -43,7 +43,7 @@ export const HowItWorks = () => {
     <div className="flex items-center justify-center min-h-screen bg-background-primary mt-20 lg:mt-0 ">
       <div className="flex flex-col lg:flex-row items-center bg-transparent  gap-8 max-w-6xl w-full rounded-2xl overflow-hidden">
         <div className="text-[#404040] ">
-          <div className="mx-auto space-y-12">
+          <div className="mx-auto space-y-12 p-10 lg:p-0">
             {/* Title Section */}
             <div className="relative">
               <h1 className="text-4xl font-bold text-[#171717] mb-4">

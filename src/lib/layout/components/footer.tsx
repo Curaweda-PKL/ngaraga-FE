@@ -87,13 +87,13 @@ export const Footer: React.FC = () => {
           <p className="text-sm text-white max-w-xs mx-auto md:mx-0">
             Sign up for our newsletter and get exclusive card drops, promotions, and community updates delivered straight to your inbox.
           </p>
-          <div className="flex overflow-hidden rounded-full bg-[#2b2b2b] border">
+          <div className="flex overflow-hidden rounded-full bg-[#2b2b2b] border border-black">
             <input
               type="email"
               placeholder="Enter your email here"
               className="flex-1 px-4 py-3 text-sm bg-[#2b2b2b] text-gray-500 outline-none"
             />
-            <button className="bg-call-to-actions-900 px-6 py-3 text-sm text-white transition-all duration-300 hover:bg-[#FFC107] hover:text-black ">
+            <button className="bg-call-to-actions-900 px-6 py-3 text-sm text-white transition-all duration-300 hover:bg-call-to-actions-800 hover:text-black ">
               Subscribe
             </button>
           </div>
