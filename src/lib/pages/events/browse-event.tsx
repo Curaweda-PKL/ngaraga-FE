@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 
 interface EventCardProps {
   title: string;
@@ -85,6 +86,11 @@ const EventCard: React.FC<EventCardProps> = ({
 };
 
 const BrowseEvents: React.FC = () => {
+  const [pageContent, setPageContent] = useState({
+    title: "Browse Events",
+    description: "Explore a wide variety of events in our Event Directory.",
+  });
+
   const eventCards = [
     {
       title: "A Special Evening Celebration",
@@ -109,14 +115,31 @@ const BrowseEvents: React.FC = () => {
     },
   ];
 
+  useEffect(() => {
+    // Fetch page content from API
+    const fetchPageContent = async () => {
+      try {
+        const response = await axios.get("http://localhost:3000/api/page-content/browsevent");
+        if (response.data) {
+          setPageContent({
+            title: response.data.title || pageContent.title,
+            description: response.data.description || pageContent.description,
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching page content:", error);
+      }
+    };
+
+    fetchPageContent();
+  }, []);
+
   return (
     <div className="w-full max-w-[1280px] px-5 py-10 mx-auto">
       {/* Header Section */}
       <div className="text-center mb-8">
-        <h1 className="text-4xl font-bold text-[#171717]">Browse Events</h1>
-        <p className="mt-2 text-lg text-[#404040]">
-          Explore a wide variety of events in our Event Directory.
-        </p>
+        <h1 className="text-4xl font-bold text-[#171717]">{pageContent.title}</h1>
+        <p className="mt-2 text-lg text-[#404040]">{pageContent.description}</p>
       </div>
 
       {/* Search Input */}
