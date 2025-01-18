@@ -4,19 +4,19 @@ export const BrowseCategories = () => {
       id: 1,
       title: "Art",
       image: "/src/assets/img/lumba.png",
-      svgPath: "/src/assets/svg/PaintBrush.svg",
+      svgPath: "https://i.ibb.co.com/dpFHmCp/EPIC.png",
     },
     {
       id: 2,
       title: "Collectibles",
       image: "/src/assets/img/monkey.png",
-      svgPath: "/src/assets/svg/Swatches.svg",
+      svgPath: "https://i.ibb.co.com/5sG5gVZ/LEGENDARY.png",
     },
     {
       id: 3,
       title: "Music",
       image: "/src/assets/img/gitar.png",
-      svgPath: "/src/assets/svg/MusicNotes.svg",
+      svgPath: "https://i.ibb.co.com/0rbMtGv/LIMITED.png",
     },
     {
       id: 4,
@@ -87,7 +87,7 @@ export const BrowseCategories = () => {
                       <img
                         src={card.svgPath}
                         alt={`${card.title} Icon`}
-                        className="w-24 h-24"
+                        className="w-24 h-24 object-contain"
                       />
                     </div>
                   </>

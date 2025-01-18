@@ -37,7 +37,7 @@ export const WeeklyUpdateForm: React.FC = () => {
             />
             <button
               onClick={handleSubscribe}
-              className="w-full sm:w-full md:w-full bg-call-to-action text-white px-6 sm:px-8 md:px-10 py-3 sm:py-4 md:py-5 rounded-2xl hover:bg-[#8839FF] focus:outline-none"
+              className="w-full sm:w-full md:w-full bg-call-to-action text-white px-6 sm:px-8 md:px-10 py-3 sm:py-4 md:py-5 rounded-2xl hover:bg-call-to-actions-800 focus:outline-none"
             >
               Subscribe
             </button>
