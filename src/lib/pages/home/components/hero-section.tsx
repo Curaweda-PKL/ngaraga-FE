@@ -16,6 +16,8 @@ export const HeroFrame = () => {
     script.type = "module";
 
     script.src = "/src/lib/pages/home/components/style.js";
+    // script.src = "/js/style.js"; 
+
     script.async = true;
     document.body.appendChild(script);
 
