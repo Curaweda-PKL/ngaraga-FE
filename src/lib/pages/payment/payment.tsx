@@ -9,7 +9,7 @@ interface PaymentMethod {
   isActive: boolean;
 }
 
-export const Payment: React.FC = () => {
+ const Payment: React.FC = () => {
   const initialPayments: PaymentMethod[] = [
     {
       id: 1,
@@ -132,3 +132,5 @@ export const Payment: React.FC = () => {
     </div>
   );
 };
+
+export default Payment;
