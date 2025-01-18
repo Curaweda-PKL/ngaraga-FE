@@ -1,8 +1,8 @@
-import React, { useState } from "react";
-import { MdArrowDropDown } from "react-icons/md"; // Import the dropdown icon
-import { PiSlidersHorizontalDuotone } from "react-icons/pi"; // Import the filter icon
-import { DropdownMarket } from "./dropdown-market"; // Import the Dropdown component
-import FilterModal from "./modal-sm"; // Import the FilterModal component
+import React, { useState, useEffect } from "react";
+import { MdArrowDropDown } from "react-icons/md"; 
+import { PiSlidersHorizontalDuotone } from "react-icons/pi"; 
+import { DropdownMarket } from "./dropdown-market"; 
+import FilterModal from "./modal-sm"; 
 
 export const MarketHeader: React.FC = () => {
   // State to track the selected filter
@@ -10,6 +10,32 @@ export const MarketHeader: React.FC = () => {
 
   // State to control the modal visibility
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+
+  // State to hold the fetched page content data
+  const [pageContent, setPageContent] = useState<{ title: string; description: string } | null>(null);
+
+  // State to handle fetch error
+  const [fetchError, setFetchError] = useState<string | null>(null);
+
+  // Fetch the page content for "marketplace" from the API
+  useEffect(() => {
+    const fetchPageContent = async () => {
+      try {
+        const response = await fetch("http://localhost:3000/api/page-content/marketplace");
+        if (!response.ok) {
+          throw new Error("Failed to fetch data");
+        }
+        const data = await response.json();
+        setPageContent(data);
+        setFetchError(null); // Reset the error state if the fetch is successful
+      } catch (error) {
+        console.error("Error fetching page content:", error);
+        setFetchError("Failed to load marketplace content. Please try again later.");
+      }
+    };
+
+    fetchPageContent();
+  }, []); // Empty dependency array ensures this runs once when the component mounts
 
   // Function to handle the selection of a filter item
   const handleSelectFilter = (filter: string) => {
@@ -21,12 +47,17 @@ export const MarketHeader: React.FC = () => {
       <div className="mx-auto ml-7">
         {/* Title and Subtitle */}
         <div className="mb-10">
-          <h1 className="text-4xl font-bold text-[#171717] mb-2">
-            Browse Marketplace
-          </h1>
-          <p className="text-lg text-[#404040]">
-            Browse through more than 50k Cards on the Card Marketplace.
-          </p>
+          {fetchError ? (
+            // Display error message if fetch fails
+            <p className="text-lg text-red-500">{fetchError}</p>
+          ) : pageContent ? (
+            <>
+              <h1 className="text-4xl font-bold text-[#171717] mb-2">{pageContent.title}</h1>
+              <p className="text-lg text-[#404040]">{pageContent.description}</p>
+            </>
+          ) : (
+            <p>Loading...</p> 
+          )}
         </div>
 
         {/* Search Input and Filter */}
@@ -41,28 +72,25 @@ export const MarketHeader: React.FC = () => {
               <span>{selectedFilter}</span>
             </button>
             <FilterModal
-  isOpen={isModalOpen}
-  onClose={() => setIsModalOpen(false)}
-  onApply={() => {
-    // Handle apply logic
-    console.log("Filters applied!");
-    setIsModalOpen(false);
-  }}
->
-  <ul>
-    <li className="py-2">d 1</li>
-    <li className="py-2">Item 2</li>
-    <li className="py-2">Item 3</li>
-    <li className="py-2">Item 3</li>
-    <li className="py-2">Item 3</li>
-    <li className="py-2">Item 3</li>
-    <li className="py-2">Item 3</li>
-    <li className="py-2">Item 3</li>
-    <li className="py-2">Item 3</li>
-
-  </ul>
-</FilterModal>
-
+              isOpen={isModalOpen}
+              onClose={() => setIsModalOpen(false)}
+              onApply={() => {
+                // Handle apply logic
+                console.log("Filters applied!");
+                setIsModalOpen(false);
+              }}
+            >
+              <ul>
+                <li className="py-2">d 1</li>
+                <li className="py-2">Item 2</li>
+                <li className="py-2">Item 3</li>
+                <li className="py-2">Item 3</li>
+                <li className="py-2">Item 3</li>
+                <li className="py-2">Item 3</li>
+                <li className="py-2">Item 3</li>
+                <li className="py-2">Item 3</li>
+              </ul>
+            </FilterModal>
           </div>
 
           {/* Dropdown for Medium and Larger Screens */}
