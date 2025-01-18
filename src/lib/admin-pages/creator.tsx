@@ -1,7 +1,6 @@
 import {useState} from "react";
 import {X, Pencil, Eye, Trash2} from "lucide-react";
 
-// Extending the existing Creator component
 export const Creator = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const creators = [
