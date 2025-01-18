@@ -14,11 +14,12 @@ import {Categories} from "../admin-pages/marketplace/categories";
 import {Master} from "../admin-pages/marketplace/master";
 import {Series} from "../admin-pages/marketplace/series";
 import {Tag} from "../admin-pages/marketplace/tag";
-import {SignUpPage} from "../admin-pages/pages/Sign-Up/sign-up";
-import {SignInPage} from "../admin-pages/pages/Sign-In/sign-in";
-import {MarketplaceForm} from "../admin-pages/pages/Marketplace/marketplace";
-import {RankingsForm} from "../admin-pages/pages/Rankings/rankings";
-import {EventsForm} from "../admin-pages/pages/Events/events";
+import {SignUpPage} from "../admin-pages/pages/sign-up";
+import {SignInPage} from "../admin-pages/pages/sign-in";
+import {HomeSection} from "../admin-pages/pages/Home/home";
+import {MarketplaceForm} from "../admin-pages/pages/marketplace";
+import {RankingsForm} from "../admin-pages/pages/rankings";
+import {EventsForm} from "../admin-pages/pages/events";
 import {Events} from "../admin-pages/event/events";
 import {EditEvent} from "../admin-pages/event/edit-event";
 import {AddEvents} from "../admin-pages/event/add-events";
@@ -84,6 +85,7 @@ export const routes: Array<PathRouteProps> = [
   {path: "/admin/tag", element: <Tag />},
   {path: "/admin/sign-in", element: <SignInPage />},
   {path: "/admin/sign-up", element: <SignUpPage />},
+  {path: "/admin/home", element: <HomeSection />},
   {path: "/admin/marketplace", element: <MarketplaceForm />},
   {path: "/admin/rankings", element: <RankingsForm />},
   {path: "/admin/events", element: <EventsForm />},
