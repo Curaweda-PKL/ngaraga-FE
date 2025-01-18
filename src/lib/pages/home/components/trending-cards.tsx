@@ -4,19 +4,19 @@ export const TrendingCards = () => {
       id: 1,
       title: "DSGN Animals",
       creator: "MrFox",
-      image: "https://i.ibb.co.com/rQyy7jc/PASUKAN-SULTAN-MATANGAJI.jpg",
+      image: "https://i.ibb.co.com/VHbw3c7/DAENDELS-LEGEND.jpg",
     },
     {
       id: 2,
       title: "Magic Mushroom",
       creator: "Shroomie",
-      image: "https://i.ibb.co.com/ZTK4pwT/MAKAN-MALAM-BERSAMA.jpg",
+      image: "https://i.ibb.co.com/VHbw3c7/DAENDELS-LEGEND.jpg",
     },
     {
       id: 3,
       title: "Disco Machines",
       creator: "BeKind2Robots",
-      image: "https://i.ibb.co.com/1R0ZKpW/DAENDELS-LEGEND.jpg",
+      image: "https://i.ibb.co.com/VHbw3c7/DAENDELS-LEGEND.jpg",
     },
   ];
 
