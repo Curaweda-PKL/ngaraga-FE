@@ -52,7 +52,7 @@ export const CollectorCards = () => {
           {/* View Rankings Button */}
           <button className="flex items-center gap-2 bg-[#DDB11F] border-2 border-call-to-action text-white py-2 px-4 rounded-lg shadow-md hover:bg-call-to-actions-800 transition-all">
             <FaRocket className="text-white" />
-            <span><a href="/rankings">View Rankings</a></span>
+            <span>View Rankings</span>
           </button>
         </div>
 
