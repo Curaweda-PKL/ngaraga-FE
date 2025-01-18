@@ -1,50 +1,134 @@
-import React from 'react';
+import React, {useState} from "react";
+import {SiShopee, SiGojek} from "react-icons/si";
+import {BsBank, BsWallet2} from "react-icons/bs";
 
-type paymentProps = {
-  // Add any props if needed in the future
-};
+interface PaymentMethod {
+  id: number;
+  name: string;
+  icon: JSX.Element;
+  isActive: boolean;
+}
 
-const PaymentUser: React.FC<paymentProps> = () => {
+export const Payment: React.FC = () => {
+  const initialPayments: PaymentMethod[] = [
+    {
+      id: 1,
+      name: "Bank BCA",
+      icon: <BsBank className="w-6 h-6" />,
+      isActive: true,
+    },
+    {
+      id: 2,
+      name: "Bank BNI",
+      icon: <BsBank className="w-6 h-6" />,
+      isActive: true,
+    },
+    {
+      id: 3,
+      name: "Bank BRI",
+      icon: <BsBank className="w-6 h-6" />,
+      isActive: true,
+    },
+    {
+      id: 4,
+      name: "Bank BSI",
+      icon: <BsBank className="w-6 h-6" />,
+      isActive: true,
+    },
+    {
+      id: 5,
+      name: "Bank Mandiri",
+      icon: <BsBank className="w-6 h-6" />,
+      isActive: true,
+    },
+    {
+      id: 6,
+      name: "Qris",
+      icon: <BsWallet2 className="w-6 h-6" />,
+      isActive: true,
+    },
+    {
+      id: 7,
+      name: "Dana",
+      icon: <BsWallet2 className="w-6 h-6" />,
+      isActive: true,
+    },
+    {
+      id: 8,
+      name: "Ovo",
+      icon: <BsWallet2 className="w-6 h-6" />,
+      isActive: true,
+    },
+    {
+      id: 9,
+      name: "Gopay",
+      icon: <SiGojek className="w-6 h-6" />,
+      isActive: true,
+    },
+    {
+      id: 10,
+      name: "Shopee Pay",
+      icon: <SiShopee className="w-6 h-6" />,
+      isActive: false,
+    },
+  ];
+
+  const [payments, setPayments] = useState<PaymentMethod[]>(initialPayments);
+
+  const handleToggle = (id: number) => {
+    setPayments((prevPayments) =>
+      prevPayments.map((payment) =>
+        payment.id === id ? {...payment, isActive: !payment.isActive} : payment
+      )
+    );
+  };
+
   return (
-    <div className="checkout-container px-14 mt-5 grid grid-cols-3 gap-10">
-      {/* Left Section */}
-      <div className="col-span-2">
+    <div className="min-h-screen p-6">
+      <div className="max-w-5xl mx-auto">
+        {/* Breadcrumb */}
+        <div className="text-sm text-gray-500 mb-4">Payment / Payment List</div>
+
         {/* Header */}
-        <div className="checkout-header">
-          <h1 className="font-bold text-2xl mb-2">Checkout</h1>
-          <div className="flex items-center">
-            <div className="w-8 h-8 bg-call-to-actions-900 rounded-lg text-white flex items-center justify-center mt-2">
-              <span className="text-white font-bold">1</span>
-            </div>
-            <span className="text-yellow-500 text-md text-center mx-4">
-              Information
-            </span>
+        <h1 className="text-2xl font-semibold text-gray-800 mb-6">Payment</h1>
 
-            <div className="w-8 h-8 border border-gray-500 rounded-lg flex items-center justify-center mt-2 mx-4">
-              <span className="text-gray-500 font-bold">2</span>
-            </div>
-            <span className="text-gray-500 text-md text-center mx-1">
-              Payment
-            </span>
+        {/* Payment Methods Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {payments.map((payment) => (
+            <div
+              key={payment.id}
+              className="flex items-center justify-between bg-white rounded-lg p-4 shadow-sm transition-shadow hover:shadow-md"
+            >
+              {/* Icon and Name */}
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 flex items-center justify-center bg-gray-100 rounded-lg">
+                  {payment.icon}
+                </div>
+                <span className="text-gray-700 font-medium">
+                  {payment.name}
+                </span>
+              </div>
 
-            <div className="w-8 h-8 border border-gray-500 rounded-lg flex items-center justify-center mt-2 mx-4">
-              <span className="text-gray-500 font-bold">3</span>
+              {/* Toggle Button */}
+              <div
+                className={`w-12 h-6 rounded-full p-1 cursor-pointer transition-colors duration-200 ease-in-out ${
+                  payment.isActive ? "bg-yellow-500" : "bg-gray-200"
+                }`}
+                onClick={() => handleToggle(payment.id)}
+                role="switch"
+                aria-checked={payment.isActive}
+                tabIndex={0}
+              >
+                <div
+                  className={`w-4 h-4 rounded-full bg-white transform transition-transform duration-200 ease-in-out ${
+                    payment.isActive ? "translate-x-6" : "translate-x-0"
+                  }`}
+                />
+              </div>
             </div>
-            <span className="text-gray-500 text-md text-center mx-2">
-              Complete Orders
-            </span>
-          </div>
+          ))}
         </div>
-      </div>
-
-
-      {/* Right Section (if needed) */}
-      <div className="col-span-1">
-
-
       </div>
     </div>
   );
 };
-
-export default PaymentUser;

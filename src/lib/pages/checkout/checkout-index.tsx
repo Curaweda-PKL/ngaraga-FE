@@ -1,11 +1,9 @@
-import React, { useState, useEffect } from "react";
-import { AiOutlineUser } from "react-icons/ai";
-import { MdOutlineMail } from "react-icons/md";
-import { PiPackageLight } from "react-icons/pi";
-import { TbTruckDelivery } from "react-icons/tb";
+import React, {useState} from "react";
+import {AiOutlineUser} from "react-icons/ai";
+import {MdOutlineMail} from "react-icons/md";
+import {PiPackageLight} from "react-icons/pi";
+import {TbTruckDelivery} from "react-icons/tb";
 import PhoneInput from "./components/PhoneInput";
-import axios from "axios";
-import { IoRadioButtonOn } from "react-icons/io5";
 
 interface Item {
   title: string;
@@ -29,23 +27,6 @@ interface FormData {
   notes: string;
 }
 
-interface Province {
-  id: string;
-  name: string;
-}
-
-interface City {
-  id: string;
-  province_id: string;
-  name: string;
-}
-
-interface Subdistrict {
-  id: string;
-  regency_id: string;
-  name: string;
-}
-
 const items: Item[] = [
   {
     title: "Dancing Robot 0512",
@@ -54,6 +35,14 @@ const items: Item[] = [
     quantity: 1,
     price: 200000,
     author: "Orbitian",
+  },
+  {
+    title: "Space Explorer 9000",
+    image:
+      "https://c4.wallpaperflare.com/wallpaper/251/380/59/1920x1080-px-album-covers-led-zeppelin-music-motorcycles-honda-hd-art-wallpaper-preview.jpg",
+    quantity: 2,
+    price: 150000,
+    author: "Galactica",
   },
 ];
 
@@ -66,79 +55,21 @@ const Checkout: React.FC = () => {
     phoneCode: "+62",
     phoneNumber: "",
     country: "Indonesia",
-    state: "",
-    city: "",
-    subdistrict: "",
+    state: "State/Province",
+    city: "City/Regency",
+    subdistrict: "Subdistrict",
     postalCode: "",
     addressDetails: "",
     notes: "",
   });
-
-  const [provinces, setProvinces] = useState<Province[]>([]);
-  const [cities, setCities] = useState<City[]>([]);
-  const [subdistricts, setSubdistricts] = useState<Subdistrict[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchProvinces = async () => {
-      try {
-        const response = await axios.get<Province[]>(
-          "https://curaweda-pkl.github.io/api-wilayah-indonesia/api/provinces.json"
-        );
-        setProvinces(response.data);
-        setLoading(false);
-      } catch (err) {
-        console.error("Error fetching provinces:", err);
-        setError("Failed to load provinces");
-        setLoading(false);
-      }
-    };
-
-    fetchProvinces();
-  }, []);
-
-  useEffect(() => {
-    const fetchCities = async () => {
-      if (formData.state) {
-        try {
-          const response = await axios.get<City[]>(
-            `https://curaweda-pkl.github.io/api-wilayah-indonesia/api/regencies/${formData.state}.json`
-          );
-          setCities(response.data);
-        } catch (err) {
-          console.error("Error fetching cities:", err);
-        }
-      }
-    };
-
-    fetchCities();
-  }, [formData.state]);
-
-  useEffect(() => {
-    const fetchSubdistricts = async () => {
-      if (formData.city) {
-        try {
-          const response = await axios.get<Subdistrict[]>(
-            `https://curaweda-pkl.github.io/api-wilayah-indonesia/api/districts/${formData.city}.json`
-          );
-          setSubdistricts(response.data);
-        } catch (err) {
-          console.error("Error fetching subdistricts:", err);
-        }
-      }
-    };
-
-    fetchSubdistricts();
-  }, [formData.city]);
 
   const handleFormChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
     >
   ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    const {name, value} = e.target;
+    setFormData((prev) => ({...prev, [name]: value}));
   };
 
   const formatCurrency = (value: number): string =>
@@ -235,7 +166,6 @@ const Checkout: React.FC = () => {
           </div>
 
           <select
-            typeof="text"
             name="country"
             value={formData.country}
             onChange={handleFormChange}
@@ -245,87 +175,39 @@ const Checkout: React.FC = () => {
           </select>
 
           <div className="grid grid-cols-2 gap-4">
-            <div className="relative">
-              {loading ? (
-                <p>Loading provinces...</p>
-              ) : error ? (
-                <p style={{ color: "red" }}>{error}</p>
-              ) : (
-                <select
-                  name="state"
-                  value={formData.state}
-                  onChange={handleFormChange}
-                  className="border border-neutral-colors-500 rounded-lg p-3 w-full z-10"
-                >
-                  <option value="">State/Province</option>
-                  {provinces.map((province) => {
-                    console.log("Rendering province:", province);
-                    return (
-                      <option key={province.id} value={province.id}>
-                        {province.name}
-                      </option>
-                    );
-                  })}
-                </select>
-              )}
-            </div>
-
-            <div>
-              {loading ? (
-                <p>Loading City...</p>
-              ) : error ? (
-                <p style={{ color: "red" }}>{error}</p>
-              ) : (
-                <select
-                  name="city"
-                  value={formData.city}
-                  onChange={handleFormChange}
-                  className="border border-neutral-colors-500 rounded-lg p-3 w-full z-10"
-                  disabled={cities.length === 0}
-                >
-                  <option value="">City/Regency</option>
-                  {cities.map((city) => (
-                    <option key={city.id} value={city.id}>
-                      {city.name}
-                    </option>
-                  ))}
-                </select>
-              )}
-            </div>
-
-            <div>
-              {loading ? (
-                <p>Loading Subdistrict...</p>
-              ) : error ? (
-                <p style={{ color: "red" }}>{error}</p>
-              ) : (
-                <select
-                  name="subdistrict"
-                  value={formData.subdistrict}
-                  onChange={handleFormChange}
-                  className="border border-neutral-colors-500 rounded-lg p-3 w-full z-10"
-                  disabled={subdistricts.length === 0}
-                >
-                  <option value="Subdistrict">Subdistrict</option>
-                  {subdistricts.map((subdistrict) => (
-                    <option key={subdistrict.id} value={subdistrict.id}>
-                      {subdistrict.name}
-                    </option>
-                  ))}
-                </select>
-              )}
-            </div>
-
+            <select
+              name="state"
+              value={formData.state}
+              onChange={handleFormChange}
+              className="border border-neutral-colors-500  rounded-lg p-3"
+            >
+              <option value="State/Province">State/Province</option>
+            </select>
+            <select
+              name="city"
+              value={formData.city}
+              onChange={handleFormChange}
+              className="border border-neutral-colors-500  rounded-lg p-3"
+            >
+              <option value="City/Regency">City/Regency</option>
+            </select>
+            <select
+              name="subdistrict"
+              value={formData.subdistrict}
+              onChange={handleFormChange}
+              className="border border-neutral-colors-500  rounded-lg p-3"
+            >
+              <option value="Subdistrict">Subdistrict</option>
+            </select>
             <input
               type="text"
               name="postalCode"
               value={formData.postalCode}
               onChange={handleFormChange}
               placeholder="Postal Code"
-              className="border border-neutral-colors-500 rounded-lg p-3"
+              className="border border-neutral-colors-500  rounded-lg p-3"
             />
           </div>
-
           <textarea
             name="addressDetails"
             value={formData.addressDetails}
@@ -341,6 +223,7 @@ const Checkout: React.FC = () => {
             className="w-full border border-neutral-colors-500  rounded-lg p-3"
           ></textarea>
         </div>
+
         {/* Delivery Options */}
         <div className="mt-8">
           <h2 className="font-bold text-lg mb-4">Delivery Options</h2>
@@ -348,29 +231,12 @@ const Checkout: React.FC = () => {
             {["Anter Aja", "ID Express", "JNE"].map((option) => (
               <label
                 key={option}
-                className={`flex items-center justify-between border rounded-lg p-3 cursor-pointer mt-4 h-20 ${
-                  deliveryOption === option ? "border-call-to-actions-900" : ""
+                className={`flex justify-between items-center border rounded-lg p-3 cursor-pointer ${
+                  deliveryOption === option ? "border-yellow-500" : ""
                 }`}
               >
-                {/* Delivery Option Image */}
-                <img
-                  src="https://assets.kompasiana.com/items/album/2024/06/28/jne-reg-667e8e2fed64153ad268a362.png?t=o&v=300"
-                  alt={option}
-                  className="w-16 h-16 mr-4 object-cover"
-                />
-
-                {/* Option Text */}
-                <span className="flex-grow">{option}</span>
-
-                {/* Conditional Radio Button Icon */}
-                <div className="flex flex-col items-end">
-                  {deliveryOption === option && (
-                    <IoRadioButtonOn className="text-xl mb-1 IoRadioIcon" />
-                  )}
-                  <span>Rp 15.000</span>
-                </div>
-
-                {/* Hidden Radio Input */}
+                <span>{option}</span>
+                <span>Rp 15.000</span>
                 <input
                   type="radio"
                   name="delivery"
@@ -385,57 +251,17 @@ const Checkout: React.FC = () => {
         </div>
 
         {/* Payment Method */}
-        <div className="mt-8 mb-8">
+        <div className="mt-8">
           <h2 className="font-bold text-lg mb-4">Payment Method</h2>
           <div className="grid grid-cols-4 gap-4">
-            {[
-              {
-                method: "Bank BCA",
-                image:
-                  "https://png.pngtree.com/png-vector/20221121/ourmid/pngtree-bca-bank-logo-png-image_6472275.png",
-                icon: <IoRadioButtonOn />,
-              },
-              {
-                method: "Bank BNI",
-                image:
-                  "https://png.pngtree.com/png-vector/20221121/ourmid/pngtree-bca-bank-logo-png-image_6472275.png",
-                icon: <IoRadioButtonOn />,
-              },
-              {
-                method: "Bank BRI",
-                image:
-                  "https://png.pngtree.com/png-vector/20221121/ourmid/pngtree-bca-bank-logo-png-image_6472275.png",
-                icon: <IoRadioButtonOn />,
-              },
-              {
-                method: "Qris",
-                image:
-                  "https://png.pngtree.com/png-vector/20221121/ourmid/pngtree-bca-bank-logo-png-image_6472275.png",
-                icon: <IoRadioButtonOn />,
-              },
-            ].map(({ method, image, icon }) => (
+            {["Bank BCA", "Bank BNI", "Bank BRI", "Qris"].map((method) => (
               <label
                 key={method}
                 className={`flex justify-center items-center border rounded-lg p-3 cursor-pointer ${
-                  paymentMethod === method ? "border-call-to-actions-900" : ""
+                  paymentMethod === method ? "border-yellow-500" : ""
                 }`}
               >
-                {/* Payment Option Image */}
-                <img
-                  src={image}
-                  alt={method}
-                  className="w-16 h-16 mr-4 object-cover p-3"
-                />
-
-                {/* Payment Option Text */}
-                <span className="flex-grow">{method}</span>
-
-                {/* Conditional Radio Button Icon */}
-                <div className="relative  flex flex-col items-end mb-10 IoRadioIcon">
-                  {paymentMethod === method && icon}
-                </div>
-
-                {/* Hidden Radio Input */}
+                {method}
                 <input
                   type="radio"
                   name="payment"
@@ -505,9 +331,11 @@ const Checkout: React.FC = () => {
             <span>{formatCurrency(total)}</span>
           </div>
         </div>
-        <button className="w-full bg-call-to-actions-900 text-white rounded-lg py-3 mt-6 font-bold hover:bg-call-to-actions-800">
-          Pay Now
-        </button>
+        <a href="/payment">
+          <button className="w-full bg-call-to-actions-900 text-white rounded-lg py-3 mt-6 font-bold hover:bg-call-to-actions-800">
+            Pay Now
+          </button>
+        </a>
       </div>
     </div>
   );

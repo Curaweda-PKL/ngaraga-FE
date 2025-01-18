@@ -1,70 +1,69 @@
 import React from "react";
+import {FaRocket} from "react-icons/fa"; // Importing the rocket icon
 
-export const CardCollection: React.FC = () => {
-  type Cards = {
-    imageUrl: string;
-    title: string;
-    subtitle: string;
-    price: string;
-  };
+type Card = {
+  id: number;
+  title: string;
+  creator: string;
+  image: string;
+  price?: string;
+};
 
-  const cards: Cards[] = [
-    {
-      imageUrl: "https://via.placeholder.com/150",
-      title: "Magic Mushroom 0324",
-      subtitle: "Shroomie",
-      price: "Rp 200.000",
-    },
-    {
-      imageUrl: "https://via.placeholder.com/150",
-      title: "Happy Robot 032",
-      subtitle: "BeKind2Robots",
-      price: "Rp 200.000",
-    },
-    {
-      imageUrl: "https://via.placeholder.com/150",
-      title: "Happy Robot 024",
-      subtitle: "BeKind2Robots",
-      price: "Rp 200.000",
-    },
-  ];
+const cardData: Card[] = [
+  {
+    id: 1,
+    title: "Distant Galaxy",
+    creator: "Animakid",
+    image: "/src/assets/img/Distant-Galaxy.png",
+    price: "Rp. 200.000",
+  },
+];
 
+export const MoreCardSection: React.FC = () => {
   return (
-    <div className="container py-10">
+    <div className="w-full mb-10 lg:ml-8">
       {/* Header Section */}
-      <div className="mb-8 pl-0 ml-[4rem]">
-        <h1 className="text-3xl font-bold mb-2 text-left">
-          Distant Galaxy Special
-        </h1>
-        <p className="text-sm text-gray-700 mb-4 text-left">
-          Minted on Sep 30, 2022
-        </p>
-        <p className="text-lg font-medium mb-4 text-left">
-          Own the cards below for the special card
-        </p>
+      <div className="flex justify-between items-center px-6 mb-6">
+        <h2 className="text-2xl ml-2 font-bold text-[#171717] ">
+          Explore More Cards
+        </h2>
+        <button className="flex items-center px-4 py-2 mr-10 bg-call-to-action text-white rounded-lg shadow-md hover:bg-call-to-actions-800 transition">
+          <FaRocket className="mr-2" />
+          <a href="/marketplace">
+            <span>More Cards</span>
+          </a>
+        </button>
       </div>
-
-      {/* Cards Section */}
-      <div className="max-w-7xl ml-[4rem] grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-0">
-        {cards.map((card, index) => (
+      {/* Cards Grid */}
+      <div className="grid gap-6 px-6 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4">
+        {cardData.map((card) => (
           <div
-            key={index}
-            className="flex flex-row items-start bg-gray-100 border border-gray-300 rounded-lg shadow-sm hover:shadow-md transition-shadow w-full h-[150px] px-0 py-0"
+            key={card.id}
+            className="w-full h-[400px] flex flex-col items-start gap-4 bg-[#F2F2F2] rounded-2xl shadow-xl transition-transform hover:scale-[1.02] lg:w-[90%] md:w-full sm:w-full"
           >
-            {/* Image Section */}
-            <div className="flex-shrink-0 w-2/5 h-full">
-              <img
-                src={card.imageUrl}
-                alt={card.title}
-                className="object-cover w-full h-full rounded-lg"
-              />
-            </div>
-
-            {/* Text Section */}
-            <div className="text-left pl-4 w-3/5 h-full flex flex-col justify-center">
-              <h2 className="text-lg font-semibold mb-1">{card.title}</h2>
-              <p className="text-sm text-gray-500 mb-2">{card.subtitle}</p>
-              <p className="text-lg font-bold">{card.price}</p>
+            <figure className="w-full h-[260px] rounded-t-2xl overflow-hidden">
+              {card.image ? (
+                <img
+                  src={card.image}
+                  alt={card.title}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-[#3B3B3B] text-gray-400 rounded-t-2xl" />
+              )}
+            </figure>
+            <div className="p-6 flex flex-col items-start gap-2 w-full flex-grow">
+              <h3 className="text-2xl font-bold text-[#171717] font-[Poppins]">
+                {card.title}
+              </h3>
+              <span className="text-base text-[#404040] font-[Nunito]">
+                {card.creator}
+              </span>
+              {card.price && (
+                <span className="text-base text-[#404040] font-[Nunito]">
+                  {card.price}
+                </span>
+              )}
             </div>
           </div>
         ))}
@@ -72,4 +71,3 @@ export const CardCollection: React.FC = () => {
     </div>
   );
 };
-

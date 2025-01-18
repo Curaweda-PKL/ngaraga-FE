@@ -125,7 +125,7 @@ export const Shipping: React.FC<ShippingProps> = ({onStatusChange}) => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen p-6">
       <div className="max-w-5xl mx-auto">
         {/* Breadcrumb Navigation */}
         <div className="text-sm text-gray-500 mb-4">
