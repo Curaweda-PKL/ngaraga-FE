@@ -1,20 +1,41 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
+import axios from "axios";
 
 export const RankingsForm: React.FC = () => {
   const [title, setTitle] = useState("Top Collectors");
   const [description, setDescription] = useState(
     "Check out top ranking Card Collectors on the Card Marketplace."
   );
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const handleCancel = () => {
     setTitle("Top Collectors");
     setDescription(
       "Check out top ranking Card Collectors on the Card Marketplace."
     );
+    setError("");
+    setSuccess("");
   };
 
-  const handleUpdate = () => {
-    alert(`Updated Title: ${title}\nUpdated Description: ${description}`);
+  const handleUpdate = async () => {
+    setLoading(true);
+    setError("");
+    setSuccess("");
+    try {
+      const response = await axios.post(
+        "http://localhost:3000/api/page-content/rankings",
+        { title, description }
+      );
+      if (response.status === 200) {
+        setSuccess("Rankings content updated successfully!");
+      }
+    } catch (error) {
+      setError("Failed to update rankings content. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -63,10 +84,15 @@ export const RankingsForm: React.FC = () => {
           <button
             onClick={handleUpdate}
             className="px-6 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600"
+            disabled={loading}
           >
-            Update
+            {loading ? "Updating..." : "Update"}
           </button>
         </div>
+
+        {/* Feedback Messages */}
+        {error && <p className="text-red-500 mt-4">{error}</p>}
+        {success && <p className="text-green-500 mt-4">{success}</p>}
       </div>
     </div>
   );

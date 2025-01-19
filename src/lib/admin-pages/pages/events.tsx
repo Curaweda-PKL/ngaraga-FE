@@ -1,20 +1,40 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
+import axios from "axios";
 
 export const EventsForm: React.FC = () => {
   const [title, setTitle] = useState("Browse Events");
   const [description, setDescription] = useState(
     "Explore a wide variety of events in our Event Directory."
   );
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const handleCancel = () => {
-    // Reset to initial values or handle cancellation logic
+    // Reset to default values
     setTitle("Browse Events");
     setDescription("Explore a wide variety of events in our Event Directory.");
+    setError("");
+    setSuccess("");
   };
 
-  const handleUpdate = () => {
-    // Logic to handle update (e.g., API call or form submission)
-    alert("Updated: " + title + " - " + description);
+  const handleUpdate = async () => {
+    setLoading(true);
+    setError("");
+    setSuccess("");
+    try {
+      const response = await axios.post(
+        "http://localhost:3000/api/page-content/browsevent",
+        { title, description }
+      );
+      if (response.status === 200) {
+        setSuccess("Events content updated successfully!");
+      }
+    } catch (error) {
+      setError("Failed to update events content. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -63,10 +83,15 @@ export const EventsForm: React.FC = () => {
           <button
             onClick={handleUpdate}
             className="px-6 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600"
+            disabled={loading}
           >
-            Update
+            {loading ? "Updating..." : "Update"}
           </button>
         </div>
+
+        {/* Feedback Messages */}
+        {error && <p className="text-red-500 mt-4">{error}</p>}
+        {success && <p className="text-green-500 mt-4">{success}</p>}
       </div>
     </div>
   );
