@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import {
   FiEdit2,
   FiEye,
@@ -33,7 +33,7 @@ interface EditModalProps {
   data: CategoryData | null;
 }
 
-const EditModal: React.FC<EditModalProps> = ({isOpen, onClose}) => {
+const EditModal: React.FC<EditModalProps> = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
@@ -78,15 +78,6 @@ const EditModal: React.FC<EditModalProps> = ({isOpen, onClose}) => {
                       d="M19 9l-7 7-7-7"
                     />
                   </svg>
-                </div>
-              </div>
-              {/* Selected Series Tag */}
-              <div className="mt-2">
-                <div className="inline-flex items-center bg-yellow-50 rounded-lg px-3 py-1">
-                  <span className="text-sm text-yellow-800">Series 3</span>
-                  <button className="ml-2 text-yellow-600 hover:text-yellow-800">
-                    <FiX className="w-4 h-4" />
-                  </button>
                 </div>
               </div>
             </div>
@@ -148,11 +139,87 @@ const EditModal: React.FC<EditModalProps> = ({isOpen, onClose}) => {
   );
 };
 
+// Add Category Modal
+const AddCategoryModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+      <div className="bg-white rounded-lg w-full max-w-md">
+        {/* Modal Header */}
+        <div className="flex justify-between items-center p-4 border-b">
+          <h2 className="text-lg font-medium">Add Categories</h2>
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-600"
+          >
+            <FiX className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Modal Content */}
+        <div className="p-4">
+          <div className="space-y-4">
+            {/* Series Selection */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Select Series*
+              </label>
+              <div className="relative">
+                <select className="w-full border rounded-lg px-3 py-2 appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-yellow-500">
+                  <option>Choose a Series</option>
+                  {/* Add other series options */}
+                </select>
+              </div>
+            </div>
+
+            {/* Categories Icon */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Categories Icon*
+              </label>
+              <input
+                type="text"
+                className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                placeholder="Enter Icon"
+              />
+            </div>
+
+            {/* Category Name */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Category Name*
+              </label>
+              <input
+                type="text"
+                className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                placeholder="Enter Category Name"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Modal Footer */}
+        <div className="flex justify-end gap-2 p-4 border-t">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 border rounded-lg text-gray-600 hover:bg-gray-50"
+          >
+            Cancel
+          </button>
+          <button className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600">
+            Add Category
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export const Categories = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [editingCategory, setEditingCategory] = useState<CategoryData | null>(
-    null
-  );
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false); // New state for Add Category Modal
+  const [editingCategory, setEditingCategory] = useState<CategoryData | null>(null);
 
   const handleEdit = (category: CategoryData) => {
     setEditingCategory(category);
@@ -160,52 +227,18 @@ export const Categories = () => {
   };
 
   const tableData = [
-    {master: "Master 1", series: "Series 1", category: "Art", Icon: FaPalette},
-    {
-      master: "Master 2",
-      series: "Series 2",
-      category: "Collectibles",
-      Icon: FaBoxOpen,
-    },
-    {master: "Master 3", series: "Series 3", category: "Music", Icon: FaMusic},
-    {master: "Master 4", series: "Series 4", category: "Video", Icon: FaVideo},
-    {
-      master: "Master 5",
-      series: "Series 5",
-      category: "Sport",
-      Icon: FaRunning,
-    },
-    {
-      master: "Master 6",
-      series: "Series 6",
-      category: "Virtual Worlds",
-      Icon: FaGlobe,
-    },
-    {
-      master: "Master 7",
-      series: "Series 7",
-      category: "Photography",
-      Icon: FaCamera,
-    },
-    {
-      master: "Master 8",
-      series: "Series 8",
-      category: "Utility",
-      Icon: FaTools,
-    },
-    {
-      master: "Master 9",
-      series: "Series 9",
-      category: "Fashion",
-      Icon: FaTshirt,
-    },
-    {
-      master: "Master 10",
-      series: "Series 10",
-      category: "Technology",
-      Icon: FaMicrochip,
-    },
+    { master: "Master 1", series: "Series 1", category: "Art", Icon: FaPalette },
+    { master: "Master 2", series: "Series 2", category: "Collectibles", Icon: FaBoxOpen },
+    { master: "Master 3", series: "Series 3", category: "Music", Icon: FaMusic },
+    { master: "Master 4", series: "Series 4", category: "Video", Icon: FaVideo },
+    { master: "Master 5", series: "Series 5", category: "Sport", Icon: FaRunning },
+    { master: "Master 6", series: "Series 6", category: "Virtual Worlds", Icon: FaGlobe },
+    { master: "Master 7", series: "Series 7", category: "Photography", Icon: FaCamera },
+    { master: "Master 8", series: "Series 8", category: "Utility", Icon: FaTools },
+    { master: "Master 9", series: "Series 9", category: "Fashion", Icon: FaTshirt },
+    { master: "Master 10", series: "Series 10", category: "Technology", Icon: FaMicrochip },
   ];
+
   return (
     <div className="p-6">
       {/* Breadcrumb */}
@@ -219,7 +252,10 @@ export const Categories = () => {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-semibold">Categories</h1>
         <div className="flex items-center gap-4">
-          <button className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg flex items-center gap-2">
+          <button
+            onClick={() => setIsAddModalOpen(true)} // Open Add Category Modal
+            className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+          >
             <FiPlusCircle /> Add Categories
           </button>
           <div className="relative">
@@ -246,10 +282,7 @@ export const Categories = () => {
           </thead>
           <tbody>
             {tableData.map((item, index) => (
-              <tr
-                key={index}
-                className="border-b last:border-b-0 hover:bg-gray-50"
-              >
+              <tr key={index} className="border-b last:border-b-0 hover:bg-gray-50">
                 <td className="p-4">{item.master}</td>
                 <td className="p-4">{item.series}</td>
                 <td className="p-4">
@@ -278,24 +311,6 @@ export const Categories = () => {
             ))}
           </tbody>
         </table>
-        {/* Pagination */}
-        <div className="flex justify-end p-4 border-t">
-          <div className="flex items-center gap-2">
-            <button className="w-8 h-8 flex items-center justify-center bg-yellow-500 text-white rounded">
-              1
-            </button>
-            <button className="w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-gray-100 rounded">
-              2
-            </button>
-            <button className="w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-gray-100 rounded">
-              3
-            </button>
-            <span className="text-gray-400">...</span>
-            <button className="w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-gray-100 rounded">
-              10
-            </button>
-          </div>
-        </div>
       </div>
 
       <EditModal
@@ -305,6 +320,11 @@ export const Categories = () => {
           setEditingCategory(null);
         }}
         data={editingCategory}
+      />
+
+      <AddCategoryModal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)} // Close Add Category Modal
       />
     </div>
   );

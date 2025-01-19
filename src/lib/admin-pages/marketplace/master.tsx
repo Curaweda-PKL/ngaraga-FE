@@ -1,21 +1,17 @@
-import React, {useState} from "react";
-import {Pencil, Eye, Trash2, X} from "lucide-react";
+import React from "react";
+import { Pencil, Eye, Trash2, X } from "lucide-react";
 
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   title: string;
-  value: string;
-  onChange: (value: string) => void;
-  onSubmit: () => void;
   submitText: string;
+  onSubmit: () => void;
 }
 
 export const Master = () => {
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [editingSeries, setEditingSeries] = useState("");
-  const [newSeries, setNewSeries] = useState("");
+  const [isAddModalOpen, setIsAddModalOpen] = React.useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = React.useState(false);
 
   const seriesList = [
     "Master 1",
@@ -28,8 +24,7 @@ export const Master = () => {
     "Master 8",
   ];
 
-  const handleEdit = (series: string) => {
-    setEditingSeries(series);
+  const handleEdit = () => {
     setIsEditModalOpen(true);
   };
 
@@ -37,10 +32,8 @@ export const Master = () => {
     isOpen,
     onClose,
     title,
-    value,
-    onChange,
-    onSubmit,
     submitText,
+    onSubmit,
   }) => {
     if (!isOpen) return null;
 
@@ -67,8 +60,7 @@ export const Master = () => {
                 </label>
                 <input
                   type="text"
-                  value={value}
-                  onChange={(e) => onChange(e.target.value)}
+                  defaultValue="ddddadd"  // Set your default value here
                   className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500"
                 />
               </div>
@@ -147,7 +139,7 @@ export const Master = () => {
             </div>
             <div className="flex items-center gap-4">
               <button
-                onClick={() => handleEdit(series)}
+                onClick={handleEdit}
                 className="text-gray-400 hover:text-gray-600"
               >
                 <Pencil className="w-5 h-5" />
@@ -168,14 +160,11 @@ export const Master = () => {
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
         title="Add Series"
-        value={newSeries}
-        onChange={setNewSeries}
+        submitText="Save"
         onSubmit={() => {
           // Handle add series logic here
           setIsAddModalOpen(false);
-          setNewSeries("");
         }}
-        submitText="Save"
       />
 
       {/* Edit Series Modal */}
@@ -183,14 +172,11 @@ export const Master = () => {
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
         title="Edit Series"
-        value={editingSeries}
-        onChange={setEditingSeries}
+        submitText="Update"
         onSubmit={() => {
           // Handle edit series logic here
           setIsEditModalOpen(false);
-          setEditingSeries("");
         }}
-        submitText="Update"
       />
     </div>
   );
