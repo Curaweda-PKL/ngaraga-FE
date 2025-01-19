@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Pencil, Trash2, Search, X } from "lucide-react";
 
 interface ModalProps {
@@ -11,116 +11,59 @@ interface ModalProps {
 }
 
 export const Series = () => {
-  const [seriesList, setSeriesList] = useState<any[]>([]);
-  const [masterList, setMasterList] = useState<any[]>([]);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [selectedSeries, setSelectedSeries] = useState<{ id: number; name: string } | null>(null);
-  const [errorMessage, setErrorMessage] = useState("");
+  const [selectedSeries, setSelectedSeries] = useState<{
+    id: number;
+    name: string;
+  } | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedMasterId, setSelectedMasterId] = useState<number | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-
-  // Fetch Series List from API
-  const fetchSeriesList = async () => {
-    setIsLoading(true);
-    try {
-      const response = await fetch("http://localhost:3000/api/series/all");
-      if (!response.ok) {
-        throw new Error("Failed to fetch series");
-      }
-      const data = await response.json();
-      console.log("Fetched series:", data); // Check fetched data
-      setSeriesList(data.series || []);
-    } catch (error) {
-      setErrorMessage("Failed to load series list.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Fetch Master List from API
-  const fetchMasterList = async () => {
-    try {
-      const response = await fetch("http://localhost:3000/api/series/masters/all");
-      if (!response.ok) {
-        throw new Error("Failed to fetch master");
-      }
-      const data = await response.json();
-      console.log("Fetched master:", data); // Check fetched data
-      setMasterList(data.master || []);
-    } catch (error) {
-      setErrorMessage("Failed to load master list.");
-    }
-  };
+  const [masters, setMasters] = useState<{ id: number; name: string }[]>([]);
+  const [loadingMasters, setLoadingMasters] = useState(true);
+  const [errorMasters, setErrorMasters] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchSeriesList();
-    fetchMasterList();
+    const fetchMasters = async () => {
+      try {
+        const response = await fetch("http://localhost:3000/api/series/masters/all");
+        if (!response.ok) {
+          throw new Error("Failed to fetch master data");
+        }
+        const data = await response.json();
+        setMasters(data);
+      } catch (err) {
+        setErrorMasters((err as Error).message);
+      } finally {
+        setLoadingMasters(false);
+      }
+    };
+
+    fetchMasters();
   }, []);
 
-  // Add Series Handler
-  const handleAddSeries = async (name: string, masterId: number) => {
-    try {
-      const response = await fetch("http://localhost:3000/api/series/create", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, masterId }),
-      });
+  // Static data for demonstration
+  const masterList = [
+    { id: 1, name: "Master 1" },
+    { id: 2, name: "Master 2" },
+  ];
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to add series");
-      }
+  const seriesList = [
+    { id: 1, name: "Series 1", masterName: "Master 1" },
+    { id: 2, name: "Series 2", masterName: "Master 2" },
+  ];
 
-      const newSeries = await response.json();
-      setSeriesList((prev) => [...prev, newSeries.series]);
-    } catch (error: any) {
-      setErrorMessage(error?.message || "Failed to add series.");
-    }
+  const handleAddSeries = (name: string, masterId: number) => {
+    console.log(`Adding series: ${name}, Master ID: ${masterId}`);
   };
 
-  // Edit Series Handler
-  const handleEditSeries = async (id: number, name: string, masterId: number) => {
-    try {
-      const response = await fetch(`http://localhost:3000/api/series/edit/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, masterId }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to update series");
-      }
-
-      const updatedSeries = await response.json();
-      setSeriesList((prev) =>
-        prev.map((series) => (series.id === id ? updatedSeries.updatedSeries : series))
-      );
-    } catch (error: any) {
-      setErrorMessage(error?.message || "Failed to update series.");
-    }
+  const handleEditSeries = (id: number, name: string, masterId: number) => {
+    console.log(`Editing series: ID ${id}, Name: ${name}, Master ID: ${masterId}`);
   };
 
-  // Delete Series Handler
-  const handleDeleteSeries = async (id: number) => {
-    try {
-      const response = await fetch(`http://localhost:3000/api/series/delete/${id}`, {
-        method: "DELETE",
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to delete series");
-      }
-
-      setSeriesList((prev) => prev.filter((series) => series.id !== id));
-    } catch (error: any) {
-      setErrorMessage(error?.message || "Failed to delete series.");
-    }
+  const handleDeleteSeries = (id: number) => {
+    console.log(`Deleting series with ID: ${id}`);
   };
 
-  // Modal Component for Add/Edit Series
   const Modal: React.FC<ModalProps> = ({
     isOpen,
     onClose,
@@ -130,12 +73,7 @@ export const Series = () => {
     defaultValue = "",
   }) => {
     const [inputValue, setInputValue] = useState(defaultValue);
-    const [selectedMaster, setSelectedMaster] = useState<number | null>(selectedMasterId);
-
-    useEffect(() => {
-      setInputValue(defaultValue);
-      setSelectedMaster(selectedMasterId);
-    }, [defaultValue, selectedMasterId]);
+    const [selectedMaster, setSelectedMaster] = useState<number | null>(null);
 
     if (!isOpen) return null;
 
@@ -150,20 +88,25 @@ export const Series = () => {
           </div>
 
           <div className="p-4">
-            {/* Dropdown untuk memilih Master */}
             <label className="block text-sm font-medium text-gray-700 mb-1">Select Master*</label>
-            <select
-              value={selectedMaster || ""}
-              onChange={(e) => setSelectedMaster(Number(e.target.value))}
-              className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500"
-            >
-              <option value="">Select Master</option>
-              {masterList.map((master: { id: number; name: string }) => (
-                <option key={master.id} value={master.id}>
-                  {master.name}
-                </option>
-              ))}
-            </select>
+            {loadingMasters ? (
+              <p>Loading Masters...</p>
+            ) : errorMasters ? (
+              <p className="text-red-500">{errorMasters}</p>
+            ) : (
+              <select
+                value={selectedMaster || ""}
+                onChange={(e) => setSelectedMaster(Number(e.target.value))}
+                className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+              >
+                <option value="">Select Master</option>
+                {masters.map((master) => (
+                  <option key={master.id} value={master.id}>
+                    {master.name}
+                  </option>
+                ))}
+              </select>
+            )}
 
             <label className="block text-sm font-medium text-gray-700 mb-1 mt-4">Series Name*</label>
             <input
@@ -183,8 +126,6 @@ export const Series = () => {
                 if (selectedMaster !== null) {
                   onSubmit(inputValue, selectedMaster);
                   onClose();
-                } else {
-                  setErrorMessage("Please select a master.");
                 }
               }}
               className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600"
@@ -199,12 +140,12 @@ export const Series = () => {
 
   return (
     <div className="p-6">
-      {errorMessage && <div className="mb-4 text-red-500">{errorMessage}</div>}
-
       {/* Breadcrumb */}
       <div className="mb-4">
         <nav className="text-sm text-gray-500">
-          <a href="/marketplace" className="hover:text-yellow-500">Marketplace</a>
+          <a href="/marketplace" className="hover:text-yellow-500">
+            Marketplace
+          </a>
           <span className="mx-2">/</span>
           <span className="text-yellow-500">Series</span>
         </nav>
@@ -233,52 +174,47 @@ export const Series = () => {
         </div>
       </div>
 
-      {/* Loading Indicator */}
-      {isLoading ? (
-        <div>Loading...</div>
-      ) : (
-        <div className="overflow-x-auto">
-          {/* Series Table */}
-          <table className="min-w-full table-auto border-collapse">
-            <thead>
-              <tr>
-                <th className="px-4 py-2 border-b text-left">Series Name</th>
-                <th className="px-4 py-2 border-b text-left">Master Name</th>
-                <th className="px-4 py-2 border-b text-left">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {seriesList
-                .filter((series) =>
-                  series.name.toLowerCase().includes(searchQuery.toLowerCase())
-                )
-                .map((series: { id: number; name: string, masterName: string }) => (
-                  <tr key={series.id}>
-                    <td className="px-4 py-2 border-b">{series.name}</td>
-                    <td className="px-4 py-2 border-b">{series.masterName}</td>
-                    <td className="px-4 py-2 border-b flex gap-4">
-                      <button
-                        onClick={() => {
-                          setSelectedSeries(series);
-                          setIsEditModalOpen(true);
-                        }}
-                        className="text-gray-400 hover:text-gray-600"
-                      >
-                        <Pencil className="w-5 h-5" />
-                      </button>
-                      <button
-                        onClick={() => handleDeleteSeries(series.id)}
-                        className="text-red-400 hover:text-red-600"
-                      >
-                        <Trash2 className="w-5 h-5" />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+      {/* Series Table */}
+      <div className="overflow-x-auto">
+        <table className="min-w-full table-auto border-collapse">
+          <thead>
+            <tr>
+              <th className="px-4 py-2 border-b text-left">Series Name</th>
+              <th className="px-4 py-2 border-b text-left">Master Name</th>
+              <th className="px-4 py-2 border-b text-left">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {seriesList
+              .filter((series) =>
+                series.name.toLowerCase().includes(searchQuery.toLowerCase())
+              )
+              .map((series) => (
+                <tr key={series.id}>
+                  <td className="px-4 py-2 border-b">{series.name}</td>
+                  <td className="px-4 py-2 border-b">{series.masterName}</td>
+                  <td className="px-4 py-2 border-b flex gap-4">
+                    <button
+                      onClick={() => {
+                        setSelectedSeries(series);
+                        setIsEditModalOpen(true);
+                      }}
+                      className="text-gray-400 hover:text-gray-600"
+                    >
+                      <Pencil className="w-5 h-5" />
+                    </button>
+                    <button
+                      onClick={() => handleDeleteSeries(series.id)}
+                      className="text-red-400 hover:text-red-600"
+                    >
+                      <Trash2 className="w-5 h-5" />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+          </tbody>
+        </table>
+      </div>
 
       {/* Modals */}
       <Modal
@@ -295,7 +231,9 @@ export const Series = () => {
           onClose={() => setIsEditModalOpen(false)}
           title="Edit Series"
           submitText="Update"
-          onSubmit={(name: string, masterId: number) => handleEditSeries(selectedSeries.id, name, masterId)}
+          onSubmit={(name: string, masterId: number) =>
+            handleEditSeries(selectedSeries.id, name, masterId)
+          }
           defaultValue={selectedSeries.name}
         />
       )}
