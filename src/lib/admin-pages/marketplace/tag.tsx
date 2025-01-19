@@ -1,21 +1,18 @@
-import React, {useState} from "react";
-import {Pencil, Eye, Trash2, X} from "lucide-react";
+import React from "react";
+import { Pencil, Eye, Trash2, X } from "lucide-react";
 
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   title: string;
   value: string;
-  onChange: (value: string) => void;
-  onSubmit: () => void;
   submitText: string;
+  onSubmit: () => void;
 }
 
 export const Tag = () => {
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [editingTag, setEditingTag] = useState("");
-  const [newTag, setNewTag] = useState("");
+  const [isAddModalOpen, setIsAddModalOpen] = React.useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = React.useState(false);
 
   const tags = [
     "Animation Voyager",
@@ -29,7 +26,6 @@ export const Tag = () => {
   ];
 
   const handleEdit = (tag: string) => {
-    setEditingTag(tag);
     setIsEditModalOpen(true);
   };
 
@@ -38,9 +34,8 @@ export const Tag = () => {
     onClose,
     title,
     value,
-    onChange,
-    onSubmit,
     submitText,
+    onSubmit,
   }) => {
     if (!isOpen) return null;
 
@@ -67,8 +62,7 @@ export const Tag = () => {
                 </label>
                 <input
                   type="text"
-                  value={value}
-                  onChange={(e) => onChange(e.target.value)}
+                  defaultValue={value}  // Default value passed from the parent
                   className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500"
                 />
               </div>
@@ -168,14 +162,12 @@ export const Tag = () => {
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
         title="Add Tag"
-        value={newTag}
-        onChange={setNewTag}
+        value=""
+        submitText="Save"
         onSubmit={() => {
           // Handle add tag logic here
           setIsAddModalOpen(false);
-          setNewTag("");
         }}
-        submitText="Save"
       />
 
       {/* Edit Tag Modal */}
@@ -183,14 +175,12 @@ export const Tag = () => {
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
         title="Edit Tag"
-        value={editingTag}
-        onChange={setEditingTag}
+        value=""
+        submitText="Update"
         onSubmit={() => {
           // Handle edit tag logic here
           setIsEditModalOpen(false);
-          setEditingTag("");
         }}
-        submitText="Update"
       />
     </div>
   );
