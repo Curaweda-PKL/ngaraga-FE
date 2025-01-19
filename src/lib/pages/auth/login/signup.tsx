@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { FaUser, FaLock, FaEnvelope } from "react-icons/fa";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
@@ -23,6 +23,38 @@ const SignUp: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false);
+  const [apiData, setApiData] = useState({
+    image: LoginImage,
+    title: "Sign Up",
+    description: "Create an account to start using our service.",
+  });
+
+
+  useEffect(() => {
+    const fetchThumbnailData = async () => {
+      try {
+        const response = await axios.get("http://localhost:3000/api/auththumb/sign-up");
+        const { title, description, image } = response.data.data;
+
+        setApiData({
+          title: title || "Sign Up",
+          description: description || "Create an account to start using our service.",
+          image: image ? `http://localhost:3000/${image}` : LoginImage,
+        });
+      } catch (error) {
+        console.error("Error fetching thumbnail data:", error);
+        // Fallback in case of failure
+        setApiData({
+          image: LoginImage,
+          title: "Sign Up",
+          description: "Create an account to start using our service.",
+        });
+      }
+    };
+
+    fetchThumbnailData();
+  }, []);
+
 
   // Handle form input changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -57,23 +89,6 @@ const SignUp: React.FC = () => {
       valid = false;
     }
 
-    // Password validation
-    // const passwordPattern =
-    //   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-    // if (!formData.password) {
-    //   newError.password = "Password cannot be empty!";
-    //   valid = false;
-    // } else if (!passwordPattern.test(formData.password)) {
-    //   newError.password =
-    //     "Password must contain at least one uppercase, one lowercase, one number, and one special character!";
-    //   valid = false;
-    // }
-
-    // Confirm Password validation
-    // if (formData.password !== formData.confirmPassword) {
-    //   newError.confirmPassword = "Passwords do not match!";
-    //   valid = false;
-    // }
 
     setError(newError);
     return valid;
@@ -149,7 +164,7 @@ const SignUp: React.FC = () => {
         <section className="relative flex h-32 items-end bg-gray-900 lg:col-span-5 lg:h-full xl:col-span-6">
           <img
             alt="signup"
-            src={LoginImage}
+            src={apiData.image}
             loading="lazy"
             className="absolute inset-0 h-full w-full object-cover opacity-80"
           />
@@ -171,8 +186,8 @@ const SignUp: React.FC = () => {
             >
               {/* Title and Description */}
               <div className="col-span-6">
-                <h2 className="text-3xl font-bold text-gray-800 mb-2">Sign Up</h2>
-                <p className="text-lg text-gray-500">Create an account to start using our service.</p>
+              <h2 className="text-3xl font-bold text-gray-800 mb-2">{apiData.title}</h2>
+              <p className="text-lg text-gray-500">{apiData.description}</p>
               </div>
 
               {/* name */}
