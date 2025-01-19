@@ -58,22 +58,22 @@ const SignUp: React.FC = () => {
     }
 
     // Password validation
-    const passwordPattern =
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-    if (!formData.password) {
-      newError.password = "Password cannot be empty!";
-      valid = false;
-    } else if (!passwordPattern.test(formData.password)) {
-      newError.password =
-        "Password must contain at least one uppercase, one lowercase, one number, and one special character!";
-      valid = false;
-    }
+    // const passwordPattern =
+    //   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    // if (!formData.password) {
+    //   newError.password = "Password cannot be empty!";
+    //   valid = false;
+    // } else if (!passwordPattern.test(formData.password)) {
+    //   newError.password =
+    //     "Password must contain at least one uppercase, one lowercase, one number, and one special character!";
+    //   valid = false;
+    // }
 
     // Confirm Password validation
-    if (formData.password !== formData.confirmPassword) {
-      newError.confirmPassword = "Passwords do not match!";
-      valid = false;
-    }
+    // if (formData.password !== formData.confirmPassword) {
+    //   newError.confirmPassword = "Passwords do not match!";
+    //   valid = false;
+    // }
 
     setError(newError);
     return valid;
