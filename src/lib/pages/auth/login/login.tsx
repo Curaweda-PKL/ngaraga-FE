@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { FaLock, FaEnvelope } from "react-icons/fa";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
@@ -18,6 +18,21 @@ const Login: React.FC = () => {
   const [error, setError] = useState<{ [key: string]: string }>({});
   const [loading, setLoading] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [thumbnailData, setThumbnailData] = useState<any>(null);
+
+  // Fetch thumbnail data
+  useEffect(() => {
+    const fetchThumbnailData = async () => {
+      try {
+        const response = await axios.get("http://localhost:3000/api/auththumb/sign-in");
+        setThumbnailData(response.data.data);
+      } catch (error) {
+        console.error("Error fetching thumbnail data:", error);
+      }
+    };
+
+    fetchThumbnailData();
+  }, []);
 
   // Handle form input changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -57,12 +72,12 @@ const Login: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-  
+
     if (!validateForm()) {
       setLoading(false);
       return;
     }
-  
+
     try {
       const response = await axios.post(
         "http://localhost:3000/api/login",
@@ -71,14 +86,14 @@ const Login: React.FC = () => {
           password: formData.password,
         },
         {
-          withCredentials: true, 
+          withCredentials: true,
         }
       );
-  
+
       // Handle successful login
       alert("Logged in successfully!");
       console.log("Login Response:", response.data);
-  
+
       // Optionally redirect the user
       window.location.href = "/";
     } catch (error: any) {
@@ -88,6 +103,7 @@ const Login: React.FC = () => {
       setLoading(false);
     }
   };
+
   // Toggle visibility for password
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
 
@@ -110,11 +126,12 @@ const Login: React.FC = () => {
     >
       <div className="lg:grid lg:min-h-screen lg:grid-cols-12">
         <section className="relative flex h-32 items-end bg-gray-900 lg:col-span-5 lg:h-full xl:col-span-6">
+          {/* Display thumbnail image if available */}
           <img
             alt="login"
-            src={LoginImage}
+            src={thumbnailData?.image ? `http://localhost:3000/${thumbnailData.image}` : LoginImage} 
             loading="lazy"
-            className="absolute inset-0 h-full w-full object-cover opacity-80"
+            className="absolute inset-0 h-full w-full object-contain opacity-80"
           />
         </section>
 
@@ -132,13 +149,13 @@ const Login: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4, duration: 0.7 }}
             >
-              {/* Title and Description */}
+              {/* Display the title and description if available */}
               <div className="col-span-6">
                 <h2 className="text-3xl font-bold text-gray-800 mb-2">
-                  Log In
+                  {thumbnailData?.title || "Log In"} 
                 </h2>
                 <p className="text-lg text-gray-500">
-                  Welcome back! Please log in to your account.
+                  {thumbnailData?.description || "Welcome back! Please log in to your account."} 
                 </p>
               </div>
 
@@ -146,9 +163,7 @@ const Login: React.FC = () => {
               <div className="col-span-6 relative">
                 <div
                   className={`mt-1 flex items-center border rounded-md bg-white py-3 px-4 shadow-sm ${
-                    error.email
-                      ? "border-[#D22424]"
-                      : "focus-within:border-[var(--typing)]"
+                    error.email ? "border-[#D22424]" : "focus-within:border-[var(--typing)]"
                   }`}
                 >
                   <FaEnvelope className="text-gray-500 mr-2 text-sm" />
@@ -164,18 +179,14 @@ const Login: React.FC = () => {
                     required
                   />
                 </div>
-                {error.email && (
-                  <p className="text-[#D22424] text-sm">{error.email}</p>
-                )}
+                {error.email && <p className="text-[#D22424] text-sm">{error.email}</p>}
               </div>
 
               {/* Password */}
               <div className="col-span-6 relative">
                 <div
                   className={`mt-1 flex items-center border rounded-md bg-white py-3 px-4 shadow-sm ${
-                    error.password
-                      ? "border-[#D22424]"
-                      : "focus-within:border-[var(--typing)]"
+                    error.password ? "border-[#D22424]" : "focus-within:border-[var(--typing)]"
                   }`}
                 >
                   <FaLock className="text-gray-500 mr-2 text-sm" />
@@ -194,16 +205,10 @@ const Login: React.FC = () => {
                     className="text-gray-500 ml-2 cursor-pointer text-sm"
                     onClick={togglePasswordVisibility}
                   >
-                    {showPassword ? (
-                      <AiOutlineEyeInvisible />
-                    ) : (
-                      <AiOutlineEye />
-                    )}
+                    {showPassword ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
                   </div>
                 </div>
-                {error.password && (
-                  <p className="text-[#D22424] text-sm">{error.password}</p>
-                )}
+                {error.password && <p className="text-[#D22424] text-sm">{error.password}</p>}
 
                 {/* Forgot Password Link */}
                 <div className="mt-4 text-right">
