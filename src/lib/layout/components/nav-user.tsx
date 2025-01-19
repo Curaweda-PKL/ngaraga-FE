@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
-import { FaBars, FaTimes, FaUserFriends } from "react-icons/fa";
-import { CiShoppingCart } from "react-icons/ci";
-import { useNavigate } from "react-router-dom";
+import React, {useEffect, useState} from "react";
+import {FaBars, FaTimes, FaUserFriends} from "react-icons/fa";
+import {CiShoppingCart} from "react-icons/ci";
+import {useNavigate} from "react-router-dom";
 
 interface UserProfile {
   name: string;
@@ -26,20 +26,23 @@ export const Navbar: React.FC = () => {
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
-        const response = await fetch("http://localhost:3000/api/account/profile", {
-          credentials: "include", // To include cookies in the request
-        });
+        const response = await fetch(
+          "http://localhost:3000/api/account/profile",
+          {
+            credentials: "include", // To include cookies in the request
+          }
+        );
 
         if (response.ok) {
           const data: UserProfile = await response.json();
           setUserProfile(data);
         } else {
           console.error("Failed to fetch user profile");
-          setUserProfile({ name: "JohnDoe", avatarUrl: "" });
+          setUserProfile({name: "JohnDoe", avatarUrl: ""});
         }
       } catch (error) {
         console.error("Error fetching user profile:", error);
-        setUserProfile({ name: "JohnDoe", avatarUrl: "" });
+        setUserProfile({name: "JohnDoe", avatarUrl: ""});
       }
     };
 
@@ -101,7 +104,10 @@ export const Navbar: React.FC = () => {
             className="cursor-pointer flex items-center"
             onClick={() => navigateToPage("cart")}
           >
-            <CiShoppingCart size={31} className="lg:mr-3 ShoppingCartIcon" />
+            <CiShoppingCart
+              size={31}
+              className="lg:mr-3 ShoppingCartIcon"
+            />
           </a>
 
           {/* Conditional rendering for Sign In / Sign Up buttons or Avatar */}
@@ -126,22 +132,24 @@ export const Navbar: React.FC = () => {
             </>
           ) : (
             // Logged in
-            <div className="flex items-center space-x-2">
-              <span className="hidden sm:block text-sm font-medium ml-2">
-                {userProfile?.name || "JohnDoe"}
-              </span>
-              <button
-                className="avatar btn btn-ghost"
-                onClick={() => navigateToPage("user")}
-              >
-                <div className="w-8 h-8 rounded-full">
-                  <img
-                    src={userProfile?.avatarUrl || "/default-avatar.png"}
-                    alt="User Avatar"
-                  />
-                </div>
-              </button>
-            </div>
+            <a href="/account">
+              <div className="flex items-center space-x-2">
+                <span className="hidden sm:block text-sm font-medium ml-2">
+                  {userProfile?.name || "JohnDoe"}
+                </span>
+                <button
+                  className="avatar btn btn-ghost"
+                  onClick={() => navigateToPage("user")}
+                >
+                  <div className="w-8 h-8 rounded-full">
+                    <img
+                      src={userProfile?.avatarUrl || "/default-avatar.png"}
+                      alt="User Avatar"
+                    />
+                  </div>
+                </button>
+              </div>
+            </a>
           )}
         </div>
       </div>
