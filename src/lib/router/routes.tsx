@@ -114,7 +114,6 @@ export const routes: Array<PathRouteProps> = [
   {path: "/login", element: <Login />},
   {path: "/forgot-password", element: <ForgotPassword />},
   {path: "/reset-password", element: <ResetPassword />},
-
   {path: "/artist", element: <Artists />},
   {path: "/account", element: <Account />},
   {path: "/marketplace", element: <Marketplace />},

@@ -4,7 +4,7 @@ var x;
 var $cards = $(".card-container");
 var $style = $(".hover");
 console.log($cards);
-console.log("Cards found:", document.querySelectorAll(".card-container"));
+
 
 $cards
   .on("mousemove touchmove", function(e) { 

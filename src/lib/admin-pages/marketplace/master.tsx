@@ -1,31 +1,100 @@
-import React from "react";
-import { Pencil, Eye, Trash2, X } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Pencil, Trash2, Search, X } from "lucide-react";
 
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   title: string;
   submitText: string;
-  onSubmit: () => void;
+  onSubmit: (value: string) => void;
+  defaultValue?: string;
 }
 
 export const Master = () => {
-  const [isAddModalOpen, setIsAddModalOpen] = React.useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = React.useState(false);
+  const [masterList, setMasterList] = useState<any[]>([]);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedMaster, setSelectedMaster] = useState<{ id: number; name: string } | null>(null);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const seriesList = [
-    "Master 1",
-    "Master 2",
-    "Master 3",
-    "Master 4",
-    "Master 5",
-    "Master 6",
-    "Master 7",
-    "Master 8",
-  ];
+  const fetchMasterList = async () => {
+    try {
+      const response = await fetch("http://localhost:3000/api/masters/all");
+      if (!response.ok) {
+        throw new Error("Failed to fetch data");
+      }
+      const data = await response.json();
+      setMasterList(data.masters);
+    } catch (error) {
+      console.error("Error fetching master list:", error);
+      setErrorMessage("Failed to load master list.");
+    }
+  };
 
-  const handleEdit = () => {
-    setIsEditModalOpen(true);
+  useEffect(() => {
+    fetchMasterList();
+  }, []);
+
+  const handleAddMaster = async (name: string) => {
+    try {
+      const response = await fetch("http://localhost:3000/api/master/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to add master");
+      }
+
+      const newMaster = await response.json();
+      setMasterList((prev) => [...prev, newMaster.master]);
+    } catch (error: any) {
+      console.error("Error adding master:", error);
+      setErrorMessage(error?.message || "Failed to add master.");
+    }
+  };
+
+  const handleEditMaster = async (id: number, name: string) => {
+    try {
+      const response = await fetch(`http://localhost:3000/api/master/edit/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to update master");
+      }
+
+      const updatedMaster = await response.json();
+      setMasterList((prev) =>
+        prev.map((master) => (master.id === id ? updatedMaster.updatedMaster : master))
+      );
+    } catch (error: any) {
+      console.error("Error updating master:", error);
+      setErrorMessage(error?.message || "Failed to update master.");
+    }
+  };
+
+  const handleDeleteMaster = async (id: number) => {
+    try {
+      const response = await fetch(`http://localhost:3000/api/master/delete/${id}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete master");
+      }
+
+      setMasterList((prev) => prev.filter((master) => master.id !== id));
+    } catch (error: any) {
+      console.error("Error deleting master:", error);
+      setErrorMessage(error?.message || "Failed to delete master.");
+    }
   };
 
   const Modal: React.FC<ModalProps> = ({
@@ -34,49 +103,43 @@ export const Master = () => {
     title,
     submitText,
     onSubmit,
+    defaultValue = "",
   }) => {
+    const [inputValue, setInputValue] = useState(defaultValue);
+
+    useEffect(() => setInputValue(defaultValue), [defaultValue]);
+
     if (!isOpen) return null;
 
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
         <div className="bg-white rounded-lg w-full max-w-md">
-          {/* Modal Header */}
           <div className="flex justify-between items-center p-4 border-b">
             <h2 className="text-lg font-medium">{title}</h2>
-            <button
-              onClick={onClose}
-              className="text-gray-400 hover:text-gray-600"
-            >
+            <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
               <X className="w-5 h-5" />
             </button>
           </div>
 
-          {/* Modal Content */}
           <div className="p-4">
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Series Name*
-                </label>
-                <input
-                  type="text"
-                  defaultValue="ddddadd"  // Set your default value here
-                  className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500"
-                />
-              </div>
-            </div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Master Name*</label>
+            <input
+              type="text"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+            />
           </div>
 
-          {/* Modal Footer */}
           <div className="flex justify-end gap-2 p-4 border-t">
-            <button
-              onClick={onClose}
-              className="px-4 py-2 border rounded-lg text-gray-600 hover:bg-gray-50"
-            >
+            <button onClick={onClose} className="px-4 py-2 border rounded-lg text-gray-600 hover:bg-gray-50">
               Cancel
             </button>
             <button
-              onClick={onSubmit}
+              onClick={() => {
+                onSubmit(inputValue);
+                onClose();
+              }}
               className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600"
             >
               {submitText}
@@ -89,94 +152,91 @@ export const Master = () => {
 
   return (
     <div className="p-6">
+      {errorMessage && <div className="mb-4 text-red-500">{errorMessage}</div>}
+
       {/* Breadcrumb */}
-      <div className="flex items-center gap-2 text-sm text-gray-500 mb-4">
-        <span>Marketplace</span>
-        <span>/</span>
-        <span className="text-gray-700">Series</span>
+      <div className="mb-4">
+        <nav className="text-sm text-gray-500">
+          <a href="/marketplace" className="hover:text-yellow-500">Marketplace</a>
+          <span className="mx-2">/</span>
+          <span className="text-yellow-500">Master</span>
+        </nav>
       </div>
 
-      {/* Header */}
+      {/* Title */}
+      <h1 className="text-2xl font-bold mb-4">Master</h1>
+
+      {/* Add Master & Search */}
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold">Series</h1>
-        <div className="flex gap-4">
-          <button
-            onClick={() => setIsAddModalOpen(true)}
-            className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
-          >
-            <span className="text-xl">+</span> Add Series
-          </button>
-          <div className="relative">
-            <input
-              type="text"
-              placeholder="Search"
-              className="pl-10 pr-4 py-2 border rounded-lg w-64 focus:outline-none focus:ring-2 focus:ring-yellow-500"
-            />
-            <svg
-              className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-              fill="none"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-          </div>
+        <button
+          onClick={() => setIsAddModalOpen(true)}
+          className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+        >
+          <span className="text-xl">+</span> Add Master
+        </button>
+        <div className="relative w-full max-w-xs">
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search Master"
+            className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
+          />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
         </div>
       </div>
 
-      {/* Series Grid */}
+      {/* Master List */}
       <div className="grid grid-cols-2 gap-4">
-        {seriesList.map((series, index) => (
-          <div
-            key={index}
-            className="bg-white rounded-lg p-4 flex items-center justify-between border border-gray-100"
-          >
-            <div className="flex items-center">
-              <span className="font-medium text-gray-700">{series}</span>
+        {masterList
+          .filter((master) =>
+            master.name.toLowerCase().includes(searchQuery.toLowerCase())
+          )
+          .map((master: { id: number; name: string }) => (
+            <div
+              key={master.id}
+              className="bg-white rounded-lg p-4 flex items-center justify-between border border-gray-100"
+            >
+              <span className="font-medium text-gray-700">{master.name}</span>
+              <div className="flex items-center gap-4">
+                <button
+                  onClick={() => {
+                    setSelectedMaster(master);
+                    setIsEditModalOpen(true);
+                  }}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <Pencil className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={() => handleDeleteMaster(master.id)}
+                  className="text-red-400 hover:text-red-600"
+                >
+                  <Trash2 className="w-5 h-5" />
+                </button>
+              </div>
             </div>
-            <div className="flex items-center gap-4">
-              <button
-                onClick={handleEdit}
-                className="text-gray-400 hover:text-gray-600"
-              >
-                <Pencil className="w-5 h-5" />
-              </button>
-              <button className="text-gray-400 hover:text-gray-600">
-                <Eye className="w-5 h-5" />
-              </button>
-              <button className="text-red-400 hover:text-red-600">
-                <Trash2 className="w-5 h-5" />
-              </button>
-            </div>
-          </div>
-        ))}
+          ))}
       </div>
 
-      {/* Add Series Modal */}
+      {/* Modals */}
       <Modal
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
-        title="Add Series"
+        title="Add Master"
         submitText="Save"
-        onSubmit={() => {
-          // Handle add series logic here
-          setIsAddModalOpen(false);
-        }}
+        onSubmit={handleAddMaster}
       />
 
-      {/* Edit Series Modal */}
       <Modal
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
-        title="Edit Series"
+        title="Edit Master"
         submitText="Update"
-        onSubmit={() => {
-          // Handle edit series logic here
-          setIsEditModalOpen(false);
-        }}
+        onSubmit={(name) =>
+          selectedMaster && handleEditMaster(selectedMaster.id, name)
+        }
+        defaultValue={selectedMaster?.name || ""}
       />
     </div>
   );
