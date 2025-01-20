@@ -1,16 +1,69 @@
-import {useState} from "react";
-import {X, Pencil, Eye, Trash2} from "lucide-react";
+import { useEffect, useState } from "react";
+import { X, Pencil, Eye, Trash2 } from "lucide-react";
+import axios from "axios";
 
 export const Creator = () => {
+  const [image, setImage] = useState<File | null>(null);
+  const [creatorName, setCreatorName] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const creators = [
-    {name: "Astrovia", avatar: "/api/placeholder/40/40"},
-    {name: "Stellaris", avatar: "/api/placeholder/40/40"},
-    {name: "Galactica", avatar: "/api/placeholder/40/40"},
-    {name: "Cosmara", avatar: "/api/placeholder/40/40"},
-    {name: "Nebulon", avatar: "/api/placeholder/40/40"},
-    {name: "Galactica", avatar: "/api/placeholder/40/40"},
-  ];
+  const [creators, setCreators] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchCreators = async () => {
+      try {
+        const response = await axios.get("http://localhost:3000/api/creator/all");
+        setCreators(response.data.creators);
+      } catch (error) {
+        console.error("Error fetching creators:", error);
+      }
+    };
+
+    fetchCreators();
+  }, []);
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImage(file);
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setImage(null);
+  };
+
+  const handleSave = async () => {
+    if (!image || !creatorName) {
+      alert("Please upload an image and provide a creator name.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("image", image);
+    formData.append("name", creatorName);
+
+    try {
+      const response = await axios.post(
+        "http://localhost:3000/api/creator/create",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      if (response.data.message === "Creator created successfully") {
+        alert("Creator created successfully!");
+        setIsModalOpen(false); // Close the modal after success
+      } else {
+        alert("Failed to create creator.");
+      }
+    } catch (error) {
+      console.error("Error creating creator:", error);
+      alert("An error occurred while creating the creator.");
+    }
+  };
 
   return (
     <div className="p-6">
@@ -54,33 +107,34 @@ export const Creator = () => {
 
       {/* Creator Grid */}
       <div className="grid grid-cols-2 gap-4">
-        {creators.map((creator, index) => (
-          <div
-            key={index}
-            className="bg-white rounded-lg p-4 flex items-center justify-between"
-          >
-            <div className="flex items-center gap-3">
-              <img
-                src={creator.avatar}
-                alt={creator.name}
-                className="w-10 h-10 rounded-lg"
-              />
-              <span className="font-medium">{creator.name}</span>
-            </div>
-            <div className="flex items-center gap-4">
-              <button className="text-gray-400 hover:text-gray-600">
-                <Pencil className="w-5 h-5" />
-              </button>
-              <button className="text-gray-400 hover:text-gray-600">
-                <Eye className="w-5 h-5" />
-              </button>
-              <button className="text-gray-400 hover:text-gray-600">
-                <Trash2 className="w-5 h-5" />
-              </button>
-            </div>
+      {creators.map((creator, index) => (
+        <div
+          key={index}
+          className="bg-white rounded-lg p-4 flex items-center justify-between"
+        >
+          <div className="flex items-center gap-3">
+            {/* Image is fetched dynamically from the server */}
+            <img
+              src={`http://localhost:3000/uploads/creator/${creator.image}`} // Assuming the image path is correct
+              alt={creator.name}
+              className="w-10 h-10 rounded-lg"
+            />
+            <span className="font-medium">{creator.name}</span>
           </div>
-        ))}
-      </div>
+          <div className="flex items-center gap-4">
+            <button className="text-gray-400 hover:text-gray-600">
+              <Pencil className="w-5 h-5" />
+            </button>
+            <button className="text-gray-400 hover:text-gray-600">
+              <Eye className="w-5 h-5" />
+            </button>
+            <button className="text-gray-400 hover:text-gray-600">
+              <Trash2 className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+      ))}
+    </div>
 
       {/* Add Creator Modal */}
       {isModalOpen && (
@@ -98,37 +152,72 @@ export const Creator = () => {
 
             <div className="p-4">
               <div className="space-y-4">
+                {/* Image Upload */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Creator Image*
                   </label>
                   <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
                     <div className="text-center">
-                      <button className="bg-yellow-500 text-white px-4 py-1 rounded-lg text-sm">
-                        Browse
-                      </button>
-                      <p className="mt-2 text-sm text-red-500">
-                        Click to Upload
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        jpeg, jpg, png max 4mb
-                      </p>
+                      {image ? (
+                        <div className="relative">
+                          <img
+                            src={URL.createObjectURL(image)}
+                            alt="Uploaded"
+                            className="w-full h-48 object-cover rounded"
+                          />
+                          <div className="absolute top-2 right-2 flex space-x-2">
+                            <button
+                              onClick={handleRemoveImage}
+                              className="p-2 bg-red-500 text-white rounded-full"
+                            >
+                              🗑️
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <>
+                          <input
+                            type="file"
+                            accept=".jpg,.jpeg,.png"
+                            onChange={handleImageChange}
+                            className="hidden"
+                            id="image-upload"
+                          />
+                          <label
+                            htmlFor="image-upload"
+                            className="cursor-pointer px-4 py-2 bg-yellow-500 text-white rounded"
+                          >
+                            Browse
+                          </label>
+                          <p className="mt-2 text-sm text-red-500">
+                            Click to Upload
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            jpeg, jpg, png max 4mb
+                          </p>
+                        </>
+                      )}
                     </div>
                   </div>
                 </div>
 
+                {/* Creator Name */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Creator Name*
                   </label>
                   <input
                     type="text"
+                    value={creatorName}
+                    onChange={(e) => setCreatorName(e.target.value)}
                     className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500"
                   />
                 </div>
               </div>
             </div>
 
+            {/* Action Buttons */}
             <div className="flex justify-end gap-2 p-4 border-t">
               <button
                 onClick={() => setIsModalOpen(false)}
@@ -136,7 +225,10 @@ export const Creator = () => {
               >
                 Cancel
               </button>
-              <button className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600">
+              <button
+                onClick={handleSave}
+                className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600"
+              >
                 Save
               </button>
             </div>

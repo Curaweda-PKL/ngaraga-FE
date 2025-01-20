@@ -121,6 +121,7 @@ export const routes: Array<PathRouteProps> = [
   {path: "/checkout", element: <Checkout />},
   {path: "/payment", element: <PaymentPage />},
   {path: "/complete", element: <OrderComplete />},
+  
 ];
 
 export const privateRoutes: Array<PathRouteProps> = [];

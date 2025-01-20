@@ -63,7 +63,7 @@ export const Admin = () => {
           <Plus className="w-4 h-4" />
           <span>
             {" "}
-            <a href="/admin/add-admin">Add Member</a>
+            <a href="/admin/add-admin">Add Admin</a>
           </span>
         </button>
 
