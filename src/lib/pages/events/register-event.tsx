@@ -18,13 +18,17 @@ const EventRegistration: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6">
-      <div className="w-full rounded-lg p-6 md:p-12 grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-800 mb-6">Register</h1>
+    <div className="min-h-screen p-4 md:p-8">
+      {/* Heading */}
+      <h1 className="text-4xl text-[#171717] font-bold mb-8">Register</h1>
+
+      {/* Content Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Registration Form */}
+        <div className="lg:col-span-2">
           <form
             onSubmit={handleSubmit}
-            className="space-y-4"
+            className="space-y-6 bg-white p-6 rounded-lg"
           >
             <div>
               <input
@@ -62,12 +66,12 @@ const EventRegistration: React.FC = () => {
           </form>
         </div>
 
-        {/* Event Summary Section */}
-        <div className="border-2 bg-gray-50 p-6 rounded-lg">
+        {/* Event Summary */}
+        <div className="bg-gray-50 border p-6 rounded-lg shadow-md lg:mt-0 lg:ml-8">
           <h2 className="text-lg font-bold text-gray-800 mb-4">
             Summary Event
           </h2>
-          <div className="bg-gray-100 border-t shadow-md rounded-lg flex items-center p-4 mb-4">
+          <div className="bg-gray-100 border-t rounded-lg flex items-center p-4 mb-4">
             <img
               src="/src/assets/img/dall-e.png"
               alt="Event Thumbnail"

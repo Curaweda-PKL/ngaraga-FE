@@ -1,4 +1,4 @@
-import LeftSectionOrderSummary from "./components/leftsection-ordersummary";
+import LeftSectionOrderSummary from "./components/ordersummary";
 import OrderStages from "./components/order-stages";
 import RightSectionOrderSummary from "./components/rightSection-orderSummary";
 
