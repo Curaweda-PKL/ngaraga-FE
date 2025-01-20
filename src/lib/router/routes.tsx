@@ -52,6 +52,7 @@ const Home = React.lazy(() => import("@/lib/pages/home/Home"));
 const Signup = React.lazy(() => import("@/lib/pages/auth/login/signup"));
 const Login = React.lazy(() => import("@/lib/pages/auth/login/login"));
 const Artists = React.lazy(() => import("@/lib/pages/artists/artists-index"));
+const Account = React.lazy(() => import("@/lib/pages/account/account-index"));
 const Marketplace = React.lazy(
   () => import("@/lib/pages/marketplace/marketplace-index")
 );
@@ -62,6 +63,9 @@ const BrowseEvents = React.lazy(
 );
 const EventDetail = React.lazy(
   () => import("@/lib/pages/events/detail-events")
+);
+const EventRegistration = React.lazy(
+  () => import("@/lib/pages/events/register-event")
 );
 const Checkout = React.lazy(
   () => import("@/lib/pages/checkout/checkout-index")
@@ -111,13 +115,15 @@ export const routes: Array<PathRouteProps> = [
   {path: "/forgot-password", element: <ForgotPassword />},
   {path: "/reset-password", element: <ResetPassword />},
   {path: "/artist", element: <Artists />},
+  {path: "/account", element: <Account />},
   {path: "/marketplace", element: <Marketplace />},
   {path: "/rankings", element: <TopCollectors />},
-  {path: "/detail-special-card", element: <DetailSpecial />},
   {path: "/detail-cards", element: <DetailCards />},
+  {path: "/detail-special-card", element: <DetailSpecial />},
   {path: "/cart", element: <Cart />},
   {path: "/events", element: <BrowseEvents />},
   {path: "/detail-events", element: <EventDetail />},
+  {path: "/register-events", element: <EventRegistration />},
   {path: "/checkout", element: <Checkout />},
   {path: "/payment", element: <PaymentPage />},
   {path: "/complete", element: <OrderComplete />},
