@@ -1,17 +1,34 @@
-import React, {useEffect, useState} from "react";
-import {FaBars, FaTimes, FaUserFriends} from "react-icons/fa";
-import {CiShoppingCart} from "react-icons/ci";
-import {useNavigate} from "react-router-dom";
-
-interface UserProfile {
-  name: string;
-  avatarUrl: string;
-}
+import { useEffect, useState } from "react";
+import { FaBars, FaTimes, FaUserFriends } from "react-icons/fa";
+import { CiShoppingCart } from "react-icons/ci";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 export const Navbar: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const navigate = useNavigate();
+  const [username, setUsername] = useState(""); 
+
+  // mock
+  const isAuthenticated = true;
+  const userAvatarUrl = "https://www.gravatar.com/avatar/abc123";
+
+  useEffect(() => {
+    // Fetch user data from the API
+    const fetchUserData = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:3000/api/account/profile",
+          { withCredentials: true }
+        );
+        setUsername(response.data.name); // Update username with fetched data
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    };
+
+    fetchUserData();
+  }, []);
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -21,35 +38,6 @@ export const Navbar: React.FC = () => {
     navigate(`/${page}`);
     toggleSidebar();
   };
-
-  // Fetch the user profile on component mount
-  useEffect(() => {
-    const fetchUserProfile = async () => {
-      try {
-        const response = await fetch(
-          "http://localhost:3000/api/account/profile",
-          {
-            credentials: "include", // To include cookies in the request
-          }
-        );
-
-        if (response.ok) {
-          const data: UserProfile = await response.json();
-          setUserProfile(data);
-        } else {
-          console.error("Failed to fetch user profile");
-          setUserProfile({name: "JohnDoe", avatarUrl: ""});
-        }
-      } catch (error) {
-        console.error("Error fetching user profile:", error);
-        setUserProfile({name: "JohnDoe", avatarUrl: ""});
-      }
-    };
-
-    fetchUserProfile();
-  }, []);
-
-  const isAuthenticated = Boolean(userProfile);
 
   return (
     <>
@@ -104,10 +92,7 @@ export const Navbar: React.FC = () => {
             className="cursor-pointer flex items-center"
             onClick={() => navigateToPage("cart")}
           >
-            <CiShoppingCart
-              size={31}
-              className="lg:mr-3 ShoppingCartIcon"
-            />
+            <CiShoppingCart size={31} className="lg:mr-3 ShoppingCartIcon" />
           </a>
 
           {/* Conditional rendering for Sign In / Sign Up buttons or Avatar */}
@@ -132,24 +117,19 @@ export const Navbar: React.FC = () => {
             </>
           ) : (
             // Logged in
-            <a href="/account">
-              <div className="flex items-center space-x-2">
-                <span className="hidden sm:block text-sm font-medium ml-2">
-                  {userProfile?.name || "JohnDoe"}
-                </span>
-                <button
-                  className="avatar btn btn-ghost"
-                  onClick={() => navigateToPage("user")}
-                >
-                  <div className="w-8 h-8 rounded-full">
-                    <img
-                      src={userProfile?.avatarUrl || "/default-avatar.png"}
-                      alt="User Avatar"
-                    />
-                  </div>
-                </button>
-              </div>
-            </a>
+            <div className="flex items-center space-x-2">
+              <span className="hidden sm:block text-sm font-medium ml-2">
+              {username || "Loading..."} 
+              </span>
+              <button
+                className="avatar btn btn-ghost"
+                onClick={() => navigateToPage("user")}
+              >
+                <div className="w-8 h-8 rounded-full">
+                  <img src={userAvatarUrl} alt="User Avatar" />
+                </div>
+              </button>
+            </div>
           )}
         </div>
       </div>
@@ -160,16 +140,89 @@ export const Navbar: React.FC = () => {
         ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} 
         lg:hidden text-black overflow-x-hidden`}
       >
-        {/* Sidebar content */}
+        {/* Sidebar header */}
+        <div className="flex justify-between items-center p-4 border-b">
+          <button onClick={toggleSidebar} className="btn btn-ghost text-black">
+            <FaTimes size={20} />
+          </button>
+
+          {/* Logo at flex start */}
+          <a href="/" className="flex items-center text-xl text-black ml-4">
+            <img
+              src="/src/assets/img/LOGO.png"
+              alt="Ngaraga Logo"
+              className="w-8 h-8 mr-2"
+            />
+            NGARAGA
+          </a>
+
+          <div className="flex items-center space-x-4 ml-auto">
+            {!isAuthenticated ? (
+              <>
+                {/* Sign-in Button */}
+                <a
+                  className="btn bg-white border-call-to-action rounded-lg text-orange-300 sm:flex lg:flex items-center gap-2 hover:bg-call-to-actions-800 hover:text-white transition"
+                  onClick={() => navigateToPage("login")}
+                >
+                  Sign In
+                </a>
+
+                {/* Sign-up Button */}
+                <a
+                  className="btn bg-call-to-action border-transparent rounded-lg text-white hidden lg:flex items-center gap-2 hover:bg-call-to-actions-800 transition"
+                  onClick={() => navigateToPage("signup")}
+                >
+                  <FaUserFriends size={18} />
+                  Sign Up
+                </a>
+              </>
+            ) : (
+              // Logged in - Avatar and Cart
+              <div className="flex items-center justify-between space-x-4">
+                <a
+                  className="cursor-pointer"
+                  onClick={() => navigateToPage("cart")}
+                >
+                  <CiShoppingCart size={31} />
+                </a>
+                <button
+                  className="avatar btn btn-ghost"
+                  onClick={() => navigateToPage("user")}
+                >
+                  <div className="w-8 h-8 rounded-full">
+                    <img src={userAvatarUrl} alt="User Avatar" />
+                  </div>
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Sidebar menu */}
         <ul className="menu p-4 space-y-4 text-black">
           <li>
-            <a onClick={() => navigateToPage("marketplace")}>Marketplace</a>
+            <a
+              className="flex items-center"
+              onClick={() => navigateToPage("marketplace")}
+            >
+              Marketplace
+            </a>
           </li>
           <li>
-            <a onClick={() => navigateToPage("rankings")}>Rankings</a>
+            <a
+              className="flex items-center"
+              onClick={() => navigateToPage("rankings")}
+            >
+              Rankings
+            </a>
           </li>
           <li>
-            <a onClick={() => navigateToPage("events")}>Events</a>
+            <a
+              className="flex items-center"
+              onClick={() => navigateToPage("events")}
+            >
+              Events
+            </a>
           </li>
         </ul>
       </div>
