@@ -7,7 +7,6 @@ import PhoneInput from "./PhoneInput";
 import axios from "axios";
 import { IoRadioButtonOn } from "react-icons/io5";
 
-
 interface FormData {
   fullName: string;
   email: string;
@@ -20,6 +19,7 @@ interface FormData {
   postalCode: string;
   addressDetails: string;
   notes: string;
+  pickUpTime: string; // added for pick up time selection
 }
 
 interface Province {
@@ -38,91 +38,95 @@ interface Subdistrict {
   regency_id: string;
   name: string;
 }
-  
-const CheckoutForm:React.FC = () => {
 
-    const [deliveryOption, setDeliveryOption] = useState<string>("Anter Aja");
-    const [paymentMethod, setPaymentMethod] = useState<string>("Bank BCA");
-    const [formData, setFormData] = useState<FormData>({
-      fullName: "",
-      email: "",
-      phoneCode: "+62",
-      phoneNumber: "",
-      country: "Indonesia",
-      state: "",
-      city: "",
-      subdistrict: "",
-      postalCode: "",
-      addressDetails: "",
-      notes: "",
-    });
-  
-    const [provinces, setProvinces] = useState<Province[]>([]);
-    const [cities, setCities] = useState<City[]>([]);
-    const [subdistricts, setSubdistricts] = useState<Subdistrict[]>([]);
-    const [loading, setLoading] = useState<boolean>(true);
-    const [error, setError] = useState<string | null>(null);
-  
-    useEffect(() => {
-      const fetchProvinces = async () => {
-        try {
-          const response = await axios.get<Province[]>(
-            "https://curaweda-pkl.github.io/api-wilayah-indonesia/api/provinces.json"
-          );
-          setProvinces(response.data);
-          setLoading(false);
-        } catch (err) {
-          console.error("Error fetching provinces:", err);
-          setError("Failed to load provinces");
-          setLoading(false);
-        }
-      };
-  
-      fetchProvinces();
-    }, []);
-  
-    useEffect(() => {
-      const fetchCities = async () => {
-        if (formData.state) {
-          try {
-            const response = await axios.get<City[]>(
-              `https://curaweda-pkl.github.io/api-wilayah-indonesia/api/regencies/${formData.state}.json`
-            );
-            setCities(response.data);
-          } catch (err) {
-            console.error("Error fetching cities:", err);
-          }
-        }
-      };
-  
-      fetchCities();
-    }, [formData.state]);
-  
-    useEffect(() => {
-      const fetchSubdistricts = async () => {
-        if (formData.city) {
-          try {
-            const response = await axios.get<Subdistrict[]>(
-              `https://curaweda-pkl.github.io/api-wilayah-indonesia/api/districts/${formData.city}.json`
-            );
-            setSubdistricts(response.data);
-          } catch (err) {
-            console.error("Error fetching subdistricts:", err);
-          }
-        }
-      };
-  
-      fetchSubdistricts();
-    }, [formData.city]);
-  
-    const handleFormChange = (
-      e: React.ChangeEvent<
-        HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-      >
-    ) => {
-      const { name, value } = e.target;
-      setFormData((prev) => ({ ...prev, [name]: value }));
+const CheckoutForm: React.FC = () => {
+  const [deliveryOption, setDeliveryOption] = useState<string>("Anter Aja");
+  const [paymentMethod, setPaymentMethod] = useState<string>("Bank BCA");
+  const [formData, setFormData] = useState<FormData>({
+    fullName: "",
+    email: "",
+    phoneCode: "+62",
+    phoneNumber: "",
+    country: "Indonesia",
+    state: "",
+    city: "",
+    subdistrict: "",
+    postalCode: "",
+    addressDetails: "",
+    notes: "",
+    pickUpTime: "", // initialize with an empty value
+  });
+
+  const [provinces, setProvinces] = useState<Province[]>([]);
+  const [cities, setCities] = useState<City[]>([]);
+  const [subdistricts, setSubdistricts] = useState<Subdistrict[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const availablePickUpTimes = ["08:00", "10:00", "13:00", "14:00", "15:00"];
+
+  useEffect(() => {
+    const fetchProvinces = async () => {
+      try {
+        const response = await axios.get<Province[]>(
+          "https://curaweda-pkl.github.io/api-wilayah-indonesia/api/provinces.json"
+        );
+        setProvinces(response.data);
+        setLoading(false);
+      } catch (err) {
+        console.error("Error fetching provinces:", err);
+        setError("Failed to load provinces");
+        setLoading(false);
+      }
     };
+
+    fetchProvinces();
+  }, []);
+
+  useEffect(() => {
+    const fetchCities = async () => {
+      if (formData.state) {
+        try {
+          const response = await axios.get<City[]>(
+            `https://curaweda-pkl.github.io/api-wilayah-indonesia/api/regencies/${formData.state}.json`
+          );
+          setCities(response.data);
+        } catch (err) {
+          console.error("Error fetching cities:", err);
+        }
+      }
+    };
+
+    fetchCities();
+  }, [formData.state]);
+
+  useEffect(() => {
+    const fetchSubdistricts = async () => {
+      if (formData.city) {
+        try {
+          const response = await axios.get<Subdistrict[]>(
+            `https://curaweda-pkl.github.io/api-wilayah-indonesia/api/districts/${formData.city}.json`
+          );
+          setSubdistricts(response.data);
+        } catch (err) {
+          console.error("Error fetching subdistricts:", err);
+        }
+      }
+    };
+
+    fetchSubdistricts();
+  }, [formData.city]);
+
+  const handleFormChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handlePickUpTimeChange = (time: string) => {
+    setFormData((prev) => ({ ...prev, pickUpTime: time }));
+  };
 
     return (
         <div className="col-span-2">
@@ -154,66 +158,72 @@ const CheckoutForm:React.FC = () => {
         </div>
 
         {/* Information Form */}
-        <div className="mt-10 space-y-4 ">
-          <div className="flex gap-5 items-center mb-3">
-            <button className="btn bg-call-to-actions-100 border border-call-to-actions-900 rounded-lg hover:bg-white text-call-to-actions-900 ">
-              <TbTruckDelivery size={18} />
-              Delivery
-            </button>
+        <div className="mt-10 space-y-4">
+        {/* Tab Buttons */}
+        <div className="flex gap-5 items-center mb-3">
+          <button
+            className={`btn ${
+            deliveryOption === "Anter Aja"
+              ? "bg-call-to-actions-100"
+              : "bg-neutral-colors-200"
+              } border rounded-lg`}
+              onClick={() => setDeliveryOption("Anter Aja")}
+              >
+            <TbTruckDelivery size={18} />
+            Delivery
+          </button>
+      <button
+      className={`btn ${
+        deliveryOption === "Pick up"
+          ? "bg-call-to-actions-100"
+          : "bg-neutral-colors-200"
+      } border rounded-lg`}
+      onClick={() => setDeliveryOption("Pick up")}
+    >
+      <PiPackageLight size={18} />
+      Pick up
+    </button>
+  </div>
 
-            <button className="btn bg-neutral-colors-200 border border-neutral-colors-500 rounded-lg hover:bg-call-to-actions-100 text-neutral-colors-500">
-              <PiPackageLight size={18} />
-              Pick up
-            </button>
-          </div>
+  {/* Form Content for Delivery */}
+  {deliveryOption === "Anter Aja" && (
+    <div className="grid grid-cols-1 gap-4">
+      <div className="relative w-full mb-4">
+        <AiOutlineUser
+          className="absolute text-neutral-colors-500 left-3 top-1/2 transform -translate-y-1/2"
+          size={23}
+        />
+        <input
+          type="text"
+          name="fullName"
+          value={formData.fullName}
+          onChange={handleFormChange}
+          placeholder="Full Name"
+          className="w-full border border-neutral-colors-500 rounded-lg p-3 pl-11"
+        />
+      </div>
 
-          <div className="relative w-full mb-4">
-            <AiOutlineUser
-              className="absolute text-neutral-colors-500 left-3 top-1/2 transform -translate-y-1/2"
-              size={23}
-            />
-            <input
-              type="text"
-              name="fullName"
-              value={formData.fullName}
-              onChange={handleFormChange}
-              placeholder="Full Name"
-              className="w-full border border-neutral-colors-500 rounded-lg p-3 pl-11"
-            />
-          </div>
+      <div className="relative w-full mb-4">
+        <MdOutlineMail
+          className="absolute text-neutral-colors-500 left-3 top-1/2 transform -translate-y-1/2"
+          size={23}
+        />
+        <input
+          type="email"
+          name="email"
+          value={formData.email}
+          onChange={handleFormChange}
+          placeholder="Email"
+          className="w-full border border-neutral-colors-500 rounded-lg p-3 pl-11"
+        />
+      </div>
 
-          <div className="relative w-full mb-4">
-            <MdOutlineMail
-              className="absolute text-neutral-colors-500 left-3 top-1/2 transform -translate-y-1/2"
-              size={23}
-            />
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleFormChange}
-              placeholder="Email"
-              className="w-full border border-neutral-colors-500 rounded-lg p-3 pl-11"
-            />
-          </div>
-
-          <div className="flex ">
-            <PhoneInput />
-          </div>
-
-          <select
-            typeof="text"
-            name="country"
-            value={formData.country}
-            onChange={handleFormChange}
-            className="w-full border border-neutral-colors-500  rounded-lg p-3"
-          >
-            <option value="Indonesia">Indonesia</option>
-          </select>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="relative">
-              {loading ? (
+      <div className="flex">
+        <PhoneInput />
+      </div>
+      <div className="grid grid-cols-2 gap-4">
+            <div>
+                {loading ? (
                 <p>Loading provinces...</p>
               ) : error ? (
                 <p style={{ color: "red" }}>{error}</p>
@@ -222,21 +232,17 @@ const CheckoutForm:React.FC = () => {
                   name="state"
                   value={formData.state}
                   onChange={handleFormChange}
-                  className="border border-neutral-colors-500 rounded-lg p-3 w-full z-10"
+                  className="border border-neutral-colors-500 rounded-lg p-3 w-full"
                 >
                   <option value="">State/Province</option>
-                  {provinces.map((province) => {
-                    console.log("Rendering province:", province);
-                    return (
-                      <option key={province.id} value={province.id}>
-                        {province.name}
-                      </option>
-                    );
-                  })}
+                  {provinces.map((province) => (
+                    <option key={province.id} value={province.id}>
+                      {province.name}
+                    </option>
+                  ))}
                 </select>
               )}
             </div>
-
             <div>
               {loading ? (
                 <p>Loading City...</p>
@@ -247,8 +253,7 @@ const CheckoutForm:React.FC = () => {
                   name="city"
                   value={formData.city}
                   onChange={handleFormChange}
-                  className="border border-neutral-colors-500 rounded-lg p-3 w-full z-10"
-                  disabled={cities.length === 0}
+                  className="border border-neutral-colors-500 rounded-lg p-3 w-full"
                 >
                   <option value="">City/Regency</option>
                   {cities.map((city) => (
@@ -259,7 +264,6 @@ const CheckoutForm:React.FC = () => {
                 </select>
               )}
             </div>
-
             <div>
               {loading ? (
                 <p>Loading Subdistrict...</p>
@@ -270,10 +274,9 @@ const CheckoutForm:React.FC = () => {
                   name="subdistrict"
                   value={formData.subdistrict}
                   onChange={handleFormChange}
-                  className="border border-neutral-colors-500 rounded-lg p-3 w-full z-10"
-                  disabled={subdistricts.length === 0}
+                  className="border border-neutral-colors-500 rounded-lg p-3 w-full"
                 >
-                  <option value="Subdistrict">Subdistrict</option>
+                  <option value="">Subdistrict</option>
                   {subdistricts.map((subdistrict) => (
                     <option key={subdistrict.id} value={subdistrict.id}>
                       {subdistrict.name}
@@ -282,32 +285,115 @@ const CheckoutForm:React.FC = () => {
                 </select>
               )}
             </div>
-
+            <div>
             <input
               type="text"
               name="postalCode"
               value={formData.postalCode}
               onChange={handleFormChange}
               placeholder="Postal Code"
-              className="border border-neutral-colors-500 rounded-lg p-3"
+              className="border border-neutral-colors-500 rounded-lg p-3 w-full"
             />
           </div>
-
+          </div>
           <textarea
             name="addressDetails"
             value={formData.addressDetails}
             onChange={handleFormChange}
             placeholder="Address Details"
-            className="w-full border border-neutral-colors-500  rounded-lg p-3"
+            className="w-full border border-neutral-colors-500 rounded-lg p-3 mt-4"
           ></textarea>
           <textarea
             name="notes"
             value={formData.notes}
             onChange={handleFormChange}
             placeholder="Notes (Optional)"
-            className="w-full border border-neutral-colors-500  rounded-lg p-3"
+            className="w-full border border-neutral-colors-500 rounded-lg p-3 mt-4"
           ></textarea>
+    </div>
+    
+  )}
+
+  {/* Form Content for Pick Up */}
+  {deliveryOption === "Pick up" && (
+    
+    <div className="grid grid-cols-1 gap-4">
+      <div className="border rounded-lg p-4 flex items-start gap-4 shadow-sm mt-4">
+      <div className="text-call-to-actions-100">
+    </div>
+      <div>
+      <h3 className="text-lg font-semibold  mb-2">Ngaraga by Dolanan</h3>
+      <p className="text-sm text-neutral-colors-600">
+        Jl. Medan Merdeka Barat No.12, Gambir, Kecamatan Gambir, Kota Jakarta
+        Pusat, Daerah Khusus Ibukota Jakarta 10110
+      </p>
+      </div>
+    </div>
+      <div className="relative w-full mb-4">
+        <AiOutlineUser
+          className="absolute text-neutral-colors-500 left-3 top-1/2 transform -translate-y-1/2"
+          size={23}
+        />
+        <input
+          type="text"
+          name="fullName"
+          value={formData.fullName}
+          onChange={handleFormChange}
+          placeholder="Full Name"
+          className="w-full border border-neutral-colors-500 rounded-lg p-3 pl-11"
+        />
+      </div>
+
+      <div className="relative w-full mb-4">
+        <MdOutlineMail
+          className="absolute text-neutral-colors-500 left-3 top-1/2 transform -translate-y-1/2"
+          size={23}
+        />
+        <input
+          type="email"
+          name="email"
+          value={formData.email}
+          onChange={handleFormChange}
+          placeholder="Email"
+          className="w-full border border-neutral-colors-500 rounded-lg p-3 pl-11"
+        />
+      </div>
+
+      <div className="flex">
+        <PhoneInput />
+      </div>
+
+      {/* Pick Up Time Section */}
+      <div className="space-y-4">
+        <p className="text-lg">Select a Pick Up Time:</p>
+        <div className="grid grid-cols-3 gap-4">
+          {availablePickUpTimes.map((time) => (
+            <div
+              key={time}
+              className={`p-3 border rounded-lg cursor-pointer w-full border border-neutral-colors-500 rounded-lg ${
+                formData.pickUpTime === time
+                  ? "bg-call-to-actions-100 text-yellow"
+                  : "bg-neutral-colors-200"
+              }`}
+              onClick={() => handlePickUpTimeChange(time)}
+            >
+              <p className="text-center">{time}</p>
+            </div>
+            
+          ))}
         </div>
+      </div>
+      <textarea
+            name="notes"
+            value={formData.notes}
+            onChange={handleFormChange}
+            placeholder="Notes (Optional)"
+            className="w-full border border-neutral-colors-500 rounded-lg p-3 mt-4"
+          ></textarea>
+    </div>
+  )}
+</div>
+
         {/* Delivery Options */}
         <div className="mt-8">
           <h2 className="font-bold text-lg mb-4">Delivery Options</h2>
@@ -346,6 +432,7 @@ const CheckoutForm:React.FC = () => {
                   onChange={() => setDeliveryOption(option)}
                   className="hidden"
                 />
+                
               </label>
             ))}
           </div>
