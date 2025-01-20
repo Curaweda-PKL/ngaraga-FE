@@ -53,6 +53,10 @@ const Signup = React.lazy(() => import("@/lib/pages/auth/login/signup"));
 const Login = React.lazy(() => import("@/lib/pages/auth/login/login"));
 const Artists = React.lazy(() => import("@/lib/pages/artists/artists-index"));
 const Account = React.lazy(() => import("@/lib/pages/account/account-index"));
+const SpecialCardDetail = React.lazy(
+  () => import("@/lib/pages/account/specialcard-details")
+);
+const ViewDetail = React.lazy(() => import("@/lib/pages/account/view-details"));
 const Marketplace = React.lazy(
   () => import("@/lib/pages/marketplace/marketplace-index")
 );
@@ -116,6 +120,8 @@ export const routes: Array<PathRouteProps> = [
   {path: "/reset-password", element: <ResetPassword />},
   {path: "/artist", element: <Artists />},
   {path: "/account", element: <Account />},
+  {path: "/special-card-detail", element: <SpecialCardDetail />},
+  {path: "/view-detail", element: <ViewDetail />},
   {path: "/marketplace", element: <Marketplace />},
   {path: "/rankings", element: <TopCollectors />},
   {path: "/detail-cards", element: <DetailCards />},

@@ -90,7 +90,7 @@ const Cart: React.FC = () => {
           {cartItems.map((item) => (
             <div
               key={item.id}
-              className="flex items-center justify-between p-4 mb-4 bg-white rounded-lg shadow-md"
+              className="flex items-center justify-between p-4 mb-4 bg-white rounded-lg"
             >
               <div className="flex items-center space-x-4">
                 <input
