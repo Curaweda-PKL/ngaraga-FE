@@ -35,6 +35,7 @@ import {Payment} from "../admin-pages/payment";
 import {Admin} from "../admin-pages/admin/admin";
 import {AddAdmin} from "../admin-pages/admin/add-admin";
 import {ProfileSettings} from "../admin-pages/admin-profile";
+import AdminLogin from "../pages/auth/login/admin-login";
 
 const DetailSpecial = React.lazy(
   () => import("@/lib/pages/detail-card/detail-special-index")
@@ -133,6 +134,7 @@ export const routes: Array<PathRouteProps> = [
   {path: "/checkout", element: <Checkout />},
   {path: "/payment", element: <PaymentPage />},
   {path: "/complete", element: <OrderComplete />},
+  {path: "/login/admin", element: <AdminLogin />},
   
 ];
 
