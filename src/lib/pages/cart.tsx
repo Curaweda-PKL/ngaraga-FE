@@ -182,7 +182,9 @@ const Cart: React.FC = () => {
           </div>
           <button className="w-full py-2 text-white bg-call-to-action rounded-md flex items-center justify-center space-x-2">
             <FaTrash />
-            <span>Checkout Now ({cartItems.length} items)</span>
+            <a href="/checkout">
+              <span>Checkout Now ({cartItems.length} items)</span>
+            </a>
           </button>
         </div>
       </div>
