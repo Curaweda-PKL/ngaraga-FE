@@ -132,10 +132,9 @@ export const routes: Array<PathRouteProps> = [
   {path: "/detail-events", element: <EventDetail />},
   {path: "/register-events", element: <EventRegistration />},
   {path: "/checkout", element: <Checkout />},
-  {path: "/payment", element: <PaymentPage />},
+  {path: "/payments", element: <PaymentPage />},
   {path: "/complete", element: <OrderComplete />},
   {path: "/login/admin", element: <AdminLogin />},
-  
 ];
 
 export const privateRoutes: Array<PathRouteProps> = [];

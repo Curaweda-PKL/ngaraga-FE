@@ -155,7 +155,7 @@ export const CardSection = () => {
             <button className="px-4 py-2 text-yellow-600 border border-yellow-600 rounded-lg hover:bg-yellow-50">
               Change Payment
             </button>
-            <a href="/payment">
+            <a href="/payments">
               <button className="px-4 py-2 text-white bg-yellow-600 rounded-lg hover:bg-yellow-700">
                 Payment
               </button>
