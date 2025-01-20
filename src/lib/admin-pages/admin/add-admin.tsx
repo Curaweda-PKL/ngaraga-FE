@@ -1,48 +1,56 @@
-import axios from "axios";
-import {useState, useRef} from "react";
-
-interface FormDataType {
-  memberImage: File | null; // Explicitly define type
-  fullName: string;
-  username: string;
-  email: string;
-  phoneNumber: string;
-  countryCode: string;
-  bio: string;
-  website: string;
-  discord: string;
-  youtube: string;
-  twitter: string;
-  instagram: string;
-  newPassword: string;
-  confirmPassword: string;
-}
+import { useRef, useState, useEffect } from "react";
 
 export const AddAdmin = () => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const [formData, setFormData] = useState<FormDataType>({
-    memberImage: null,
+
+  const [formData, setFormData] = useState({
     fullName: "",
     username: "",
     email: "",
     phoneNumber: "",
-    countryCode: "+62",
     bio: "",
     website: "",
     discord: "",
     youtube: "",
     twitter: "",
     instagram: "",
-    newPassword: "",
+    password: "",
     confirmPassword: "",
   });
 
+  const CancelClearFormData = {
+    fullName: "",
+    username: "",
+    email: "",
+    phoneNumber: "",
+    bio: "",
+    website: "",
+    discord: "",
+    youtube: "",
+    twitter: "",
+    instagram: "",
+    password: "",
+    confirmPassword: "",
+  };
+
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+
+  // Load data from localStorage if available
+  useEffect(() => {
+    const savedData = localStorage.getItem("addAdminForm");
+    if (savedData) {
+      setFormData(JSON.parse(savedData));
+    }
+  }, []);
+
+  // Save data to localStorage whenever form data changes
+  useEffect(() => {
+    localStorage.setItem("addAdminForm", JSON.stringify(formData));
+  }, [formData]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setFormData({...formData, memberImage: file});
       const reader = new FileReader();
       reader.onload = () => {
         setImagePreview(reader.result as string);
@@ -59,7 +67,6 @@ export const AddAdmin = () => {
     e.preventDefault();
     const file = e.dataTransfer.files[0];
     if (file) {
-      setFormData({...formData, memberImage: file});
       const reader = new FileReader();
       reader.onload = () => {
         setImagePreview(reader.result as string);
@@ -68,51 +75,47 @@ export const AddAdmin = () => {
     }
   };
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({ ...prevData, [name]: value }));
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-  
-    if (formData.newPassword !== formData.confirmPassword) {
-      alert("Passwords do not match!");
-      return;
-    }
-  
+
+    // Prepare the form data for submission
+    const adminData = {
+      fullName: formData.fullName,
+      phoneNumber: formData.phoneNumber,
+      email: formData.email,
+      password: formData.password,
+      confirmPassword: formData.confirmPassword,
+      socialLinks: {
+        website: formData.website,
+        discord: formData.discord,
+        youtube: formData.youtube,
+        twitter: formData.twitter,
+        instagram: formData.instagram,
+      },
+    };
+
     try {
-      const formDataToSend = new FormData();
-  
-      // Add image file if available
-      if (formData.memberImage) {
-        formDataToSend.append("memberImage", formData.memberImage);
+      const response = await fetch("http://localhost:3000/api/create-admin", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(adminData),
+      });
+
+      if (response.ok) {
+        alert("Admin created successfully!");
+      } else {
+        alert("Failed to create admin");
       }
-  
-      // Add other form data
-      formDataToSend.append("fullName", formData.fullName);
-      formDataToSend.append("username", formData.username);
-      formDataToSend.append("email", formData.email);
-      formDataToSend.append("phoneNumber", formData.phoneNumber);
-      formDataToSend.append("countryCode", formData.countryCode);
-      formDataToSend.append("bio", formData.bio);
-      formDataToSend.append("website", formData.website);
-      formDataToSend.append("discord", formData.discord);
-      formDataToSend.append("youtube", formData.youtube);
-      formDataToSend.append("twitter", formData.twitter);
-      formDataToSend.append("instagram", formData.instagram);
-      formDataToSend.append("password", formData.newPassword);
-  
-      const response = await axios.post(
-        "http://localhost:3000/api/create-admin",
-        formDataToSend,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-  
-      console.log("Response:", response.data);
-      alert("Admin created successfully!");
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error creating admin:", error);
-      alert(error.response?.data?.message || "An error occurred while creating the admin.");
+      alert("An error occurred while creating the admin.");
     }
   };
 
@@ -124,10 +127,7 @@ export const AddAdmin = () => {
 
       <h1 className="text-2xl font-semibold mb-6">Add Admin</h1>
 
-      <form
-        onSubmit={handleSubmit}
-        className="space-y-6"
-      >
+      <form onSubmit={handleSubmit} className="space-y-6">
         <div className="space-y-4">
           <label className="block">
             Member Image <span className="text-red-500">*</span>
@@ -169,6 +169,7 @@ export const AddAdmin = () => {
             />
           </div>
         </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label className="block mb-1">
@@ -177,10 +178,10 @@ export const AddAdmin = () => {
             <input
               type="text"
               className="w-full p-2 border rounded-lg"
+              name="fullName"
               value={formData.fullName}
-              onChange={(e) =>
-                setFormData({...formData, fullName: e.target.value})
-              }
+              onChange={handleInputChange}
+              placeholder="Full Name"
             />
           </div>
 
@@ -191,10 +192,10 @@ export const AddAdmin = () => {
             <input
               type="text"
               className="w-full p-2 border rounded-lg"
+              name="username"
               value={formData.username}
-              onChange={(e) =>
-                setFormData({...formData, username: e.target.value})
-              }
+              onChange={handleInputChange}
+              placeholder="Username"
             />
           </div>
 
@@ -205,10 +206,10 @@ export const AddAdmin = () => {
             <input
               type="email"
               className="w-full p-2 border rounded-lg"
+              name="email"
               value={formData.email}
-              onChange={(e) =>
-                setFormData({...formData, email: e.target.value})
-              }
+              onChange={handleInputChange}
+              placeholder="Email"
             />
           </div>
 
@@ -217,21 +218,17 @@ export const AddAdmin = () => {
             <div className="flex">
               <select
                 className="p-2 border rounded-l-lg w-20"
-                value={formData.countryCode}
-                onChange={(e) =>
-                  setFormData({...formData, countryCode: e.target.value})
-                }
+                defaultValue="+62"
               >
                 <option value="+62">+62</option>
               </select>
               <input
                 type="tel"
                 className="flex-1 p-2 border border-l-0 rounded-r-lg"
-                placeholder="Enter Phone Number"
+                name="phoneNumber"
                 value={formData.phoneNumber}
-                onChange={(e) =>
-                  setFormData({...formData, phoneNumber: e.target.value})
-                }
+                onChange={handleInputChange}
+                placeholder="Enter Phone Number"
               />
             </div>
           </div>
@@ -241,8 +238,10 @@ export const AddAdmin = () => {
             <input
               type="text"
               className="w-full p-2 border rounded-lg"
+              name="bio"
               value={formData.bio}
-              onChange={(e) => setFormData({...formData, bio: e.target.value})}
+              onChange={handleInputChange}
+              placeholder="Bio"
             />
           </div>
 
@@ -251,10 +250,10 @@ export const AddAdmin = () => {
             <input
               type="url"
               className="w-full p-2 border rounded-lg"
+              name="website"
               value={formData.website}
-              onChange={(e) =>
-                setFormData({...formData, website: e.target.value})
-              }
+              onChange={handleInputChange}
+              placeholder="Website"
             />
           </div>
 
@@ -263,10 +262,10 @@ export const AddAdmin = () => {
             <input
               type="text"
               className="w-full p-2 border rounded-lg"
+              name="discord"
               value={formData.discord}
-              onChange={(e) =>
-                setFormData({...formData, discord: e.target.value})
-              }
+              onChange={handleInputChange}
+              placeholder="Discord"
             />
           </div>
 
@@ -275,10 +274,10 @@ export const AddAdmin = () => {
             <input
               type="text"
               className="w-full p-2 border rounded-lg"
+              name="youtube"
               value={formData.youtube}
-              onChange={(e) =>
-                setFormData({...formData, youtube: e.target.value})
-              }
+              onChange={handleInputChange}
+              placeholder="Youtube"
             />
           </div>
 
@@ -287,10 +286,10 @@ export const AddAdmin = () => {
             <input
               type="text"
               className="w-full p-2 border rounded-lg"
+              name="twitter"
               value={formData.twitter}
-              onChange={(e) =>
-                setFormData({...formData, twitter: e.target.value})
-              }
+              onChange={handleInputChange}
+              placeholder="Twitter"
             />
           </div>
 
@@ -299,10 +298,10 @@ export const AddAdmin = () => {
             <input
               type="text"
               className="w-full p-2 border rounded-lg"
+              name="instagram"
               value={formData.instagram}
-              onChange={(e) =>
-                setFormData({...formData, instagram: e.target.value})
-              }
+              onChange={handleInputChange}
+              placeholder="Instagram"
             />
           </div>
 
@@ -313,10 +312,10 @@ export const AddAdmin = () => {
             <input
               type="password"
               className="w-full p-2 border rounded-lg"
-              value={formData.newPassword}
-              onChange={(e) =>
-                setFormData({...formData, newPassword: e.target.value})
-              }
+              name="password"
+              value={formData.password}
+              onChange={handleInputChange}
+              placeholder="New Password"
             />
           </div>
 
@@ -327,10 +326,10 @@ export const AddAdmin = () => {
             <input
               type="password"
               className="w-full p-2 border rounded-lg"
+              name="confirmPassword"
               value={formData.confirmPassword}
-              onChange={(e) =>
-                setFormData({...formData, confirmPassword: e.target.value})
-              }
+              onChange={handleInputChange}
+              placeholder="Confirm Password"
             />
           </div>
         </div>
@@ -339,7 +338,8 @@ export const AddAdmin = () => {
           <button
             type="button"
             className="px-6 py-2 border rounded-lg hover:bg-gray-50"
-          >
+            onClick={() => setFormData(CancelClearFormData )}
+            >
             Cancel
           </button>
           <button
