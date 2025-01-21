@@ -84,7 +84,7 @@ const OrderComplete = () => {
 
       {/* View Details Button */}
       <div className="flex justify-start">
-        <button className="bg-call-to-actions-900 text-white px-6 py-3 rounded-lg font-semibold hover:bg-yellow-600 transition-colors">
+        <button className="bg-call-to-actions-900 text-white px-6 py-3 rounded-lg font-semibold hover:bg-call-to-actions-800 transition-colors">
           View Details
         </button>
       </div>
