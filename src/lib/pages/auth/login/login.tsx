@@ -131,7 +131,7 @@ const Login: React.FC = () => {
             alt="login"
             src={thumbnailData?.image ? `http://localhost:3000/${thumbnailData.image}` : LoginImage} 
             loading="lazy"
-            className="absolute inset-0 h-full w-full object-contain opacity-80"
+            className="absolute inset-0 h-full w-full object-cover opacity-80"
           />
         </section>
 

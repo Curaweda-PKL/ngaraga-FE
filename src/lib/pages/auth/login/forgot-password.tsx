@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { FaEnvelope } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 import ForgotPasswordImage from "@/assets/img/spacestarry.png";
 
 type ForgotPasswordFormData = {
@@ -13,6 +14,7 @@ const ForgotPassword: React.FC = () => {
   });
   const [error, setError] = useState<{ [key: string]: string }>({});
   const [loading, setLoading] = useState<boolean>(false);
+  const navigate = useNavigate();
 
   // Handle form input changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -52,9 +54,11 @@ const ForgotPassword: React.FC = () => {
       return;
     }
 
+    // Simulate API call
     setTimeout(() => {
       setLoading(false);
-      alert("Reset instructions sent to your email!");
+      // Redirect to /sentemail after successful submission
+      navigate("/sentemail");
     }, 1000);
   };
 
