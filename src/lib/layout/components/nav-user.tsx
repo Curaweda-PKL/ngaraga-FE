@@ -6,8 +6,10 @@ import axios from "axios";
 
 export const Navbar: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false); // Dropdown state
   const navigate = useNavigate();
   const [username, setUsername] = useState(""); 
+
 
   // mock
   const isAuthenticated = true;
@@ -41,16 +43,25 @@ export const Navbar: React.FC = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
+  const toggleDropdown = () => {
+    setIsDropdownOpen(!isDropdownOpen);
+  };
+
   const navigateToPage = (page: string) => {
     navigate(`/${page}`);
     toggleSidebar();
+  };
+
+  const handleLogout = () => {
+    console.log("Logging out...");
+    // Add logout logic here
+    navigateToPage("login");
   };
 
   return (
     <>
       {/* Main Navbar */}
       <div className="navbar relative text-black">
-        {/* Navbar start */}
         <div className="navbar-start flex items-center space-x-4">
           {/* Hamburger menu for small screens */}
           <div className="dropdown lg:hidden sm:mr-2 md:mr-3">
@@ -124,19 +135,46 @@ export const Navbar: React.FC = () => {
             </>
           ) : (
             // Logged in
-            <div className="flex items-center space-x-2">
+            <div className="relative flex items-center space-x-2">
               <span className="hidden sm:block text-sm font-medium ml-2">
-              {username || "Loading..."} 
+                {username || "Loading..."}
               </span>
               <button
                 className="avatar btn btn-ghost"
-                onClick={() => navigateToPage("user")}
+                onClick={toggleDropdown}
               >
                 <div className="w-8 h-8 rounded-full">
                   <img src={userAvatarUrl ? `http://localhost:3000/${userAvatarUrl}` : "https://www.gravatar.com/avatar/abc123"}
                   alt="User Avatar" />
                 </div>
               </button>
+
+              {/* Dropdown Menu */}
+              {isDropdownOpen && (
+                <div
+                  className="absolute right-0 mt w-40 bg-white rounded-lg shadow-lg border z-50"
+                  style={{ top: "100%" }} // Optional: Can also use mt-12 for spacing
+                >
+                  <ul className="py-1">
+                    <li>
+                      <a
+                        className="block px-4 py-2 text-sm hover:bg-gray-100"
+                        onClick={() => navigateToPage("profile")}
+                      >
+                        Profile
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        className="block px-4 py-2 text-sm hover:bg-gray-100"
+                        onClick={handleLogout}
+                      >
+                        Logout
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -144,17 +182,16 @@ export const Navbar: React.FC = () => {
 
       {/* Sliding Sidebar for Mobile */}
       <div
-        className={`fixed inset-y-0 left-0 z-50 w-full bg-base-100 transform transition-transform duration-500 ease-in-out 
+        className={`fixed inset-y-0 left-0 z-50 w-full bg-white transform transition-transform duration-500 ease-in-out 
         ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} 
         lg:hidden text-black overflow-x-hidden`}
       >
-        {/* Sidebar header */}
         <div className="flex justify-between items-center p-4 border-b">
           <button onClick={toggleSidebar} className="btn btn-ghost text-black">
             <FaTimes size={20} />
           </button>
 
-          {/* Logo at flex start */}
+          {/* Logo */}
           <a href="/" className="flex items-center text-xl text-black ml-4">
             <img
               src="/src/assets/img/LOGO.png"
@@ -167,15 +204,12 @@ export const Navbar: React.FC = () => {
           <div className="flex items-center space-x-4 ml-auto">
             {!isAuthenticated ? (
               <>
-                {/* Sign-in Button */}
                 <a
                   className="btn bg-white border-call-to-action rounded-lg text-orange-300 sm:flex lg:flex items-center gap-2 hover:bg-call-to-actions-800 hover:text-white transition"
                   onClick={() => navigateToPage("login")}
                 >
                   Sign In
                 </a>
-
-                {/* Sign-up Button */}
                 <a
                   className="btn bg-call-to-action border-transparent rounded-lg text-white hidden lg:flex items-center gap-2 hover:bg-call-to-actions-800 transition"
                   onClick={() => navigateToPage("signup")}
@@ -185,8 +219,7 @@ export const Navbar: React.FC = () => {
                 </a>
               </>
             ) : (
-              // Logged in - Avatar and Cart
-              <div className="flex items-center justify-between space-x-4">
+              <div className="flex items-center space-x-4">
                 <a
                   className="cursor-pointer"
                   onClick={() => navigateToPage("cart")}
@@ -206,7 +239,6 @@ export const Navbar: React.FC = () => {
           </div>
         </div>
 
-        {/* Sidebar menu */}
         <ul className="menu p-4 space-y-4 text-black">
           <li>
             <a
