@@ -11,7 +11,7 @@ export const Navbar: React.FC = () => {
 
   // mock
   const isAuthenticated = true;
-  const userAvatarUrl = "https://www.gravatar.com/avatar/abc123";
+  const [userAvatarUrl, setUserAvatarUrl] = useState("https://www.gravatar.com/avatar/abc123"); 
 
   useEffect(() => {
     // Fetch user data from the API
@@ -21,14 +21,21 @@ export const Navbar: React.FC = () => {
           "http://localhost:3000/api/account/profile",
           { withCredentials: true }
         );
-        setUsername(response.data.name); // Update username with fetched data
+        // Extract image URL if available
+        const userImage = response.data.image;
+        setUsername(response.data.fullName); // Update username with fetched fullName
+        if (userImage) {
+          setUserAvatarUrl(userImage); // Set the image URL if it exists
+        }
       } catch (error) {
         console.error("Error fetching user data:", error);
       }
     };
-
+  
     fetchUserData();
   }, []);
+  
+  
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -126,7 +133,8 @@ export const Navbar: React.FC = () => {
                 onClick={() => navigateToPage("user")}
               >
                 <div className="w-8 h-8 rounded-full">
-                  <img src={userAvatarUrl} alt="User Avatar" />
+                  <img src={userAvatarUrl ? `http://localhost:3000/${userAvatarUrl}` : "https://www.gravatar.com/avatar/abc123"}
+                  alt="User Avatar" />
                 </div>
               </button>
             </div>

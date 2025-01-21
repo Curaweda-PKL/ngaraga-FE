@@ -1,4 +1,5 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
+import PhoneInput from "../checkout/components/PhoneInput";
 
 const EventRegistration: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -8,8 +9,8 @@ const EventRegistration: React.FC = () => {
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const {name, value} = e.target;
-    setFormData({...formData, [name]: value});
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -20,12 +21,12 @@ const EventRegistration: React.FC = () => {
   return (
     <div className="min-h-screen p-4 md:p-8">
       {/* Heading */}
-      <h1 className="text-4xl text-[#171717] font-bold mb-8">Register</h1>
+      <h1 className="text-4xl text-[#171717] font-bold mb-8 ml-8">Register</h1>
 
       {/* Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Registration Form */}
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-2 -mt-4">
           <form
             onSubmit={handleSubmit}
             className="space-y-6 bg-white p-6 rounded-lg"
@@ -51,17 +52,7 @@ const EventRegistration: React.FC = () => {
               />
             </div>
             <div className="flex items-center">
-              <span className="inline-block px-4 py-3 bg-gray-100 border border-r-0 rounded-l-lg text-gray-700">
-                +62
-              </span>
-              <input
-                type="text"
-                name="phoneNumber"
-                placeholder="Enter Phone Number"
-                value={formData.phoneNumber}
-                onChange={handleInputChange}
-                className="w-full px-4 py-3 border rounded-r-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              />
+              <PhoneInput/>
             </div>
           </form>
         </div>
