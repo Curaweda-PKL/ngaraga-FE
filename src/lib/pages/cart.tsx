@@ -90,7 +90,7 @@ const Cart: React.FC = () => {
           {cartItems.map((item) => (
             <div
               key={item.id}
-              className="flex items-center justify-between p-4 mb-4 bg-white rounded-lg shadow-md"
+              className="flex items-center justify-between p-4 mb-4 bg-white rounded-lg"
             >
               <div className="flex items-center space-x-4">
                 <input
@@ -182,7 +182,9 @@ const Cart: React.FC = () => {
           </div>
           <button className="w-full py-2 text-white bg-call-to-action rounded-md flex items-center justify-center space-x-2">
             <FaTrash />
-            <span>Checkout Now ({cartItems.length} items)</span>
+            <a href="/checkout">
+              <span>Checkout Now ({cartItems.length} items)</span>
+            </a>
           </button>
         </div>
       </div>

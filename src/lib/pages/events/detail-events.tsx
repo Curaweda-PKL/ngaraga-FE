@@ -61,9 +61,11 @@ const EventDetail: React.FC = () => {
 
             {/* Button */}
             <div className="mt-8">
-              <button className="bg-yellow-500 text-white px-6 py-3 rounded-lg font-bold hover:bg-yellow-600 transition">
-                Register Now
-              </button>
+              <a href="/register-events">
+                <button className="bg-yellow-500 text-white px-6 py-3 rounded-lg font-bold hover:bg-yellow-600 transition">
+                  Register Now
+                </button>
+              </a>
             </div>
           </div>
 

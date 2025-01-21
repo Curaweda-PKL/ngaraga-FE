@@ -1,31 +1,36 @@
-import {useState} from "react";
-import {Search, Edit3, Eye, Trash2, Plus} from "lucide-react";
+import { useState, useEffect } from "react";
+import axios from "axios";
+import { Search, Edit3, Eye, Trash2, Plus } from "lucide-react";
 
 export const Admin = () => {
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const users = [
-    {
-      fullName: "EmmaTaylor",
-      username: "creativemind77",
-      phone: "+62 813 4567 8901",
-      email: "jane.doe@example.com",
-      avatar: "/api/placeholder/40/40",
-    },
-    {
-      fullName: "LiamCarter",
-      username: "coolcat99",
-      phone: "+62 814 5678 9012",
-      email: "alice.johnson@example.com",
-      avatar: "/api/placeholder/40/40",
-    },
-    // ... Add more user data to match the mockup
-  ];
+  useEffect(() => {
+    const fetchAdmins = async () => {
+      setLoading(true);
+      try {
+        const response = await axios.get(
+          "http://localhost:3000/api/accounts/role/ADMIN"
+        );
+        setUsers(response.data.data || []);
+        setError("");
+      } catch (err) {
+        setError("Failed to fetch admin accounts. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAdmins();
+  }, []);
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
-      setSelectedUsers(users.map((user) => user.email));
+      setSelectedUsers(users.map((user: any) => user.email));
     } else {
       setSelectedUsers([]);
     }
@@ -58,7 +63,7 @@ export const Admin = () => {
           <Plus className="w-4 h-4" />
           <span>
             {" "}
-            <a href="/admin/add-member">Add Member</a>
+            <a href="/admin/add-admin">Add Admin</a>
           </span>
         </button>
 
@@ -75,78 +80,84 @@ export const Admin = () => {
         </div>
       </div>
 
-      {/* Users table */}
-      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-        <table className="w-full">
-          <thead>
-            <tr className="bg-gray-50 border-b border-gray-200">
-              <th className="p-4">
-                <input
-                  type="checkbox"
-                  className="rounded border-gray-300"
-                  checked={selectedUsers.length === users.length}
-                  onChange={(e) => handleSelectAll(e.target.checked)}
-                />
-              </th>
-              <th className="p-4 text-left font-medium">Full Name</th>
-              <th className="p-4 text-left font-medium">Username</th>
-              <th className="p-4 text-left font-medium">Phone Number</th>
-              <th className="p-4 text-left font-medium">Email</th>
-              <th className="p-4 text-left font-medium">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map((user, index) => (
-              <tr
-                key={index}
-                className="border-b last:border-b-0"
-              >
-                <td className="p-4">
+      {/* Loading and Error States */}
+      {loading ? (
+        <p className="text-center text-gray-500">Loading...</p>
+      ) : error ? (
+        <p className="text-center text-red-500">{error}</p>
+      ) : (
+        /* Users table */
+        <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+          <table className="w-full">
+            <thead>
+              <tr className="bg-gray-50 border-b border-gray-200">
+                <th className="p-4">
                   <input
                     type="checkbox"
                     className="rounded border-gray-300"
-                    checked={selectedUsers.includes(user.email)}
-                    onChange={(e) =>
-                      handleSelectUser(user.email, e.target.checked)
-                    }
+                    checked={selectedUsers.length === users.length}
+                    onChange={(e) => handleSelectAll(e.target.checked)}
                   />
-                </td>
-                <td className="p-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg overflow-hidden">
-                      <img
-                        src={user.avatar}
-                        alt={`${user.fullName}'s avatar`}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <span className="font-medium">{user.fullName}</span>
-                  </div>
-                </td>
-                <td className="p-4">{user.username}</td>
-                <td className="p-4">{user.phone}</td>
-                <td className="p-4">{user.email}</td>
-                <td className="p-4">
-                  <div className="flex gap-2">
-                    <button className="p-2 hover:bg-gray-100 rounded-lg text-gray-600">
-                      <Search className="w-4 h-4" />
-                    </button>
-                    <button className="p-2 hover:bg-gray-100 rounded-lg text-gray-600">
-                      <Edit3 className="w-4 h-4" />
-                    </button>
-                    <button className="p-2 hover:bg-gray-100 rounded-lg text-gray-600">
-                      <Eye className="w-4 h-4" />
-                    </button>
-                    <button className="p-2 hover:bg-gray-100 rounded-lg text-red-500">
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                </td>
+                </th>
+                <th className="p-4 text-left font-medium">Full Name</th>
+                <th className="p-4 text-left font-medium">Email</th>
+                <th className="p-4 text-left font-medium">Phone Number</th>
+                <th className="p-4 text-left font-medium">Action</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {users.map((user: any, index: number) => (
+                <tr key={index} className="border-b last:border-b-0">
+                  <td className="p-4">
+                    <input
+                      type="checkbox"
+                      className="rounded border-gray-300"
+                      checked={selectedUsers.includes(user.email)}
+                      onChange={(e) =>
+                        handleSelectUser(user.email, e.target.checked)
+                      }
+                    />
+                  </td>
+                  <td className="p-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-lg overflow-hidden">
+                        <img
+                          src={
+                            user?.image
+                              ? `http://localhost:3000/${user.image}`
+                              : "/api/placeholder/40/40"
+                          }
+                          alt={`${user.fullName}'s avatar`}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <span className="font-medium">{user.fullName}</span>
+                    </div>
+                  </td>
+                  <td className="p-4">{user.email}</td>
+                  <td className="p-4">{user.phoneNumber || "N/A"}</td>
+                  <td className="p-4">
+                    <div className="flex gap-2">
+                      <button className="p-2 hover:bg-gray-100 rounded-lg text-gray-600">
+                        <Search className="w-4 h-4" />
+                      </button>
+                      <button className="p-2 hover:bg-gray-100 rounded-lg text-gray-600">
+                        <Edit3 className="w-4 h-4" />
+                      </button>
+                      <button className="p-2 hover:bg-gray-100 rounded-lg text-gray-600">
+                        <Eye className="w-4 h-4" />
+                      </button>
+                      <button className="p-2 hover:bg-gray-100 rounded-lg text-red-500">
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
 
       {/* Pagination */}
       <div className="flex justify-end mt-4 gap-1">

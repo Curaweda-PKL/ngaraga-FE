@@ -10,7 +10,7 @@ type LoginFormData = {
   password: string;
 };
 
-const Login: React.FC = () => {
+const AdminLogin: React.FC = () => {
   const [formData, setFormData] = useState<LoginFormData>({
     email: "",
     password: "",
@@ -125,16 +125,6 @@ const Login: React.FC = () => {
       variants={ariseVariant}
     >
       <div className="lg:grid lg:min-h-screen lg:grid-cols-12">
-        <section className="relative flex h-32 items-end bg-gray-900 lg:col-span-5 lg:h-full xl:col-span-6">
-          {/* Display thumbnail image if available */}
-          <img
-            alt="login"
-            src={thumbnailData?.image ? `http://localhost:3000/${thumbnailData.image}` : LoginImage} 
-            loading="lazy"
-            className="absolute inset-0 h-full w-full object-contain opacity-80"
-          />
-        </section>
-
         <main className="flex items-center justify-center px-8 py-8 sm:px-12 lg:col-span-7 lg:px-16 lg:py-12 xl:col-span-6">
           <motion.div
             className="max-w-xl lg:max-w-3xl"
@@ -247,9 +237,19 @@ const Login: React.FC = () => {
             </motion.form>
           </motion.div>
         </main>
+
+        <section className="relative flex h-32 items-end bg-gray-900 lg:col-span-5 lg:h-full xl:col-span-6">
+          {/* Display thumbnail image if available */}
+          <img
+            alt="login"
+            src={thumbnailData?.image ? `http://localhost:3000/${thumbnailData.image}` : LoginImage} 
+            loading="lazy"
+            className="absolute inset-0 h-full w-full object-cover opacity-80"
+          />
+        </section>
       </div>
     </motion.section>
   );
 };
 
-export default Login;
+export default AdminLogin;

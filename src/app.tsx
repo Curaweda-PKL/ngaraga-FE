@@ -7,7 +7,7 @@ const AppContent = () => {
   const location = useLocation();
 
   // List of routes to exclude from the layout
-  const excludedRoutes = ['/login', '/signup', '/forgot-password', '/reset-password'];
+  const excludedRoutes = ['/login', '/signup', '/forgot-password', '/reset-password', '/login/admin', '/login/', '/signup/', '/forgot-password/', '/reset-password/', '/login/admin/'];
 
   // Check if the route belongs to the CMS (admin) section
   const isAdminRoute = location.pathname.startsWith('/admin');

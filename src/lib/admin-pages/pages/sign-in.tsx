@@ -1,4 +1,5 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
+import axios from "axios";
 
 export const SignInPage = () => {
   const [image, setImage] = useState<File | null>(null);
@@ -18,11 +19,33 @@ export const SignInPage = () => {
     setImage(null);
   };
 
-  const handleUpdate = () => {
-    console.log("Title:", title);
-    console.log("Description:", description);
-    console.log("Image:", image);
-    alert("Details updated successfully!");
+  const handleUpdate = async () => {
+    if (!image) {
+      alert("Please upload an image.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("image", image);
+    formData.append("title", title);
+    formData.append("description", description);
+
+    try {
+      const response = await axios.post("http://localhost:3000/api/auththumb/sign-in", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      if (response.data.message === "Thumbnail uploaded successfully") {
+        alert("Details updated successfully!");
+      } else {
+        alert("Failed to upload thumbnail.");
+      }
+    } catch (error) {
+      console.error("Error uploading thumbnail:", error);
+      alert("An error occurred while updating details.");
+    }
   };
 
   return (

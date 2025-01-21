@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Pencil, Eye, Trash2, X } from "lucide-react";
+import axios from "axios";
 
 interface ModalProps {
   isOpen: boolean;
@@ -7,27 +8,79 @@ interface ModalProps {
   title: string;
   value: string;
   submitText: string;
-  onSubmit: () => void;
+  onSubmit: (tagName: string) => void;
 }
 
 export const Tag = () => {
-  const [isAddModalOpen, setIsAddModalOpen] = React.useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = React.useState(false);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [tagToEdit, setTagToEdit] = useState<string | null>(null);
+  const [tags, setTags] = useState<string[]>([]); // Initialize with an empty array
+  const [searchQuery, setSearchQuery] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
 
-  const tags = [
-    "Animation Voyager",
-    "Music",
-    "Video",
-    "Sport",
-    "Collectibles",
-    "Photography",
-    "Utility",
-    "Virtual Worlds",
-  ];
+  useEffect(() => {
+    const fetchTags = async () => {
+      try {
+        const response = await axios.get("http://localhost:3000/api/tags/all");
+        setTags(response.data.tags.map((tag: { name: string }) => tag.name));
+      } catch (error) {
+        console.error("Error fetching tags:", error);
+      }
+    };
+
+    fetchTags();
+  }, []);
 
   const handleEdit = (tag: string) => {
+    setTagToEdit(tag);
     setIsEditModalOpen(true);
   };
+
+  const handleAddTag = async (tagName: string) => {
+    try {
+      const response = await axios.post(
+        "http://localhost:3000/api/tag/create",
+        {
+          name: tagName,
+        }
+      );
+      setTags((prevTags) => [...prevTags, response.data.tag.name]);
+      setIsAddModalOpen(false);
+      setSuccessMessage("Tag added successfully!");
+      setTimeout(() => setSuccessMessage(""), 3000);
+    } catch (error) {
+      console.error("Error creating tag:", error);
+    }
+  };
+
+  const handleEditTag = async (tagName: string) => {
+    if (tagToEdit) {
+      try {
+        const response = await axios.put(
+          `http://localhost:3000/api/tag/${tagToEdit}`,
+          {
+            name: tagName,
+          }
+        );
+        setTags((prevTags) =>
+          prevTags.map((tag) =>
+            tag === tagToEdit ? response.data.tag.name : tag
+          )
+        );
+        setIsEditModalOpen(false);
+        setTagToEdit(null);
+        setSuccessMessage("Tag updated successfully!");
+        setTimeout(() => setSuccessMessage(""), 3000);
+      } catch (error) {
+        console.error("Error updating tag:", error);
+      }
+    }
+  };
+
+  const filteredTags = tags.filter((tag) =>
+    tag.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const Modal: React.FC<ModalProps> = ({
     isOpen,
@@ -37,12 +90,13 @@ export const Tag = () => {
     submitText,
     onSubmit,
   }) => {
+    const [inputValue, setInputValue] = useState(value);
+
     if (!isOpen) return null;
 
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
         <div className="bg-white rounded-lg w-full max-w-md">
-          {/* Modal Header */}
           <div className="flex justify-between items-center p-4 border-b">
             <h2 className="text-lg font-medium">{title}</h2>
             <button
@@ -53,7 +107,6 @@ export const Tag = () => {
             </button>
           </div>
 
-          {/* Modal Content */}
           <div className="p-4">
             <div className="space-y-4">
               <div>
@@ -62,14 +115,14 @@ export const Tag = () => {
                 </label>
                 <input
                   type="text"
-                  defaultValue={value}  // Default value passed from the parent
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
                   className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500"
                 />
               </div>
             </div>
           </div>
 
-          {/* Modal Footer */}
           <div className="flex justify-end gap-2 p-4 border-t">
             <button
               onClick={onClose}
@@ -78,7 +131,7 @@ export const Tag = () => {
               Cancel
             </button>
             <button
-              onClick={onSubmit}
+              onClick={() => onSubmit(inputValue)}
               className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600"
             >
               {submitText}
@@ -91,28 +144,29 @@ export const Tag = () => {
 
   return (
     <div className="p-6">
-      {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-sm text-gray-500 mb-4">
         <span>Marketplace</span>
         <span>/</span>
         <span className="text-gray-700">Tag</span>
       </div>
 
-      {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-semibold">Tag</h1>
-        <div className="flex gap-4">
+        <div className="flex items-center gap-4">
           <button
             onClick={() => setIsAddModalOpen(true)}
             className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
           >
             <span className="text-xl">+</span> Add Tag
           </button>
+
           <div className="relative">
             <input
               type="text"
               placeholder="Search"
               className="pl-10 pr-4 py-2 border rounded-lg w-64 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
             />
             <svg
               className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
@@ -129,9 +183,14 @@ export const Tag = () => {
         </div>
       </div>
 
-      {/* Tags Grid */}
+      {successMessage && (
+        <div className="text-green-500 mb-4 p-2 border border-green-500 bg-green-100 rounded-lg">
+          {successMessage}
+        </div>
+      )}
+
       <div className="grid grid-cols-2 gap-4">
-        {tags.map((tag, index) => (
+        {filteredTags.map((tag, index) => (
           <div
             key={index}
             className="bg-white rounded-lg p-4 flex items-center justify-between border border-gray-100"
@@ -157,30 +216,22 @@ export const Tag = () => {
         ))}
       </div>
 
-      {/* Add Tag Modal */}
       <Modal
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
         title="Add Tag"
         value=""
         submitText="Save"
-        onSubmit={() => {
-          // Handle add tag logic here
-          setIsAddModalOpen(false);
-        }}
+        onSubmit={handleAddTag}
       />
 
-      {/* Edit Tag Modal */}
       <Modal
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
         title="Edit Tag"
-        value=""
+        value={tagToEdit || ""}
         submitText="Update"
-        onSubmit={() => {
-          // Handle edit tag logic here
-          setIsEditModalOpen(false);
-        }}
+        onSubmit={handleEditTag}
       />
     </div>
   );

@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { Pencil, Trash2, Search, X } from "lucide-react";
+import React, {useState, useEffect} from "react";
+import {Pencil, Eye, Trash2, Search, X} from "lucide-react";
 
 interface ModalProps {
   isOpen: boolean;
@@ -14,7 +14,10 @@ export const Master = () => {
   const [masterList, setMasterList] = useState<any[]>([]);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [selectedMaster, setSelectedMaster] = useState<{ id: number; name: string } | null>(null);
+  const [selectedMaster, setSelectedMaster] = useState<{
+    id: number;
+    name: string;
+  } | null>(null);
   const [errorMessage, setErrorMessage] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -40,8 +43,8 @@ export const Master = () => {
     try {
       const response = await fetch("http://localhost:3000/api/master/create", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name }),
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({name}),
       });
 
       if (!response.ok) {
@@ -59,11 +62,14 @@ export const Master = () => {
 
   const handleEditMaster = async (id: number, name: string) => {
     try {
-      const response = await fetch(`http://localhost:3000/api/master/edit/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name }),
-      });
+      const response = await fetch(
+        `http://localhost:3000/api/master/edit/${id}`,
+        {
+          method: "PUT",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify({name}),
+        }
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -72,7 +78,9 @@ export const Master = () => {
 
       const updatedMaster = await response.json();
       setMasterList((prev) =>
-        prev.map((master) => (master.id === id ? updatedMaster.updatedMaster : master))
+        prev.map((master) =>
+          master.id === id ? updatedMaster.updatedMaster : master
+        )
       );
     } catch (error: any) {
       console.error("Error updating master:", error);
@@ -82,9 +90,12 @@ export const Master = () => {
 
   const handleDeleteMaster = async (id: number) => {
     try {
-      const response = await fetch(`http://localhost:3000/api/master/delete/${id}`, {
-        method: "DELETE",
-      });
+      const response = await fetch(
+        `http://localhost:3000/api/master/delete/${id}`,
+        {
+          method: "DELETE",
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Failed to delete master");
@@ -116,13 +127,18 @@ export const Master = () => {
         <div className="bg-white rounded-lg w-full max-w-md">
           <div className="flex justify-between items-center p-4 border-b">
             <h2 className="text-lg font-medium">{title}</h2>
-            <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+            <button
+              onClick={onClose}
+              className="text-gray-400 hover:text-gray-600"
+            >
               <X className="w-5 h-5" />
             </button>
           </div>
 
           <div className="p-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Master Name*</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Master Name*
+            </label>
             <input
               type="text"
               value={inputValue}
@@ -132,7 +148,10 @@ export const Master = () => {
           </div>
 
           <div className="flex justify-end gap-2 p-4 border-t">
-            <button onClick={onClose} className="px-4 py-2 border rounded-lg text-gray-600 hover:bg-gray-50">
+            <button
+              onClick={onClose}
+              className="px-4 py-2 border rounded-lg text-gray-600 hover:bg-gray-50"
+            >
               Cancel
             </button>
             <button
@@ -157,7 +176,12 @@ export const Master = () => {
       {/* Breadcrumb */}
       <div className="mb-4">
         <nav className="text-sm text-gray-500">
-          <a href="/marketplace" className="hover:text-yellow-500">Marketplace</a>
+          <a
+            href="/marketplace"
+            className="hover:text-yellow-500"
+          >
+            Marketplace
+          </a>
           <span className="mx-2">/</span>
           <span className="text-yellow-500">Master</span>
         </nav>
@@ -192,7 +216,7 @@ export const Master = () => {
           .filter((master) =>
             master.name.toLowerCase().includes(searchQuery.toLowerCase())
           )
-          .map((master: { id: number; name: string }) => (
+          .map((master: {id: number; name: string}) => (
             <div
               key={master.id}
               className="bg-white rounded-lg p-4 flex items-center justify-between border border-gray-100"
@@ -207,6 +231,9 @@ export const Master = () => {
                   className="text-gray-400 hover:text-gray-600"
                 >
                   <Pencil className="w-5 h-5" />
+                </button>
+                <button className="text-gray-400 hover:text-gray-600">
+                  <Eye className="w-5 h-5" />
                 </button>
                 <button
                   onClick={() => handleDeleteMaster(master.id)}

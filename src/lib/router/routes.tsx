@@ -35,6 +35,7 @@ import {Payment} from "../admin-pages/payment";
 import {Admin} from "../admin-pages/admin/admin";
 import {AddAdmin} from "../admin-pages/admin/add-admin";
 import {ProfileSettings} from "../admin-pages/admin-profile";
+import AdminLogin from "../pages/auth/login/admin-login";
 
 const DetailSpecial = React.lazy(
   () => import("@/lib/pages/detail-card/detail-special-index")
@@ -52,6 +53,11 @@ const Home = React.lazy(() => import("@/lib/pages/home/Home"));
 const Signup = React.lazy(() => import("@/lib/pages/auth/login/signup"));
 const Login = React.lazy(() => import("@/lib/pages/auth/login/login"));
 const Artists = React.lazy(() => import("@/lib/pages/artists/artists-index"));
+const Account = React.lazy(() => import("@/lib/pages/account/account-index"));
+const SpecialCardDetail = React.lazy(
+  () => import("@/lib/pages/account/specialcard-details")
+);
+const ViewDetail = React.lazy(() => import("@/lib/pages/account/view-details"));
 const Marketplace = React.lazy(
   () => import("@/lib/pages/marketplace/marketplace-index")
 );
@@ -62,6 +68,9 @@ const BrowseEvents = React.lazy(
 );
 const EventDetail = React.lazy(
   () => import("@/lib/pages/events/detail-events")
+);
+const EventRegistration = React.lazy(
+  () => import("@/lib/pages/events/register-event")
 );
 const Checkout = React.lazy(
   () => import("@/lib/pages/checkout/checkout-index")
@@ -110,18 +119,22 @@ export const routes: Array<PathRouteProps> = [
   {path: "/login", element: <Login />},
   {path: "/forgot-password", element: <ForgotPassword />},
   {path: "/reset-password", element: <ResetPassword />},
-
   {path: "/artist", element: <Artists />},
+  {path: "/account", element: <Account />},
+  {path: "/special-card-detail", element: <SpecialCardDetail />},
+  {path: "/view-detail", element: <ViewDetail />},
   {path: "/marketplace", element: <Marketplace />},
   {path: "/rankings", element: <TopCollectors />},
-  {path: "/detail-special-card", element: <DetailSpecial />},
   {path: "/detail-cards", element: <DetailCards />},
+  {path: "/detail-special-card", element: <DetailSpecial />},
   {path: "/cart", element: <Cart />},
   {path: "/events", element: <BrowseEvents />},
   {path: "/detail-events", element: <EventDetail />},
+  {path: "/register-events", element: <EventRegistration />},
   {path: "/checkout", element: <Checkout />},
-  {path: "/payment", element: <PaymentPage />},
+  {path: "/payments", element: <PaymentPage />},
   {path: "/complete", element: <OrderComplete />},
+  {path: "/login/admin", element: <AdminLogin />},
 ];
 
 export const privateRoutes: Array<PathRouteProps> = [];
