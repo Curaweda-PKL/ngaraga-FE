@@ -19,7 +19,7 @@ const EventDetail: React.FC = () => {
       </header>
 
       {/* Content Section */}
-      <main className="container mx-auto px-6 py-8">
+      <main className="container p-10">
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Left Content */}
           <div className="flex-1">
@@ -62,7 +62,7 @@ const EventDetail: React.FC = () => {
             {/* Button */}
             <div className="mt-8">
               <a href="/register-events">
-                <button className="bg-yellow-500 text-white px-6 py-3 rounded-lg font-bold hover:bg-yellow-600 transition">
+                <button className="bg-call-to-actions-900 text-white px-6 py-3 rounded-lg font-bold hover:bg-call-to-actions-800 transition">
                   Register Now
                 </button>
               </a>
