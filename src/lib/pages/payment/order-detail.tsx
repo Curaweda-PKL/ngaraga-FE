@@ -1,77 +1,84 @@
-import React from "react";
 import {
-  FaBox,
-  FaCreditCard,
-  FaTruck,
-  FaCheck,
-  FaCopy,
-  FaLongArrowAltLeft,
-} from "react-icons/fa";
+  MdPayment,
+  MdInventory,
+  MdLocalShipping,
+  MdDoneAll,
+} from "react-icons/md";
 
-const ViewDetail: React.FC = () => {
+const OrderDetails = () => {
   const orderStages = [
     {
-      icon: <FaCreditCard size={20} />,
       label: "Payment",
-      active: true,
       completed: true,
+      icon: <MdPayment className="w-5 h-5" />,
     },
     {
-      icon: <FaBox size={20} />,
       label: "Packaging",
-      active: true,
       completed: true,
+      icon: <MdInventory className="w-5 h-5" />,
     },
     {
-      icon: <FaTruck size={20} />,
       label: "Shipping",
-      active: false,
       completed: false,
+      icon: <MdLocalShipping className="w-5 h-5" />,
     },
     {
-      icon: <FaCheck size={20} />,
       label: "Delivered",
-      active: false,
       completed: false,
+      icon: <MdDoneAll className="w-5 h-5" />,
     },
   ];
 
   const orderItems = [
     {
-      id: 1,
       name: "Dancing Robot 0512",
       type: "Orbitian",
       price: 200000,
       qty: 1,
-      image: "/api/placeholder/150/150",
+      image: "/api/placeholder/80/80",
     },
     {
-      id: 2,
       name: "Dancing Robot 0512",
       type: "Orbitian",
       price: 200000,
       qty: 1,
-      image: "/api/placeholder/150/150",
+      image: "/api/placeholder/80/80",
     },
     {
-      id: 3,
       name: "Dancing Robot 0512",
       type: "Orbitian",
       price: 100000,
       qty: 1,
-      image: "/api/placeholder/150/150",
+      image: "/api/placeholder/80/80",
     },
+  ];
+
+  const trackingEvents = [
+    {date: "10 Dec 2024 17:20", status: "Delivered"},
+    {date: "10 Dec 2024 13:53", status: "The order is in transit for delivery"},
+    {
+      date: "10 Dec 2024 06:24",
+      status: "Pesanan dipindai di lokal transit JAKARTA",
+    },
+    {
+      date: "09 Dec 2024 20:51",
+      status: "The order was dispatched from the sorting facility in JAKARTA",
+    },
+    {
+      date: "09 Dec 2024 20:51",
+      status: "The order was received by the JAKARTA agent for processing",
+    },
+    {date: "12 Dec 2024 16:00", status: "Preparing to ship"},
+    {
+      date: "09 Dec 2024 13:07",
+      status: "Courier assigned to pick up the order",
+    },
+    {date: "09 Dec 2024 12:54", status: "Order placed"},
   ];
 
   return (
     <div className="max-w-7xl mx-auto p-6">
-      {/* Back Button */}
-      <button className="flex items-center text-gray-500 hover:text-gray-700 mb-6">
-        <a href="/account">
-          <FaLongArrowAltLeft className="mr-2" />
-          Back
-        </a>
-      </button>
+      <h1 className="text-2xl font-bold mb-6">Order Details</h1>
 
       {/* Order Stages */}
       <div className="bg-white rounded-lg p-6 mb-6">
@@ -109,36 +116,42 @@ const ViewDetail: React.FC = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Left Section - Order Summary */}
-        <div className="bg-white rounded-2xl p-6">
+        <div className="bg-white rounded-lg p-6">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-lg font-semibold">Summary Order</h2>
-            <span className="text-gray-500">Order ID: ORD123456789</span>
+            <h2 className="text-sm">Summary Order</h2>
+            <span className="text-xs text-gray-500">
+              Order ID: ORD123456789
+            </span>
           </div>
 
           <div className="space-y-4 mb-6">
-            {orderItems.map((item) => (
+            {orderItems.map((item, index) => (
               <div
-                key={item.id}
+                key={index}
                 className="flex gap-4"
               >
                 <img
                   src={item.image}
                   alt={item.name}
-                  className="w-20 h-20 rounded-lg object-cover"
+                  className="w-16 h-16 rounded-lg object-cover"
                 />
                 <div className="flex-1">
-                  <h3 className="font-medium">{item.name}</h3>
-                  <p className="text-gray-500">{item.type}</p>
+                  <h3 className="text-sm font-medium">{item.name}</h3>
+                  <p className="text-xs text-gray-500">{item.type}</p>
                   <div className="flex justify-between mt-2">
-                    <span className="text-gray-500">Qty: {item.qty}</span>
-                    <span>Rp {item.price.toLocaleString()}</span>
+                    <span className="text-xs text-gray-500">
+                      Qty: {item.qty}
+                    </span>
+                    <span className="text-sm">
+                      Rp {item.price.toLocaleString()}
+                    </span>
                   </div>
                 </div>
               </div>
             ))}
           </div>
 
-          <div className="space-y-2 pt-4 border-t">
+          <div className="space-y-2 pt-4 border-t text-sm">
             <div className="flex justify-between text-gray-500">
               <span>Subtotal</span>
               <span>Rp 500,000</span>
@@ -155,7 +168,7 @@ const ViewDetail: React.FC = () => {
               <span>VAT 11%</span>
               <span>Rp 45,650</span>
             </div>
-            <div className="flex justify-between font-semibold text-lg pt-2 border-t">
+            <div className="flex justify-between font-medium pt-2 border-t">
               <span>Total</span>
               <span>Rp 460,650</span>
             </div>
@@ -163,117 +176,98 @@ const ViewDetail: React.FC = () => {
         </div>
 
         {/* Right Section */}
-        <div className="bg-white rounded-2xl p-6">
-          {/* Payment Info */}
+        <div className="bg-white rounded-lg p-6">
           <div className="mb-8">
-            <h2 className="text-lg font-semibold mb-4">Payment</h2>
+            <h2 className="text-sm mb-4">Payment</h2>
             <div className="flex items-center gap-3">
               <img
-                src="/api/placeholder/40/40"
+                src="/api/placeholder/32/32"
                 alt="BCA"
-                className="w-10 h-10 rounded"
+                className="w-8 h-8 rounded"
               />
-              <span>Bank BCA</span>
+              <span className="text-sm">Bank BCA</span>
             </div>
           </div>
 
-          {/* Shipping Info */}
           <div className="mb-8">
-            <h2 className="text-lg font-semibold mb-4">Shipping</h2>
+            <h2 className="text-sm mb-4">Shipping</h2>
             <div className="flex items-center gap-3 mb-4">
               <img
-                src="/api/placeholder/40/40"
+                src="/api/placeholder/32/32"
                 alt="Antar Aja"
-                className="w-10 h-10 rounded"
+                className="w-8 h-8 rounded"
               />
               <div>
-                <div>Antar Aja</div>
-                <div className="text-gray-500 text-sm">
+                <div className="text-sm">Antar Aja</div>
+                <div className="text-xs text-gray-500">
                   Estimated Delivery: 3-4 Days
                 </div>
               </div>
             </div>
 
-            <div className="mb-4">
-              <div className="flex items-center justify-between text-sm text-gray-500 mb-2">
+            <div className="mb-6">
+              <div className="flex items-center justify-between text-xs text-gray-500 mb-2">
                 <span>Receipt</span>
                 <div className="flex items-center gap-2">
                   <span>BDG12345678901KT</span>
-                  <FaCopy className="cursor-pointer" />
+                  <button className="text-gray-400 hover:text-gray-600">
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                      />
+                    </svg>
+                  </button>
                 </div>
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-6">
+            <div className="grid grid-cols-2 gap-6 mb-8">
               <div>
-                <h3 className="font-medium mb-2">Store Address</h3>
-                <p className="text-sm text-gray-500">Ngaraga by Dolanan</p>
-                <p className="text-sm text-gray-500">
+                <h3 className="text-sm font-medium mb-2">Store Address</h3>
+                <p className="text-xs text-gray-500">Ngaraga by Dolanan</p>
+                <p className="text-xs text-gray-500">
                   Jl. Medan Merdeka Barat No.12, Gambir, Jakarta Pusat
                 </p>
               </div>
               <div>
-                <h3 className="font-medium mb-2">Delivery Address</h3>
-                <p className="text-sm text-gray-500">Animakid</p>
-                <p className="text-sm text-gray-500">+62 854 5565 6745</p>
-                <p className="text-sm text-gray-500">
+                <h3 className="text-sm font-medium mb-2">Delivery Address</h3>
+                <p className="text-xs text-gray-500">Animakid</p>
+                <p className="text-xs text-gray-500">+62 854 5565 6745</p>
+                <p className="text-xs text-gray-500">
                   Jl. Medan Merdeka Barat No.12, Gambir, Jakarta Pusat
                 </p>
               </div>
             </div>
           </div>
 
-          {/* Order Tracking */}
           <div>
-            <h2 className="text-lg font-semibold mb-4">Order Tracking</h2>
+            <h2 className="text-sm mb-4">Order Tracking</h2>
             <div className="space-y-6">
-              {[
-                {
-                  date: "10 Dec 2024 17:20",
-                  status: "Delivered",
-                  highlight: true,
-                },
-                {
-                  date: "10 Dec 2024 13:53",
-                  status: "The order is in transit for delivery",
-                },
-                {
-                  date: "10 Dec 2024 06:24",
-                  status: "Pesanan dipindai di lokal transit JAKARTA",
-                },
-                {
-                  date: "09 Dec 2024 20:51",
-                  status:
-                    "The order was dispatched from the sorting facility in JAKARTA",
-                },
-                {
-                  date: "09 Dec 2024 20:51",
-                  status:
-                    "The order was received by the JAKARTA agent for processing",
-                },
-                {date: "12 Dec 2024 16:00", status: "Preparing to ship"},
-                {
-                  date: "09 Dec 2024 13:07",
-                  status: "Courier assigned to pick up the order",
-                },
-                {date: "09 Dec 2024 12:54", status: "Order placed"},
-              ].map((event, index) => (
+              {trackingEvents.map((event, index) => (
                 <div
                   key={index}
                   className="flex gap-4"
                 >
-                  <div className="w-32 text-sm text-gray-500">{event.date}</div>
+                  <div className="w-32 text-xs text-gray-500">{event.date}</div>
                   <div className="relative">
                     <div
-                      className={`w-3 h-3 rounded-full ${
-                        event.highlight ? "bg-yellow-500" : "bg-gray-300"
+                      className={`w-2 h-2 rounded-full ${
+                        index === 0 ? "bg-yellow-500" : "bg-gray-300"
                       }`}
                     />
-                    {index !== 7 && (
-                      <div className="absolute top-3 left-1.5 w-px h-16 bg-gray-200" />
+                    {index !== trackingEvents.length - 1 && (
+                      <div className="absolute top-2 left-1 w-[1px] h-16 bg-gray-200" />
                     )}
                   </div>
-                  <div className="flex-1 text-sm">{event.status}</div>
+                  <div className="flex-1 text-xs">{event.status}</div>
                 </div>
               ))}
             </div>
@@ -284,4 +278,4 @@ const ViewDetail: React.FC = () => {
   );
 };
 
-export default ViewDetail;
+export default OrderDetails;

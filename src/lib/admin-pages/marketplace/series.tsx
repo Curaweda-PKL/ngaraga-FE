@@ -257,7 +257,7 @@ export const Series = () => {
       <div className="mb-4">
         <nav className="text-sm text-gray-500">
           <a
-            href="/marketplace"
+            href="/admin/marketplace"
             className="hover:text-yellow-500"
           >
             Marketplace
