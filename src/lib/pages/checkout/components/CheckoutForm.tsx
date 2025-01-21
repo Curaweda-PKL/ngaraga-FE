@@ -282,7 +282,7 @@ const CheckoutForm: React.FC = () => {
                     name="subdistrict"
                     value={formData.subdistrict}
                     onChange={handleFormChange}
-                    className="border border-neutral-colors-500 rounded-lg p-3 w-full"
+                    className="border border-neutral-colors-500 rounded-lg p-3 w-full"        
                   >
                     <option value="">Subdistrict</option>
                     {subdistricts.map((subdistrict) => (
@@ -326,6 +326,7 @@ const CheckoutForm: React.FC = () => {
 
         {/* Form Content for Pick Up */}
         {deliveryOption === "Pick up" && (
+          
           <div className="grid grid-cols-1 gap-4">
             <div className="border rounded-lg p-4 flex items-start gap-4 shadow-sm mt-4">
               <div className="text-call-to-actions-100"></div>
