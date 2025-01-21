@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { CheckCircle2, Copy } from "lucide-react";
+import { PaymentOverlay } from "./components/paymentModal";
 
 const PaymentPage = () => {
   const [activeTab, setActiveTab] = useState("ATM");
@@ -10,10 +11,12 @@ const PaymentPage = () => {
     { number: 3, label: "Complete Order", completed: false },
   ];
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   return (
     <div className="p-6">
       {/* Header - Payment */}
-      <section>
+      <section className="ml-8">
         <h1 className="text-2xl font-bold mb-6">Payment</h1>
 
         {/* Progress Steps */}
@@ -47,11 +50,18 @@ const PaymentPage = () => {
       </section>
 
       {/* Section 2 - Order Details and Timer */}
-      <section className="mb-8">
+      <section className="mb-8 grid grid-cols-1 lg:grid-cols-2 gap-8 p-6">
         {/* Order Details */}
-        <div className="mb-8">
-          <p className="text-gray-600 mb-2">Order ID</p>
-          <p className="text-lg font-semibold">ORD123456789</p>
+        <div>
+          <div className="mb-6">
+            <p className="text-gray-600 mb-2">Order ID</p>
+            <p className="text-lg font-semibold">ORD123456789</p>
+          </div>
+          {/* Total Payment */}
+          <div className="">
+            <p className="text-gray-600 mb-2">Total Payment</p>
+            <p className="text-2xl font-bold text-yellow-500">Rp 460.650</p>
+          </div>
         </div>
 
         {/* Timer */}
@@ -76,136 +86,135 @@ const PaymentPage = () => {
             Due on 12 Dec 2024, 15:17
           </p>
         </div>
-
-        {/* Total Payment */}
-        <div className="mb-8">
-          <p className="text-gray-600 mb-2">Total Payment</p>
-          <p className="text-2xl font-bold text-yellow-500">Rp 460.650</p>
-        </div>
       </section>
 
       {/* Section 3 - Bank Details and Payment Methods */}
       <section>
         {/* Bank Details */}
-        <div className="border rounded-lg p-4 mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-4">
-              <img
-                src="/api/placeholder/40/40"
-                alt="BCA Logo"
-                className="w-10 h-10"
-              />
-              <span className="font-semibold">Bank BCA</span>
+        <div className="p-6 mb-8 grid grid-cols-2 col-start-1 col-end-2">
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-4">
+                <img
+                  src="/api/placeholder/40/40"
+                  alt="BCA Logo"
+                  className="w-10 h-10"
+                />
+                <span className="font-semibold">Bank BCA</span>
+              </div>
+              <button
+                className="text-yellow-500 border border-yellow-500 rounded-lg px-4 py-2"
+                onClick={() => setIsModalOpen(true)}
+              >
+                Change Payment
+              </button>
             </div>
-            <button className="text-yellow-500 border border-yellow-500 rounded-lg px-4 py-2">
-              Change Payment
-            </button>
-          </div>
 
-          <div className="grid grid-cols-2 gap-4 mb-4">
-            <div>
-              <p className="text-gray-600 text-sm">Virtual Account Name</p>
-              <p className="font-semibold">Ngaraga</p>
-            </div>
-            <div>
-              <p className="text-gray-600 text-sm">Virtual Account Number</p>
-              <div className="flex items-center gap-2">
-                <p className="font-semibold">1234 5678 9102</p>
-                <Copy className="text-gray-400 cursor-pointer" size={16} />
+            <div className="grid grid-cols-2 gap-4 mb-4">
+              <div>
+                <p className="text-gray-600 text-sm">Virtual Account Name</p>
+                <p className="font-semibold">Ngaraga</p>
+              </div>
+              <div>
+                <p className="text-gray-600 text-sm">Virtual Account Number</p>
+                <div className="flex items-center gap-2">
+                  <p className="font-semibold">1234 5678 9102</p>
+                  <Copy className="text-gray-400 cursor-pointer" size={16} />
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* Payment Methods Tabs */}
-          <div className="flex border-b mb-4">
-            <button
-              onClick={() => setActiveTab("ATM")}
-              className={`px-4 py-2 ${
-                activeTab === "ATM"
-                  ? "border-b-2 border-yellow-500 font-semibold"
-                  : "text-gray-500"
-              }`}
-            >
-              ATM
-            </button>
-            <button
-              onClick={() => setActiveTab("iBanking")}
-              className={`px-4 py-2 ${
-                activeTab === "iBanking"
-                  ? "border-b-2 border-yellow-500 font-semibold"
-                  : "text-gray-500"
-              }`}
-            >
-              iBanking
-            </button>
-            <button
-              onClick={() => setActiveTab("mBanking")}
-              className={`px-4 py-2 ${
-                activeTab === "mBanking"
-                  ? "border-b-2 border-yellow-500 font-semibold"
-                  : "text-gray-500"
-              }`}
-            >
-              mBanking
-            </button>
-          </div>
+            {/* Payment Methods Tabs */}
+            <div className="flex border-b mb-4">
+              <button
+                onClick={() => setActiveTab("ATM")}
+                className={`px-4 py-2 ${
+                  activeTab === "ATM"
+                    ? "border-b-2 border-yellow-500 font-semibold"
+                    : "text-gray-500"
+                }`}
+              >
+                ATM
+              </button>
+              <button
+                onClick={() => setActiveTab("iBanking")}
+                className={`px-4 py-2 ${
+                  activeTab === "iBanking"
+                    ? "border-b-2 border-yellow-500 font-semibold"
+                    : "text-gray-500"
+                }`}
+              >
+                iBanking
+              </button>
+              <button
+                onClick={() => setActiveTab("mBanking")}
+                className={`px-4 py-2 ${
+                  activeTab === "mBanking"
+                    ? "border-b-2 border-yellow-500 font-semibold"
+                    : "text-gray-500"
+                }`}
+              >
+                mBanking
+              </button>
+            </div>
 
-          {/* Instructions Based on Active Tab */}
-          {activeTab === "ATM" && (
-            <div>
-              <button className="text-blue-500 mb-4">Find Nearest ATM</button>
+            {/* Instructions Based on Active Tab */}
+            {activeTab === "ATM" && (
+              <div>
+                <button className="text-blue-500 mb-4">Find Nearest ATM</button>
+                <div className="space-y-2 text-sm">
+                  <p>1. Insert your BCA ATM card and PIN</p>
+                  <p>2. Enter your ATM PIN</p>
+                  <p className="font-semibold mt-4">Payment Details</p>
+                  <p>1. Select Menu "Other Transaction"</p>
+                  <p>2. Select "Transfer"</p>
+                  <p>3. Select "To BCA Virtual Account"</p>
+                  <p>
+                    4. Enter Virtual Account Number{" "}
+                    <span className="text-yellow-500">1234 5678 9102</span>{" "}
+                    Press "Correct" to proceed
+                  </p>
+                  <p>
+                    5. Verify Virtual Account details and then enter amount to
+                    be transferred and select "Correct" to confirm
+                  </p>
+                  <p>6. Confirm your transaction details displayed</p>
+                  <p>
+                    7. Select "Yes" if the details are correct or "No" if the
+                    details are not correct
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {activeTab === "iBanking" && (
               <div className="space-y-2 text-sm">
-                <p>1. Insert your BCA ATM card and PIN</p>
-                <p>2. Enter your ATM PIN</p>
-                <p className="font-semibold mt-4">Payment Details</p>
-                <p>1. Select Menu "Other Transaction"</p>
-                <p>2. Select "Transfer"</p>
-                <p>3. Select "To BCA Virtual Account"</p>
+                <p>1. Visit your bank's internet banking website</p>
+                <p>2. Log in with your credentials</p>
+                <p>3. Navigate to the payment or transfer section</p>
+                <p>4. Choose "BCA Virtual Account"</p>
                 <p>
-                  4. Enter Virtual Account Number{" "}
-                  <span className="text-yellow-500">1234 5678 9102</span> Press
-                  "Correct" to proceed
+                  5. Enter the virtual account number{" "}
+                  <span className="text-yellow-500">1234 5678 9102</span>
                 </p>
-                <p>
-                  5. Verify Virtual Account details and then enter amount to be
-                  transferred and select "Correct" to confirm
-                </p>
-                <p>6. Confirm your transaction details displayed</p>
-                <p>
-                  7. Select "Yes" if the details are correct or "No" if the
-                  details are not correct
-                </p>
+                <p>6. Confirm the details and proceed with the payment</p>
               </div>
-            </div>
-          )}
+            )}
 
-          {activeTab === "iBanking" && (
-            <div className="space-y-2 text-sm">
-              <p>1. Visit your bank's internet banking website</p>
-              <p>2. Log in with your credentials</p>
-              <p>3. Navigate to the payment or transfer section</p>
-              <p>4. Choose "BCA Virtual Account"</p>
-              <p>
-                5. Enter the virtual account number{" "}
-                <span className="text-yellow-500">1234 5678 9102</span>
-              </p>
-              <p>6. Confirm the details and proceed with the payment</p>
-            </div>
-          )}
-
-          {activeTab === "mBanking" && (
-            <div className="space-y-2 text-sm">
-              <p>1. Open your mobile banking app</p>
-              <p>2. Log in using your credentials</p>
-              <p>3. Select "Transfer" or "Payments"</p>
-              <p>4. Choose "BCA Virtual Account"</p>
-              <p>
-                5. Enter virtual account number{" "}
-                <span className="text-yellow-500">1234 5678 9102</span>
-              </p>
-              <p>6. Review and confirm the payment details</p>
-            </div>
-          )}
+            {activeTab === "mBanking" && (
+              <div className="space-y-2 text-sm">
+                <p>1. Open your mobile banking app</p>
+                <p>2. Log in using your credentials</p>
+                <p>3. Select "Transfer" or "Payments"</p>
+                <p>4. Choose "BCA Virtual Account"</p>
+                <p>
+                  5. Enter virtual account number{" "}
+                  <span className="text-yellow-500">1234 5678 9102</span>
+                </p>
+                <p>6. Review and confirm the payment details</p>
+              </div>
+            )}
+          </div>
         </div>
       </section>
     </div>
