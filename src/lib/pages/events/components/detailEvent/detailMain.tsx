@@ -32,7 +32,7 @@ const MainContent: React.FC = () => {
                 07 Dec 2024
               </li>
               <li className="flex items-center gap-2">
-                <LocationIcon />
+                <LocationIcon  />
                 Jakarta
               </li>
             </ul>
