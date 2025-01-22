@@ -1,37 +1,24 @@
-import React, {useEffect, useState} from "react";
+import React, {useState, useEffect} from "react";
 import {
   Pencil,
-  Eye,
   Trash2,
   Search,
+  Eye,
   X,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
-
-// Interfaces
-interface Series {
-  id: number;
-  name: string;
-  masterName: string;
-}
-
-interface Master {
-  id: number;
-  name: string;
-}
 
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   title: string;
   submitText: string;
-  onSubmit: (value: string, masterId: number) => void;
+  onSubmit: (name: string, masterId: number) => void;
   defaultValue?: string;
 }
 
 export const Series = () => {
-  // State management
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedSeries, setSelectedSeries] = useState<{
@@ -39,22 +26,18 @@ export const Series = () => {
     name: string;
   } | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [masters, setMasters] = useState<Master[]>([]);
+  const [masters, setMasters] = useState<{id: number; name: string}[]>([]);
+  const [seriesList, setSeriesList] = useState<
+    {id: number; name: string; masterId: number}[]
+  >([]);
   const [loadingMasters, setLoadingMasters] = useState(true);
   const [errorMasters, setErrorMasters] = useState<string | null>(null);
-
-  // Mock data for demonstration
-  const seriesList: Series[] = Array.from({length: 100}, (_, index) => ({
-    id: index + 1,
-    name: `Series ${index + 1}`,
-    masterName: `Master ${Math.floor(index / 10) + 1}`,
-  }));
-
+  const [loadingSeries, setLoadingSeries] = useState(true);
+  const [errorSeries, setErrorSeries] = useState<string | null>(null);
+  const [selectedMaster, setSelectedMaster] = useState<number | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
-  const totalPages = Math.ceil(seriesList.length / itemsPerPage);
 
-  // Fetch masters data
   useEffect(() => {
     const fetchMasters = async () => {
       try {
@@ -76,14 +59,30 @@ export const Series = () => {
     fetchMasters();
   }, []);
 
-  // Handlers
+  useEffect(() => {
+    const fetchSeries = async () => {
+      try {
+        const response = await fetch("http://localhost:3000/api/series/all");
+        if (!response.ok) {
+          throw new Error("Failed to fetch series data");
+        }
+        const data = await response.json();
+        setSeriesList(data.series);
+      } catch (err) {
+        setErrorSeries((err as Error).message);
+      } finally {
+        setLoadingSeries(false);
+      }
+    };
+
+    fetchSeries();
+  }, []);
+
   const handleAddSeries = async (name: string, masterId: number) => {
     try {
-      const response = await fetch("http://localhost:3000/api/series", {
+      const response = await fetch("http://localhost:3000/api/series/create", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: {"Content-Type": "application/json"},
         body: JSON.stringify({name, masterId}),
       });
 
@@ -91,8 +90,8 @@ export const Series = () => {
         throw new Error("Failed to add series");
       }
 
-      // Refresh data or update local state
-      // Implementation depends on your requirements
+      const newSeries = await response.json();
+      setSeriesList((prev) => [...prev, newSeries.series]);
     } catch (error) {
       console.error("Error adding series:", error);
     }
@@ -104,55 +103,55 @@ export const Series = () => {
     masterId: number
   ) => {
     try {
-      const response = await fetch(`http://localhost:3000/api/series/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({name, masterId}),
-      });
+      const response = await fetch(
+        `http://localhost:3000/api/series/edit/${id}`,
+        {
+          method: "PUT",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify({name, masterId}),
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Failed to update series");
       }
-
-      // Refresh data or update local state
-      // Implementation depends on your requirements
+      window.location.reload();
+      const updatedSeries = await response.json();
+      setSeriesList((prev) =>
+        prev.map((series) =>
+          series.id === id
+            ? {
+                ...series,
+                name: updatedSeries.name,
+                masterId: updatedSeries.masterId,
+              }
+            : series
+        )
+      );
     } catch (error) {
       console.error("Error updating series:", error);
     }
   };
 
   const handleDeleteSeries = async (id: number) => {
-    if (window.confirm("Are you sure you want to delete this series?")) {
-      try {
-        const response = await fetch(`http://localhost:3000/api/series/${id}`, {
+    try {
+      const response = await fetch(
+        `http://localhost:3000/api/series/delete/${id}`,
+        {
           method: "DELETE",
-        });
-
-        if (!response.ok) {
-          throw new Error("Failed to delete series");
         }
+      );
 
-        // Refresh data or update local state
-        // Implementation depends on your requirements
-      } catch (error) {
-        console.error("Error deleting series:", error);
+      if (!response.ok) {
+        throw new Error("Failed to delete series");
       }
+
+      setSeriesList((prev) => prev.filter((series) => series.id !== id));
+    } catch (error) {
+      console.error("Error deleting series:", error);
     }
   };
 
-  // Get current page items
-  const getCurrentItems = () => {
-    const filteredItems = seriesList.filter((series) =>
-      series.name.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    return filteredItems.slice(startIndex, startIndex + itemsPerPage);
-  };
-
-  // Modal Component
   const Modal: React.FC<ModalProps> = ({
     isOpen,
     onClose,
@@ -162,7 +161,8 @@ export const Series = () => {
     defaultValue = "",
   }) => {
     const [inputValue, setInputValue] = useState(defaultValue);
-    const [selectedMaster, setSelectedMaster] = useState<number | null>(null);
+
+    useEffect(() => setInputValue(defaultValue), [defaultValue]);
 
     if (!isOpen) return null;
 
@@ -230,8 +230,7 @@ export const Series = () => {
                   onClose();
                 }
               }}
-              disabled={!selectedMaster || !inputValue.trim()}
-              className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600"
             >
               {submitText}
             </button>
@@ -241,13 +240,24 @@ export const Series = () => {
     );
   };
 
+  // Calculate pagination
+  const filteredSeries = seriesList.filter((series) =>
+    series.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+  const totalPages = Math.ceil(filteredSeries.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const visibleSeries = filteredSeries.slice(
+    startIndex,
+    startIndex + itemsPerPage
+  );
+
   return (
     <div className="p-6">
       {/* Breadcrumb */}
       <div className="mb-4">
         <nav className="text-sm text-gray-500">
           <a
-            href="/marketplace"
+            href="/admin/marketplace"
             className="hover:text-yellow-500"
           >
             Marketplace
@@ -280,7 +290,7 @@ export const Series = () => {
         </div>
       </div>
 
-      {/* Table */}
+      {/* Series Table */}
       <div className="bg-white rounded-lg shadow overflow-hidden">
         <table className="w-full">
           <thead>
@@ -297,41 +307,69 @@ export const Series = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {getCurrentItems().map((series) => (
-              <tr
-                key={series.id}
-                className="hover:bg-gray-50"
-              >
-                <td className="px-6 py-4 text-sm text-gray-600">
-                  {series.masterName}
-                </td>
-                <td className="px-6 py-4 text-sm text-gray-600">
-                  {series.name}
-                </td>
-                <td className="px-6 py-4">
-                  <div className="flex justify-end gap-4">
-                    <button
-                      onClick={() => {
-                        setSelectedSeries(series);
-                        setIsEditModalOpen(true);
-                      }}
-                      className="text-gray-400 hover:text-gray-600"
-                    >
-                      <Pencil className="w-4 h-4" />
-                    </button>
-                    <button className="text-gray-400 hover:text-gray-600">
-                      <Eye className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => handleDeleteSeries(series.id)}
-                      className="text-red-400 hover:text-red-600"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
+            {loadingSeries ? (
+              <tr>
+                <td
+                  colSpan={3}
+                  className="px-6 py-4 text-center"
+                >
+                  Loading series...
                 </td>
               </tr>
-            ))}
+            ) : errorSeries ? (
+              <tr>
+                <td
+                  colSpan={3}
+                  className="px-6 py-4 text-center text-red-500"
+                >
+                  {errorSeries}
+                </td>
+              </tr>
+            ) : (
+              visibleSeries.map((series) => (
+                <tr
+                  key={series.id}
+                  className="hover:bg-gray-50"
+                >
+                  <td className="px-6 py-4 text-sm text-gray-600">
+                    {loadingMasters ? (
+                      "Loading..."
+                    ) : errorMasters ? (
+                      <span className="text-red-500">{errorMasters}</span>
+                    ) : (
+                      masters.find((master) => master.id === series.masterId)
+                        ?.name || "Unknown Master"
+                    )}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-600">
+                    {series.name}
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="flex justify-end gap-4">
+                      <button
+                        onClick={() => {
+                          setSelectedSeries(series);
+                          setSelectedMaster(series.masterId);
+                          setIsEditModalOpen(true);
+                        }}
+                        className="text-gray-400 hover:text-gray-600"
+                      >
+                        <Pencil className="w-4 h-4" />
+                      </button>
+                      <button className="text-gray-400 hover:text-gray-600">
+                        <Eye className="w-5 h-5" />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteSeries(series.id)}
+                        className="text-red-400 hover:text-red-600"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
 
@@ -397,27 +435,26 @@ export const Series = () => {
         </div>
       </div>
 
-      {/* Modals */}
+      {/* Add/Edit Modal */}
       <Modal
-        isOpen={isAddModalOpen}
-        onClose={() => setIsAddModalOpen(false)}
-        title="Add Series"
-        submitText="Save"
-        onSubmit={handleAddSeries}
+        isOpen={isAddModalOpen || isEditModalOpen}
+        onClose={() => {
+          setIsAddModalOpen(false);
+          setIsEditModalOpen(false);
+          setSelectedSeries(null);
+        }}
+        title={isAddModalOpen ? "Add Series" : "Edit Series"}
+        submitText={isAddModalOpen ? "Add" : "Save Changes"}
+        onSubmit={
+          isAddModalOpen
+            ? handleAddSeries
+            : (name, masterId) =>
+                handleEditSeries(selectedSeries?.id || 0, name, masterId)
+        }
+        defaultValue={
+          isEditModalOpen && selectedSeries ? selectedSeries.name : ""
+        }
       />
-
-      {selectedSeries && (
-        <Modal
-          isOpen={isEditModalOpen}
-          onClose={() => setIsEditModalOpen(false)}
-          title="Edit Series"
-          submitText="Update"
-          onSubmit={(name, masterId) =>
-            handleEditSeries(selectedSeries.id, name, masterId)
-          }
-          defaultValue={selectedSeries.name}
-        />
-      )}
     </div>
   );
 };

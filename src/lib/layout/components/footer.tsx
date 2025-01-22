@@ -1,12 +1,12 @@
 import type React from "react";
-import { FaDiscord, FaInstagram, FaTwitter, FaYoutube } from "react-icons/fa";
+import {FaDiscord, FaInstagram, FaTwitter, FaYoutube} from "react-icons/fa";
 
 export const Footer: React.FC = () => {
   const socialLinks = [
-    { icon: <FaDiscord className="h-5 w-5" />, href: "#" },
-    { icon: <FaYoutube className="h-5 w-5" />, href: "#" },
-    { icon: <FaTwitter className="h-5 w-5" />, href: "#" },
-    { icon: <FaInstagram className="h-5 w-5" />, href: "#" },
+    {icon: <FaDiscord className="h-5 w-5" />, href: "#"},
+    {icon: <FaYoutube className="h-5 w-5" />, href: "#"},
+    {icon: <FaTwitter className="h-5 w-5" />, href: "#"},
+    {icon: <FaInstagram className="h-5 w-5" />, href: "#"},
   ];
 
   return (
@@ -28,7 +28,9 @@ export const Footer: React.FC = () => {
 
           {/* Description */}
           <p className="text-sm text-white max-w-xs mx-auto md:mx-0">
-            Welcome to Ngaraga, your go-to marketplace for rare and collectible cards. Join our community of passionate collectors and experience the world of trading like never before!
+            Welcome to Ngaraga, your go-to marketplace for rare and collectible
+            cards. Join our community of passionate collectors and experience
+            the world of trading like never before!
           </p>
 
           {/* Community Section */}
@@ -53,13 +55,13 @@ export const Footer: React.FC = () => {
           <h3 className="text-xl font-bold text-white">Explore</h3>
           <div className="grid gap-3">
             <a
-              href="#"
+              href="/marketplace"
               className="text-sm text-white transition-colors duration-300 hover:text-[#FFC107] hover:underline"
             >
               Marketplace
             </a>
             <a
-              href="#"
+              href="/rankings"
               className="text-sm text-white transition-colors duration-300 hover:text-[#FFC107] hover:underline"
             >
               Rankings
@@ -82,18 +84,18 @@ export const Footer: React.FC = () => {
         {/* Right Column - Newsletter */}
         <div className="grid gap-4 text-center md:text-left">
           <h3 className="text-xl font-bold text-white">
-            Stay Updated with Ngaraga
+            Join our weekly Update
           </h3>
           <p className="text-sm text-white max-w-xs mx-auto md:mx-0">
-            Sign up for our newsletter and get exclusive card drops, promotions, and community updates delivered straight to your inbox.
+            Get exclusive promotions & updates straight to your inbox
           </p>
-          <div className="flex overflow-hidden rounded-full bg-[#2b2b2b] border border-black">
+          <div className="flex overflow-hidden rounded-3xl bg-[#2b2b2b] border-black">
             <input
               type="email"
               placeholder="Enter your email here"
-              className="flex-1 px-4 py-3 text-sm bg-[#2b2b2b] text-gray-500 outline-none"
+              className="flex-1 px-4 text-sm bg-[#2b2b2b] text-white"
             />
-            <button className="bg-call-to-actions-900 px-6 py-3 text-sm text-white transition-all duration-300 hover:bg-call-to-actions-800 hover:text-black ">
+            <button className="bg-call-to-actions-800 px-6 py-3 text-sm text-white transition-all duration-300 hover:bg-call-to-actions-800 hover:text-black ">
               Subscribe
             </button>
           </div>
@@ -101,9 +103,12 @@ export const Footer: React.FC = () => {
       </div>
 
       {/* Copyright */}
-      <div className="mt-8 sm:mt-10 md:mt-12 border-t pt-6 sm:pt-8" style={{ borderTop: "1px solid var(--old-secondary)" }}>
+      <div
+        className="mt-8 sm:mt-10 md:mt-12 border-t pt-6 sm:pt-8"
+        style={{borderTop: "1px solid var(--old-secondary)"}}
+      >
         <p className="text-sm text-white text-center md:text-left">
-          © 2024 Ngaraga. All rights reserved. Powered by Dolanan Yuk x Curaweda.
+          © Ngaraga by Dolanan yuk x Curaweda.
         </p>
       </div>
     </footer>
