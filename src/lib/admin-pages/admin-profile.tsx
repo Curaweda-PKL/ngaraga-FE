@@ -1,5 +1,6 @@
 import React, {useState, ChangeEvent} from "react";
 import {X} from "lucide-react";
+import PhoneInput from "../pages/checkout/components/PhoneInput";
 
 export const ProfileSettings = () => {
   const [formData, setFormData] = useState({
@@ -141,25 +142,8 @@ export const ProfileSettings = () => {
                 className="input input-bordered w-full bg-white"
               />
             </div>
-            <div>
-              <label className="block mb-2 font-medium">Phone Number</label>
-              <div className="flex">
-                <select
-                  name="countryCode"
-                  value={formData.countryCode}
-                  onChange={handleInputChange}
-                  className="select select-bordered w-20 bg-white"
-                >
-                  <option value="+62">+62</option>
-                </select>
-                <input
-                  type="text"
-                  name="phoneNumber"
-                  value={formData.phoneNumber}
-                  onChange={handleInputChange}
-                  className="input input-bordered w-full bg-white"
-                />
-              </div>
+            <div className="mt-9">
+            <PhoneInput className=""/>
             </div>
           </div>
 

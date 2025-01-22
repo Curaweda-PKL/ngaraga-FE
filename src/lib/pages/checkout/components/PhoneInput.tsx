@@ -7,6 +7,11 @@ interface Country {
   flag: string;
 }
 
+interface PhoneInputProps {
+  className?: string;
+  // Other props...
+}
+
 const countries: Country[] = [
   { name: "Austria", prefix: 43, flag: "at" },
   { name: "Belgium", prefix: 32, flag: "be" },
@@ -15,7 +20,7 @@ const countries: Country[] = [
   // Add more countries here
 ];
 
-const PhoneInput: React.FC = () => {
+const PhoneInput: React.FC<PhoneInputProps> = ({className, ...props}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [selectedCountry, setSelectedCountry] = useState<Country>(countries[0]);
@@ -54,7 +59,7 @@ const PhoneInput: React.FC = () => {
   };
 
   return (
-    <div className="relative w-full max-w-full" ref={dropdownRef}>
+    <div className={`relative w-full max-w-full ${className}`} ref={dropdownRef}>
       <div className="flex items-center">
         {/* Country Selector */}
         <button
