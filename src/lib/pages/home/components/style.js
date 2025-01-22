@@ -6,14 +6,14 @@ var $style = $(".hover");
 console.log($cards);
 console.log("Cards found:", document.querySelectorAll(".card-container"));
 
-let count = 0;
-const intervalId = setInterval(() => {
-  console.log("Cards found:", document.querySelectorAll(".card-container"));
-  count += 1;
-  if (count >= 4) {
-    clearInterval(intervalId); 
-  }
-}, 1000);
+// let count = 0;
+// const intervalId = setInterval(() => {
+//   console.log("Cards found:", document.querySelectorAll(".card-container"));
+//   count += 1;
+//   if (count >= 4) {
+//     clearInterval(intervalId); 
+//   }
+// }, 1000);
 
 $cards
   .on("mousemove touchmove", function(e) { 

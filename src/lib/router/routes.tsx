@@ -36,6 +36,7 @@ import { Payment } from "../admin-pages/payment";
 import { Admin } from "../admin-pages/admin/admin";
 import { AddAdmin } from "../admin-pages/admin/add-admin";
 import { ProfileSettings } from "../admin-pages/admin-profile";
+
 import AdminLogin from "../pages/auth/login/admin-login";
 import SentEmail from "../pages/auth/login/sentEmail";
 import SuccesRegist from "../pages/events/success-regist";
@@ -51,7 +52,7 @@ const Login = React.lazy(() => import("@/lib/pages/auth/login/login"));
 const Artists = React.lazy(() => import("@/lib/pages/artists/artists-index"));
 const Account = React.lazy(() => import("@/lib/pages/account/account-index"));
 const SpecialCardDetail = React.lazy(() => import("@/lib/pages/account/specialcard-details"));
-const ViewDetail = React.lazy(() => import("@/lib/pages/account/view-details"));
+const ViewDetail = React.lazy(() => import("@/lib/pages/order-details/view-details"));
 const Marketplace = React.lazy(() => import("@/lib/pages/marketplace/marketplace-index"));
 const TopCollectors = React.lazy(() => import("@/lib/pages/top-players"));
 const Cart = React.lazy(() => import("@/lib/pages/cart"));
