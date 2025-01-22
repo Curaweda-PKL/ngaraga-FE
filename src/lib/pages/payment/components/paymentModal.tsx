@@ -10,10 +10,10 @@ export const PaymentOverlay: React.FC = () => {
       {/* Button to Open Modal */}
       {!showOverlay && (
         <button
-          className="px-4 py-2 bg-blue-500 text-white rounded-md"
           onClick={() => setShowOverlay(true)}
+          className="text-[#DDB11F]"
         >
-          Open Payment Modal
+          Change Payment
         </button>
       )}
 
@@ -25,15 +25,19 @@ export const PaymentOverlay: React.FC = () => {
           {/* Overlay Content */}
           <div className="bg-white rounded-lg shadow-lg p-6 w-3/4 max-w-xl">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold">Change Payment</h2>
+              <h2 className="text-xl font-bold text-black">Change Payment</h2>
               <button
-                className="text-gray-500 hover:text-red-500"
+                className="text-black hover:text-red-500"
                 onClick={() => setShowOverlay(false)}
               >
                 ✕
               </button>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+            {/* Full-width divider */}
+            <div className="mt-6 border-t-2 border-gray-300 my-4 w-full"></div>
+
+            <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
               {[
                 {
                   method: "Bank BCA",
@@ -64,7 +68,7 @@ export const PaymentOverlay: React.FC = () => {
                   key={method}
                   className={`flex justify-center items-center border rounded-lg p-3 cursor-pointer ${
                     paymentMethod === method
-                      ? "border-yellow-500"
+                      ? "border-[#DDB11F]"
                       : "border-gray-300"
                   }`}
                   onClick={() => setPaymentMethod(method)}
@@ -74,7 +78,7 @@ export const PaymentOverlay: React.FC = () => {
                     alt={method}
                     className="w-12 h-12 object-cover mr-4"
                   />
-                  <span className="flex-grow">{method}</span>
+                  <span className="flex-grow text-black">{method}</span>
                   {paymentMethod === method && (
                     <div className="text-yellow-500">{icon}</div>
                   )}
@@ -83,13 +87,13 @@ export const PaymentOverlay: React.FC = () => {
             </div>
             <div className="flex justify-end mt-6 gap-4">
               <button
-                className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md"
+                className="px-4 py-2 bg-gray-300 text-black rounded-md"
                 onClick={() => setShowOverlay(false)}
               >
                 Close
               </button>
               <button
-                className="px-4 py-2 bg-yellow-500 text-white rounded-md"
+                className="px-4 py-2 bg-[#DDB11F] text-white rounded-md"
                 onClick={() => {
                   console.log("Payment Confirmed:", paymentMethod);
                   setShowOverlay(false);
