@@ -60,6 +60,7 @@ const BrowseEvents = React.lazy(() => import("@/lib/pages/events/browse-event"))
 const EventDetail = React.lazy(() => import("@/lib/pages/events/detail-events"));
 const EventRegistration = React.lazy(() => import("@/lib/pages/events/register-event"));
 const Checkout = React.lazy(() => import("@/lib/pages/checkout/checkout-index"));
+const CheckoutLogin = React.lazy(() => import("@/lib/pages/checkout/chekout-login-index"))
 const PaymentPage = React.lazy(() => import("@/lib/pages/payment/payment"));
 const OrderComplete = React.lazy(() => import("@/lib/pages/payment/complete"));
 
@@ -117,6 +118,7 @@ export const routes: Array<PathRouteProps> = [
   {path: "/detail-events", element: <EventDetail />},
   {path: "/register-events", element: <EventRegistration />},
   {path: "/checkout", element: <Checkout />},
+  {path: "/checkout-login", element: <CheckoutLogin />},
   {path: "/payment", element: <PaymentPage />},
   {path: "/complete", element: <OrderComplete />},
   {path: "/login/admin", element: <AdminLogin />},
