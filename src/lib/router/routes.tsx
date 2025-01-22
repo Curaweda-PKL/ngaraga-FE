@@ -60,9 +60,7 @@ const TopCollectors = React.lazy(() => import("@/lib/pages/top-players"));
 const SpecialCardDetail = React.lazy(
   () => import("@/lib/pages/account/specialcard-details")
 );
-const ViewDetail = React.lazy(
-  () => import("@/lib/pages/order-details/view-details")
-);
+const ViewDetail = React.lazy(() => import("@/lib/pages/account/view-details"));
 const DetailSpecial = React.lazy(
   () => import("@/lib/pages/detail-card/detail-special-index")
 );
