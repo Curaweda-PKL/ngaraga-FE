@@ -162,220 +162,75 @@ const CheckoutForm: React.FC = () => {
       {/* Information Form */}
       <div className="mt-10 space-y-4">
         {/* Tab Buttons */}
-        <div className="flex gap-5 items-center mb-8">
-          <button
-            className={`btn ${
-              deliveryOption === "Anter Aja"
-                ? "bg-call-to-actions-100"
-                : "bg-neutral-colors-200"
-            } border rounded-lg`}
-            onClick={() => setDeliveryOption("Anter Aja")}
-          >
-            <TbTruckDelivery size={18} />
-            Delivery
-          </button>
-          <button
-            className={`btn ${
-              deliveryOption === "Pick up"
-                ? "bg-call-to-actions-100"
-                : "bg-neutral-colors-200"
-            } border rounded-lg`}
-            onClick={() => setDeliveryOption("Pick up")}
-          >
-            <PiPackageLight size={18} />
-            Pick up
-          </button>
-        </div>
+        <div className="flex gap-5 items-center mb-3">
+  <button
+    className={`btn ${
+      deliveryOption === "Anter Aja"
+        ? "bg-call-to-actions-100"
+        : "bg-neutral-colors-200"
+    } border rounded-lg`}
+    onClick={() => setDeliveryOption("Anter Aja")}
+  >
+    <TbTruckDelivery size={18} />
+    Delivery
+  </button>
+  <button
+    className={`btn ${
+      deliveryOption === "Pick up"
+        ? "bg-call-to-actions-100"
+        : "bg-neutral-colors-200"
+    } border rounded-lg`}
+    onClick={() => setDeliveryOption("Pick up")}
+  >
+    <PiPackageLight size={18} />
+    Pick up
+  </button>
+</div>
 
         {/* Form Content for Delivery */}
         {deliveryOption === "Anter Aja" && (
-          <div className="grid grid-cols-1 gap-4">
-            <div className="relative w-full mt-4 mb-4">
-              <AiOutlineUser
-                className="absolute text-neutral-colors-500 left-3 top-1/2 transform -translate-y-1/2"
-                size={23}
-              />
-              <input
-                type="text"
-                name="fullName"
-                value={formData.fullName}
-                onChange={handleFormChange}
-                placeholder="Full Name"
-                className="w-full border border-neutral-colors-500 rounded-lg p-3 pl-11"
-              />
-            </div>
-
-            <div className="relative w-full mb-4">
-              <MdOutlineMail
-                className="absolute text-neutral-colors-500 left-3 top-1/2 transform -translate-y-1/2"
-                size={23}
-              />
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleFormChange}
-                placeholder="Email"
-                className="w-full border border-neutral-colors-500 rounded-lg p-3 pl-11"
-              />
-            </div>
-
-            <div className="flex">
-              <PhoneInput />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                {loading ? (
-                  <p>Loading provinces...</p>
-                ) : error ? (
-                  <p style={{color: "red"}}>{error}</p>
-                ) : (
-                  <select
-                    name="state"
-                    value={formData.state}
-                    onChange={handleFormChange}
-                    className="border border-neutral-colors-500 rounded-lg p-3 w-full"
-                  >
-                    <option value="">State/Province</option>
-                    {provinces.map((province) => (
-                      <option
-                        key={province.id}
-                        value={province.id}
-                      >
-                        {province.name}
-                      </option>
-                    ))}
-                  </select>
-                )}
-              </div>
-              <div>
-                {loading ? (
-                  <p>Loading City...</p>
-                ) : error ? (
-                  <p style={{color: "red"}}>{error}</p>
-                ) : (
-                  <select
-                    name="city"
-                    value={formData.city}
-                    onChange={handleFormChange}
-                    className="border border-neutral-colors-500 rounded-lg p-3 w-full"
-                  >
-                    <option value="">City/Regency</option>
-                    {cities.map((city) => (
-                      <option
-                        key={city.id}
-                        value={city.id}
-                      >
-                        {city.name}
-                      </option>
-                    ))}
-                  </select>
-                )}
-              </div>
-              <div>
-                {loading ? (
-                  <p>Loading Subdistrict...</p>
-                ) : error ? (
-                  <p style={{color: "red"}}>{error}</p>
-                ) : (
-                  <select
-                    name="subdistrict"
-                    value={formData.subdistrict}
-                    onChange={handleFormChange}
-                    className="border border-neutral-colors-500 rounded-lg p-3 w-full"        
-                  >
-                    <option value="">Subdistrict</option>
-                    {subdistricts.map((subdistrict) => (
-                      <option
-                        key={subdistrict.id}
-                        value={subdistrict.id}
-                      >
-                        {subdistrict.name}
-                      </option>
-                    ))}
-                  </select>
-                )}
-              </div>
-              <div>
-                <input
-                  type="text"
-                  name="postalCode"
-                  value={formData.postalCode}
-                  onChange={handleFormChange}
-                  placeholder="Postal Code"
-                  className="border border-neutral-colors-500 rounded-lg p-3 w-full"
-                />
-              </div>
-            </div>
-            <textarea
-              name="addressDetails"
-              value={formData.addressDetails}
-              onChange={handleFormChange}
-              placeholder="Address Details"
-              className="w-full border border-neutral-colors-500 rounded-lg p-3 mt-4"
-            ></textarea>
-            <textarea
-              name="notes"
-              value={formData.notes}
-              onChange={handleFormChange}
-              placeholder="Notes (Optional)"
-              className="w-full border border-neutral-colors-500 rounded-lg p-3 mt-4"
-            ></textarea>
-          </div>
-        )}
+  <div className="grid grid-cols-1 gap-4 ">
+    <div className="p-4 border rounded-lg shadow-sm mt-4">
+      <div className="flex items-center mb-4">
+        <span className="material-icons text-gray-600 mr-2">home</span>
+        <h3 className="text-lg font-semibold">Animakid</h3>
+      </div>
+      <p className="text-gray-700 text-sm mb-2">+62 854 5565 6745</p>
+      <p className="text-gray-600 text-sm">
+        Jl. Medan Merdeka Barat No.12, Gambir, Kecamatan Gambir, Kota Jakarta
+        Pusat, Daerah Khusus Ibukota Jakarta 10110
+      </p>
+      <div className="flex mt-4 space-x-4">
+        <button className="text-[#DDB11F] text-sm font-medium">Edit</button>
+        <button className="text-[#DDB11F] text-sm font-medium">Delete</button>
+      </div>
+    </div>
+    <div className="flex justify-between mt-4 mb-2">
+      <button className="px-4 py-2 border-2 border-[#DDB11F] text-[#DDB11F] text-sm font-medium rounded-lg shadow hover:bg-[#DDB11F] hover:text-white transition">
+        Change Address
+      </button>
+      <button className="px-4 py-2 bg-[#DDB11F] text-white text-sm font-medium rounded-lg shadow hover:bg-[#c5991a] transition">
+        + Add New Address
+      </button>
+    </div>
+  </div>
+)}
 
         {/* Form Content for Pick Up */}
         {deliveryOption === "Pick up" && (
-          
-          <div className="grid grid-cols-1 gap-4">
-            <div className="border rounded-lg p-4 flex items-start gap-4 shadow-sm mt-4 mb-4">
-              <div className="text-call-to-actions-100"></div>
-              <div>
-                <h3 className="text-lg font-semibold  mb-2">
-                  Ngaraga by Dolanan
-                </h3>
-                <p className="text-sm text-neutral-colors-600">
-                  Jl. Medan Merdeka Barat No.12, Gambir, Kecamatan Gambir, Kota
-                  Jakarta Pusat, Daerah Khusus Ibukota Jakarta 10110
-                </p>
-              </div>
-            </div>
-            <div className="relative w-full mb-4">
-              <AiOutlineUser
-                className="absolute text-neutral-colors-500 left-3 top-1/2 transform -translate-y-1/2"
-                size={23}
-              />
-              <input
-                type="text"
-                name="fullName"
-                value={formData.fullName}
-                onChange={handleFormChange}
-                placeholder="Full Name"
-                className="w-full border border-neutral-colors-500 rounded-lg p-3 pl-11"
-              />
-            </div>
-
-            <div className="relative w-full mb-4">
-              <MdOutlineMail
-                className="absolute text-neutral-colors-500 left-3 top-1/2 transform -translate-y-1/2"
-                size={23}
-              />
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleFormChange}
-                placeholder="Email"
-                className="w-full border border-neutral-colors-500 rounded-lg p-3 pl-11"
-              />
-            </div>
-
-            <div className="flex">
-              <PhoneInput />
-            </div>
-
-            {/* Pick Up Time Section */}
-            <div className="space-y-3">
+  <div className="grid grid-cols-1 gap-4 mb-8">
+    <div className="border rounded-lg p-4 flex items-start gap-4 shadow-sm mt-4 mb-4">
+      <div className="text-call-to-actions-100 "></div>
+      <div>
+        <h3 className="text-lg font-semibold mb-2">Ngaraga by Dolanan</h3>
+        <p className="text-sm text-neutral-colors-600">
+          Jl. Medan Merdeka Barat No.12, Gambir, Kecamatan Gambir, Kota Jakarta
+          Pusat, Daerah Khusus Ibukota Jakarta 10110
+        </p>
+      </div>
+    </div>
+    {/* Pick Up Time Section */}
+    <div className="space-y-3">
       <p className="text-base font-medium">Pick a Pickup Time</p>
       <div className="max-w-sm grid grid-cols-5 gap-2">
         {availablePickUpTimes.map((time) => (
@@ -393,19 +248,9 @@ const CheckoutForm: React.FC = () => {
         ))}
       </div>
     </div>
-            <textarea
-              name="notes"
-              value={formData.notes}
-              onChange={handleFormChange}
-              placeholder="Notes (Optional)"
-              className="w-full border border-neutral-colors-500 rounded-lg p-3 mt-4"
-            ></textarea>
-          </div>
-        )}
-      </div>
-
-      {/* Delivery Options */}
-{deliveryOption === "Anter Aja" && (
+  </div>
+)}
+ {deliveryOption === "Anter Aja" && (
   <div className="mt-8">
     <h2 className="font-bold text-lg mb-4">Delivery Options</h2>
     <div className="space-y-4 mb-10">
@@ -448,7 +293,6 @@ const CheckoutForm: React.FC = () => {
     </div>
   </div>
 )}
-
       {/* Payment Method */}
       <div className="mt-8 mb-8">
         <h2 className="font-bold text-lg mb-4">Payment Method</h2>
@@ -513,6 +357,7 @@ const CheckoutForm: React.FC = () => {
           ))}
         </div>
       </div>
+    </div>
     </div>
   );
 };

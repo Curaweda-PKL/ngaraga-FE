@@ -19,7 +19,7 @@ const cardData: Card[] = [
   },
 ];
 
-export const CardCollection: React.FC = () => {
+export const MoreCardSection: React.FC = () => {
   return (
     <div className="w-full mb-10 lg:ml-8">
       {/* Header Section */}
