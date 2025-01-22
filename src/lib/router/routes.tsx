@@ -86,6 +86,9 @@ const EventRegistration = React.lazy(
 const Checkout = React.lazy(
   () => import("@/lib/pages/checkout/checkout-index")
 );
+const CheckoutLogin = React.lazy(
+  () => import("@/lib/pages/checkout/chekout-login-index")
+)
 
 export const routes: Array<PathRouteProps> = [
   {path: "/admin/dashboard", element: <Dashboard />},
@@ -136,6 +139,7 @@ export const routes: Array<PathRouteProps> = [
   {path: "/cart", element: <Cart />},
   {path: "/account", element: <Account />},
   {path: "/checkout", element: <Checkout />},
+  {path: "/checkout-existing", element: <CheckoutLogin />},
   {path: "/payments", element: <PaymentPage />},
   {path: "/complete", element: <OrderComplete />},
   {path: "/order-detail", element: <OrderDetails />},

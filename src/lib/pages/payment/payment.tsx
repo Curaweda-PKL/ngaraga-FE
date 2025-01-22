@@ -30,7 +30,7 @@ const PaymentPage = () => {
                     step.completed
                       ? "bg-green-500"
                       : step.active
-                      ? "bg-yellow-500"
+                      ? "bg-[#DDB11F]"
                       : "bg-gray-200"
                   }
                   text-white
@@ -60,7 +60,7 @@ const PaymentPage = () => {
           {/* Total Payment */}
           <div className="">
             <p className="text-gray-600 mb-2">Total Payment</p>
-            <p className="text-2xl font-bold text-yellow-500">Rp 460.650</p>
+            <p className="text-2xl font-bold text-[#DDB11F]">Rp 460.650</p>
           </div>
         </div>
 
@@ -103,10 +103,10 @@ const PaymentPage = () => {
                 <span className="font-semibold">Bank BCA</span>
               </div>
               <button
-                className="text-yellow-500 border border-yellow-500 rounded-lg px-4 py-2"
+                className="text-yellow-500 border border-[#DDB11F] rounded-lg px-4 py-2"
                 onClick={() => setIsModalOpen(true)}
               >
-                Change Payment
+                {isModalOpen && <PaymentOverlay />}
               </button>
             </div>
 
@@ -130,7 +130,7 @@ const PaymentPage = () => {
                 onClick={() => setActiveTab("ATM")}
                 className={`px-4 py-2 ${
                   activeTab === "ATM"
-                    ? "border-b-2 border-yellow-500 font-semibold"
+                    ? "border-b-2 border-[#DDB11F] font-semibold"
                     : "text-gray-500"
                 }`}
               >
@@ -140,7 +140,7 @@ const PaymentPage = () => {
                 onClick={() => setActiveTab("iBanking")}
                 className={`px-4 py-2 ${
                   activeTab === "iBanking"
-                    ? "border-b-2 border-yellow-500 font-semibold"
+                    ? "border-b-2 border-[#DDB11F] font-semibold"
                     : "text-gray-500"
                 }`}
               >
@@ -150,7 +150,7 @@ const PaymentPage = () => {
                 onClick={() => setActiveTab("mBanking")}
                 className={`px-4 py-2 ${
                   activeTab === "mBanking"
-                    ? "border-b-2 border-yellow-500 font-semibold"
+                    ? "border-b-2 border-[#DDB11F] font-semibold"
                     : "text-gray-500"
                 }`}
               >
@@ -171,7 +171,7 @@ const PaymentPage = () => {
                   <p>3. Select "To BCA Virtual Account"</p>
                   <p>
                     4. Enter Virtual Account Number{" "}
-                    <span className="text-yellow-500">1234 5678 9102</span>{" "}
+                    <span className="text-[#DDB11F]">1234 5678 9102</span>{" "}
                     Press "Correct" to proceed
                   </p>
                   <p>
@@ -195,7 +195,7 @@ const PaymentPage = () => {
                 <p>4. Choose "BCA Virtual Account"</p>
                 <p>
                   5. Enter the virtual account number{" "}
-                  <span className="text-yellow-500">1234 5678 9102</span>
+                  <span className="text-[#DDB11F]">1234 5678 9102</span>
                 </p>
                 <p>6. Confirm the details and proceed with the payment</p>
               </div>
@@ -209,7 +209,7 @@ const PaymentPage = () => {
                 <p>4. Choose "BCA Virtual Account"</p>
                 <p>
                   5. Enter virtual account number{" "}
-                  <span className="text-yellow-500">1234 5678 9102</span>
+                  <span className="text-[#DDB11F]">1234 5678 9102</span>
                 </p>
                 <p>6. Review and confirm the payment details</p>
               </div>
