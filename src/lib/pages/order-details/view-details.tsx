@@ -1,11 +1,5 @@
 import React from "react";
-import {
-  FaBox,
-  FaCheck,
-  FaCopy,
-  FaCreditCard,
-  FaTruck
-} from "react-icons/fa";
+import {FaBox, FaCheck, FaCopy, FaCreditCard, FaTruck} from "react-icons/fa";
 
 const ViewDetail: React.FC = () => {
   const orderStages = [
@@ -73,7 +67,10 @@ const ViewDetail: React.FC = () => {
         <h2 className="text-lg font-semibold mb-6">Order Stages</h2>
         <div className="flex justify-between items-center relative">
           {orderStages.map((stage, index) => (
-            <div key={index} className="flex flex-col items-center z-10">
+            <div
+              key={index}
+              className="flex flex-col items-center z-10"
+            >
               <div
                 className={`rounded-lg p-3 ${
                   stage.completed
@@ -111,7 +108,10 @@ const ViewDetail: React.FC = () => {
 
           <div className="space-y-4 mb-6">
             {orderItems.map((item) => (
-              <div key={item.id} className="flex gap-4">
+              <div
+                key={item.id}
+                className="flex gap-4"
+              >
                 <img
                   src={item.image}
                   alt={item.name}
@@ -242,14 +242,17 @@ const ViewDetail: React.FC = () => {
                   status:
                     "The order was received by the JAKARTA agent for processing",
                 },
-                { date: "12 Dec 2024 16:00", status: "Preparing to ship" },
+                {date: "12 Dec 2024 16:00", status: "Preparing to ship"},
                 {
                   date: "09 Dec 2024 13:07",
                   status: "Courier assigned to pick up the order",
                 },
-                { date: "09 Dec 2024 12:54", status: "Order placed" },
+                {date: "09 Dec 2024 12:54", status: "Order placed"},
               ].map((event, index) => (
-                <div key={index} className="flex gap-4">
+                <div
+                  key={index}
+                  className="flex gap-4"
+                >
                   <div className="w-32 text-sm text-gray-500">{event.date}</div>
                   <div className="relative">
                     <div

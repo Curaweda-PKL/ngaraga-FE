@@ -1,5 +1,13 @@
-import React, { useState, useEffect } from "react";
-import { Pencil, Trash2, Search, X } from "lucide-react";
+import React, {useState, useEffect} from "react";
+import {
+  Pencil,
+  Trash2,
+  Search,
+  Eye,
+  X,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 
 interface ModalProps {
   isOpen: boolean;
@@ -15,13 +23,17 @@ export const Series = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedSeries, setSelectedSeries] = useState<{ id: number; name: string } | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [masters, setMasters] = useState<{ id: number; name: string }[]>([]);
-  const [seriesList, setSeriesList] = useState<{ id: number; name: string; masterId: number }[]>([]);
+  const [masters, setMasters] = useState<{id: number; name: string}[]>([]);
+  const [seriesList, setSeriesList] = useState<
+    {id: number; name: string; masterId: number}[]
+  >([]);
   const [loadingMasters, setLoadingMasters] = useState(true);
   const [errorMasters, setErrorMasters] = useState<string | null>(null);
   const [loadingSeries, setLoadingSeries] = useState(true);
   const [errorSeries, setErrorSeries] = useState<string | null>(null);
   const [selectedMaster, setSelectedMaster] = useState<number | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   useEffect(() => {
     const fetchMasters = async () => {
@@ -51,7 +63,7 @@ export const Series = () => {
           throw new Error("Failed to fetch series data");
         }
         const data = await response.json();
-        setSeriesList(data.series); // Assuming series data is wrapped in `series` key
+        setSeriesList(data.series);
       } catch (err) {
         setErrorSeries((err as Error).message);
       } finally {
@@ -66,8 +78,8 @@ export const Series = () => {
     try {
       const response = await fetch("http://localhost:3000/api/series/create", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, masterId }),
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({name, masterId}),
       });
 
       if (!response.ok) {
@@ -83,20 +95,29 @@ export const Series = () => {
 
   const handleEditSeries = async (id: number, name: string, masterId: number) => {
     try {
-      const response = await fetch(`http://localhost:3000/api/series/edit/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, masterId }),
-      });
+      const response = await fetch(
+        `http://localhost:3000/api/series/edit/${id}`,
+        {
+          method: "PUT",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify({name, masterId}),
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Failed to update series");
       }
-      window.location.reload()
+      window.location.reload();
       const updatedSeries = await response.json();
       setSeriesList((prev) =>
         prev.map((series) =>
-          series.id === id ? { ...series, name: updatedSeries.name, masterId: updatedSeries.masterId } : series
+          series.id === id
+            ? {
+                ...series,
+                name: updatedSeries.name,
+                masterId: updatedSeries.masterId,
+              }
+            : series
         )
       );
     } catch (error) {
@@ -106,9 +127,12 @@ export const Series = () => {
 
   const handleDeleteSeries = async (id: number) => {
     try {
-      const response = await fetch(`http://localhost:3000/api/series/delete/${id}`, {
-        method: "DELETE",
-      });
+      const response = await fetch(
+        `http://localhost:3000/api/series/delete/${id}`,
+        {
+          method: "DELETE",
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Failed to delete series");
@@ -195,12 +219,26 @@ export const Series = () => {
     );
   };
 
+  // Calculate pagination
+  const filteredSeries = seriesList.filter((series) =>
+    series.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+  const totalPages = Math.ceil(filteredSeries.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const visibleSeries = filteredSeries.slice(
+    startIndex,
+    startIndex + itemsPerPage
+  );
+
   return (
     <div className="p-6">
       {/* Breadcrumb */}
       <div className="mb-4">
         <nav className="text-sm text-gray-500">
-          <a href="/marketplace" className="hover:text-yellow-500">
+          <a
+            href="/admin/marketplace"
+            className="hover:text-yellow-500"
+          >
             Marketplace
           </a>
           <span className="mx-2">/</span>
@@ -232,8 +270,8 @@ export const Series = () => {
       </div>
 
       {/* Series Table */}
-      <div className="overflow-x-auto">
-        <table className="min-w-full table-auto border-collapse">
+      <div className="bg-white rounded-lg shadow overflow-hidden">
+        <table className="w-full">
           <thead>
             <tr>
               <th className="px-4 py-2 border-b text-left">Series Name</th>
@@ -241,43 +279,70 @@ export const Series = () => {
               <th className="px-4 py-2 border-b text-left">Actions</th>
             </tr>
           </thead>
-          <tbody>
-            {seriesList
-              .filter((series) =>
-                series.name.toLowerCase().includes(searchQuery.toLowerCase())
-              )
-              .map((series) => (
-                <tr key={series.id}>
-                  <td className="px-4 py-2 border-b">{series.name}</td>
-                  <td className="px-4 py-2 border-b">
+          <tbody className="divide-y divide-gray-200">
+            {loadingSeries ? (
+              <tr>
+                <td
+                  colSpan={3}
+                  className="px-6 py-4 text-center"
+                >
+                  Loading series...
+                </td>
+              </tr>
+            ) : errorSeries ? (
+              <tr>
+                <td
+                  colSpan={3}
+                  className="px-6 py-4 text-center text-red-500"
+                >
+                  {errorSeries}
+                </td>
+              </tr>
+            ) : (
+              visibleSeries.map((series) => (
+                <tr
+                  key={series.id}
+                  className="hover:bg-gray-50"
+                >
+                  <td className="px-6 py-4 text-sm text-gray-600">
                     {loadingMasters ? (
                       "Loading..."
                     ) : errorMasters ? (
                       <span className="text-red-500">{errorMasters}</span>
                     ) : (
-                      masters.find((master) => master.id === series.masterId)?.name || "Unknown Master"
+                      masters.find((master) => master.id === series.masterId)
+                        ?.name || "Unknown Master"
                     )}
                   </td>
-                  <td className="px-4 py-2 border-b flex gap-4">
-                    <button
-                      onClick={() => {
-                        setSelectedSeries(series);
-                        setSelectedMaster(series.masterId); // Set selected master ID
-                        setIsEditModalOpen(true);
-                      }}
-                      className="text-gray-400 hover:text-gray-600"
-                    >
-                      <Pencil className="w-5 h-5" />
-                    </button>
-                    <button
-                      onClick={() => handleDeleteSeries(series.id)}
-                      className="text-red-400 hover:text-red-600"
-                    >
-                      <Trash2 className="w-5 h-5" />
-                    </button>
+                  <td className="px-6 py-4 text-sm text-gray-600">
+                    {series.name}
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="flex justify-end gap-4">
+                      <button
+                        onClick={() => {
+                          setSelectedSeries(series);
+                          setSelectedMaster(series.masterId);
+                          setIsEditModalOpen(true);
+                        }}
+                        className="text-gray-400 hover:text-gray-600"
+                      >
+                        <Pencil className="w-4 h-4" />
+                      </button>
+                      <button className="text-gray-400 hover:text-gray-600">
+                        <Eye className="w-5 h-5" />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteSeries(series.id)}
+                        className="text-red-400 hover:text-red-600"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
                   </td>
                 </tr>
-              ))}
+              ))
+            )}
           </tbody>
         </table>
       </div>
@@ -292,8 +357,15 @@ export const Series = () => {
         }}
         title={isAddModalOpen ? "Add Series" : "Edit Series"}
         submitText={isAddModalOpen ? "Add" : "Save Changes"}
-        onSubmit={isAddModalOpen ? handleAddSeries : (name, masterId) => handleEditSeries(selectedSeries?.id || 0, name, masterId)}
-        defaultValue={isEditModalOpen && selectedSeries ? selectedSeries.name : ""}
+        onSubmit={
+          isAddModalOpen
+            ? handleAddSeries
+            : (name, masterId) =>
+                handleEditSeries(selectedSeries?.id || 0, name, masterId)
+        }
+        defaultValue={
+          isEditModalOpen && selectedSeries ? selectedSeries.name : ""
+        }
       />
     </div>
   );
