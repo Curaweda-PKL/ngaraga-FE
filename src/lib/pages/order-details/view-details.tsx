@@ -1,12 +1,5 @@
 import React from "react";
-import {
-  FaBox,
-  FaCreditCard,
-  FaTruck,
-  FaCheck,
-  FaCopy,
-  FaLongArrowAltLeft,
-} from "react-icons/fa";
+import {FaBox, FaCheck, FaCopy, FaCreditCard, FaTruck} from "react-icons/fa";
 
 const ViewDetail: React.FC = () => {
   const orderStages = [
@@ -64,35 +57,31 @@ const ViewDetail: React.FC = () => {
   ];
 
   return (
-    <div className="max-w-7xl mx-auto p-6">
-      {/* Back Button */}
-      <button className="flex items-center text-gray-500 hover:text-gray-700 mb-6">
-        <a href="/account">
-          <FaLongArrowAltLeft className="mr-2" />
-          Back
-        </a>
-      </button>
+    <div className="p-6">
+      <div className="detail-header flex items-center ml-[1rem] mb-6 font-bold text-2xl">
+        <h1>Order Details</h1>
+      </div>
 
       {/* Order Stages */}
-      <div className="bg-white rounded-lg p-6 mb-6">
-        <h2 className="text-sm mb-6">Order Stages</h2>
-        <div className="relative flex justify-between items-center px-8">
+      <div className="bg-neutral-colors-200 border border-neutral-colors-400 rounded-2xl p-4 mb-6">
+        <h2 className="text-lg font-semibold mb-6">Order Stages</h2>
+        <div className="flex justify-between items-center relative">
           {orderStages.map((stage, index) => (
             <div
               key={index}
               className="flex flex-col items-center z-10"
             >
               <div
-                className={`w-12 h-12 rounded-lg flex items-center justify-center ${
+                className={`rounded-lg p-3 ${
                   stage.completed
-                    ? "bg-yellow-50 text-yellow-500"
+                    ? "bg-yellow-100 text-yellow-600"
                     : "bg-gray-100 text-gray-400"
                 }`}
               >
                 {stage.icon}
               </div>
               <span
-                className={`mt-2 text-xs ${
+                className={`mt-2 text-sm ${
                   stage.completed ? "text-gray-900" : "text-gray-400"
                 }`}
               >
@@ -101,7 +90,7 @@ const ViewDetail: React.FC = () => {
             </div>
           ))}
           {/* Progress Line */}
-          <div className="absolute top-6 left-0 w-full h-[2px] bg-gray-200">
+          <div className="absolute top-6 left-0 w-full h-0.5 bg-gray-200">
             <div className="w-1/3 h-full bg-yellow-500" />
           </div>
         </div>
@@ -109,9 +98,11 @@ const ViewDetail: React.FC = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Left Section - Order Summary */}
-        <div className="bg-white rounded-2xl p-6">
+        <div className="bg-neutral-colors-200 border border-neutral-colors-400 rounded-2xl p-6">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-lg font-semibold">Summary Order</h2>
+            <h2 className="text-lg font-semibold border-b border-neutral-colors-400">
+              Summary Order
+            </h2>
             <span className="text-gray-500">Order ID: ORD123456789</span>
           </div>
 
@@ -163,7 +154,7 @@ const ViewDetail: React.FC = () => {
         </div>
 
         {/* Right Section */}
-        <div className="bg-white rounded-2xl p-6">
+        <div className="bg-neutral-colors-200 border border-neutral-colors-400 rounded-2xl p-6">
           {/* Payment Info */}
           <div className="mb-8">
             <h2 className="text-lg font-semibold mb-4">Payment</h2>
