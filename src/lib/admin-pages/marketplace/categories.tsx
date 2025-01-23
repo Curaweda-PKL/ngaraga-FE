@@ -91,7 +91,7 @@ export const Categories = () => {
       if (!response.ok) {
         throw new Error("Failed to add category");
       }
-
+      window.location.reload();
       const newCategory = await response.json();
       setCategoriesList((prev) => [...prev, newCategory.category]);
       setIsAddModalOpen(false);
@@ -118,7 +118,7 @@ export const Categories = () => {
       if (!response.ok) {
         throw new Error("Failed to update category");
       }
-
+      window.location.reload();
       const updatedCategory = await response.json();
       setCategoriesList((prev) =>
         prev.map((category) =>
