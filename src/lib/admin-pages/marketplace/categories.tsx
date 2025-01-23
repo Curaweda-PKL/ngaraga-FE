@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Pencil, Trash2, Search, Eye, X } from "lucide-react";
+import axios from "axios";
 
 interface ModalProps {
   isOpen: boolean;
@@ -27,6 +28,7 @@ export const Categories = () => {
   const [selectedSeries, setSelectedSeries] = useState<number | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
+  const [selectedimage, setSelectedimage] = useState<File | null>(null);
 
   // Fetch Series
   useEffect(() => {
@@ -50,18 +52,20 @@ export const Categories = () => {
     fetchSeries();
   }, []);
 
-  // Fetch Categories
+  // Fetch Categories (Updated Version)
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch(
+        const response = await axios.get(
           "http://localhost:3000/api/categories/all"
         );
-        if (!response.ok) {
-          throw new Error("Failed to fetch categories data");
-        }
-        const data = await response.json();
-        setCategoriesList(data.categories);
+
+        // Verify response structure in browser console:
+        console.log("Categories API Response:", response.data);
+
+        // Adjust based on actual API response structure:
+        const categories = response.data.categories || response.data.data || [];
+        setCategoriesList(categories);
       } catch (err) {
         setErrorCategories((err as Error).message);
       } finally {
@@ -73,28 +77,33 @@ export const Categories = () => {
   }, []);
 
   const handleAddCategory = async (name: string, seriesId: number) => {
-    if (!seriesId) {
-      console.error("Series is not selected.");
+    if (!seriesId || !selectedimage) {
+      console.error("Series and image must be selected");
       return;
     }
 
+    const formData = new FormData();
+    formData.append("name", name);
+    formData.append("seriesId", seriesId.toString());
+    formData.append("image", selectedimage);
+
     try {
-      const response = await fetch(
+      const response = await axios.post(
         "http://localhost:3000/api/categories/create",
+        formData,
         {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name, seriesId }),
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
         }
       );
 
-      if (!response.ok) {
-        throw new Error("Failed to add category");
+      if (response.status === 201) {
+        setCategoriesList((prev) => [...prev, response.data.category]);
+        setIsAddModalOpen(false);
+        setSelectedimage(null);
+        window.location.reload(); // Remove if you're updating state properly
       }
-      window.location.reload();
-      const newCategory = await response.json();
-      setCategoriesList((prev) => [...prev, newCategory.category]);
-      setIsAddModalOpen(false);
     } catch (error) {
       console.error("Error adding category:", error);
     }
@@ -184,8 +193,8 @@ export const Categories = () => {
               <X className="w-5 h-5" />
             </button>
           </div>
-
           <div className="p-4">
+            {/* Existing Series Select */}
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Select Series*
             </label>
@@ -208,6 +217,41 @@ export const Categories = () => {
               </select>
             )}
 
+            {/* New image Upload Field */}
+            <label className="block text-sm font-medium text-gray-700 mb-1 mt-4">
+              Category image*
+            </label>
+            <div className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500 cursor-pointer">
+              <input
+                type="file"
+                accept=".svg"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file && file.type === "image/svg+xml") {
+                    setSelectedimage(file);
+                  }
+                }}
+                className="hidden"
+                id="imageUpload"
+              />
+              <div
+                className="flex justify-between items-center"
+                onClick={() => document.getElementById("imageUpload")?.click()}
+              >
+                <span className="text-gray-500">
+                  {selectedimage ? selectedimage.name : "No svg file chosen"}
+                </span>
+                <button
+                  type="button"
+                  className="bg-gray-100 hover:bg-gray-200 px-4 py-1 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                >
+                  Browse
+                </button>
+              </div>
+            </div>
+            <p className="text-xs text-gray-500 mt-1 ml-2">SVG only *</p>
+
+            {/* Existing Category Name Input */}
             <label className="block text-sm font-medium text-gray-700 mb-1 mt-4">
               Category Name*
             </label>
@@ -270,7 +314,7 @@ export const Categories = () => {
       <div className="flex justify-between items-center mb-6">
         <button
           onClick={() => setIsAddModalOpen(true)}
-          className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+          className="bg-call-to-actions-900 hover:bg-call-to-actions-800 text-white px-4 py-2 rounded-lg flex items-center gap-2"
         >
           <span className="text-xl">+</span> Add Category
         </button>
@@ -290,9 +334,9 @@ export const Categories = () => {
         <table className="w-full">
           <thead>
             <tr>
-              <th className="px-4 py-2 border-b text-left">Category Name</th>
               <th className="px-4 py-2 border-b text-left">Master Name</th>
               <th className="px-4 py-2 border-b text-left">Series Name</th>
+              <th className="px-4 py-2 border-b text-left">Category Name</th>
               <th className="px-4 py-2 border-b text-left">Actions</th>
             </tr>
           </thead>
@@ -313,17 +357,34 @@ export const Categories = () => {
               visibleCategories.map((category) => (
                 <tr key={category.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 text-sm text-gray-600">
-                    {category.name}
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-600">
                     {category.series?.master?.name || "No Master"}
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-600">
-                    {series.find((series) => series.id === category.seriesId)
-                      ?.name || "Unknown Series"}
+                    {series.find((s) => s.id === category.seriesId)?.name ||
+                      "Unknown Series"}
                   </td>
+                  <td className="px-6 py-4 text-sm text-gray-600">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 flex items-center justify-center">
+                        {category.image ? (
+                          <img
+                          src={`http://localhost:3000/${category.image}`}
+                          alt={category.name}
+                            className="w-8 h-8 object-contain rounded-full"
+                
+                          />
+                        ) : (
+                          <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
+                            <span className="text-gray-400">N/A</span>
+                          </div>
+                        )}
+                      </div>
+                      {category.name}
+                    </div>
+                  </td>
+
                   <td className="px-6 py-4">
-                    <div className="flex justify-end gap-4">
+                    <div className="flex justify-start -ml-2 gap-4">
                       <button
                         onClick={() => {
                           setSelectedCategory(category);
@@ -358,6 +419,7 @@ export const Categories = () => {
           setIsAddModalOpen(false);
           setIsEditModalOpen(false);
           setSelectedCategory(null);
+          setSelectedimage(null);
         }}
         title={isAddModalOpen ? "Add Category" : "Edit Category"}
         submitText={isAddModalOpen ? "Add" : "Save Changes"}
