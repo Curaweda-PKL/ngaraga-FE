@@ -1,7 +1,8 @@
-import {useState} from "react";
+import { useState } from "react";
 import DatePicker from "react-datepicker";
-import {FaPlus} from "react-icons/fa6";
+import { FaPlus } from "react-icons/fa6";
 import "react-datepicker/dist/react-datepicker.css";
+import { FaEyeSlash, FaTrash } from "react-icons/fa";
 
 const members = [
   {
@@ -64,15 +65,25 @@ export const Member = () => {
 
       <h1 className="text-2xl font-semibold mb-6">Member</h1>
 
-      <div className="flex justify-between items-center mb-6">
-        <button className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg flex items-center gap-2">
+      <div className="flex justify-start items-center mb-6 ">
+        <button className="bg-call-to-actions-900 hover:bg-call-to-actions-800 text-white px-4 py-2 rounded-lg flex items-center gap-2">
           <FaPlus className="w-4 h-4" />
           <span>
             <a href="/admin/add-member">Add Member</a>
           </span>
         </button>
 
-        <div className="flex items-center gap-4 ml-auto">
+        <button className="border ml-2 border-call-to-actions-900 hover:bg-call-to-actions-200 text-call-to-actions-900 px-4 py-2 rounded-lg flex items-center gap-2 ">
+          <FaEyeSlash />
+          <span>Hide</span>
+        </button>
+
+        <button className="border border-danger-colors-700 text-danger-colors-700 rounded-lg flex items-center ml-2 px-4 py-2 hover:bg-danger-colors-200 gap-2">
+          <FaTrash className="w-4 h-4" />
+          <span>Delete</span>
+        </button>
+
+        <div className="flex justify-end items-end gap-4 ml-auto">
           {/* Search Bar */}
           <div className="flex-grow">
             <input
@@ -115,10 +126,7 @@ export const Member = () => {
           <thead className="bg-gray-50">
             <tr>
               <th className="p-4">
-                <input
-                  type="checkbox"
-                  className="rounded"
-                />
+                <input type="checkbox" className="rounded" />
               </th>
               <th className="p-4 text-left">Name</th>
               <th className="p-4 text-left">Email</th>
@@ -132,15 +140,9 @@ export const Member = () => {
           </thead>
           <tbody>
             {filteredMembers.map((member, index) => (
-              <tr
-                key={index}
-                className="border-t"
-              >
+              <tr key={index} className="border-t">
                 <td className="p-4">
-                  <input
-                    type="checkbox"
-                    className="rounded"
-                  />
+                  <input type="checkbox" className="rounded" />
                 </td>
                 <td className="p-4">
                   <div className="flex items-center gap-3">

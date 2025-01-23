@@ -121,6 +121,21 @@ input::-webkit-inner-spin-button {
   color: var(--call-to-actions-900)
 }
 
+/* Style when the checkbox is not checked */
+label {
+  background-color: white;
+  color: var(--neutral-colors-500); 
+  
+}
+
+/* Style when the checkbox is checked */
+input:checked + label {
+  border: 2px solid var(--call-to-actions-900);
+  border-color: var(--call-to-actions); 
+  background-color: var(--call-to-actions-100); 
+  color: var(--call-to-actions-900); 
+}
+
 
 @layer base {
   /* Fullscreen container */

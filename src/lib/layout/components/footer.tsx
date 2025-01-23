@@ -89,13 +89,13 @@ export const Footer: React.FC = () => {
           <p className="text-sm text-white max-w-xs mx-auto md:mx-0">
             Get exclusive promotions & updates straight to your inbox
           </p>
-          <div className="flex overflow-hidden rounded-3xl bg-[#2b2b2b] border-black">
+          <div className="flex rounded-lg bg-[#2b2b2b] ">
             <input
               type="email"
               placeholder="Enter your email here"
-              className="flex-1 px-4 text-sm bg-[#2b2b2b] text-white"
+              className="flex-1 px-4 text-sm bg-[#2b2b2b] text-white border-transparent rounded-lg  focus:border-0"
             />
-            <button className="bg-call-to-actions-800 px-6 py-3 text-sm text-white transition-all duration-300 hover:bg-call-to-actions-800 hover:text-black ">
+            <button className="bg-call-to-actions-800 px-6 py-3 text-sm text-white transition-all duration-300 hover:bg-call-to-actions-800 rounded-lg border border-l-transparent hover:text-black ">
               Subscribe
             </button>
           </div>
