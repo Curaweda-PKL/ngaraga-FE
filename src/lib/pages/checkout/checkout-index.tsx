@@ -1,5 +1,5 @@
 import React from "react";
-import CheckoutForm from "./components/CheckoutForm";
+import CheckoutForm from "./components/newCust/CheckoutForm";
 import OrderSummary from "./components/OrderSummary";
 
 const Checkout: React.FC = () => {
