@@ -21,10 +21,7 @@ interface ModalProps {
 export const Series = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [selectedSeries, setSelectedSeries] = useState<{
-    id: number;
-    name: string;
-  } | null>(null);
+  const [selectedSeries, setSelectedSeries] = useState<{ id: number; name: string } | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [masters, setMasters] = useState<{id: number; name: string}[]>([]);
   const [seriesList, setSeriesList] = useState<
@@ -41,9 +38,7 @@ export const Series = () => {
   useEffect(() => {
     const fetchMasters = async () => {
       try {
-        const response = await fetch(
-          "http://localhost:3000/api/series/masters/all"
-        );
+        const response = await fetch("http://localhost:3000/api/series/masters/all");
         if (!response.ok) {
           throw new Error("Failed to fetch master data");
         }
@@ -54,6 +49,7 @@ export const Series = () => {
       } finally {
         setLoadingMasters(false);
       }
+
     };
 
     fetchMasters();
@@ -97,11 +93,7 @@ export const Series = () => {
     }
   };
 
-  const handleEditSeries = async (
-    id: number,
-    name: string,
-    masterId: number
-  ) => {
+  const handleEditSeries = async (id: number, name: string, masterId: number) => {
     try {
       const response = await fetch(
         `http://localhost:3000/api/series/edit/${id}`,
@@ -171,18 +163,13 @@ export const Series = () => {
         <div className="bg-white rounded-lg w-full max-w-md">
           <div className="flex justify-between items-center p-4 border-b">
             <h2 className="text-lg font-medium">{title}</h2>
-            <button
-              onClick={onClose}
-              className="text-gray-400 hover:text-gray-600"
-            >
+            <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
               <X className="w-5 h-5" />
             </button>
           </div>
 
           <div className="p-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Select Master*
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Select Master*</label>
             {loadingMasters ? (
               <p>Loading Masters...</p>
             ) : errorMasters ? (
@@ -195,19 +182,14 @@ export const Series = () => {
               >
                 <option value="">Select Master</option>
                 {masters.map((master) => (
-                  <option
-                    key={master.id}
-                    value={master.id}
-                  >
+                  <option key={master.id} value={master.id}>
                     {master.name}
                   </option>
                 ))}
               </select>
             )}
 
-            <label className="block text-sm font-medium text-gray-700 mb-1 mt-4">
-              Series Name*
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1 mt-4">Series Name*</label>
             <input
               type="text"
               value={inputValue}
@@ -217,10 +199,7 @@ export const Series = () => {
           </div>
 
           <div className="flex justify-end gap-2 p-4 border-t">
-            <button
-              onClick={onClose}
-              className="px-4 py-2 border rounded-lg text-gray-600 hover:bg-gray-50"
-            >
+            <button onClick={onClose} className="px-4 py-2 border rounded-lg text-gray-600 hover:bg-gray-50">
               Cancel
             </button>
             <button
@@ -294,16 +273,10 @@ export const Series = () => {
       <div className="bg-white rounded-lg shadow overflow-hidden">
         <table className="w-full">
           <thead>
-            <tr className="bg-gray-50 border-b">
-              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">
-                Master
-              </th>
-              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600">
-                Series
-              </th>
-              <th className="px-6 py-3 text-right text-sm font-semibold text-gray-600">
-                Action
-              </th>
+            <tr>
+              <th className="px-4 py-2 border-b text-left">Series Name</th>
+              <th className="px-4 py-2 border-b text-left">Master Name</th>
+              <th className="px-4 py-2 border-b text-left">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
@@ -372,67 +345,6 @@ export const Series = () => {
             )}
           </tbody>
         </table>
-
-        {/* Pagination */}
-        <div className="flex items-center justify-between px-6 py-3 border-t">
-          <button
-            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-            disabled={currentPage === 1}
-            className="p-2 text-gray-400 hover:text-gray-600 disabled:opacity-50"
-          >
-            <ChevronLeft className="w-5 h-5" />
-          </button>
-
-          <div className="flex gap-2">
-            {Array.from({length: totalPages}, (_, i) => i + 1)
-              .filter((page) => {
-                if (page === 1 || page === totalPages) return true;
-                return Math.abs(currentPage - page) <= 2;
-              })
-              .map((page, index, array) => {
-                if (index > 0 && array[index - 1] !== page - 1) {
-                  return (
-                    <React.Fragment key={`ellipsis-${page}`}>
-                      <span className="px-3 py-1 text-gray-400">...</span>
-                      <button
-                        onClick={() => setCurrentPage(page)}
-                        className={`px-3 py-1 rounded ${
-                          currentPage === page
-                            ? "bg-yellow-500 text-white"
-                            : "text-gray-600 hover:bg-gray-100"
-                        }`}
-                      >
-                        {page}
-                      </button>
-                    </React.Fragment>
-                  );
-                }
-                return (
-                  <button
-                    key={page}
-                    onClick={() => setCurrentPage(page)}
-                    className={`px-3 py-1 rounded ${
-                      currentPage === page
-                        ? "bg-yellow-500 text-white"
-                        : "text-gray-600 hover:bg-gray-100"
-                    }`}
-                  >
-                    {page}
-                  </button>
-                );
-              })}
-          </div>
-
-          <button
-            onClick={() =>
-              setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-            }
-            disabled={currentPage === totalPages}
-            className="p-2 text-gray-400 hover:text-gray-600 disabled:opacity-50"
-          >
-            <ChevronRight className="w-5 h-5" />
-          </button>
-        </div>
       </div>
 
       {/* Add/Edit Modal */}
