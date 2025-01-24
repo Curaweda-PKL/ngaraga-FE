@@ -1,6 +1,6 @@
 import axios from "axios";
-import React, { useEffect, useState } from "react";
-import { IoRadioButtonOn } from "react-icons/io5";
+import React, {useEffect, useState} from "react";
+import {IoRadioButtonOn} from "react-icons/io5";
 import DeliveryTab from "./DeliveryForm";
 import PickupTab from "./PickupTab";
 
@@ -37,7 +37,9 @@ interface Subdistrict {
 }
 
 const CheckoutExisting: React.FC = () => {
-  const [selectedTab, setSelectedTab] = useState<"delivery" | "pickup">("delivery");
+  const [selectedTab, setSelectedTab] = useState<"delivery" | "pickup">(
+    "delivery"
+  );
   const [paymentMethod, setPaymentMethod] = useState<string>("Bank BCA");
   const [formData, setFormData] = useState<FormData>({
     fullName: "",
@@ -113,7 +115,7 @@ const CheckoutExisting: React.FC = () => {
   }, [formData.city]);
 
   const handlePickUpTimeChange = (time: string) => {
-    setFormData((prev) => ({ ...prev, pickUpTime: time }));
+    setFormData((prev) => ({...prev, pickUpTime: time}));
   };
 
   return (
@@ -169,9 +171,7 @@ const CheckoutExisting: React.FC = () => {
         </div>
 
         {selectedTab === "delivery" ? (
-          <DeliveryTab
-
-          />
+          <DeliveryTab />
         ) : (
           <PickupTab
             pickUpTime={formData.pickUpTime}
@@ -203,7 +203,7 @@ const CheckoutExisting: React.FC = () => {
                 image:
                   "https://png.pngtree.com/png-vector/20221121/ourmid/pngtree-bca-bank-logo-png-image_6472275.png",
               },
-            ].map(({ method, image }) => (
+            ].map(({method, image}) => (
               <label
                 key={method}
                 className={`flex justify-center items-center border rounded-lg p-3 cursor-pointer mb-16 ${
