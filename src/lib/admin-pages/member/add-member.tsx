@@ -1,10 +1,10 @@
-import { useRef, useState, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export const AddMember = () => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const [formData, setFormData] = useState({
-    fullName: "",
+    name: "",
     username: "",
     email: "",
     phoneNumber: "",
@@ -19,7 +19,7 @@ export const AddMember = () => {
   });
 
   const CancelClearFormData = {
-    fullName: "",
+    name: "",
     username: "",
     email: "",
     phoneNumber: "",
@@ -37,7 +37,7 @@ export const AddMember = () => {
 
   // Load data from localStorage if available
   useEffect(() => {
-    const savedData = localStorage.getItem("addMemberForm");
+    const savedData = localStorage.getItem("AddMemberForm");
     if (savedData) {
       setFormData(JSON.parse(savedData));
     }
@@ -45,7 +45,7 @@ export const AddMember = () => {
 
   // Save data to localStorage whenever form data changes
   useEffect(() => {
-    localStorage.setItem("addMemberForm", JSON.stringify(formData));
+    localStorage.setItem("AddMemberForm", JSON.stringify(formData));
   }, [formData]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -84,8 +84,8 @@ export const AddMember = () => {
     e.preventDefault();
 
     // Prepare the form data for submission
-    const userData = {
-      fullName: formData.fullName,
+    const MemberData = {
+      name: formData.name,
       phoneNumber: formData.phoneNumber,
       email: formData.email,
       password: formData.password,
@@ -105,29 +105,51 @@ export const AddMember = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(userData),
+        body: JSON.stringify(MemberData),
       });
-
+    
       if (response.ok) {
         alert("Member created successfully!");
       } else {
-        alert("Failed to create Member");
+        // Handle server-side error response
+        try {
+          // Attempt to parse JSON error response
+          const errorData = await response.json();
+          alert(`Failed to create Member: ${errorData.message || JSON.stringify(errorData)}`);
+        } catch (parseError) {
+          // Fallback to text if JSON parsing fails
+          const errorText = await response.text();
+          console.log(`Failed to create Member. Status: ${response.status} - ${errorText}`);
+        }
       }
     } catch (error) {
       console.error("Error creating Member:", error);
-      alert("An error occurred while creating the Member.");
+      
+      // Prepare error message
+      let errorMessage = "An error occurred while creating the Member.";
+      
+      // Add error details if available
+      if (error instanceof Error) {
+        errorMessage += `\nError: ${error.message}`;
+        // Include stack trace if needed (might be long)
+        errorMessage += `\nStack Trace: ${error.stack}`;
+      } else {
+        errorMessage += `\nError: ${String(error)}`;
+      }
+      
+      alert(errorMessage);
     }
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
+    <div className="p-6">
       <div className="text-sm text-gray-500 mb-4">
         Member / Member List / Add Member
       </div>
 
       <h1 className="text-2xl font-semibold mb-6">Add Member</h1>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-6 border p-6 rounded-lg">
         <div className="space-y-4">
           <label className="block">
             Member Image <span className="text-red-500">*</span>
@@ -178,8 +200,8 @@ export const AddMember = () => {
             <input
               type="text"
               className="w-full p-2 border rounded-lg"
-              name="fullName"
-              value={formData.fullName}
+              name="name"
+              value={formData.name}
               onChange={handleInputChange}
               placeholder="Full Name"
             />
@@ -334,12 +356,13 @@ export const AddMember = () => {
           </div>
         </div>
 
+
         <div className="flex justify-end gap-4 pt-4">
           <button
             type="button"
             className="px-6 py-2 border rounded-lg hover:bg-gray-50"
-            onClick={() => setFormData(CancelClearFormData )}
-            >
+            onClick={() => setFormData(CancelClearFormData)}
+          >
             Cancel
           </button>
           <button

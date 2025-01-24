@@ -1,311 +1,437 @@
-import React, {useState} from "react";
-import {FiEdit2, FiTrash2, FiSearch, FiX} from "react-icons/fi";
-import {
-  FaPalette,
-  FaEye,
-  FaMusic,
-  FaPlus,
-  FaVideo,
-  FaRunning,
-  FaBoxOpen,
-  FaCamera,
-  FaTools,
-  FaGlobe,
-  FaTshirt,
-  FaMicrochip,
-} from "react-icons/fa";
+import React, { useState, useEffect } from "react";
+import { Pencil, Trash2, Search, Eye, X } from "lucide-react";
+import axios from "axios";
 
-interface CategoryData {
-  master: string;
-  series: string;
-  category: string;
-  Icon: React.ComponentType;
-}
-
-interface EditModalProps {
+interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
-  data: CategoryData | null;
-  isAddCategory: boolean;
+  title: string;
+  submitText: string;
+  onSubmit: (name: string, seriesId: number) => void;
+  defaultValue?: string;
 }
 
-const EditModal: React.FC<EditModalProps> = ({
-  isOpen,
-  onClose,
-  isAddCategory,
-}) => {
-  const fileInputRef = React.useRef<HTMLInputElement | null>(null);
+export const Categories = () => {
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<{
+    id: number;
+    name: string;
+  } | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [series, setSeries] = useState<{ id: number; name: string }[]>([]); // Menyimpan list series
+  const [categoriesList, setCategoriesList] = useState<any[]>([]);
+  const [loadingSeries, setLoadingSeries] = useState(true);
+  const [errorSeries, setErrorSeries] = useState<string | null>(null);
+  const [loadingCategories, setLoadingCategories] = useState(true);
+  const [errorCategories, setErrorCategories] = useState<string | null>(null);
+  const [selectedSeries, setSelectedSeries] = useState<number | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+  const [selectedimage, setSelectedimage] = useState<File | null>(null);
 
-  const handleEyeClick = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.click();
+  // Fetch Series
+  useEffect(() => {
+    const fetchSeries = async () => {
+      try {
+        const response = await fetch(
+          "http://localhost:3000/api/categories/series/all"
+        );
+        if (!response.ok) {
+          throw new Error("Failed to fetch series data");
+        }
+        const data = await response.json();
+        setSeries(data.series); // Menyimpan data series ke state
+      } catch (err) {
+        setErrorSeries((err as Error).message);
+      } finally {
+        setLoadingSeries(false);
+      }
+    };
+
+    fetchSeries();
+  }, []);
+
+  // Fetch Categories (Updated Version)
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:3000/api/categories/all"
+        );
+
+        // Verify response structure in browser console:
+        console.log("Categories API Response:", response.data);
+
+        // Adjust based on actual API response structure:
+        const categories = response.data.categories || response.data.data || [];
+        setCategoriesList(categories);
+      } catch (err) {
+        setErrorCategories((err as Error).message);
+      } finally {
+        setLoadingCategories(false);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
+  const handleAddCategory = async (name: string, seriesId: number) => {
+    if (!seriesId || !selectedimage) {
+      console.error("Series and image must be selected");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("name", name);
+    formData.append("seriesId", seriesId.toString());
+    formData.append("image", selectedimage);
+
+    try {
+      const response = await axios.post(
+        "http://localhost:3000/api/categories/create",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      if (response.status === 201) {
+        setCategoriesList((prev) => [...prev, response.data.category]);
+        setIsAddModalOpen(false);
+        setSelectedimage(null);
+        window.location.reload(); // Remove if you're updating state properly
+      }
+    } catch (error) {
+      console.error("Error adding category:", error);
     }
   };
 
-  if (!isOpen) return null;
+  const handleEditCategory = async (
+    id: number,
+    name: string,
+    seriesId: number
+  ) => {
+    try {
+      const response = await fetch(
+        `http://localhost:3000/api/categories/edit/${id}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name, seriesId }),
+        }
+      );
 
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-      <div className="bg-white rounded-lg w-full max-w-md">
-        {/* Modal Header */}
-        <div className="flex justify-between items-center p-6 border-b">
-          <h2 className="text-xl font-semibold">
-            {isAddCategory ? "Add Categories" : "Edit Categories"}
-          </h2>
-          <button
-            onClick={onClose}
-            className="text-gray-500 hover:text-gray-700"
-          >
-            <FiX className="w-6 h-6" />
-          </button>
-        </div>
+      if (!response.ok) {
+        throw new Error("Failed to update category");
+      }
+      window.location.reload();
+      const updatedCategory = await response.json();
+      setCategoriesList((prev) =>
+        prev.map((category) =>
+          category.id === id
+            ? {
+                ...category,
+                name: updatedCategory.name,
+                seriesId: updatedCategory.seriesId,
+              }
+            : category
+        )
+      );
+      setIsEditModalOpen(false);
+    } catch (error) {
+      console.error("Error updating category:", error);
+    }
+  };
 
-        {/* Modal Content */}
-        <div className="p-6 space-y-5">
-          <div>
-            <label className="block text-sm font-medium mb-2">
-              Select Series *
-            </label>
-            <select className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500">
-              <option>Choose a Series</option>
-              <option>Series 3</option>
-            </select>
+  const handleDeleteCategory = async (id: number) => {
+    try {
+      const response = await fetch(
+        `http://localhost:3000/api/categories/delete/${id}`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to delete category");
+      }
+
+      setCategoriesList((prev) =>
+        prev.filter((category) => category.id !== id)
+      );
+    } catch (error) {
+      console.error("Error deleting category:", error);
+    }
+  };
+
+  const Modal: React.FC<ModalProps> = ({
+    isOpen,
+    onClose,
+    title,
+    submitText,
+    onSubmit,
+    defaultValue = "",
+  }) => {
+    const [inputValue, setInputValue] = useState(defaultValue);
+
+    useEffect(() => setInputValue(defaultValue), [defaultValue]);
+
+    if (!isOpen) return null;
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="bg-white rounded-lg w-full max-w-md">
+          <div className="flex justify-between items-center p-4 border-b">
+            <h2 className="text-lg font-medium">{title}</h2>
+            <button
+              onClick={onClose}
+              className="text-gray-400 hover:text-gray-600"
+            >
+              <X className="w-5 h-5" />
+            </button>
           </div>
-          <div>
-            <label className="block text-sm font-medium mb-2">
-              Categories Icon *
+          <div className="p-4">
+            {/* Existing Series Select */}
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Select Series*
             </label>
-            <div className="flex items-center space-x-4">
-              <select className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500">
-                <option value="Art.svg">Art.svg</option>
-                <option value="Music.svg">Music.svg</option>
-                <option value="Sports.svg">Sports.svg</option>
-                <option value="Fashion.svg">Fashion.svg</option>
-              </select>
-              <button className="p-2 border border-gray-300 rounded-lg text-gray-500 hover:text-gray-700">
-                <FaPalette className="w-6 h-6" />
-              </button>
-              <button
-                onClick={handleEyeClick}
-                className="p-2 border border-gray-300 rounded-lg text-gray-500 hover:text-gray-700"
+            {loadingSeries ? (
+              <p>Loading Series...</p>
+            ) : errorSeries ? (
+              <p className="text-red-500">{errorSeries}</p>
+            ) : (
+              <select
+                value={selectedSeries || ""}
+                onChange={(e) => setSelectedSeries(Number(e.target.value))}
+                className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500"
               >
-                <FiEdit2 className="w-6 h-6" />
-              </button>
-              <button className="p-2 border border-gray-300 rounded-lg text-red-500 hover:text-red-700">
-                <FiTrash2 className="w-6 h-6" />
-              </button>
+                <option value="">Select Series</option>
+                {series.map((serie) => (
+                  <option key={serie.id} value={serie.id}>
+                    {serie.name}
+                  </option>
+                ))}
+              </select>
+            )}
+
+            {/* New image Upload Field */}
+            <label className="block text-sm font-medium text-gray-700 mb-1 mt-4">
+              Category image*
+            </label>
+            <div className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500 cursor-pointer">
+              <input
+                type="file"
+                accept=".svg"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file && file.type === "image/svg+xml") {
+                    setSelectedimage(file);
+                  }
+                }}
+                className="hidden"
+                id="imageUpload"
+              />
+              <div
+                className="flex justify-between items-center"
+                onClick={() => document.getElementById("imageUpload")?.click()}
+              >
+                <span className="text-gray-500">
+                  {selectedimage ? selectedimage.name : "No svg file chosen"}
+                </span>
+                <button
+                  type="button"
+                  className="bg-gray-100 hover:bg-gray-200 px-4 py-1 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                >
+                  Browse
+                </button>
+              </div>
             </div>
-            <p className="mt-2 text-sm text-gray-500">SVG Only</p>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".svg"
-              className="hidden"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-2">
-              Category Name *
+            <p className="text-xs text-gray-500 mt-1 ml-2">SVG only *</p>
+
+            {/* Existing Category Name Input */}
+            <label className="block text-sm font-medium text-gray-700 mb-1 mt-4">
+              Category Name*
             </label>
             <input
               type="text"
-              className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500"
             />
           </div>
-        </div>
 
-        {/* Modal Footer */}
-        <div className="flex justify-end gap-3 p-6 border-t">
-          <button
-            onClick={onClose}
-            className="px-5 py-2 border rounded-lg text-gray-600 hover:bg-gray-100"
-          >
-            Cancel
-          </button>
-          <button className="px-5 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600">
-            {isAddCategory ? "Add" : "Update"}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export const Categories = () => {
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isAddCategoryModalOpen, setIsAddCategoryModalOpen] = useState(false);
-  const [editingCategory, setEditingCategory] = useState<CategoryData | null>(
-    null
-  );
-
-  const handleEdit = (category: CategoryData) => {
-    setEditingCategory(category);
-    setIsEditModalOpen(true);
-  };
-
-  const handleAddCategory = () => {
-    setIsAddCategoryModalOpen(true);
-  };
-
-  const tableData = [
-    {
-      master: "Master 1",
-      series: "Series 1",
-      category: "Art",
-      Icon: FaPalette,
-    },
-    {
-      master: "Master 2",
-      series: "Series 2",
-      category: "Collectibles",
-      Icon: FaBoxOpen,
-    },
-    {
-      master: "Master 3",
-      series: "Series 3",
-      category: "Music",
-      Icon: FaMusic,
-    },
-    {
-      master: "Master 4",
-      series: "Series 4",
-      category: "Video",
-      Icon: FaVideo,
-    },
-    {
-      master: "Master 5",
-      series: "Series 5",
-      category: "Sport",
-      Icon: FaRunning,
-    },
-    {
-      master: "Master 6",
-      series: "Series 6",
-      category: "Virtual Worlds",
-      Icon: FaGlobe,
-    },
-    {
-      master: "Master 7",
-      series: "Series 7",
-      category: "Photography",
-      Icon: FaCamera,
-    },
-    {
-      master: "Master 8",
-      series: "Series 8",
-      category: "Utility",
-      Icon: FaTools,
-    },
-    {
-      master: "Master 9",
-      series: "Series 9",
-      category: "Fashion",
-      Icon: FaTshirt,
-    },
-    {
-      master: "Master 10",
-      series: "Series 10",
-      category: "Technology",
-      Icon: FaMicrochip,
-    },
-  ];
-
-  return (
-    <div className="p-8">
-      {/* Breadcrumb */}
-      <div className="text-sm text-gray-500 mb-6">
-        Marketplace / <span className="text-gray-700">Categories</span>
-      </div>
-
-      {/* Header */}
-      <h1 className="text-2xl font-semibold mb-6">Categories</h1>
-      <div className="flex justify-between items-center">
-        <button
-          onClick={handleAddCategory}
-          className="bg-yellow-500 hover:bg-yellow-600 text-white px-5 py-2 rounded-lg flex items-center gap-2 mb-6"
-        >
-          <FaPlus /> Add Categories
-        </button>
-
-        <div className="relative mb-4">
-          <input
-            type="text"
-            placeholder="Search"
-            className="pl-10 pr-4 border rounded-lg w-64 focus:outline-none focus:ring-2 focus:ring-yellow-500"
-          />
-          <FiSearch className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-        </div>
-      </div>
-
-      <div className="bg-white rounded-lg border">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b">
-              <th className="p-4 text-left">Master</th>
-              <th className="p-4 text-left">Series</th>
-              <th className="p-4 text-left">Categories</th>
-              <th className="p-4 text-center">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {tableData.map((item, index) => (
-              <tr
-                key={index}
-                className="border-b last:border-0"
-              >
-                <td className="p-4">{item.master}</td>
-                <td className="p-4">{item.series}</td>
-                <td className="p-4">
-                  <div className="flex items-center gap-2">
-                    <item.Icon className="text-gray-500" />
-                    {item.category}
-                  </div>
-                </td>
-                <td className="p-4">
-                  <div className="flex justify-center gap-4">
-                    <button
-                      onClick={() => handleEdit(item)}
-                      className="text-gray-500 hover:text-gray-700"
-                    >
-                      <FiEdit2 className="w-5 h-5" />
-                    </button>
-                    <button className="text-gray-500 hover:text-gray-700">
-                      <FaEye className="w-5 h-5" />
-                    </button>
-                    <button className="text-red-500 hover:text-red-700">
-                      <FiTrash2 className="w-5 h-5" />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-
-        <div className="flex justify-end p-4">
-          <div className="space-x-2">
-            <button className="px-3 py-1 bg-yellow-500 text-white rounded">
-              1
+          <div className="flex justify-end gap-2 p-4 border-t">
+            <button
+              onClick={onClose}
+              className="px-4 py-2 border rounded-lg text-gray-600 hover:bg-gray-50"
+            >
+              Cancel
             </button>
-            <button className="px-3 py-1 border rounded">2</button>
-            <button className="px-3 py-1 border rounded">3</button>
-            <span>...</span>
-            <button className="px-3 py-1 border rounded">10</button>
+            <button
+              onClick={() => {
+                if (selectedSeries !== null) {
+                  onSubmit(inputValue, selectedSeries);
+                  onClose();
+                }
+              }}
+              className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600"
+            >
+              {submitText}
+            </button>
           </div>
         </div>
       </div>
+    );
+  };
 
-      <EditModal
-        isOpen={isEditModalOpen}
-        onClose={() => setIsEditModalOpen(false)}
-        data={editingCategory}
-        isAddCategory={false}
-      />
-      <EditModal
-        isOpen={isAddCategoryModalOpen}
-        onClose={() => setIsAddCategoryModalOpen(false)}
-        data={null}
-        isAddCategory={true}
+  const filteredCategories = categoriesList.filter((category) =>
+    category.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+  const totalPages = Math.ceil(filteredCategories.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const visibleCategories = filteredCategories.slice(
+    startIndex,
+    startIndex + itemsPerPage
+  );
+
+  return (
+    <div className="p-6">
+      <div className="mb-4">
+        <nav className="text-sm text-gray-500">
+          <a href="/admin/marketplace" className="hover:text-yellow-500">
+            Marketplace
+          </a>
+          <span className="mx-2">/</span>
+          <span className="text-yellow-500">Categories</span>
+        </nav>
+      </div>
+
+      <h1 className="text-2xl font-bold mb-4">Categories</h1>
+
+      <div className="flex justify-between items-center mb-6">
+        <button
+          onClick={() => setIsAddModalOpen(true)}
+          className="bg-call-to-actions-900 hover:bg-call-to-actions-800 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+        >
+          <span className="text-xl">+</span> Add Category
+        </button>
+        <div className="relative w-full max-w-xs">
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search Categories"
+            className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
+          />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+        </div>
+      </div>
+
+      <div className="bg-white rounded-lg shadow overflow-hidden">
+        <table className="w-full">
+          <thead>
+            <tr>
+              <th className="px-4 py-2 border-b text-left">Master Name</th>
+              <th className="px-4 py-2 border-b text-left">Series Name</th>
+              <th className="px-4 py-2 border-b text-left">Category Name</th>
+              <th className="px-4 py-2 border-b text-left">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-200">
+            {loadingCategories ? (
+              <tr>
+                <td colSpan={4} className="px-6 py-4 text-center">
+                  Loading categories...
+                </td>
+              </tr>
+            ) : errorCategories ? (
+              <tr>
+                <td colSpan={4} className="px-6 py-4 text-center text-red-500">
+                  {errorCategories}
+                </td>
+              </tr>
+            ) : (
+              visibleCategories.map((category) => (
+                <tr key={category.id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 text-sm text-gray-600">
+                    {category.series?.master?.name || "No Master"}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-600">
+                    {series.find((s) => s.id === category.seriesId)?.name ||
+                      "Unknown Series"}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-600">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 flex items-center justify-center">
+                        {category.image ? (
+                          <img
+                          src={`http://localhost:3000/${category.image}`}
+                          alt={category.name}
+                            className="w-8 h-8 object-contain rounded-full"
+                
+                          />
+                        ) : (
+                          <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
+                            <span className="text-gray-400">N/A</span>
+                          </div>
+                        )}
+                      </div>
+                      {category.name}
+                    </div>
+                  </td>
+
+                  <td className="px-6 py-4">
+                    <div className="flex justify-start -ml-2 gap-4">
+                      <button
+                        onClick={() => {
+                          setSelectedCategory(category);
+                          setSelectedSeries(category.seriesId);
+                          setIsEditModalOpen(true);
+                        }}
+                        className="text-gray-400 hover:text-gray-600"
+                      >
+                        <Pencil className="w-4 h-4" />
+                      </button>
+                      <button className="text-gray-400 hover:text-gray-600">
+                        <Eye className="w-5 h-5" />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteCategory(category.id)}
+                        className="text-red-400 hover:text-red-600"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      <Modal
+        isOpen={isAddModalOpen || isEditModalOpen}
+        onClose={() => {
+          setIsAddModalOpen(false);
+          setIsEditModalOpen(false);
+          setSelectedCategory(null);
+          setSelectedimage(null);
+        }}
+        title={isAddModalOpen ? "Add Category" : "Edit Category"}
+        submitText={isAddModalOpen ? "Add" : "Save Changes"}
+        onSubmit={
+          isAddModalOpen
+            ? handleAddCategory
+            : (name: string, seriesId: number) =>
+                handleEditCategory(selectedCategory?.id || 0, name, seriesId)
+        }
+        defaultValue={
+          isEditModalOpen && selectedCategory ? selectedCategory.name : ""
+        }
       />
     </div>
   );

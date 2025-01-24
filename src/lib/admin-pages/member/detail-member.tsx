@@ -1,7 +1,8 @@
-import {useState} from "react";
-import {BsCreditCard} from "react-icons/bs";
-import {FaBox, FaTruck, FaCheckCircle} from "react-icons/fa";
-import {EyeIcon} from "lucide-react";
+import { useState } from "react";
+import { BsCreditCard } from "react-icons/bs";
+import { FaBox, FaTruck, FaCheckCircle } from "react-icons/fa";
+import { EyeIcon } from "lucide-react";
+import { AddressIcons } from "./components/svgsIconMember/addressIcons";
 
 interface Order {
   date: string;
@@ -68,10 +69,14 @@ export const MemberDetails = () => {
   };
 
   const statusColors = {
-    Payment: "bg-red-50 text-red-500",
-    Packaging: "bg-yellow-50 text-yellow-500",
-    Shipping: "bg-blue-50 text-blue-500",
-    Delivered: "bg-green-50 text-green-500",
+    Payment:
+      "bg-danger-colors-100 border border-danger-colors-700 text-danger-colors-700",
+    Packaging:
+      "bg-warning-colors-100 border border-warning-colors-700 text-warning-colors-700",
+    Shipping:
+      "bg-info-colors-100 border border-info-colors-700 text-info-colors-700",
+    Delivered:
+      "bg-success-colors-100 border border-success-colors-700 text-success-colors-700",
   };
 
   const statusIcons = {
@@ -95,19 +100,21 @@ export const MemberDetails = () => {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-4 gap-4 mb-6">
-        <div className="bg-white rounded-lg p-4 shadow-sm">
+        <div className="bg-neutral-colors-200 border border-neutral-colors-400 rounded-lg p-4 shadow-sm ">
           <div className="text-sm text-gray-500 mb-2">Today</div>
           <div className="text-xl font-semibold">Rp 750.000</div>
         </div>
-        <div className="bg-white rounded-lg p-4 shadow-sm">
+
+        <div className="bg-neutral-colors-200 border border-neutral-colors-400 rounded-lg p-4 shadow-sm">
           <div className="text-sm text-gray-500 mb-2">Orders Today</div>
           <div className="text-xl font-semibold">1</div>
         </div>
-        <div className="bg-white rounded-lg p-4 shadow-sm">
+
+        <div className="bg-neutral-colors-200 border border-neutral-colors-400 rounded-lg p-4 shadow-sm">
           <div className="text-sm text-gray-500 mb-2">Total</div>
           <div className="text-xl font-semibold">Rp 2.600.000</div>
         </div>
-        <div className="bg-white rounded-lg p-4 shadow-sm">
+        <div className="bg-neutral-colors-200 border border-neutral-colors-400 rounded-lg p-4 shadow-sm">
           <div className="text-sm text-gray-500 mb-2">Total Orders</div>
           <div className="text-xl font-semibold">5</div>
         </div>
@@ -130,9 +137,9 @@ export const MemberDetails = () => {
       </div>
 
       {/* Member Info Card */}
-      <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+      <div className="bg-white rounded-lg shadow-sm p-6 mb-6 border border-neutral-colors-400 rounded-lg">
         <div className="flex gap-6">
-          <div className="w-1/2">
+          <div className="w-1/2 ">
             <div className="flex gap-4 mb-6">
               <img
                 src="/api/placeholder/80/80"
@@ -177,7 +184,12 @@ export const MemberDetails = () => {
           </div>
           <div className="w-1/2 border-l pl-6">
             <div className="flex justify-between items-center mb-4">
-              <div className="text-lg font-semibold">Animakid</div>
+              <div className="text-lg font-semibold">
+                <span className="flex items-center gap-2">
+                  <AddressIcons />
+                  Animakid
+                </span>
+              </div>
               <button className="text-blue-500">
                 <EyeIcon className="w-5 h-5" />
               </button>
@@ -197,10 +209,7 @@ export const MemberDetails = () => {
           <thead className="bg-gray-50">
             <tr>
               <th className="w-8 p-4">
-                <input
-                  type="checkbox"
-                  className="rounded"
-                />
+                <input type="checkbox" className="rounded" />
               </th>
               <th className="text-left p-4">Date</th>
               <th className="text-left p-4">Order ID</th>
@@ -213,15 +222,9 @@ export const MemberDetails = () => {
           </thead>
           <tbody>
             {orders.map((order, index) => (
-              <tr
-                key={index}
-                className="border-t"
-              >
+              <tr key={index} className="border-t">
                 <td className="p-4">
-                  <input
-                    type="checkbox"
-                    className="rounded"
-                  />
+                  <input type="checkbox" className="rounded" />
                 </td>
                 <td className="p-4">{order.date}</td>
                 <td className="p-4">{order.orderId}</td>

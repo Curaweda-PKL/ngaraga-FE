@@ -4,6 +4,7 @@ import { MdOutlineMail } from "react-icons/md";
 import { CiGlobe, CiTwitter } from "react-icons/ci";
 import { AiOutlineDiscord, AiOutlineYoutube } from "react-icons/ai";
 import { IoLogoInstagram } from "react-icons/io";
+import { IoRadioButtonOn } from "react-icons/io5";
 
 interface FormData {
   userName: string;
@@ -21,6 +22,8 @@ const EditProfilePage: React.FC = () => {
     phoneCode: "+62",
     phoneNumber: "",
   });
+  const [activeTab, setActiveTab] = useState<string>("address");
+  const [selectedAddress, setSelectedAddress] = useState<number | null>(null);
 
   const PhoneInput: React.FC = () => (
     <div className="flex">
@@ -52,7 +55,9 @@ const EditProfilePage: React.FC = () => {
     }))
   );
 
-  const [activeTab, setActiveTab] = useState<string>("basic");
+  const handleAddressClick = (index: number) => {
+    setSelectedAddress(index); // Perbarui state dengan indeks kartu yang dipilih
+  };
 
   const handleFormChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -93,7 +98,19 @@ const EditProfilePage: React.FC = () => {
             backgroundSize: "cover",
             backgroundPosition: "center",
           }}
-        ></div>
+        >
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex space-x-4">
+            {/* Button 1 */}
+            <button className="bg-call-to-actions-900 text-white py-2 px-6 rounded-lg hover:bg-opacity-80">
+              Replace
+            </button>
+
+            {/* Button 2 */}
+            <button className="bg-neutral-colors-100 text-call-to-actions-900 py-2 px-6 rounded-lg hover:bg-opacity-80">
+              Remove
+            </button>
+          </div>
+        </div>
       </section>
 
       <div className="container mx-auto px-6 py-10">
@@ -109,8 +126,8 @@ const EditProfilePage: React.FC = () => {
                 onClick={() => setActiveTab("basic")}
                 className={`${
                   activeTab === "basic"
-                    ? "bg-yellow-500 text-white"
-                    : "bg-gray-300"
+                    ? "bg-call-to-actions-100 border border-call-to-actions-900 text-call-to-actions-900"
+                    : "bg-neutral-colors-100 border border-neutral-colors-400"
                 } px-6 py-2 mb-4 rounded-lg text-lg font-medium w-full text-center`}
               >
                 Basic Information
@@ -119,8 +136,8 @@ const EditProfilePage: React.FC = () => {
                 onClick={() => setActiveTab("address")}
                 className={`${
                   activeTab === "address"
-                    ? "bg-yellow-500 text-white"
-                    : "bg-gray-300"
+                    ? "bg-call-to-actions-100 border border-call-to-actions-900 text-call-to-actions-900"
+                    : "bg-neutral-colors-100 border border-neutral-colors-400"
                 } px-6 py-2 rounded-lg text-lg font-medium w-full text-center`}
               >
                 Address
@@ -136,7 +153,7 @@ const EditProfilePage: React.FC = () => {
                   className="w-full h-full rounded-lg object-cover shadow-lg"
                 />
               </div>
-              <button className="bg-yellow-500 text-white px-8 py-2 rounded-lg flex items-center space-x-3 text-lg font-medium hover:bg-yellow-600">
+              <button className="bg-call-to-actions-900 text-white px-8 py-2 rounded-lg flex items-center space-x-3 text-lg font-medium hover:bg-yellow-600">
                 Replace
               </button>
             </div>
@@ -205,25 +222,25 @@ const EditProfilePage: React.FC = () => {
                 ></textarea>
               </>
             ) : (
-              <>
-                {/* Address Fields */}
-                {/* <div className="mt-4">
-                  <input
-                    type="text"
-                    name="address"
-                    placeholder="Enter your address"
-                    className="w-full border border-neutral-colors-500 rounded-lg p-3"
-                  />
-                </div> */}
-              </>
+              <></>
             )}
             {activeTab === "address" && (
               <>
                 {/* Address Cards */}
                 {[...Array(3)].map((_, index) => (
                   <div key={index} className="grid grid-cols-1 gap-4">
-                    <div className="p-4 border border-gray-300 rounded-lg shadow-md mt-4 bg-white">
+                    <div
+                      className={`p-4 border rounded-lg shadow-md mt-4 ${
+                        selectedAddress === index
+                          ? "bg-white-100 border-call-to-actions-900"
+                          : "bg-white border-gray-300"
+                      }`}
+                      onClick={() => handleAddressClick(index)}
+                    >
                       <div className="flex items-center mb-3">
+                        {selectedAddress === index && (
+                          <IoRadioButtonOn className="text-call-to-actions-900 mr-3" />
+                        )}
                         <span className="material-icons text-gray-500 mr-3">
                           home
                         </span>
@@ -239,16 +256,22 @@ const EditProfilePage: React.FC = () => {
                         Kota Jakarta Pusat, Daerah Khusus Ibukota Jakarta 10110
                       </p>
                       <div className="flex mt-4 space-x-4">
-                        <button className="text-yellow-500 text-sm font-medium hover:underline">
+                        <button className="text-call-to-actions-900 text-sm font-medium hover:underline">
                           Edit
                         </button>
-                        <button className="text-yellow-500 text-sm font-medium hover:underline">
+                        <button className="text-call-to-actions-900 text-sm font-medium hover:underline">
                           Delete
                         </button>
                       </div>
                     </div>
                   </div>
                 ))}
+                {/* Button "Add New Address" */}
+                <div className="flex justify-end mt-4">
+                  <button className="bg-call-to-actions-100 border border-call-to-actions-900 text-call-to-actions-900 py-2 px-4 rounded-lg hover:bg-opacity-80">
+                    + Add New Address
+                  </button>
+                </div>
               </>
             )}
 
@@ -261,7 +284,7 @@ const EditProfilePage: React.FC = () => {
                     type="button"
                     onClick={() => toggleColumn(index)}
                     className={`flex items-center justify-center w-10 h-6 rounded-full ${
-                      column.enabled ? "bg-yellow-500" : "bg-gray-300"
+                      column.enabled ? "bg-call-to-actions-900" : "bg-gray-300"
                     }`}
                   >
                     <div
@@ -332,7 +355,7 @@ const EditProfilePage: React.FC = () => {
             {/* Update Button */}
             <button
               type="submit"
-              className="mt-6 bg-yellow-500 text-white py-3 px-5 rounded-md text-sm font-medium hover:bg-yellow-600 focus:ring-2 focus:ring-yellow-400"
+              className="mt-6 bg-call-to-actions-900 text-white py-3 px-5 rounded-md text-sm font-medium hover:bg-yellow-600 focus:ring-2 focus:ring-yellow-400"
             >
               Update
             </button>

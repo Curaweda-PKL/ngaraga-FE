@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import {useState, useEffect} from "react";
 import axios from "axios";
-import { Search, Edit3, Eye, Trash2, Plus } from "lucide-react";
+import {Search, Edit3, Eye, Trash2, Plus} from "lucide-react";
 
 export const Admin = () => {
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
@@ -8,7 +8,10 @@ export const Admin = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(5);
 
+  // Fetch users
   useEffect(() => {
     const fetchAdmins = async () => {
       setLoading(true);
@@ -44,6 +47,35 @@ export const Admin = () => {
     }
   };
 
+  const handleViewDetails = (user: any) => {
+    alert(`Viewing details for ${user.fullName}`);
+  };
+
+  const handleSuspendUser = (user: any) => {
+    alert(`Suspending user ${user.fullName}`);
+  };
+
+  const handleEditUser = (user: any) => {
+    alert(`Editing user ${user.fullName}`);
+  };
+
+  const handleDeleteUser = (user: any) => {
+    if (window.confirm(`Are you sure you want to delete ${user.fullName}?`)) {
+      alert(`Deleted user ${user.fullName}`);
+    }
+  };
+
+  // Pagination logic
+  const totalPages = Math.ceil(users.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedUsers = users.slice(startIndex, startIndex + itemsPerPage);
+
+  const handlePageChange = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
+
   return (
     <div className="p-4">
       {/* Breadcrumb navigation */}
@@ -62,7 +94,6 @@ export const Admin = () => {
         <button className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg flex items-center gap-2">
           <Plus className="w-4 h-4" />
           <span>
-            {" "}
             <a href="/admin/add-admin">Add Admin</a>
           </span>
         </button>
@@ -106,8 +137,11 @@ export const Admin = () => {
               </tr>
             </thead>
             <tbody>
-              {users.map((user: any, index: number) => (
-                <tr key={index} className="border-b last:border-b-0">
+              {paginatedUsers.map((user: any, index: number) => (
+                <tr
+                  key={index}
+                  className="border-b last:border-b-0"
+                >
                   <td className="p-4">
                     <input
                       type="checkbox"
@@ -138,16 +172,28 @@ export const Admin = () => {
                   <td className="p-4">{user.phoneNumber || "N/A"}</td>
                   <td className="p-4">
                     <div className="flex gap-2">
-                      <button className="p-2 hover:bg-gray-100 rounded-lg text-gray-600">
+                      <button
+                        className="p-2 hover:bg-gray-100 rounded-lg text-gray-600"
+                        onClick={() => handleViewDetails(user)}
+                      >
                         <Search className="w-4 h-4" />
                       </button>
-                      <button className="p-2 hover:bg-gray-100 rounded-lg text-gray-600">
-                        <Edit3 className="w-4 h-4" />
-                      </button>
-                      <button className="p-2 hover:bg-gray-100 rounded-lg text-gray-600">
+                      <button
+                        className="p-2 hover:bg-gray-100 rounded-lg text-yellow-500"
+                        onClick={() => handleSuspendUser(user)}
+                      >
                         <Eye className="w-4 h-4" />
                       </button>
-                      <button className="p-2 hover:bg-gray-100 rounded-lg text-red-500">
+                      <button
+                        className="p-2 hover:bg-gray-100 rounded-lg text-gray-600"
+                        onClick={() => handleEditUser(user)}
+                      >
+                        <Edit3 className="w-4 h-4" />
+                      </button>
+                      <button
+                        className="p-2 hover:bg-gray-100 rounded-lg text-red-500"
+                        onClick={() => handleDeleteUser(user)}
+                      >
                         <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
@@ -161,13 +207,33 @@ export const Admin = () => {
 
       {/* Pagination */}
       <div className="flex justify-end mt-4 gap-1">
-        <button className="px-3 py-1 rounded bg-yellow-500 text-white">
-          1
+        <button
+          className="px-3 py-1 rounded text-gray-600"
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+        >
+          Previous
         </button>
-        <button className="px-3 py-1 rounded text-gray-600">2</button>
-        <button className="px-3 py-1 rounded text-gray-600">3</button>
-        <button className="px-3 py-1 rounded text-gray-600">...</button>
-        <button className="px-3 py-1 rounded text-gray-600">10</button>
+        {Array.from({length: totalPages}, (_, i) => (
+          <button
+            key={i}
+            className={`px-3 py-1 rounded ${
+              currentPage === i + 1
+                ? "bg-yellow-500 text-white"
+                : "text-gray-600"
+            }`}
+            onClick={() => handlePageChange(i + 1)}
+          >
+            {i + 1}
+          </button>
+        ))}
+        <button
+          className="px-3 py-1 rounded text-gray-600"
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+        >
+          Next
+        </button>
       </div>
     </div>
   );

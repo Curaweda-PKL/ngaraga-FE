@@ -1,6 +1,5 @@
-import React, {useState} from "react";
-import {FaTrash} from "react-icons/fa";
-import {FaTag} from "react-icons/fa";
+import React, { useState } from "react";
+import { FaTrash, FaTag } from "react-icons/fa";
 
 const Cart: React.FC = () => {
   const [cartItems, setCartItems] = useState([
@@ -21,7 +20,7 @@ const Cart: React.FC = () => {
     setCartItems((items) =>
       items.map((item) =>
         item.id === id
-          ? {...item, quantity: Math.max(1, item.quantity + delta)}
+          ? { ...item, quantity: Math.max(1, item.quantity + delta) }
           : item
       )
     );
@@ -76,7 +75,9 @@ const Cart: React.FC = () => {
                 checked={selectAll}
                 onChange={toggleSelectAll}
               />
-              <label className="text-[#404040]">Select All</label>
+              <p className="text-[#404040] font-semibold text-lg select-none">
+                Select All
+              </p>
             </div>
             <button
               className="btn bg-call-to-action border-transparent rounded-lg text-white flex items-center space-x-2"
@@ -90,7 +91,7 @@ const Cart: React.FC = () => {
           {cartItems.map((item) => (
             <div
               key={item.id}
-              className="flex items-center justify-between p-4 mb-4 bg-white rounded-lg"
+              className="flex items-center justify-between p-4 mb-4 bg-white border border-neutral-colors-500 rounded-lg"
             >
               <div className="flex items-center space-x-4">
                 <input

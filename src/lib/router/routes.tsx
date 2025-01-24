@@ -36,6 +36,7 @@ import {Payment} from "../admin-pages/payment";
 import {Admin} from "../admin-pages/admin/admin";
 import {AddAdmin} from "../admin-pages/admin/add-admin";
 import {ProfileSettings} from "../admin-pages/admin-profile";
+
 import AdminLogin from "../pages/auth/login/admin-login";
 import SentEmail from "../pages/auth/login/sentEmail";
 import SuccesRegist from "../pages/events/success-regist";
@@ -60,9 +61,7 @@ const TopCollectors = React.lazy(() => import("@/lib/pages/top-players"));
 const SpecialCardDetail = React.lazy(
   () => import("@/lib/pages/account/specialcard-details")
 );
-const ViewDetail = React.lazy(
-  () => import("@/lib/pages/order-details/view-details")
-);
+const ViewDetail = React.lazy(() => import("@/lib/pages/account/view-details"));
 const DetailSpecial = React.lazy(
   () => import("@/lib/pages/detail-card/detail-special-index")
 );
@@ -86,8 +85,8 @@ const EventRegistration = React.lazy(
 const Checkout = React.lazy(
   () => import("@/lib/pages/checkout/checkout-index")
 );
-const CheckoutLogin = React.lazy(
-  () => import("@/lib/pages/checkout/chekout-login-index")
+const CheckoutExisting = React.lazy(
+  () => import("@/lib/pages/checkout/chekout-existing-index")
 )
 const EditProfile = React.lazy(
   () => import("@/lib/pages/account/edit-profile-index")
@@ -143,7 +142,7 @@ export const routes: Array<PathRouteProps> = [
   {path: "/account", element: <Account />},
   {path: "/edit-profile", element: <EditProfile />},
   {path: "/checkout", element: <Checkout />},
-  {path: "/checkout-existing", element: <CheckoutLogin />},
+  {path: "/checkout-existing", element: <CheckoutExisting />},
   {path: "/payments", element: <PaymentPage />},
   {path: "/complete", element: <OrderComplete />},
   {path: "/order-detail", element: <OrderDetails />},
