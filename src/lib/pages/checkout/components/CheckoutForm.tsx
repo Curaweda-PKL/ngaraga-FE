@@ -54,7 +54,7 @@ const CheckoutForm: React.FC = () => {
     postalCode: "",
     addressDetails: "",
     notes: "",
-    pickUpTime: "", // initialize with an empty value
+    pickUpTime: "", 
   });
 
   const [provinces, setProvinces] = useState<Province[]>([]);
