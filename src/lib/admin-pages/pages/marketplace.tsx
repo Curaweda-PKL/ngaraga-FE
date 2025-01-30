@@ -37,7 +37,7 @@ export const MarketplaceForm: React.FC = () => {
   };
 
   return (
-    <div className="p-6 bg-gray-100 min-h-screen">
+    <div className="p-6  min-h-screen">
       <div className="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-lg">
         {/* Header */}
         <h1 className="text-2xl font-bold text-gray-700 mb-4">Marketplace</h1>

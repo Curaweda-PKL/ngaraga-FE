@@ -136,6 +136,24 @@ input:checked + label {
   color: var(--call-to-actions-900); 
 }
 
+/* Replace your existing checkbox styles with these */
+.bg-whitey {
+  background-color: white;
+  color: var(--neutral-colors-500);
+}
+
+.border-cta-900 {
+  border: 2px solid var(--call-to-actions-900);
+}
+
+.bg-cta-100 {
+  background-color: var(--call-to-actions-100);
+}
+
+.text-cta-900 {
+  color: var(--call-to-actions-900);
+}
+
 
 @layer base {
   /* Fullscreen container */

@@ -1,7 +1,12 @@
-import {useState} from "react";
-import {FaTrash} from "react-icons/fa";
+import { useState, useEffect } from "react";
+import { FaTrash } from "react-icons/fa";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+
+interface Subscription {
+  email: string;
+  registerDate: string; // adjust based on the actual response type
+}
 
 export const Subscription = () => {
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
@@ -9,21 +14,41 @@ export const Subscription = () => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedEmails, setSelectedEmails] = useState<string[]>([]);
   const [showModal, setShowModal] = useState<boolean>(false);
+  const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const initialSubscriptions = [
-    {email: "budi.santoso@example.com", registerDate: "2025-01-20T09:30:00"},
-    {email: "siti.nurhaliza@example.com", registerDate: "2025-02-22T14:00:00"},
-    {email: "contact@samplemail.com", registerDate: "2025-03-05T11:45:00"},
-    {email: "rina.wulandari@example.com", registerDate: "2025-04-10T16:00:00"},
-    {email: "doni.setiawan@example.com", registerDate: "2025-05-15T08:15:00"},
-    {email: "nina.anggraini@example.com", registerDate: "2025-06-30T10:30:00"},
-    {email: "rudi.hartono@example.com", registerDate: "2025-07-25T12:00:00"},
-    {email: "lina.sari@example.com", registerDate: "2025-08-10T15:00:00"},
-    {email: "joko.widodo@example.com", registerDate: "2025-09-20T09:00:00"},
-    {email: "maya.sari@example.com", registerDate: "2025-10-15T14:45:00"},
-  ];
+  useEffect(() => {
+    const fetchSubscriptions = async () => {
+      try {
+        const response = await fetch("http://localhost:3000/api/subscriptions/all");
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const responseData = await response.json();
 
-  const [subscriptions, setSubscriptions] = useState(initialSubscriptions);
+        // Adjust this line to match the actual API response structure
+        const subscriptionsData = responseData.data.subscriptions.map((sub: any) => ({
+          email: sub.email,
+          registerDate: sub.createdAt, // Map createdAt to registerDate
+        }));
+
+        setSubscriptions(subscriptionsData);
+        setError(null);
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          setError(err.message); // Type assertion to Error here
+        } else {
+          setError("An unknown error occurred.");
+        }
+        setSubscriptions([]); // Ensure subscriptions remains an array
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSubscriptions();
+  }, []);
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
@@ -135,58 +160,70 @@ export const Subscription = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-        <table className="w-full">
-          <thead>
-            <tr className="bg-gray-50 border-b border-gray-200">
-              <th className="p-4 text-left">
-                <input
-                  type="checkbox"
-                  className="rounded border-gray-300"
-                  checked={
-                    selectedEmails.length === filteredSubscriptions.length
-                  }
-                  onChange={(e) => handleSelectAll(e.target.checked)}
-                />
-              </th>
-              <th className="p-4 text-left font-medium">Email</th>
-              <th className="p-4 text-left font-medium">Register Date</th>
-              <th className="p-4 text-left font-medium">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredSubscriptions.map((subscription, index) => (
-              <tr
-                key={index}
-                className="border-b last:border-b-0"
-              >
-                <td className="p-4">
+      {loading ? (
+        <div className="text-center p-8 text-gray-500">Loading subscriptions...</div>
+      ) : error ? (
+        <div className="text-center p-8 text-red-500">Error: {error}</div>
+      ) : (
+        <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+          <table className="w-full">
+            <thead>
+              <tr className="bg-gray-50 border-b border-gray-200">
+                <th className="p-4 text-left">
                   <input
                     type="checkbox"
                     className="rounded border-gray-300"
-                    checked={selectedEmails.includes(subscription.email)}
-                    onChange={(e) =>
-                      handleSelectEmail(subscription.email, e.target.checked)
+                    checked={
+                      filteredSubscriptions.length > 0 &&
+                      selectedEmails.length === filteredSubscriptions.length
                     }
+                    onChange={(e) => handleSelectAll(e.target.checked)}
+                    disabled={filteredSubscriptions.length === 0}
                   />
-                </td>
-                <td className="p-4">{subscription.email}</td>
-                <td className="p-4">
-                  {new Date(subscription.registerDate).toLocaleString()}
-                </td>
-                <td className="p-4">
-                  <button
-                    className="text-red-500 hover:text-red-600"
-                    onClick={() => handleSingleDelete(subscription.email)}
-                  >
-                    <FaTrash />
-                  </button>
-                </td>
+                </th>
+                <th className="p-4 text-left font-medium">Email</th>
+                <th className="p-4 text-left font-medium">Register Date</th>
+                <th className="p-4 text-left font-medium">Action</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {filteredSubscriptions.map((subscription, index) => (
+                <tr key={index} className="border-b last:border-b-0">
+                  <td className="p-4">
+                    <input
+                      type="checkbox"
+                      className="rounded border-gray-300"
+                      checked={selectedEmails.includes(subscription.email)}
+                      onChange={(e) =>
+                        handleSelectEmail(subscription.email, e.target.checked)
+                      }
+                    />
+                  </td>
+                  <td className="p-4">{subscription.email}</td>
+                  <td className="p-4">
+                    {new Date(subscription.registerDate).toLocaleString()}
+                  </td>
+                  <td className="p-4">
+                    <button
+                      className="text-red-500 hover:text-red-600"
+                      onClick={() => handleSingleDelete(subscription.email)}
+                    >
+                      <FaTrash />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+              {filteredSubscriptions.length === 0 && (
+                <tr>
+                  <td colSpan={4} className="p-4 text-center text-gray-500">
+                    No subscriptions found
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
 
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">

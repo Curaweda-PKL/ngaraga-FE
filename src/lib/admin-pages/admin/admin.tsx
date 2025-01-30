@@ -1,6 +1,6 @@
-import {useState, useEffect} from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
-import {Search, Edit3, Eye, Trash2, Plus} from "lucide-react";
+import { Search, Edit3, Eye, Trash2, Plus } from "lucide-react";
 
 export const Admin = () => {
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
@@ -27,7 +27,6 @@ export const Admin = () => {
         setLoading(false);
       }
     };
-
     fetchAdmins();
   }, []);
 
@@ -59,9 +58,26 @@ export const Admin = () => {
     alert(`Editing user ${user.fullName}`);
   };
 
-  const handleDeleteUser = (user: any) => {
-    if (window.confirm(`Are you sure you want to delete ${user.fullName}?`)) {
-      alert(`Deleted user ${user.fullName}`);
+  // Handle User Deletion
+  const handleDeleteUser = async (user: any) => {
+    if (
+      window.confirm(
+        `Are you sure you want to delete ${user.fullName}? This action cannot be undone.`
+      )
+    ) {
+      try {
+        await axios.delete(
+          `http://localhost:3000/api/account/delete/${user.id}`
+        );
+        // Remove the deleted user from the state
+        setUsers((prevUsers) =>
+          prevUsers.filter((u: any) => u.id !== user.id)
+        );
+        alert(`Deleted user ${user.fullName}`);
+      } catch (err) {
+        console.error(err);
+        alert(`Failed to delete user ${user.fullName}. Please try again.`);
+      }
     }
   };
 
@@ -85,9 +101,7 @@ export const Admin = () => {
           <li>Admin List</li>
         </ul>
       </div>
-
       <h1 className="text-2xl font-semibold mb-6">Admin</h1>
-
       {/* Action bar */}
       <div className="flex justify-between items-center mb-6">
         {/* Add button */}
@@ -97,7 +111,6 @@ export const Admin = () => {
             <a href="/admin/add-admin">Add Admin</a>
           </span>
         </button>
-
         {/* Search input */}
         <div className="relative w-64">
           <input
@@ -110,7 +123,6 @@ export const Admin = () => {
           <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
         </div>
       </div>
-
       {/* Loading and Error States */}
       {loading ? (
         <p className="text-center text-gray-500">Loading...</p>
@@ -138,10 +150,7 @@ export const Admin = () => {
             </thead>
             <tbody>
               {paginatedUsers.map((user: any, index: number) => (
-                <tr
-                  key={index}
-                  className="border-b last:border-b-0"
-                >
+                <tr key={index} className="border-b last:border-b-0">
                   <td className="p-4">
                     <input
                       type="checkbox"
@@ -162,7 +171,7 @@ export const Admin = () => {
                               : "/api/placeholder/40/40"
                           }
                           alt={`${user.fullName}'s avatar`}
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-contain"
                         />
                       </div>
                       <span className="font-medium">{user.fullName}</span>
@@ -204,7 +213,6 @@ export const Admin = () => {
           </table>
         </div>
       )}
-
       {/* Pagination */}
       <div className="flex justify-end mt-4 gap-1">
         <button
@@ -214,7 +222,7 @@ export const Admin = () => {
         >
           Previous
         </button>
-        {Array.from({length: totalPages}, (_, i) => (
+        {Array.from({ length: totalPages }, (_, i) => (
           <button
             key={i}
             className={`px-3 py-1 rounded ${

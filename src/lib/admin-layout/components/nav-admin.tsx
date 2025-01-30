@@ -1,5 +1,6 @@
-import {useState, useRef, useEffect} from "react";
-import {Bell} from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { Bell } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface Notification {
   id: string;
@@ -12,6 +13,7 @@ interface Notification {
 const Navbar = () => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+  const navigate = useNavigate();
   const [notifications] = useState<Notification[]>([
     {
       id: "1",
@@ -81,6 +83,23 @@ const Navbar = () => {
     };
   }, []);
 
+  const handleLogout = async () => {
+    try {
+      const response = await fetch("http://localhost:3000/api/logout", {
+        method: "POST", // or "GET" based on your API
+        credentials: "include", // To include cookies
+      });
+      
+      if (response.ok) {
+        navigate("/login"); // Redirect to login page after successful logout
+      } else {
+        console.error("Logout failed");
+      }
+    } catch (error) {
+      console.error("Error during logout:", error);
+    }
+  };
+
   const getNotificationIcon = (type: string) => {
     const iconClasses =
       {
@@ -134,7 +153,7 @@ const Navbar = () => {
                 <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-lg shadow-lg dark:bg-gray-700 ring-1 ring-black ring-opacity-5">
                   <div className="p-4">
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                      Notification
+                      Notifications
                     </h3>
                     <div className="space-y-4 max-h-[60vh] overflow-y-auto">
                       {notifications.map((notification) => (
@@ -191,13 +210,15 @@ const Navbar = () => {
                     >
                       Profile
                     </a>
-                    <a
-                      href="/"
-                      onClick={() => setIsProfileOpen(false)}
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white"
+                    <button
+                      onClick={() => {
+                        setIsProfileOpen(false);
+                        handleLogout();
+                      }}
+                      className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white text-left"
                     >
                       Logout
-                    </a>
+                    </button>
                   </div>
                 </div>
               )}

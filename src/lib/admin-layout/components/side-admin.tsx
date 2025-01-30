@@ -43,6 +43,7 @@ const SidebarComponent = () => {
     home: 'CMS_HOME',
     marketplacePages: 'CMS_MARKETPLACE_PAGES',
     rankings: 'CMS_RANKINGS',
+    pagesEvent: 'CMS_PAGES_EVENT',
     events: 'CMS_EVENTS',
     coupon: 'CMS_COUPON',
     creator: 'CMS_CREATOR',
@@ -163,9 +164,9 @@ const SidebarComponent = () => {
                         { name: "Sign-In", permission: CMS_PERMISSION_MAP.signin, icon: <FaSignInAlt /> },
                         { name: "Sign-Up", permission: CMS_PERMISSION_MAP.signup, icon: <FaSignOutAlt /> },
                         { name: "Home", permission: CMS_PERMISSION_MAP.home, icon: <FaHome /> },
-                        { name: "Marketplace Pages", permission: CMS_PERMISSION_MAP.marketplacePages, icon: <FaShoppingCart /> },
+                        { name: "Marketplace", permission: CMS_PERMISSION_MAP.marketplacePages, icon: <FaShoppingCart /> },
                         { name: "Rankings", permission: CMS_PERMISSION_MAP.rankings, icon: <FaStar /> },
-                        { name: "Events", permission: CMS_PERMISSION_MAP.events, icon: <FaCalendarAlt /> },
+                        { name: "Events", permission: CMS_PERMISSION_MAP.pagesEvent, icon: <FaCalendarAlt /> },
                       ].map(({ name, permission, icon }) => 
                         hasPermission(permission) && (
                           <li key={name}>

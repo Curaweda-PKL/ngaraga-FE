@@ -1,13 +1,37 @@
-import type React from "react";
-import {FaDiscord, FaInstagram, FaTwitter, FaYoutube} from "react-icons/fa";
+import { useState } from "react";
+import { FaDiscord, FaInstagram, FaTwitter, FaYoutube } from "react-icons/fa";
 
 export const Footer: React.FC = () => {
+  const [email, setEmail] = useState<string>(""); // State for email input
+  const [message, setMessage] = useState<string>(""); // State for response message
+
   const socialLinks = [
-    {icon: <FaDiscord className="h-5 w-5" />, href: "#"},
-    {icon: <FaYoutube className="h-5 w-5" />, href: "#"},
-    {icon: <FaTwitter className="h-5 w-5" />, href: "#"},
-    {icon: <FaInstagram className="h-5 w-5" />, href: "#"},
+    { icon: <FaDiscord className="h-5 w-5" />, href: "#" },
+    { icon: <FaYoutube className="h-5 w-5" />, href: "#" },
+    { icon: <FaTwitter className="h-5 w-5" />, href: "#" },
+    { icon: <FaInstagram className="h-5 w-5" />, href: "#" },
   ];
+
+  const handleSubscription = async () => {
+    try {
+      const response = await fetch("http://localhost:3000/api/subscribe", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      if (response.ok) {
+        setMessage("Email verification has been sent! Please check your inbox.");
+        setEmail(""); // Clear the email input after successful submission
+      } else {
+        setMessage("There was an error with the subscription. Please try again.");
+      }
+    } catch (error) {
+      setMessage("An error occurred. Please try again later.");
+    }
+  };
 
   return (
     <footer className="bg-[#3B3B3B] px-4 py-8 sm:px-6 md:px-8 lg:px-16 xl:px-24 text-white">
@@ -94,18 +118,24 @@ export const Footer: React.FC = () => {
               type="email"
               placeholder="Enter your email here"
               className="flex-1 px-4 text-sm bg-[#2b2b2b] text-white border-transparent rounded-lg  focus:border-0"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
-            <button className="bg-call-to-actions-800 px-6 py-3 text-sm text-white transition-all duration-300 hover:bg-call-to-actions-800 rounded-lg border border-l-transparent hover:text-black ">
+            <button
+              className="bg-call-to-actions-800 px-6 py-3 text-sm text-white transition-all duration-300 hover:bg-call-to-actions-800 rounded-lg border border-l-transparent hover:text-black"
+              onClick={handleSubscription}
+            >
               Subscribe
             </button>
           </div>
+          {message && <p className="mt-2 text-sm text-white">{message}</p>}
         </div>
       </div>
 
       {/* Copyright */}
       <div
         className="mt-8 sm:mt-10 md:mt-12 border-t pt-6 sm:pt-8"
-        style={{borderTop: "1px solid var(--old-secondary)"}}
+        style={{ borderTop: "1px solid var(--old-secondary)" }}
       >
         <p className="text-sm text-white text-center md:text-left">
           © Ngaraga by Dolanan yuk x Curaweda.
