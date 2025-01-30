@@ -102,7 +102,7 @@ export const Categories = () => {
         setCategoriesList((prev) => [...prev, response.data.category]);
         setIsAddModalOpen(false);
         setSelectedimage(null);
-        window.location.reload(); // Remove if you're updating state properly
+        window.location.reload();
       }
     } catch (error) {
       console.error("Error adding category:", error);
