@@ -88,6 +88,9 @@ const Checkout = React.lazy(
 const CheckoutExisting = React.lazy(
   () => import("@/lib/pages/checkout/chekout-existing-index")
 )
+const EditProfile = React.lazy(
+  () => import("@/lib/pages/account/edit-profile-index")
+)
 
 export const routes: Array<PathRouteProps> = [
   {path: "/admin/dashboard", element: <Dashboard />},
@@ -137,6 +140,7 @@ export const routes: Array<PathRouteProps> = [
   {path: "/special-card-detail", element: <SpecialCardDetail />},
   {path: "/cart", element: <Cart />},
   {path: "/account", element: <Account />},
+  {path: "/edit-profile", element: <EditProfile />},
   {path: "/checkout", element: <Checkout />},
   {path: "/checkout-existing", element: <CheckoutExisting />},
   {path: "/payments", element: <PaymentPage />},
