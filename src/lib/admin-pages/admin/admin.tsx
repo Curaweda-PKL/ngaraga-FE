@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { Search, Edit3, Eye, Trash2, Plus } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export const Admin = () => {
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
@@ -10,6 +11,7 @@ export const Admin = () => {
   const [error, setError] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(5);
+  const navigate = useNavigate();
 
   // Fetch users
   useEffect(() => {
@@ -55,7 +57,7 @@ export const Admin = () => {
   };
 
   const handleEditUser = (user: any) => {
-    alert(`Editing user ${user.fullName}`);
+    navigate(`/admin/edit-profile/${user.id}`);
   };
 
   // Handle User Deletion

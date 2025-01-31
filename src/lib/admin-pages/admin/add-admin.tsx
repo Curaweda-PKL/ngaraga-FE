@@ -11,7 +11,7 @@ export const AddAdmin = () => {
     fullName: "",
     username: "",
     email: "",
-    phoneNumber: "",
+    phoneNumber: "+62",
     bio: "",
     website: "",
     discord: "",
