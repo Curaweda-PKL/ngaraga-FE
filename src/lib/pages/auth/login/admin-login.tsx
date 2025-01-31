@@ -95,7 +95,7 @@ const AdminLogin: React.FC = () => {
       console.log("Login Response:", response.data);
 
       // Optionally redirect the user
-      window.location.href = "/";
+      window.location.href = "/admin/dashboard";
     } catch (error: any) {
       console.error("Error during login:", error);
       setError({ general: error.response?.data?.message || "Login failed!" });

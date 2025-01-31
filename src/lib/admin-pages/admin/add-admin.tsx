@@ -3,12 +3,15 @@ import { AccessComponents } from "./components/accessComponents";
 
 export const AddAdmin = () => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [selectedPermissions, setSelectedPermissions] = useState<string[]>([]);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     fullName: "",
     username: "",
     email: "",
-    phoneNumber: "",
+    phoneNumber: "+62",
     bio: "",
     website: "",
     discord: "",
@@ -34,8 +37,6 @@ export const AddAdmin = () => {
     confirmPassword: "",
   };
 
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-
   // Load data from localStorage if available
   useEffect(() => {
     const savedData = localStorage.getItem("addAdminForm");
@@ -49,9 +50,18 @@ export const AddAdmin = () => {
     localStorage.setItem("addAdminForm", JSON.stringify(formData));
   }, [formData]);
 
+  const handlePermissionChange = (permissionKey: string, isChecked: boolean) => {
+    setSelectedPermissions((prev) =>
+      isChecked
+        ? [...prev, permissionKey]
+        : prev.filter((key) => key !== permissionKey)
+    );
+  };
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      setSelectedFile(file);
       const reader = new FileReader();
       reader.onload = () => {
         setImagePreview(reader.result as string);
@@ -68,6 +78,7 @@ export const AddAdmin = () => {
     e.preventDefault();
     const file = e.dataTransfer.files[0];
     if (file) {
+      setSelectedFile(file);
       const reader = new FileReader();
       reader.onload = () => {
         setImagePreview(reader.result as string);
@@ -84,33 +95,49 @@ export const AddAdmin = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // Prepare the form data for submission
-    const adminData = {
-      fullName: formData.fullName,
-      phoneNumber: formData.phoneNumber,
-      email: formData.email,
-      password: formData.password,
-      confirmPassword: formData.confirmPassword,
-      socialLinks: {
+    const formPayload = new FormData();
+
+    // Append image file
+    if (selectedFile) {
+      formPayload.append("image", selectedFile);
+    }
+
+    // Append form data
+    formPayload.append("fullName", formData.fullName);
+    formPayload.append("username", formData.username);
+    formPayload.append("email", formData.email);
+    formPayload.append("phoneNumber", formData.phoneNumber);
+    formPayload.append("bio", formData.bio);
+    formPayload.append("password", formData.password);
+    formPayload.append("confirmPassword", formData.confirmPassword);
+
+    // Append social links as JSON string
+    formPayload.append(
+      "socialLinks",
+      JSON.stringify({
         website: formData.website,
         discord: formData.discord,
         youtube: formData.youtube,
         twitter: formData.twitter,
         instagram: formData.instagram,
-      },
-    };
+      })
+    );
+
+    // Append permissions
+    formPayload.append("permissions", JSON.stringify(selectedPermissions));
 
     try {
       const response = await fetch("http://localhost:3000/api/create-admin", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(adminData),
+        body: formPayload, // Let browser set Content-Type with boundary
       });
 
       if (response.ok) {
         alert("Admin created successfully!");
+        setFormData(CancelClearFormData);
+        setImagePreview(null);
+        setSelectedFile(null);
+        localStorage.removeItem("addAdminForm");
       } else {
         alert("Failed to create admin");
       }
@@ -118,6 +145,13 @@ export const AddAdmin = () => {
       console.error("Error creating admin:", error);
       alert("An error occurred while creating the admin.");
     }
+  };
+
+  const handleCancel = () => {
+    setFormData(CancelClearFormData);
+    setImagePreview(null);
+    setSelectedFile(null);
+    localStorage.removeItem("addAdminForm");
   };
 
   return (
@@ -183,6 +217,7 @@ export const AddAdmin = () => {
               value={formData.fullName}
               onChange={handleInputChange}
               placeholder="Full Name"
+              required
             />
           </div>
 
@@ -197,6 +232,7 @@ export const AddAdmin = () => {
               value={formData.username}
               onChange={handleInputChange}
               placeholder="Username"
+              required
             />
           </div>
 
@@ -211,6 +247,7 @@ export const AddAdmin = () => {
               value={formData.email}
               onChange={handleInputChange}
               placeholder="Email"
+              required
             />
           </div>
 
@@ -317,6 +354,7 @@ export const AddAdmin = () => {
               value={formData.password}
               onChange={handleInputChange}
               placeholder="New Password"
+              required
             />
           </div>
 
@@ -331,17 +369,21 @@ export const AddAdmin = () => {
               value={formData.confirmPassword}
               onChange={handleInputChange}
               placeholder="Confirm Password"
+              required
             />
           </div>
         </div>
 
-        <AccessComponents />
+        <AccessComponents
+          selectedPermissions={selectedPermissions}
+          onPermissionChange={handlePermissionChange}
+        />
 
         <div className="flex justify-end gap-4 pt-4">
           <button
             type="button"
             className="px-6 py-2 border rounded-lg hover:bg-gray-50"
-            onClick={() => setFormData(CancelClearFormData)}
+            onClick={handleCancel}
           >
             Cancel
           </button>

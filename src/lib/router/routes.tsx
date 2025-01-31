@@ -40,6 +40,7 @@ import {ProfileSettings} from "../admin-pages/admin-profile";
 import AdminLogin from "../pages/auth/login/admin-login";
 import SentEmail from "../pages/auth/login/sentEmail";
 import SuccesRegist from "../pages/events/success-regist";
+import { EditProfileAdmin } from "../admin-pages/admin/edit-admin";
 
 // Lazy-loaded Pages
 const Home = React.lazy(() => import("@/lib/pages/home/Home"));
@@ -127,6 +128,7 @@ export const routes: Array<PathRouteProps> = [
   {path: "/admin/admin", element: <Admin />},
   {path: "/admin/add-admin", element: <AddAdmin />},
   {path: "/admin/profile", element: <ProfileSettings />},
+  {path: "/admin/edit-profile/:id", element: <EditProfileAdmin />},
 
   {path: "/signup", element: <Signup />},
   {path: "/login", element: <Login />},
