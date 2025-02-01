@@ -43,7 +43,7 @@ const SidebarComponent = () => {
     home: 'CMS_HOME',
     marketplacePages: 'CMS_MARKETPLACE_PAGES',
     rankings: 'CMS_RANKINGS',
-    pagesEvent: 'CMS_PAGES_EVENT',
+    pagesEvent: 'CMS_PAGES_EVENTS',
     events: 'CMS_EVENTS',
     coupon: 'CMS_COUPON',
     creator: 'CMS_CREATOR',

@@ -1,17 +1,20 @@
 import { useEffect, useRef, useState } from "react";
 import { AccessComponents } from "./components/accessComponents";
+import { useNavigate } from "react-router-dom";
 
 export const AddAdmin = () => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [selectedPermissions, setSelectedPermissions] = useState<string[]>([]);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const navigate = useNavigate(); 
 
   const [formData, setFormData] = useState({
     fullName: "",
     username: "",
     email: "",
-    phoneNumber: "+62",
+    countryCode: "+62",
+    phoneNumber: "",
     bio: "",
     website: "",
     discord: "",
@@ -26,6 +29,7 @@ export const AddAdmin = () => {
     fullName: "",
     username: "",
     email: "",
+    countryCode: "",
     phoneNumber: "",
     bio: "",
     website: "",
@@ -92,6 +96,11 @@ export const AddAdmin = () => {
     setFormData((prevData) => ({ ...prevData, [name]: value }));
   };
 
+  const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const { name, value} = e.target;
+    setFormData((prevData) => ({ ...prevData, [name]: value }));
+  }
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -106,6 +115,7 @@ export const AddAdmin = () => {
     formPayload.append("fullName", formData.fullName);
     formPayload.append("username", formData.username);
     formPayload.append("email", formData.email);
+    formPayload.append("countryCode", formData.countryCode);
     formPayload.append("phoneNumber", formData.phoneNumber);
     formPayload.append("bio", formData.bio);
     formPayload.append("password", formData.password);
@@ -141,6 +151,8 @@ export const AddAdmin = () => {
       } else {
         alert("Failed to create admin");
       }
+
+      navigate("/admin/admin");
     } catch (error) {
       console.error("Error creating admin:", error);
       alert("An error occurred while creating the admin.");
@@ -152,6 +164,7 @@ export const AddAdmin = () => {
     setImagePreview(null);
     setSelectedFile(null);
     localStorage.removeItem("addAdminForm");
+    navigate("/admin/admin");
   };
 
   return (
@@ -256,7 +269,9 @@ export const AddAdmin = () => {
             <div className="flex">
               <select
                 className="p-2 border rounded-l-lg w-20"
-                defaultValue="+62"
+                name="countryCode"
+                value={formData.countryCode}
+                onChange={handleSelectChange}
               >
                 <option value="+62">+62</option>
               </select>

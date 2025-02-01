@@ -142,7 +142,7 @@ export const routes: Array<PathRouteProps> = [
   {path: "/special-card-detail", element: <SpecialCardDetail />},
   {path: "/cart", element: <Cart />},
   {path: "/account", element: <Account />},
-  {path: "/edit-profile", element: <EditProfile />},
+  {path: "/account/edit-profile", element: <EditProfile />},
   {path: "/checkout", element: <Checkout />},
   {path: "/checkout-existing", element: <CheckoutExisting />},
   {path: "/payments", element: <PaymentPage />},

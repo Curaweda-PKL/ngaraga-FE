@@ -159,7 +159,7 @@ export const Navbar: React.FC = () => {
                     <li>
                       <a
                         className="block px-4 py-2 text-sm hover:bg-gray-100"
-                        onClick={() => navigateToPage("profile")}
+                        onClick={() => navigateToPage("account")}
                       >
                         Profile
                       </a>

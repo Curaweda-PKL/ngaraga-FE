@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef,  } from "react";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 
 interface Country {
@@ -9,24 +9,28 @@ interface Country {
 
 interface PhoneInputProps {
   className?: string;
-  // Other props...
+  countryCode: string;
+  phoneNumber: string;
+  onChange: (countryCode: string, phoneNumber: string) => void;
 }
 
 const countries: Country[] = [
   { name: "Austria", prefix: 43, flag: "at" },
   { name: "Belgium", prefix: 32, flag: "be" },
   { name: "Bulgaria", prefix: 359, flag: "bg" },
-  { name: "Netherlands", prefix: 31, flag: "id" },
+  { name: "Netherlands", prefix: 31, flag: "nl" },
+  { name: "Indonesia", prefix: 62, flag: "id" }, 
   // Add more countries here
 ];
 
-const PhoneInput: React.FC<PhoneInputProps> = ({className, ...props}) => {
+const PhoneInput: React.FC<PhoneInputProps> = ({ className,  countryCode, phoneNumber, onChange }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [selectedCountry, setSelectedCountry] = useState<Country>(countries[0]);
   const [filteredCountries, setFilteredCountries] = useState<Country[]>(countries);
-
+  const [focusedIndex, setFocusedIndex] = useState(-1);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const handleOutsideClick = (event: MouseEvent) => {
@@ -36,96 +40,153 @@ const PhoneInput: React.FC<PhoneInputProps> = ({className, ...props}) => {
     };
 
     document.addEventListener("click", handleOutsideClick);
-    return () => {
-      document.removeEventListener("click", handleOutsideClick);
-    };
+    return () => document.removeEventListener("click", handleOutsideClick);
   }, []);
+
+  useEffect(() => {
+    if (isOpen && searchInputRef.current) {
+      searchInputRef.current.focus();
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: globalThis.KeyboardEvent) => {
+      if (!isOpen) return;
+
+      switch (e.key) {
+        case "ArrowDown":
+          e.preventDefault();
+          setFocusedIndex(prev => Math.min(prev + 1, filteredCountries.length - 1));
+          break;
+        case "ArrowUp":
+          e.preventDefault();
+          setFocusedIndex(prev => Math.max(prev - 1, -1));
+          break;
+        case "Enter":
+          if (focusedIndex >= 0) {
+            handleCountrySelect(filteredCountries[focusedIndex]);
+          }
+          break;
+        case "Escape":
+          setIsOpen(false);
+          break;
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen, filteredCountries, focusedIndex]);
+
+
+  useEffect(() => {
+    const numericCode = countryCode ? parseInt(countryCode.replace('+', '')) : NaN;
+    const country = countries.find(c => c.prefix === numericCode) || countries[0];
+    setSelectedCountry(country);
+  }, [countryCode]);
+
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.toLowerCase();
     setSearch(value);
     setFilteredCountries(
       countries.filter(
-        (country) =>
+        country =>
           country.name.toLowerCase().includes(value) ||
-          country.prefix.toString().includes(value)
+          country.prefix.toString().startsWith(value)
       )
     );
+    setFocusedIndex(-1);
   };
 
   const handleCountrySelect = (country: Country) => {
     setSelectedCountry(country);
     setIsOpen(false);
+    setFocusedIndex(-1);
+    onChange(`+${country.prefix}`, phoneNumber);
+
+  };
+
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.replace(/[^0-9]/g, "");
+    onChange(`+${selectedCountry.prefix}`, value);
   };
 
   return (
-    <div className={`relative w-full max-w-full ${className}`} ref={dropdownRef}>
+    <div className={`relative w-full ${className}`} ref={dropdownRef}>
       <div className="flex items-center">
-        {/* Country Selector */}
         <button
+          type="button"
           onClick={() => setIsOpen(!isOpen)}
-          className="flex items-center border border-neutral-colors-500 rounded-l-lg w-1/3 px-3 py-2 focus:outline-none"
+          className="flex items-center justify-between border border-r-0 border-neutral-500 rounded-l-lg w-1/3 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          aria-haspopup="listbox"
+          aria-expanded={isOpen}
         >
-          <img
-            src={`https://flagpedia.net/data/flags/icon/36x27/${selectedCountry.flag}.png`}
-            alt={selectedCountry.name}
-            className="w-6 h-4"
-          />
-          <span className="text-gray-700 font-medium ml-2">+{selectedCountry.prefix}</span>
-
-          {/* Dropdown Icon */}
-          <span className="ml-auto">
-            {isOpen ? (
-              <FaChevronUp className="text-neutral-colors-500" />
-            ) : (
-              <FaChevronDown className="text-neutral-colors-500" />
-            )}
-          </span>
+          <div className="flex items-center">
+            <img
+              src={`https://flagpedia.net/data/flags/icon/36x27/${selectedCountry.flag}.png`}
+              alt={selectedCountry.name}
+              className="w-6 h-4 mr-2"
+            />
+            <span className="text-gray-700 font-medium">+{selectedCountry.prefix}</span>
+          </div>
+          {isOpen ? (
+            <FaChevronUp className="text-neutral-500 ml-2" />
+          ) : (
+            <FaChevronDown className="text-neutral-500 ml-2" />
+          )}
         </button>
 
-        {/* Dropdown Menu */}
         {isOpen && (
-          <div className="absolute z-10 w-1/3 bg-white border border-neutral-colors-500 rounded-lg mt-2 top-full left-[-5px]">
+          <div className="absolute z-10 w-1/3 bg-white border border-neutral-500 rounded-lg shadow-lg mt-1 top-full">
             <input
+              ref={searchInputRef}
               type="text"
               placeholder="Search country"
               value={search}
               onChange={handleSearchChange}
-              className="w-full p-3 border box-border "
+              className="w-full p-2 border-b border-neutral-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-            <ul className="max-h-60 overflow-y-auto">
-              {filteredCountries.length > 0 ? (
-                filteredCountries.map((country) => (
-                  <li
-                    key={country.flag}
-                    onClick={() => handleCountrySelect(country)}
-                    className={`flex items-center justify-between p-3 cursor-pointer hover:bg-gray-100 ${
-                      selectedCountry.flag === country.flag ? "bg-gray-200" : ""
-                    }`}
-                  >
-                    <div className="flex items-center space-x-2">
-                      <img
-                        src={`https://flagpedia.net/data/flags/icon/36x27/${country.flag}.png`}
-                        alt={country.name}
-                        className="w-6 h-4"
-                      />
-                      <span className="text-gray-700 font-medium">{country.name}</span>
-                    </div>
-                    <span className="text-gray-500">+{country.prefix}</span>
-                  </li>
-                ))
-              ) : (
-                <li className="p-3 text-gray-500 text-center">No results found</li>
+            <ul
+              role="listbox"
+              className="max-h-60 overflow-y-auto"
+              aria-label="Country selection"
+            >
+              {filteredCountries.map((country, index) => (
+                <li
+                  key={country.flag}
+                  role="option"
+                  aria-selected={selectedCountry.flag === country.flag}
+                  onClick={() => handleCountrySelect(country)}
+                  onMouseEnter={() => setFocusedIndex(index)}
+                  className={`flex items-center justify-between p-2 cursor-pointer ${
+                    focusedIndex === index ? "bg-blue-50" : ""
+                  } ${selectedCountry.flag === country.flag ? "bg-blue-100" : ""}`}
+                >
+                  <div className="flex items-center">
+                    <img
+                      src={`https://flagpedia.net/data/flags/icon/36x27/${country.flag}.png`}
+                      alt={country.name}
+                      className="w-6 h-4 mr-2"
+                    />
+                    <span className="text-gray-700">{country.name}</span>
+                  </div>
+                  <span className="text-gray-500">+{country.prefix}</span>
+                </li>
+              ))}
+              {filteredCountries.length === 0 && (
+                <li className="p-2 text-gray-500 text-center">No results found</li>
               )}
             </ul>
           </div>
         )}
 
-        {/* Phone Number Input */}
         <input
           type="tel"
+          value={phoneNumber}
+          onChange={handlePhoneChange}
           placeholder="Enter phone number"
-          className="w-2/3 border border-neutral-colors-500 rounded-r-lg px-3 py-2 focus:outline-none"
+          className="flex-1 border border-neutral-500 rounded-r-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          aria-label="Phone number"
         />
       </div>
     </div>

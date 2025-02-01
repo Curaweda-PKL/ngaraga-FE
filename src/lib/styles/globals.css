@@ -121,6 +121,10 @@ input::-webkit-inner-spin-button {
   color: var(--call-to-actions-900)
 }
 
+.FaCalendarAlt {
+  color: var(--call-to-actions-900)
+}
+
 /* Style when the checkbox is not checked */
 label {
   background-color: white;
