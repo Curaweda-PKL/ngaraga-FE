@@ -33,6 +33,7 @@ export const Series = () => {
   const [errorSeries, setErrorSeries] = useState<string | null>(null);
   const [selectedMaster, setSelectedMaster] = useState<number | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const itemsPerPage = 10;
 
   useEffect(() => {
@@ -88,8 +89,11 @@ export const Series = () => {
 
       const newSeries = await response.json();
       setSeriesList((prev) => [...prev, newSeries.series]);
+      setSuccessMessage("Series added successfully!");
     } catch (error) {
       console.error("Error adding series:", error);
+    } finally {
+      setTimeout(() => setSuccessMessage(null), 3000);
     }
   };
 
@@ -120,8 +124,11 @@ export const Series = () => {
             : series
         )
       );
+      setSuccessMessage("Series updated successfully!");
     } catch (error) {
       console.error("Error updating series:", error);
+    } finally {
+      setTimeout(() => setSuccessMessage(null), 3000);
     }
   };
 
@@ -139,8 +146,11 @@ export const Series = () => {
       }
 
       setSeriesList((prev) => prev.filter((series) => series.id !== id));
+      setSuccessMessage("Series deleted successfully!");
     } catch (error) {
       console.error("Error deleting series:", error);
+    } finally {
+      setTimeout(() => setSuccessMessage(null), 3000);
     }
   };
 
@@ -209,7 +219,7 @@ export const Series = () => {
                   onClose();
                 }
               }}
-              className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600"
+              className="px-4 py-2 bg-call-to-actions-900 text-white rounded-lg hover:bg-call-to-actions-800"
             >
               {submitText}
             </button>
@@ -249,11 +259,18 @@ export const Series = () => {
       {/* Title */}
       <h1 className="text-2xl font-bold mb-4">Series</h1>
 
+      {/* Success Message */}
+      {successMessage && (
+        <div className="text-green-500 mb-4 p-2 border border-green-500 bg-green-100 rounded-lg">
+          {successMessage}
+        </div>
+      )}
+
       {/* Add Series & Search */}
       <div className="flex justify-between items-center mb-6">
         <button
           onClick={() => setIsAddModalOpen(true)}
-          className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+          className="bg-call-to-actions-900 hover:bg-call-to-actions-800 text-white px-4 py-2 rounded-lg flex items-center gap-2"
         >
           <span className="text-xl">+</span> Add Series
         </button>
@@ -270,82 +287,68 @@ export const Series = () => {
       </div>
 
       {/* Series Table */}
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        <table className="w-full">
-          <thead>
-            <tr>
-              <th className="px-4 py-2 border-b text-left">Series Name</th>
-              <th className="px-4 py-2 border-b text-left">Master Name</th>
-              <th className="px-4 py-2 border-b text-left">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-200">
-            {loadingSeries ? (
-              <tr>
-                <td
-                  colSpan={3}
-                  className="px-6 py-4 text-center"
+      <div className="bg-white rounded-lg overflow-hidden">
+  <table className="w-full">
+    <thead>
+      <tr>
+        <th className="px-4 py-2 border-b text-left">Series Name</th>
+        <th className="px-4 py-2 border-b text-left">Master Name</th>
+        <th className="px-4 py-2 border-b text-center w-32">Actions</th>
+      </tr>
+    </thead>
+    <tbody className="divide-y divide-gray-200">
+      {loadingSeries ? (
+        <tr>
+          <td colSpan={3} className="px-6 py-4 text-center">
+            Loading series...
+          </td>
+        </tr>
+      ) : errorSeries ? (
+        <tr>
+          <td colSpan={3} className="px-6 py-4 text-center text-red-500">
+            {errorSeries}
+          </td>
+        </tr>
+      ) : (
+        visibleSeries.map((series) => (
+          <tr key={series.id} className="hover:bg-gray-50">
+            <td className="px-6 py-4 text-sm text-gray-600">
+              {series.name}
+            </td>
+            <td className="px-6 py-4 text-sm text-gray-600">
+              {masters.find((master) => master.id === series.masterId)?.name ||
+                "Unknown Master"}
+            </td>
+            <td className="px-6 py-4 text-center">
+              <div className="flex justify-center gap-4">
+                <button
+                  onClick={() => {
+                    setSelectedSeries(series);
+                    setSelectedMaster(series.masterId);
+                    setIsEditModalOpen(true);
+                  }}
+                  className="text-gray-400 hover:text-gray-600"
                 >
-                  Loading series...
-                </td>
-              </tr>
-            ) : errorSeries ? (
-              <tr>
-                <td
-                  colSpan={3}
-                  className="px-6 py-4 text-center text-red-500"
+                  <Pencil className="w-4 h-4" />
+                </button>
+                <button className="text-gray-400 hover:text-gray-600">
+                  <Eye className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={() => handleDeleteSeries(series.id)}
+                  className="text-red-400 hover:text-red-600"
                 >
-                  {errorSeries}
-                </td>
-              </tr>
-            ) : (
-              visibleSeries.map((series) => (
-                <tr
-                  key={series.id}
-                  className="hover:bg-gray-50"
-                >
-                  <td className="px-6 py-4 text-sm text-gray-600">
-                    {loadingMasters ? (
-                      "Loading..."
-                    ) : errorMasters ? (
-                      <span className="text-red-500">{errorMasters}</span>
-                    ) : (
-                      masters.find((master) => master.id === series.masterId)
-                        ?.name || "Unknown Master"
-                    )}
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-600">
-                    {series.name}
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex justify-end gap-4">
-                      <button
-                        onClick={() => {
-                          setSelectedSeries(series);
-                          setSelectedMaster(series.masterId);
-                          setIsEditModalOpen(true);
-                        }}
-                        className="text-gray-400 hover:text-gray-600"
-                      >
-                        <Pencil className="w-4 h-4" />
-                      </button>
-                      <button className="text-gray-400 hover:text-gray-600">
-                        <Eye className="w-5 h-5" />
-                      </button>
-                      <button
-                        onClick={() => handleDeleteSeries(series.id)}
-                        className="text-red-400 hover:text-red-600"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
+            </td>
+          </tr>
+        ))
+      )}
+    </tbody>
+  </table>
+</div>
+
 
       {/* Add/Edit Modal */}
       <Modal

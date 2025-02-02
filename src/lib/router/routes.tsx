@@ -11,7 +11,7 @@ import {AddCard} from "../admin-pages/marketplace/card/add-card";
 import {SpecialCard} from "../admin-pages/marketplace/special-card/special-card";
 import {EditSpecialCard} from "../admin-pages/marketplace/special-card/edit-specialcard";
 import {AddSpecialCard} from "../admin-pages/marketplace/special-card/add-specialcard";
-import {Categories} from "../admin-pages/marketplace/categories";
+import {Categories} from "../admin-pages/marketplace/categories/categories";
 import {Master} from "../admin-pages/marketplace/master";
 import {Series} from "../admin-pages/marketplace/series";
 import {Tag} from "../admin-pages/marketplace/tag";
@@ -94,42 +94,6 @@ const EditProfile = React.lazy(
 )
 
 export const routes: Array<PathRouteProps> = [
-  {path: "/admin/dashboard", element: <Dashboard />},
-  {path: "/admin/order", element: <Order />},
-  {path: "/admin/detail-order", element: <DetailsOrder />},
-  {path: "/admin/card", element: <Card />},
-  {path: "/admin/edit-card", element: <EditCard />},
-  {path: "/admin/add-card", element: <AddCard />},
-  {path: "/admin/special-card", element: <SpecialCard />},
-  {path: "/admin/edit-special", element: <EditSpecialCard />},
-  {path: "/admin/add-special", element: <AddSpecialCard />},
-  {path: "/admin/master", element: <Master />},
-  {path: "/admin/series", element: <Series />},
-  {path: "/admin/categories", element: <Categories />},
-  {path: "/admin/tag", element: <Tag />},
-  {path: "/admin/sign-in", element: <SignInPage />},
-  {path: "/admin/sign-up", element: <SignUpPage />},
-  {path: "/admin/home", element: <HomeSection />},
-  {path: "/admin/marketplace", element: <MarketplaceForm />},
-  {path: "/admin/rankings", element: <RankingsForm />},
-  {path: "/admin/events", element: <EventsForm />},
-  {path: "/admin/event", element: <Events />},
-  {path: "/admin/edit-event", element: <EditEvent />},
-  {path: "/admin/add-event", element: <AddEvents />},
-  {path: "/admin/coupon", element: <Coupon />},
-  {path: "/admin/add-coupon", element: <AddCouponForm />},
-  {path: "/admin/creator", element: <Creator />},
-  {path: "/admin/member", element: <Member />},
-  {path: "/admin/add-member", element: <AddMember />},
-  {path: "/admin/detail-member", element: <MemberDetails />},
-  {path: "/admin/subscription", element: <Subscription />},
-  {path: "/admin/shipping", element: <Shipping />},
-  {path: "/admin/payment", element: <Payment />},
-  {path: "/admin/admin", element: <Admin />},
-  {path: "/admin/add-admin", element: <AddAdmin />},
-  {path: "/admin/profile", element: <ProfileSettings />},
-  {path: "/admin/edit-profile/:id", element: <EditProfileAdmin />},
-
   {path: "/signup", element: <Signup />},
   {path: "/login", element: <Login />},
   {path: "/forgot-password", element: <ForgotPassword />},
@@ -140,23 +104,62 @@ export const routes: Array<PathRouteProps> = [
   {path: "/detail-cards", element: <DetailCards />},
   {path: "/detail-special-card", element: <DetailSpecial />},
   {path: "/special-card-detail", element: <SpecialCardDetail />},
-  {path: "/cart", element: <Cart />},
-  {path: "/account", element: <Account />},
-  {path: "/account/edit-profile", element: <EditProfile />},
-  {path: "/checkout", element: <Checkout />},
-  {path: "/checkout-existing", element: <CheckoutExisting />},
-  {path: "/payments", element: <PaymentPage />},
-  {path: "/complete", element: <OrderComplete />},
-  {path: "/order-detail", element: <OrderDetails />},
   {path: "/view-detail", element: <ViewDetail />},
   {path: "/rankings", element: <TopCollectors />},
   {path: "/events", element: <BrowseEvents />},
   {path: "/detail-events", element: <EventDetail />},
   {path: "/register-events", element: <EventRegistration />},
-
   {path: "/login/admin", element: <AdminLogin />},
   {path: "/sentEmail", element: <SentEmail />},
   {path: "/success/regist", element: <SuccesRegist />},
 ];
 
-export const privateRoutes: Array<PathRouteProps> = [];
+export const privateRoutes: Array<PathRouteProps> = [
+  {path: "/checkout-existing", element: <CheckoutExisting />},
+  {path: "/account", element: <Account />},
+  {path: "/account/edit-profile", element: <EditProfile />},
+  {path: "/checkout", element: <Checkout />},
+  {path: "/payments", element: <PaymentPage />},
+  {path: "/complete", element: <OrderComplete />},
+  {path: "/order-detail", element: <OrderDetails />},
+  {path: "/cart", element: <Cart />},
+];
+
+export const adminRoutes: Array<PathRouteProps> = [
+  { path: "dashboard", element: <Dashboard /> },
+  { path: "order", element: <Order /> },
+  { path: "detail-order", element: <DetailsOrder /> },
+  { path: "card", element: <Card /> },
+  { path: "edit-card", element: <EditCard /> },
+  { path: "add-card", element: <AddCard /> },
+  { path: "special-card", element: <SpecialCard /> },
+  { path: "edit-special", element: <EditSpecialCard /> },
+  { path: "add-special", element: <AddSpecialCard /> },
+  { path: "master", element: <Master /> },
+  { path: "series", element: <Series /> },
+  { path: "categories", element: <Categories /> },
+  { path: "tag", element: <Tag /> },
+  { path: "sign-in", element: <SignInPage /> },
+  { path: "sign-up", element: <SignUpPage /> },
+  { path: "home", element: <HomeSection /> },
+  { path: "marketplace", element: <MarketplaceForm /> },
+  { path: "rankings", element: <RankingsForm /> },
+  { path: "events", element: <EventsForm /> },
+  { path: "event", element: <Events /> },
+  { path: "edit-event", element: <EditEvent /> },
+  { path: "add-event", element: <AddEvents /> },
+  { path: "coupon", element: <Coupon /> },
+  { path: "add-coupon", element: <AddCouponForm /> },
+  { path: "creator", element: <Creator /> },
+  { path: "member", element: <Member /> },
+  { path: "add-member", element: <AddMember /> },
+  { path: "detail-member", element: <MemberDetails /> },
+  { path: "subscription", element: <Subscription /> },
+  { path: "shipping", element: <Shipping /> },
+  { path: "payment", element: <Payment /> },
+  { path: "admin", element: <Admin /> },
+  { path: "add-admin", element: <AddAdmin /> },
+  { path: "profile", element: <ProfileSettings /> },
+  { path: "edit-profile/:id", element: <EditProfileAdmin /> },
+];
+

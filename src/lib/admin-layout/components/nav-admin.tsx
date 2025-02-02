@@ -118,7 +118,7 @@ const Navbar = () => {
       });
 
       if (response.ok) {
-        navigate("/login"); 
+        navigate("/login/admin"); 
       } else {
         console.error("Logout failed");
       }
