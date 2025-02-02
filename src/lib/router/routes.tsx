@@ -7,7 +7,7 @@ import {Order} from "../admin-pages/order/order";
 import {DetailsOrder} from "../admin-pages/order/details-order";
 import {Card} from "../admin-pages/marketplace/card/card";
 import {EditCard} from "../admin-pages/marketplace/card/edit-card";
-import {AddCard} from "../admin-pages/marketplace/card/add-card";
+import {AddCard} from "../admin-pages/marketplace/card/addcard/add-card";
 import {SpecialCard} from "../admin-pages/marketplace/special-card/special-card";
 import {EditSpecialCard} from "../admin-pages/marketplace/special-card/edit-specialcard";
 import {AddSpecialCard} from "../admin-pages/marketplace/special-card/add-specialcard";
