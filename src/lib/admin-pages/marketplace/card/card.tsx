@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import  { ChangeEvent, useState } from "react";
 import { Edit3, Eye, Trash2, Plus } from "lucide-react";
 
 export const Card = () => {
@@ -16,14 +16,14 @@ export const Card = () => {
   ]);
 
   // Handler for the "select all" checkbox
-  const handleSelectAll = (e) => {
+  const handleSelectAll = (e: { target: { checked: any; }; }) => {
     const { checked } = e.target;
     const updatedCards = cards.map((card) => ({ ...card, selected: checked }));
     setCards(updatedCards);
   };
 
   // Handler for individual row checkbox
-  const handleSelectRow = (index, e) => {
+  const handleSelectRow = (index: number, e: ChangeEvent<HTMLInputElement>) => {
     const { checked } = e.target;
     const updatedCards = [...cards];
     updatedCards[index].selected = checked;
