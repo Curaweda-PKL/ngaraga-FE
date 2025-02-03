@@ -2,13 +2,13 @@ import React, { ChangeEvent, useEffect, useState } from "react";
 
 interface CardSettingsProps {
   formData: {
-    categories: string[];
+    categories: string[]; // storing category IDs as strings
     creator: boolean;
-    selectedCreator: string;
+    selectedCreator: string; // storing creator ID as string
     tag: boolean;
-    tags: string[];
+    tags: string[]; // storing tag IDs as strings
     source: boolean;
-    // other fields are present in formData but not needed here
+    // other fields in formData are not needed here
   };
   handleInputChange: (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -30,10 +30,10 @@ interface CardSettingsProps {
       source: boolean;
     }>
   >;
-  apiCategories: { name: string; image: string | null }[];
+  apiCategories: { id: number; name: string; image: string | null }[];
   categoriesLoading: boolean;
   categoriesError: string | null;
-  apiCreators: { name: string; image: string | null }[];
+  apiCreators: { id: number; name: string; image: string | null }[];
   creatorsLoading: boolean;
   creatorsError: string | null;
   apiTags: { id: number; name: string }[];
@@ -59,14 +59,11 @@ const CardSettings: React.FC<CardSettingsProps> = ({
   const [showCreatorSkeleton, setShowCreatorSkeleton] = useState(false);
 
   useEffect(() => {
-    // When the creator toggle is switched on, show a skeleton placeholder.
     if (formData.creator) {
       setShowCreatorSkeleton(true);
-      // Simulate a delay (e.g., 1 second) for loading skeleton before showing actual data.
       const timer = setTimeout(() => {
         setShowCreatorSkeleton(false);
       }, 1000);
-
       return () => clearTimeout(timer);
     }
   }, [formData.creator]);
@@ -83,21 +80,25 @@ const CardSettings: React.FC<CardSettingsProps> = ({
             <div className="text-red-500">{categoriesError}</div>
           ) : (
             apiCategories.map((category) => {
-              const id = `category-${category.name}`;
+              const id = `category-${category.id}`;
               return (
                 <div
-                  key={category.name}
+                  key={category.id}
                   className="category-checkbox flex items-center gap-y-2 mb-2"
                 >
                   <input
                     type="checkbox"
                     id={id}
                     className="hidden"
-                    checked={formData.categories.includes(category.name)}
+                    checked={formData.categories.includes(
+                      category.id.toString()
+                    )}
                     onChange={(e) => {
                       const newCategories = e.target.checked
-                        ? [...formData.categories, category.name]
-                        : formData.categories.filter((c) => c !== category.name);
+                        ? [...formData.categories, category.id.toString()]
+                        : formData.categories.filter(
+                            (c) => c !== category.id.toString()
+                          );
                       setFormData((prev) => ({
                         ...prev,
                         categories: newCategories,
@@ -115,7 +116,9 @@ const CardSettings: React.FC<CardSettingsProps> = ({
                         }}
                       />
                     )}
-                    <span className="inline-block ml-2">{category.name}</span>
+                    <span className="inline-block ml-2">
+                      {category.name}
+                    </span>
                   </label>
                 </div>
               );
@@ -139,14 +142,12 @@ const CardSettings: React.FC<CardSettingsProps> = ({
             <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600 dark:peer-checked:bg-blue-600"></div>
           </label>
         </div>
-        {/* Always render the creator panel but toggle visibility */}
         <div
           className={`space-y-2 bg-white p-4 rounded-lg border transition-all duration-150 overflow-hidden ${
             formData.creator ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
           }`}
         >
           {showCreatorSkeleton ? (
-            // Skeleton placeholder UI
             <div className="space-y-2">
               <div className="h-8 bg-gray-300 rounded animate-pulse"></div>
               <div className="h-8 bg-gray-300 rounded animate-pulse"></div>
@@ -159,14 +160,16 @@ const CardSettings: React.FC<CardSettingsProps> = ({
           ) : (
             apiCreators.map((creator) => (
               <label
-                key={creator.name}
+                key={creator.id}
                 className="flex items-center gap-2 p-2 hover:bg-gray-50 rounded-lg cursor-pointer"
               >
                 <input
                   type="radio"
                   name="selectedCreator"
-                  value={creator.name}
-                  checked={formData.selectedCreator === creator.name}
+                  value={creator.id.toString()}
+                  checked={
+                    formData.selectedCreator === creator.id.toString()
+                  }
                   onChange={handleInputChange}
                   className="form-radio"
                 />
@@ -214,11 +217,15 @@ const CardSettings: React.FC<CardSettingsProps> = ({
                       type="checkbox"
                       id={id}
                       className="hidden"
-                      checked={formData.tags.includes(tag.name)}
+                      checked={formData.tags.includes(
+                        tag.id.toString()
+                      )}
                       onChange={(e) => {
                         const newTags = e.target.checked
-                          ? [...formData.tags, tag.name]
-                          : formData.tags.filter((t) => t !== tag.name);
+                          ? [...formData.tags, tag.id.toString()]
+                          : formData.tags.filter(
+                              (t) => t !== tag.id.toString()
+                            );
                         setFormData((prev) => ({
                           ...prev,
                           tags: newTags,
@@ -233,8 +240,6 @@ const CardSettings: React.FC<CardSettingsProps> = ({
           </div>
         )}
       </div>
-
-
     </div>
   );
 };
