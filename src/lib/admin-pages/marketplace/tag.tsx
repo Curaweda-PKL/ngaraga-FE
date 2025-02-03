@@ -2,6 +2,12 @@ import React, { useState, useEffect } from "react";
 import { Pencil, Eye, Trash2, X } from "lucide-react";
 import axios from "axios";
 
+// Define the tag type with id and name.
+interface TagItem {
+  id: string;
+  name: string;
+}
+
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -14,16 +20,18 @@ interface ModalProps {
 export const Tag = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [tagToEdit, setTagToEdit] = useState<string | null>(null);
-  const [tags, setTags] = useState<string[]>([]); // Initialize with an empty array
+  const [tagToEdit, setTagToEdit] = useState<TagItem | null>(null);
+  const [tags, setTags] = useState<TagItem[]>([]); // Now an array of tag objects
   const [searchQuery, setSearchQuery] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
+  // Fetch all tags from the API
   useEffect(() => {
     const fetchTags = async () => {
       try {
         const response = await axios.get("http://localhost:3000/api/tags/all");
-        setTags(response.data.tags.map((tag: { name: string }) => tag.name));
+        // Assume the API returns an array of tag objects with id and name.
+        setTags(response.data.tags);
       } catch (error) {
         console.error("Error fetching tags:", error);
       }
@@ -32,20 +40,20 @@ export const Tag = () => {
     fetchTags();
   }, []);
 
-  const handleEdit = (tag: string) => {
+  // Open edit modal and set tagToEdit
+  const handleEdit = (tag: TagItem) => {
     setTagToEdit(tag);
     setIsEditModalOpen(true);
   };
 
+  // Handle adding a new tag
   const handleAddTag = async (tagName: string) => {
     try {
-      const response = await axios.post(
-        "http://localhost:3000/api/tag/create",
-        {
-          name: tagName,
-        }
-      );
-      setTags((prevTags) => [...prevTags, response.data.tag.name]);
+      const response = await axios.post("http://localhost:3000/api/tag/create", {
+        name: tagName,
+      });
+      // Assuming the API returns the new tag object as response.data.tag
+      setTags((prevTags) => [...prevTags, response.data.tag]);
       setIsAddModalOpen(false);
       setSuccessMessage("Tag added successfully!");
       setTimeout(() => setSuccessMessage(""), 3000);
@@ -54,18 +62,18 @@ export const Tag = () => {
     }
   };
 
+  // Handle editing an existing tag using the new PUT route
   const handleEditTag = async (tagName: string) => {
     if (tagToEdit) {
       try {
         const response = await axios.put(
-          `http://localhost:3000/api/tag/${tagToEdit}`,
-          {
-            name: tagName,
-          }
+          `http://localhost:3000/api/tag/edit/${tagToEdit.id}`,
+          { name: tagName }
         );
+        // Use response.data.updatedTag instead of response.data.tag
         setTags((prevTags) =>
           prevTags.map((tag) =>
-            tag === tagToEdit ? response.data.tag.name : tag
+            tag.id === tagToEdit.id ? response.data.updatedTag : tag
           )
         );
         setIsEditModalOpen(false);
@@ -77,11 +85,31 @@ export const Tag = () => {
       }
     }
   };
+  
 
+  // Handle deleting a tag using the DELETE route
+  const handleDeleteTag = async (tag: TagItem) => {
+    const confirmDelete = window.confirm(
+      `Are you sure you want to delete the tag "${tag.name}"?`
+    );
+    if (!confirmDelete) return;
+
+    try {
+      await axios.delete(`http://localhost:3000/api/tag/delete/${tag.id}`);
+      setTags((prevTags) => prevTags.filter((t) => t.id !== tag.id));
+      setSuccessMessage("Tag deleted successfully!");
+      setTimeout(() => setSuccessMessage(""), 3000);
+    } catch (error) {
+      console.error("Error deleting tag:", error);
+    }
+  };
+
+  // Filter tags based on the search query
   const filteredTags = tags.filter((tag) =>
-    tag.toLowerCase().includes(searchQuery.toLowerCase())
+    tag.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  // Modal component remains unchanged in terms of style and functionality.
   const Modal: React.FC<ModalProps> = ({
     isOpen,
     onClose,
@@ -91,6 +119,11 @@ export const Tag = () => {
     onSubmit,
   }) => {
     const [inputValue, setInputValue] = useState(value);
+
+    // Update the input value if the passed in value changes (for edit modal)
+    useEffect(() => {
+      setInputValue(value);
+    }, [value]);
 
     if (!isOpen) return null;
 
@@ -155,7 +188,7 @@ export const Tag = () => {
         <div className="flex items-center gap-4">
           <button
             onClick={() => setIsAddModalOpen(true)}
-            className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+            className="bg-call-to-actions-900 hover:bg-call-to-actions-800 text-white px-4 py-2 rounded-lg flex items-center gap-2"
           >
             <span className="text-xl">+</span> Add Tag
           </button>
@@ -190,13 +223,13 @@ export const Tag = () => {
       )}
 
       <div className="grid grid-cols-2 gap-4">
-        {filteredTags.map((tag, index) => (
+        {filteredTags.map((tag) => (
           <div
-            key={index}
+            key={tag.id}
             className="bg-white rounded-lg p-4 flex items-center justify-between border border-gray-100"
           >
             <div className="flex items-center">
-              <span className="font-medium text-gray-700">{tag}</span>
+              <span className="font-medium text-gray-700">{tag.name}</span>
             </div>
             <div className="flex items-center gap-4">
               <button
@@ -208,7 +241,10 @@ export const Tag = () => {
               <button className="text-gray-400 hover:text-gray-600">
                 <Eye className="w-5 h-5" />
               </button>
-              <button className="text-red-400 hover:text-red-600">
+              <button
+                onClick={() => handleDeleteTag(tag)}
+                className="text-red-400 hover:text-red-600"
+              >
                 <Trash2 className="w-5 h-5" />
               </button>
             </div>
@@ -229,7 +265,7 @@ export const Tag = () => {
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
         title="Edit Tag"
-        value={tagToEdit || ""}
+        value={tagToEdit ? tagToEdit.name : ""}
         submitText="Update"
         onSubmit={handleEditTag}
       />

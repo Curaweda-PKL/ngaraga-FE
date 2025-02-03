@@ -13,7 +13,9 @@ interface Notification {
 const Navbar = () => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+  const [profileImage, setProfileImage] = useState<string>("/api/placeholder/32/32");
   const navigate = useNavigate();
+
   const [notifications] = useState<Notification[]>([
     {
       id: "1",
@@ -53,6 +55,31 @@ const Navbar = () => {
   const notificationRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // Fetch the admin profile on mount to retrieve the profile image
+    const fetchProfileImage = async () => {
+      try {
+        const response = await fetch("http://localhost:3000/api/account/admin/profile", {
+          credentials: "include",
+        });
+        if (response.ok) {
+          const result = await response.json();
+          // Adjust the property access based on your response structure
+          const userData = result.data.data; 
+          if (userData?.image) {
+            // Construct the URL to the image (adjust path as needed)
+            const imageUrl = `http://localhost:3000/uploads/profile/${userData.image.split("\\").pop()}`;
+            setProfileImage(imageUrl);
+          }
+        } else {
+          console.error("Failed to fetch profile image");
+        }
+      } catch (error) {
+        console.error("Error fetching profile image:", error);
+      }
+    };
+
+    fetchProfileImage();
+
     const handleClickOutside = (event: MouseEvent) => {
       if (
         profileRef.current &&
@@ -86,12 +113,12 @@ const Navbar = () => {
   const handleLogout = async () => {
     try {
       const response = await fetch("http://localhost:3000/api/logout", {
-        method: "POST", // or "GET" based on your API
-        credentials: "include", // To include cookies
+        method: "POST",
+        credentials: "include",
       });
-      
+
       if (response.ok) {
-        navigate("/login"); // Redirect to login page after successful logout
+        navigate("/login/admin"); 
       } else {
         console.error("Logout failed");
       }
@@ -101,13 +128,12 @@ const Navbar = () => {
   };
 
   const getNotificationIcon = (type: string) => {
-    const iconClasses =
-      {
-        pending: "bg-red-100 text-red-500",
-        success: "bg-blue-100 text-blue-500",
-        delivered: "bg-green-100 text-green-500",
-        event: "bg-yellow-100 text-yellow-500",
-      }[type] || "bg-gray-100 text-gray-500";
+    const iconClasses = {
+      pending: "bg-red-100 text-red-500",
+      success: "bg-blue-100 text-blue-500",
+      delivered: "bg-green-100 text-green-500",
+      event: "bg-yellow-100 text-yellow-500",
+    }[type] || "bg-gray-100 text-gray-500";
 
     return (
       <div className={`p-2 rounded-lg ${iconClasses}`}>
@@ -134,10 +160,7 @@ const Navbar = () => {
 
           <div className="flex items-center gap-4">
             {/* Notification Button */}
-            <div
-              className="relative"
-              ref={notificationRef}
-            >
+            <div className="relative" ref={notificationRef}>
               <button
                 type="button"
                 onClick={() => setIsNotificationOpen(!isNotificationOpen)}
@@ -182,10 +205,7 @@ const Navbar = () => {
             </div>
 
             {/* Profile Dropdown */}
-            <div
-              className="relative"
-              ref={profileRef}
-            >
+            <div className="relative" ref={profileRef}>
               <button
                 type="button"
                 onClick={() => setIsProfileOpen(!isProfileOpen)}
@@ -194,8 +214,8 @@ const Navbar = () => {
               >
                 <span className="sr-only">Open user menu</span>
                 <img
-                  className="w-8 h-8 rounded-full"
-                  src="/api/placeholder/32/32"
+                  className="w-8 h-8 rounded-full object-cover"
+                  src={profileImage}
                   alt="User profile"
                 />
               </button>

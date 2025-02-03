@@ -1,18 +1,19 @@
 import { useState, useEffect } from "react";
-import { FaTrash } from "react-icons/fa";
+import { FaTrash, FaSearch, FaCalendarAlt } from "react-icons/fa";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 interface Subscription {
+  id: string;
   email: string;
-  registerDate: string; // adjust based on the actual response type
+  registerDate: string; 
 }
 
 export const Subscription = () => {
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
   const [endDate, setEndDate] = useState<Date | undefined>(undefined);
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [selectedEmails, setSelectedEmails] = useState<string[]>([]);
+  const [selectedSubscriptionIds, setSelectedSubscriptionIds] = useState<string[]>([]);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -26,22 +27,20 @@ export const Subscription = () => {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const responseData = await response.json();
-
-        // Adjust this line to match the actual API response structure
         const subscriptionsData = responseData.data.subscriptions.map((sub: any) => ({
+          id: sub.id,
           email: sub.email,
-          registerDate: sub.createdAt, // Map createdAt to registerDate
+          registerDate: sub.createdAt,
         }));
-
         setSubscriptions(subscriptionsData);
         setError(null);
       } catch (err: unknown) {
         if (err instanceof Error) {
-          setError(err.message); // Type assertion to Error here
+          setError(err.message);
         } else {
           setError("An unknown error occurred.");
         }
-        setSubscriptions([]); // Ensure subscriptions remains an array
+        setSubscriptions([]);
       } finally {
         setLoading(false);
       }
@@ -52,30 +51,58 @@ export const Subscription = () => {
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
-      setSelectedEmails(subscriptions.map((sub) => sub.email));
+      setSelectedSubscriptionIds(subscriptions.map((sub) => sub.id));
     } else {
-      setSelectedEmails([]);
+      setSelectedSubscriptionIds([]);
     }
   };
 
-  const handleSelectEmail = (email: string, checked: boolean) => {
+  const handleSelectSubscription = (id: string, checked: boolean) => {
     if (checked) {
-      setSelectedEmails((prev) => [...prev, email]);
+      setSelectedSubscriptionIds((prev) => [...prev, id]);
     } else {
-      setSelectedEmails((prev) => prev.filter((e) => e !== email));
+      setSelectedSubscriptionIds((prev) => prev.filter((i) => i !== id));
     }
   };
 
-  const handleDelete = () => {
-    setSubscriptions((prev) =>
-      prev.filter((sub) => !selectedEmails.includes(sub.email))
-    );
-    setSelectedEmails([]);
-    setShowModal(false);
+  // Single deletion: call the DELETE endpoint using the subscription id.
+  const handleSingleDelete = async (id: string) => {
+    try {
+      const response = await fetch(`http://localhost:3000/api/subscriptions/delete/${id}`, {
+        method: "DELETE",
+      });
+      if (!response.ok) {
+        throw new Error("Delete failed");
+      }
+      // Update local state after deletion.
+      setSubscriptions((prev) => prev.filter((sub) => sub.id !== id));
+      // Also remove from selected list if present.
+      setSelectedSubscriptionIds((prev) => prev.filter((i) => i !== id));
+    } catch (error) {
+      console.error("Error deleting subscription:", error);
+    }
   };
 
-  const handleSingleDelete = (email: string) => {
-    setSubscriptions((prev) => prev.filter((sub) => sub.email !== email));
+  // Bulk deletion: iterate over selected IDs and delete them one by one.
+  const handleDelete = async () => {
+    try {
+      for (const id of selectedSubscriptionIds) {
+        const response = await fetch(`http://localhost:3000/api/subscriptions/delete/${id}`, {
+          method: "DELETE",
+        });
+        if (!response.ok) {
+          throw new Error(`Delete failed for id: ${id}`);
+        }
+      }
+      // Remove all deleted subscriptions from state.
+      setSubscriptions((prev) =>
+        prev.filter((sub) => !selectedSubscriptionIds.includes(sub.id))
+      );
+      setSelectedSubscriptionIds([]);
+      setShowModal(false);
+    } catch (error) {
+      console.error("Error deleting subscriptions:", error);
+    }
   };
 
   const handleDateChange = (date: Date | null, dateType: "start" | "end") => {
@@ -88,12 +115,9 @@ export const Subscription = () => {
 
   const filteredSubscriptions = subscriptions.filter((sub) => {
     const registerDate = new Date(sub.registerDate);
-    const matchesSearch = sub.email
-      .toLowerCase()
-      .includes(searchQuery.toLowerCase());
+    const matchesSearch = sub.email.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesDateRange =
-      (!startDate || registerDate >= startDate) &&
-      (!endDate || registerDate <= endDate);
+      (!startDate || registerDate >= startDate) && (!endDate || registerDate <= endDate);
     return matchesSearch && matchesDateRange;
   });
 
@@ -111,7 +135,7 @@ export const Subscription = () => {
       <div className="flex justify-between items-center gap-4 mb-6">
         <button
           className={`px-4 py-2 rounded-lg flex items-center gap-2 ${
-            selectedEmails.length > 0
+            selectedSubscriptionIds.length > 0
               ? "bg-red-50 text-red-500 border border-red-200"
               : "hidden"
           }`}
@@ -119,43 +143,50 @@ export const Subscription = () => {
         >
           <FaTrash />
           <span>Delete</span>
-          {selectedEmails.length > 0 && (
-            <span className="ml-1">({selectedEmails.length})</span>
+          {selectedSubscriptionIds.length > 0 && (
+            <span className="ml-1">({selectedSubscriptionIds.length})</span>
           )}
         </button>
 
         <div className="flex items-center gap-4 flex-1 justify-end">
-          <div className="flex-grow max-w-md">
+          <div className="flex-grow max-w-md relative">
+            <FaSearch className="absolute left-3 top-3 text-gray-500" />
             <input
               type="text"
-              placeholder="Search"
-              className="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5"
+              placeholder="Search and hit enter"
+              className="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5 pl-10"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
 
           <div className="flex items-center gap-2">
-            <DatePicker
-              selected={startDate}
-              onChange={(date: Date | null) => handleDateChange(date, "start")}
-              selectsStart
-              startDate={startDate}
-              endDate={endDate}
-              placeholderText="From"
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-36 p-2.5"
-            />
+            <div className="relative">
+              <FaCalendarAlt className="absolute left-3 top-3 FaCalendarAlt z-10" />
+              <DatePicker
+                selected={startDate}
+                onChange={(date: Date | null) => handleDateChange(date, "start")}
+                selectsStart
+                startDate={startDate}
+                endDate={endDate}
+                placeholderText="From"
+                className="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-36 p-2.5 pl-10"
+              />
+            </div>
             <span className="text-gray-500">-</span>
-            <DatePicker
-              selected={endDate}
-              onChange={(date: Date | null) => handleDateChange(date, "end")}
-              selectsEnd
-              startDate={startDate}
-              endDate={endDate}
-              minDate={startDate}
-              placeholderText="To"
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-36 p-2.5"
-            />
+            <div className="relative">
+              <FaCalendarAlt className="absolute left-3 top-3 FaCalendarAlt z-10" />
+              <DatePicker
+                selected={endDate}
+                onChange={(date: Date | null) => handleDateChange(date, "end")}
+                selectsEnd
+                startDate={startDate}
+                endDate={endDate}
+                minDate={startDate}
+                placeholderText="To"
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-36 p-2.5 pl-10"
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -175,7 +206,7 @@ export const Subscription = () => {
                     className="rounded border-gray-300"
                     checked={
                       filteredSubscriptions.length > 0 &&
-                      selectedEmails.length === filteredSubscriptions.length
+                      selectedSubscriptionIds.length === filteredSubscriptions.length
                     }
                     onChange={(e) => handleSelectAll(e.target.checked)}
                     disabled={filteredSubscriptions.length === 0}
@@ -187,15 +218,15 @@ export const Subscription = () => {
               </tr>
             </thead>
             <tbody>
-              {filteredSubscriptions.map((subscription, index) => (
-                <tr key={index} className="border-b last:border-b-0">
+              {filteredSubscriptions.map((subscription) => (
+                <tr key={subscription.id} className="border-b last:border-b-0">
                   <td className="p-4">
                     <input
                       type="checkbox"
                       className="rounded border-gray-300"
-                      checked={selectedEmails.includes(subscription.email)}
+                      checked={selectedSubscriptionIds.includes(subscription.id)}
                       onChange={(e) =>
-                        handleSelectEmail(subscription.email, e.target.checked)
+                        handleSelectSubscription(subscription.id, e.target.checked)
                       }
                     />
                   </td>
@@ -206,7 +237,7 @@ export const Subscription = () => {
                   <td className="p-4">
                     <button
                       className="text-red-500 hover:text-red-600"
-                      onClick={() => handleSingleDelete(subscription.email)}
+                      onClick={() => handleSingleDelete(subscription.id)}
                     >
                       <FaTrash />
                     </button>
@@ -230,7 +261,7 @@ export const Subscription = () => {
           <div className="bg-white rounded-lg p-6 w-96">
             <h2 className="text-lg font-semibold mb-4">Confirm Deletion</h2>
             <p className="text-sm text-gray-600 mb-6">
-              Are you sure you want to delete the selected emails?
+              Are you sure you want to delete the selected subscriptions?
             </p>
             <div className="flex justify-end gap-4">
               <button

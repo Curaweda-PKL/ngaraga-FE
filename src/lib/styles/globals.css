@@ -121,12 +121,40 @@ input::-webkit-inner-spin-button {
   color: var(--call-to-actions-900)
 }
 
+.FaCalendarAlt {
+  color: var(--call-to-actions-900)
+}
+
 /* Style when the checkbox is not checked */
 label {
   background-color: white;
   color: var(--neutral-colors-500); 
   
 }
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  background-color: var(--neutral-colors-200);
+  color: var(--neutral-colors-500);
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color 0.2s ease;
+}
+
+.nav-link:hover {
+  background-color: #f0f0f0;
+}
+
+.nav-link.active {
+  border: 2px solid var(--call-to-actions-900);
+  background-color: var(--call-to-actions-100);
+  color: var(--call-to-actions-900);
+}
+
 
 /* Style when the checkbox is checked */
 input:checked + label {
@@ -135,6 +163,43 @@ input:checked + label {
   background-color: var(--call-to-actions-100); 
   color: var(--call-to-actions-900); 
 }
+
+/* Style when the checkbox is not checked */
+.category-checkbox label {
+  background-color: white;
+  color: var(--neutral-colors-500);
+  display: block;
+  width: 100%;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+}
+
+/* Style when the checkbox is checked */
+.category-checkbox input:checked + label {
+  border: 2px solid var(--call-to-actions-900);
+  border-color: var(--call-to-actions);
+  background-color: var(--call-to-actions-100);
+  color: var(--call-to-actions-900);
+}
+
+.tag-checkbox label {
+  background-color: white;
+  color: var(--neutral-colors-500);
+  display: block;
+  width: 100%;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+}
+
+.tag-checkbox input:checked + label {
+  border: 2px solid var(--call-to-actions-900);
+  border-color: var(--call-to-actions);
+  background-color: var(--call-to-actions-100);
+  color: var(--call-to-actions-900);
+}
+
 
 /* Replace your existing checkbox styles with these */
 .bg-whitey {

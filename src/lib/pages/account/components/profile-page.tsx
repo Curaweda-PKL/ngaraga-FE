@@ -44,7 +44,7 @@ export const ProfilePage: React.FC = () => {
 
             {/* Buttons */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 lg:hidden">
-              <button className="transition duration-300 text-white bg-call-to-action transform border-2 border-call-to-action font-bold py-2 px-6 rounded-lg flex items-center justify-center space-x-2 hover:bg-[#333333] hover:text-white shadow-md hover:shadow-xl">
+              <button className="transition duration-300 text-white bg-call-to-actions-900 transform border-2 border-call-to-action font-bold py-2 px-6 rounded-lg flex items-center justify-center space-x-2 hover:bg-call-to-actions-800 hover:text-white  ">
                 <CgProfile />
                 <span>Edit Profile</span>
               </button>
@@ -129,7 +129,7 @@ export const ProfilePage: React.FC = () => {
 
           {/* Buttons for lg */}
           <div className="hidden lg:flex mt-6 lg:mt-0 justify-end space-x-4 order-2 lg:order-none">
-            <button className="transition duration-300 text-white bg-call-to-action transform border-2 border-call-to-action font-bold py-2 px-6 rounded-lg flex items-center justify-center space-x-2 hover:bg-[#333333] hover:text-white shadow-md hover:shadow-xl">
+            <button className="transition duration-300 bg-call-to-actions-900 text-white  transform border-2 border-call-to-action font-bold py-2 px-6 rounded-lg flex items-center justify-center space-x-2 hover:bg-call-to-actions-800 hover:text-white shadow-md ">
               <CgProfile />
               <span>Edit Profile</span>
             </button>

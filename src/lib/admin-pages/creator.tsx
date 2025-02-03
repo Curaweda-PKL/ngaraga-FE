@@ -1,5 +1,5 @@
-import {useEffect, useState} from "react";
-import {X, Pencil, Eye, Trash2, Plus, Search} from "lucide-react";
+import { useEffect, useState, useRef } from "react";
+import { X, Pencil, Eye, Trash2, Plus, Search } from "lucide-react";
 import axios from "axios";
 
 export const Creator = () => {
@@ -8,13 +8,15 @@ export const Creator = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [creators, setCreators] = useState<any[]>([]);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  const modalRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const fetchCreators = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:3000/api/creator/all"
-        );
+        const response = await axios.get("http://localhost:3000/api/creator/all");
         setCreators(response.data.creators);
       } catch (error) {
         console.error("Error fetching creators:", error);
@@ -27,12 +29,20 @@ export const Creator = () => {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      if (imagePreview) {
+        URL.revokeObjectURL(imagePreview);
+      }
       setImage(file);
+      setImagePreview(URL.createObjectURL(file));
     }
   };
 
   const handleRemoveImage = () => {
+    if (imagePreview) {
+      URL.revokeObjectURL(imagePreview);
+    }
     setImage(null);
+    setImagePreview(null);
   };
 
   const handleSave = async () => {
@@ -57,8 +67,22 @@ export const Creator = () => {
       );
 
       if (response.data.message === "Creator created successfully") {
-        alert("Creator created successfully!");
-        setIsModalOpen(false); // Close the modal after success
+        setSuccessMessage("Creator created successfully!");
+        setIsModalOpen(false);
+        setCreatorName("");
+        setImage(null);
+        setImagePreview(null);
+
+        // Add the new creator to the creators list in real-time
+        setCreators((prevCreators) => [
+          ...prevCreators,
+          response.data.creator,
+        ]);
+
+        // Auto-hide success message after 3 seconds
+        setTimeout(() => {
+          setSuccessMessage(null);
+        }, 3000);
       } else {
         alert("Failed to create creator.");
       }
@@ -68,8 +92,21 @@ export const Creator = () => {
     }
   };
 
+  const closeModalOnClickOutside = (e: React.MouseEvent) => {
+    if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
+      setIsModalOpen(false);
+    }
+  };
+
   return (
     <div className="p-6">
+      {/* Success Message */}
+      {successMessage && (
+        <div className="text-green-500 mb-4 p-2 border border-green-500 bg-green-100 rounded-lg">
+          {successMessage}
+        </div>
+      )}
+
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-sm text-gray-500 mb-4">
         <span>Creator</span>
@@ -82,16 +119,14 @@ export const Creator = () => {
 
       {/* Action Bar */}
       <div className="flex justify-between items-center mb-6">
-        {/* Add Creator Button */}
         <button
           onClick={() => setIsModalOpen(true)}
-          className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+          className="bg-call-to-actions-900 hover:bg-call-to-actions-800 text-white px-4 py-2 rounded-lg flex items-center gap-2"
         >
           <Plus className="w-4 h-4" />
           <span>Add Creator</span>
         </button>
 
-        {/* Search Input */}
         <div className="relative">
           <input
             type="text"
@@ -112,9 +147,8 @@ export const Creator = () => {
             className="bg-white rounded-lg p-4 flex items-center justify-between"
           >
             <div className="flex items-center gap-3">
-              {/* Image is fetched dynamically from the server */}
               <img
-                src={`http://localhost:3000/uploads/creator/${creator.image}`} // Assuming the image path is correct
+                src={`http://localhost:3000/uploads/creator/${creator.image}`}
                 alt={creator.name}
                 className="w-10 h-10 rounded-lg"
               />
@@ -137,8 +171,15 @@ export const Creator = () => {
 
       {/* Add Creator Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white rounded-lg w-full max-w-md">
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+          onClick={closeModalOnClickOutside}
+        >
+          <div
+            ref={modalRef}
+            className="bg-white rounded-lg w-full max-w-md"
+            onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside the modal
+          >
             <div className="flex justify-between items-center p-4 border-b">
               <h2 className="text-lg font-medium">Add Creator</h2>
               <button
@@ -151,7 +192,6 @@ export const Creator = () => {
 
             <div className="p-4">
               <div className="space-y-4">
-                {/* Image Upload */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Creator Image*
@@ -201,7 +241,6 @@ export const Creator = () => {
                   </div>
                 </div>
 
-                {/* Creator Name */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Creator Name*
@@ -216,7 +255,6 @@ export const Creator = () => {
               </div>
             </div>
 
-            {/* Action Buttons */}
             <div className="flex justify-end gap-2 p-4 border-t">
               <button
                 onClick={() => setIsModalOpen(false)}
@@ -236,4 +274,4 @@ export const Creator = () => {
       )}
     </div>
   );
-}
+};

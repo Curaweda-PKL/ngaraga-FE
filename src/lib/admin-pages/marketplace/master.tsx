@@ -1,5 +1,5 @@
-import React, {useState, useEffect} from "react";
-import {Pencil, Eye, Trash2, Search, X} from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Pencil, Eye, Trash2, Search, X } from "lucide-react";
 
 interface ModalProps {
   isOpen: boolean;
@@ -14,11 +14,9 @@ export const Master = () => {
   const [masterList, setMasterList] = useState<any[]>([]);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [selectedMaster, setSelectedMaster] = useState<{
-    id: number;
-    name: string;
-  } | null>(null);
+  const [selectedMaster, setSelectedMaster] = useState<{ id: number; name: string } | null>(null);
   const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
 
   const fetchMasterList = async () => {
@@ -43,8 +41,8 @@ export const Master = () => {
     try {
       const response = await fetch("http://localhost:3000/api/master/create", {
         method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({name}),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name }),
       });
 
       if (!response.ok) {
@@ -54,6 +52,8 @@ export const Master = () => {
 
       const newMaster = await response.json();
       setMasterList((prev) => [...prev, newMaster.master]);
+      setSuccessMessage("Master successfully added.");
+      setTimeout(() => setSuccessMessage(""), 3000);
     } catch (error: any) {
       console.error("Error adding master:", error);
       setErrorMessage(error?.message || "Failed to add master.");
@@ -62,14 +62,11 @@ export const Master = () => {
 
   const handleEditMaster = async (id: number, name: string) => {
     try {
-      const response = await fetch(
-        `http://localhost:3000/api/master/edit/${id}`,
-        {
-          method: "PUT",
-          headers: {"Content-Type": "application/json"},
-          body: JSON.stringify({name}),
-        }
-      );
+      const response = await fetch(`http://localhost:3000/api/master/edit/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name }),
+      });
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -82,6 +79,8 @@ export const Master = () => {
           master.id === id ? updatedMaster.updatedMaster : master
         )
       );
+      setSuccessMessage("Master successfully updated.");
+      setTimeout(() => setSuccessMessage(""), 3000);
     } catch (error: any) {
       console.error("Error updating master:", error);
       setErrorMessage(error?.message || "Failed to update master.");
@@ -90,18 +89,17 @@ export const Master = () => {
 
   const handleDeleteMaster = async (id: number) => {
     try {
-      const response = await fetch(
-        `http://localhost:3000/api/master/delete/${id}`,
-        {
-          method: "DELETE",
-        }
-      );
+      const response = await fetch(`http://localhost:3000/api/master/delete/${id}`, {
+        method: "DELETE",
+      });
 
       if (!response.ok) {
         throw new Error("Failed to delete master");
       }
 
       setMasterList((prev) => prev.filter((master) => master.id !== id));
+      setSuccessMessage("Master successfully deleted.");
+      setTimeout(() => setSuccessMessage(""), 3000);
     } catch (error: any) {
       console.error("Error deleting master:", error);
       setErrorMessage(error?.message || "Failed to delete master.");
@@ -127,10 +125,7 @@ export const Master = () => {
         <div className="bg-white rounded-lg w-full max-w-md">
           <div className="flex justify-between items-center p-4 border-b">
             <h2 className="text-lg font-medium">{title}</h2>
-            <button
-              onClick={onClose}
-              className="text-gray-400 hover:text-gray-600"
-            >
+            <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
               <X className="w-5 h-5" />
             </button>
           </div>
@@ -172,14 +167,16 @@ export const Master = () => {
   return (
     <div className="p-6">
       {errorMessage && <div className="mb-4 text-red-500">{errorMessage}</div>}
+      {successMessage && (
+        <div className="text-green-500 mb-4 p-2 border border-green-500 bg-green-100 rounded-lg">
+          {successMessage}
+        </div>
+      )}
 
       {/* Breadcrumb */}
       <div className="mb-4">
         <nav className="text-sm text-gray-500">
-          <a
-            href="/admin/marketplace"
-            className="hover:text-yellow-500"
-          >
+          <a href="/admin/marketplace" className="hover:text-yellow-500">
             Marketplace
           </a>
           <span className="mx-2">/</span>
@@ -194,7 +191,7 @@ export const Master = () => {
       <div className="flex justify-between items-center mb-6">
         <button
           onClick={() => setIsAddModalOpen(true)}
-          className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+          className="bg-call-to-actions-900 hover:bg-call-to-actions-900 text-white px-4 py-2 rounded-lg flex items-center gap-2"
         >
           <span className="text-xl">+</span> Add Master
         </button>
@@ -216,7 +213,7 @@ export const Master = () => {
           .filter((master) =>
             master.name.toLowerCase().includes(searchQuery.toLowerCase())
           )
-          .map((master: {id: number; name: string}) => (
+          .map((master: { id: number; name: string }) => (
             <div
               key={master.id}
               className="bg-white rounded-lg p-4 flex items-center justify-between border border-gray-100"

@@ -19,16 +19,18 @@ const AppContent = () => {
 
   return excludedRoutes.includes(location.pathname) ? (
     <Routings />
-  ) : isAdminRoute ? (
-    <PermissionProvider>
-      <AdminLayout>
-        <Routings />
-      </AdminLayout>
-    </PermissionProvider>
   ) : (
-    <Layout>
-      <Routings />
-    </Layout>
+    <PermissionProvider>
+      {isAdminRoute ? (
+        <AdminLayout>
+          <Routings />
+        </AdminLayout>
+      ) : (
+        <Layout>
+          <Routings />
+        </Layout>
+      )}
+    </PermissionProvider>
   );
 };
 

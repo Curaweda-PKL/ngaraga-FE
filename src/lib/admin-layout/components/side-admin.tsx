@@ -1,4 +1,6 @@
+// SidebarComponent.jsx or SidebarComponent.tsx
 import { useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { RiCoupon3Fill, RiPencilRuler2Fill } from "react-icons/ri";
 import {
@@ -22,9 +24,12 @@ type MenuKey = 'marketplace' | 'pages';
 
 const SidebarComponent = () => {
   const { permissions } = usePermissions();
+  const navigate = useNavigate();
+  const location = useLocation();
+  
   const [openMenus, setOpenMenus] = useState<Record<MenuKey, boolean>>({
     marketplace: false,
-    pages: false
+    pages: false,
   });
 
   const CMS_PERMISSION_MAP = {
@@ -43,7 +48,7 @@ const SidebarComponent = () => {
     home: 'CMS_HOME',
     marketplacePages: 'CMS_MARKETPLACE_PAGES',
     rankings: 'CMS_RANKINGS',
-    pagesEvent: 'CMS_PAGES_EVENT',
+    pagesEvent: 'CMS_PAGES_EVENTS',
     events: 'CMS_EVENTS',
     coupon: 'CMS_COUPON',
     creator: 'CMS_CREATOR',
@@ -51,14 +56,30 @@ const SidebarComponent = () => {
     subscribe: 'CMS_SUBSCRIBE',
     admin: 'CMS_ADMIN',
     shipping: 'CMS_SHIPPING',
-    payment: 'CMS_PAYMENT'
+    payment: 'CMS_PAYMENT',
   };
 
   const hasPermission = (key: string) => permissions.includes(key);
 
   const toggleMenu = (menu: MenuKey) => {
-    setOpenMenus(prev => ({ ...prev, [menu]: !prev[menu] }));
+    setOpenMenus((prev) => ({ ...prev, [menu]: !prev[menu] }));
   };
+
+  // Utility to check if a route is active
+  const isActiveRoute = (path: string) => location.pathname === path;
+
+  // Helper component for navigation items
+  const NavItem = ({ to, icon, label }: { to: string; icon: JSX.Element; label: string }) => (
+    <li>
+      <div
+        onClick={() => navigate(to)}
+        className={`nav-link ${isActiveRoute(to) ? "active" : ""}`}
+      >
+        {icon}
+        <span>{label}</span>
+      </div>
+    </li>
+  );
 
   return (
     <div className="relative">
@@ -81,28 +102,12 @@ const SidebarComponent = () => {
             <ul className="space-y-1">
               {/* Dashboard */}
               {hasPermission(CMS_PERMISSION_MAP.dashboard) && (
-                <li>
-                  <a
-                    href="/admin/dashboard"
-                    className="flex items-center gap-3 px-4 py-3 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
-                  >
-                    <FaHome />
-                    Dashboard
-                  </a>
-                </li>
+                <NavItem to="/admin/dashboard" icon={<FaHome />} label="Dashboard" />
               )}
 
               {/* Orders */}
               {hasPermission(CMS_PERMISSION_MAP.orders) && (
-                <li>
-                  <a
-                    href="/admin/order"
-                    className="flex items-center gap-3 px-4 py-3 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
-                  >
-                    <FaClipboardList />
-                    Orders
-                  </a>
-                </li>
+                <NavItem to="/admin/order" icon={<FaClipboardList />} label="Orders" />
               )}
 
               {/* Marketplace Dropdown */}
@@ -112,11 +117,15 @@ const SidebarComponent = () => {
                     onClick={() => toggleMenu('marketplace')}
                     className="flex items-center justify-between w-full px-4 py-3 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
                   >
-                    <span className="flex items-center gap-3">
+                    <span className="flex items-center gap-3 text-neutral-colors-500">
                       <FaShoppingCart />
                       Marketplace
                     </span>
-                    {openMenus.marketplace ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                    {openMenus.marketplace ? (
+                      <ChevronUp size={20} />
+                    ) : (
+                      <ChevronDown size={20} />
+                    )}
                   </button>
                   {openMenus.marketplace && (
                     <ul className="mt-1 ml-4 space-y-1">
@@ -127,17 +136,14 @@ const SidebarComponent = () => {
                         { name: "Series", permission: CMS_PERMISSION_MAP.series, icon: <FaTags /> },
                         { name: "Categories", permission: CMS_PERMISSION_MAP.categories, icon: <FaTags /> },
                         { name: "Tag", permission: CMS_PERMISSION_MAP.tags, icon: <FaTags /> },
-                      ].map(({ name, permission, icon }) => 
+                      ].map(({ name, permission, icon }) =>
                         hasPermission(permission) && (
-                          <li key={name}>
-                            <a
-                              href={`/admin/${name.toLowerCase().replace(" ", "-")}`}
-                              className="flex items-center gap-3 px-4 py-2 text-sm text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
-                            >
-                              {icon}
-                              {name}
-                            </a>
-                          </li>
+                          <NavItem
+                            key={name}
+                            to={`/admin/${name.toLowerCase().replace(" ", "-")}`}
+                            icon={icon}
+                            label={name}
+                          />
                         )
                       )}
                     </ul>
@@ -152,11 +158,15 @@ const SidebarComponent = () => {
                     onClick={() => toggleMenu('pages')}
                     className="flex items-center justify-between w-full px-4 py-3 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
                   >
-                    <span className="flex items-center gap-3">
+                    <span className="flex items-center gap-3 text-neutral-colors-500">
                       <FaSignInAlt />
                       Pages
                     </span>
-                    {openMenus.pages ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                    {openMenus.pages ? (
+                      <ChevronUp size={20} />
+                    ) : (
+                      <ChevronDown size={20} />
+                    )}
                   </button>
                   {openMenus.pages && (
                     <ul className="mt-1 ml-4 space-y-1">
@@ -167,17 +177,14 @@ const SidebarComponent = () => {
                         { name: "Marketplace", permission: CMS_PERMISSION_MAP.marketplacePages, icon: <FaShoppingCart /> },
                         { name: "Rankings", permission: CMS_PERMISSION_MAP.rankings, icon: <FaStar /> },
                         { name: "Events", permission: CMS_PERMISSION_MAP.pagesEvent, icon: <FaCalendarAlt /> },
-                      ].map(({ name, permission, icon }) => 
+                      ].map(({ name, permission, icon }) =>
                         hasPermission(permission) && (
-                          <li key={name}>
-                            <a
-                              href={`/admin/${name.toLowerCase().replace(" ", "-")}`}
-                              className="flex items-center gap-3 px-4 py-2 text-sm text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
-                            >
-                              {icon}
-                              {name}
-                            </a>
-                          </li>
+                          <NavItem
+                            key={name}
+                            to={`/admin/${name.toLowerCase().replace(" ", "-")}`}
+                            icon={icon}
+                            label={name}
+                          />
                         )
                       )}
                     </ul>
@@ -195,17 +202,14 @@ const SidebarComponent = () => {
                 { name: "Shipping", permission: CMS_PERMISSION_MAP.shipping, icon: <FaShippingFast /> },
                 { name: "Payment", permission: CMS_PERMISSION_MAP.payment, icon: <FaMoneyCheckAlt /> },
                 { name: "Admin", permission: CMS_PERMISSION_MAP.admin, icon: <FaUserShield /> },
-              ].map(({ name, permission, icon }) => 
+              ].map(({ name, permission, icon }) =>
                 hasPermission(permission) && (
-                  <li key={name}>
-                    <a
-                      href={`/admin/${name.toLowerCase()}`}
-                      className="flex items-center gap-3 px-4 py-3 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
-                    >
-                      {icon}
-                      {name}
-                    </a>
-                  </li>
+                  <NavItem
+                    key={name}
+                    to={`/admin/${name.toLowerCase()}`}
+                    icon={icon}
+                    label={name}
+                  />
                 )
               )}
             </ul>
