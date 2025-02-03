@@ -1,15 +1,42 @@
-import React, { ChangeEvent } from "react";
+import React, { ChangeEvent, useRef } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { Upload } from "lucide-react";
 
 interface CardFormProps {
-  formData: any;
-  handleInputChange: (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
-  handleImageUpload: (e: ChangeEvent<HTMLInputElement>) => void;
-  handleDragOver: (e: React.DragEvent<HTMLDivElement>) => void;
-  handleDrop: (e: React.DragEvent<HTMLDivElement>) => void;
-  setFormData: React.Dispatch<React.SetStateAction<any>>;
+  formData: {
+    cardImage: string | ArrayBuffer | null;
+    cardName: string;
+    sku: string;
+    price: string;
+    salePrice: boolean;
+    stock: string;
+    cardDetails: string;
+    // ...other fields if needed
+  };
+  handleInputChange: (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => void;
+  handleImageUpload: (event: ChangeEvent<HTMLInputElement>) => void;
+  handleDragOver: (event: React.DragEvent<HTMLDivElement>) => void;
+  handleDrop: (event: React.DragEvent<HTMLDivElement>) => void;
+  setFormData: React.Dispatch<
+    React.SetStateAction<{
+      cardImage: string | ArrayBuffer | null;
+      cardName: string;
+      sku: string;
+      price: string;
+      salePrice: boolean;
+      stock: string;
+      cardDetails: string;
+      categories: string[];
+      creator: boolean;
+      selectedCreator: string;
+      tag: boolean;
+      tags: string[];
+      source: boolean;
+    }>
+  >;
 }
 
 const CardForm: React.FC<CardFormProps> = ({
@@ -20,9 +47,11 @@ const CardForm: React.FC<CardFormProps> = ({
   handleDrop,
   setFormData,
 }) => {
+  // Create a ref for the hidden file input
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   return (
     <div className="space-y-6">
-      {/* Card Image */}
       <div>
         <label className="block mb-2 text-sm">Card Image *</label>
         <div
@@ -39,13 +68,19 @@ const CardForm: React.FC<CardFormProps> = ({
           ) : (
             <div className="space-y-4">
               <div className="flex justify-center">
-                <button className="px-4 py-2 bg-yellow-500 text-white rounded-lg flex items-center gap-2">
-                  <Upload size={20} /> Browse
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="px-4 py-2 bg-call-to-actions-900 text-white rounded-lg flex items-center gap-2"
+                >
+                  <Upload size={20} />
+                  Browse
                 </button>
                 <input
                   type="file"
                   accept="image/*"
                   className="hidden"
+                  ref={fileInputRef}
                   onChange={handleImageUpload}
                 />
               </div>
@@ -58,7 +93,6 @@ const CardForm: React.FC<CardFormProps> = ({
         </div>
       </div>
 
-      {/* Card Name */}
       <div>
         <label className="block mb-2 text-sm">Card Name *</label>
         <input
@@ -70,7 +104,6 @@ const CardForm: React.FC<CardFormProps> = ({
         />
       </div>
 
-      {/* SKU */}
       <div>
         <label className="block mb-2 text-sm">SKU *</label>
         <input
@@ -82,7 +115,6 @@ const CardForm: React.FC<CardFormProps> = ({
         />
       </div>
 
-      {/* Price */}
       <div>
         <div className="flex items-center justify-between mb-2">
           <label className="text-sm">Price *</label>
@@ -94,7 +126,7 @@ const CardForm: React.FC<CardFormProps> = ({
               onChange={handleInputChange}
               className="sr-only peer"
             />
-            <div className="relative w-11 h-6 bg-gray-200 rounded-full peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 dark:bg-gray-700 peer-checked:bg-blue-600"></div>
+            <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600 dark:peer-checked:bg-blue-600"></div>
           </label>
         </div>
         <input
@@ -106,7 +138,6 @@ const CardForm: React.FC<CardFormProps> = ({
         />
       </div>
 
-      {/* Stock */}
       <div>
         <label className="block mb-2 text-sm">Stock *</label>
         <input
@@ -118,14 +149,13 @@ const CardForm: React.FC<CardFormProps> = ({
         />
       </div>
 
-      {/* Card Details using ReactQuill */}
       <div>
         <label className="block mb-2 text-sm">Card Details</label>
         <div className="border rounded-lg">
           <ReactQuill
             value={formData.cardDetails}
             onChange={(value) =>
-              setFormData((prev: any) => ({ ...prev, cardDetails: value }))
+              setFormData((prev) => ({ ...prev, cardDetails: value }))
             }
             placeholder="Write your card details..."
           />

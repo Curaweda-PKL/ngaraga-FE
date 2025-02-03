@@ -1,4 +1,6 @@
 import React, { useState, ChangeEvent } from "react";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css"; // Import the styles
 import { Upload } from "lucide-react";
 
 export const AddEvents = () => {
@@ -52,7 +54,8 @@ export const AddEvents = () => {
     }
   };
 
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => e.preventDefault();
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) =>
+    e.preventDefault();
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -64,6 +67,11 @@ export const AddEvents = () => {
       };
       reader.readAsDataURL(file);
     }
+  };
+
+  // Handler for React Quill editor change
+  const handleEventDetailsChange = (value: string) => {
+    setFormData((prev) => ({ ...prev, eventDetails: value }));
   };
 
   return (
@@ -100,7 +108,7 @@ export const AddEvents = () => {
                 <div className="space-y-4">
                   <label
                     htmlFor="upload-image"
-                    className="cursor-pointer px-4 py-2 bg-yellow-500 text-white rounded-lg flex items-center gap-2"
+                    className="cursor-pointer px-4 py-2 bg-call-to-actions-900 text-white rounded-lg flex items-center gap-2"
                   >
                     <Upload size={20} />
                     Browse
@@ -159,17 +167,22 @@ export const AddEvents = () => {
             </div>
           </div>
 
-          {/* Event Benefit */}
+          {/* Event Benefit Toggle */}
           <div>
             <div className="flex items-center justify-between mb-2">
               <label className="text-sm">Event Benefit *</label>
-              <input
-                type="checkbox"
-                name="eventBenefit"
-                checked={formData.eventBenefit}
-                onChange={handleInputChange}
-                className="w-6 h-6"
-              />
+              <label htmlFor="eventBenefit" className="relative inline-block w-10 h-6">
+                <input
+                  type="checkbox"
+                  id="eventBenefit"
+                  name="eventBenefit"
+                  checked={formData.eventBenefit}
+                  onChange={handleInputChange}
+                  className="sr-only peer"
+                />
+                <div className="w-full h-full bg-gray-200 rounded-full peer peer-checked:bg-yellow-500 transition-colors"></div>
+                <div className="absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 peer-checked:translate-x-4" />
+              </label>
             </div>
             <select
               disabled={!formData.eventBenefit}
@@ -179,15 +192,24 @@ export const AddEvents = () => {
             </select>
           </div>
 
-          {/* Event Details */}
+          {/* Event Details with React Quill */}
           <div>
             <label className="block mb-2 text-sm">Event Details</label>
-            <textarea
-              name="eventDetails"
+            <ReactQuill
               value={formData.eventDetails}
-              onChange={handleInputChange}
-              className="w-full p-4 min-h-[150px] border rounded-lg focus:ring-2 focus:ring-yellow-500"
+              onChange={handleEventDetailsChange}
               placeholder="Write your event details..."
+              className="min-h-[150px]"
+              // Optionally, you can customize the toolbar:
+              modules={{
+                toolbar: [
+                  [{ header: [1, 2, false] }],
+                  ["bold", "italic", "underline", "strike"],
+                  [{ list: "ordered" }, { list: "bullet" }],
+                  ["link", "image"],
+                  ["clean"],
+                ],
+              }}
             />
           </div>
         </div>
@@ -239,7 +261,7 @@ export const AddEvents = () => {
           {/* Offline Location */}
           {formData.eventType === "offline" && (
             <div>
-              <label className="block mb-2 text-sm">Event Location</label>
+              <label className="block mb-2 text-sm mt-2">Event Location</label>
               <input
                 type="text"
                 name="offlineLocation"
@@ -251,17 +273,22 @@ export const AddEvents = () => {
             </div>
           )}
 
-          {/* Special Guest */}
+          {/* Special Guest Toggle */}
           <div>
             <div className="flex items-center justify-between mb-2">
               <label className="text-sm">Special Guest</label>
-              <input
-                type="checkbox"
-                name="specialGuest"
-                checked={formData.specialGuest}
-                onChange={handleInputChange}
-                className="w-6 h-6"
-              />
+              <label htmlFor="specialGuest" className="relative inline-block w-10 h-6">
+                <input
+                  type="checkbox"
+                  id="specialGuest"
+                  name="specialGuest"
+                  checked={formData.specialGuest}
+                  onChange={handleInputChange}
+                  className="sr-only peer"
+                />
+                <div className="w-full h-full bg-gray-200 rounded-full peer peer-checked:bg-yellow-500 transition-colors"></div>
+                <div className="absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 peer-checked:translate-x-4" />
+              </label>
             </div>
             {formData.specialGuest && (
               <div className="space-y-4">
@@ -304,7 +331,7 @@ export const AddEvents = () => {
                       <div className="space-y-4">
                         <label
                           htmlFor="upload-avatar"
-                          className="cursor-pointer px-4 py-2 bg-yellow-500 text-white rounded-lg flex items-center gap-2"
+                          className="cursor-pointer px-4 py-2 bg-call-to-actions-900 text-white rounded-lg flex items-center gap-2"
                         >
                           <Upload size={20} />
                           Browse
@@ -337,7 +364,7 @@ export const AddEvents = () => {
         <button className="px-6 py-2 border rounded-lg hover:bg-gray-50">
           Cancel
         </button>
-        <button className="px-6 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600">
+        <button className="px-6 py-2 bg-call-to-actions-900 text-white rounded-lg hover:bg-yellow-600">
           Save
         </button>
       </div>
