@@ -1,8 +1,10 @@
-import  { ChangeEvent, useState } from "react";
+import { ChangeEvent, useState } from "react";
 import { Edit3, Eye, Trash2, Plus } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export const Card = () => {
-  // Initialize state with an added `selected` property for each card
+  const navigate = useNavigate();
+
   const [cards, setCards] = useState([
     {
       sku: "ABC123",
@@ -12,17 +14,14 @@ export const Card = () => {
       price: 250000,
       selected: false,
     },
-    // You can add more card objects here...
   ]);
 
-  // Handler for the "select all" checkbox
-  const handleSelectAll = (e: { target: { checked: any; }; }) => {
+  const handleSelectAll = (e: { target: { checked: any } }) => {
     const { checked } = e.target;
     const updatedCards = cards.map((card) => ({ ...card, selected: checked }));
     setCards(updatedCards);
   };
 
-  // Handler for individual row checkbox
   const handleSelectRow = (index: number, e: ChangeEvent<HTMLInputElement>) => {
     const { checked } = e.target;
     const updatedCards = [...cards];
@@ -34,11 +33,12 @@ export const Card = () => {
     <div className="p-6">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-semibold">Card</h1>
-        <button className="bg-call-to-actions-900 hover:bg-call-to-actions-800 text-white px-4 py-2 rounded-lg flex items-center gap-2">
+        <button
+          className="bg-call-to-actions-900 hover:bg-call-to-actions-800 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+          onClick={() => navigate("/admin/add-card")}
+        >
           <Plus className="w-4 h-4" />
-          <span>
-            <a href="/admin/add-card">Add Card</a>
-          </span>
+          <span>Add Card</span>
         </button>
       </div>
       <div className="overflow-x-auto">
@@ -49,7 +49,6 @@ export const Card = () => {
                 <input
                   type="checkbox"
                   className="checkbox"
-                  // The header checkbox is checked if every card is selected
                   checked={cards.every((card) => card.selected)}
                   onChange={handleSelectAll}
                 />
@@ -80,10 +79,11 @@ export const Card = () => {
                 <td>Rp {card.price.toLocaleString()}</td>
                 <td>
                   <div className="flex items-center gap-2">
-                    <button className="p-2 hover:bg-gray-100 rounded-lg text-gray-600">
-                      <a href="/admin/edit-card">
-                        <Edit3 className="w-4 h-4" />
-                      </a>
+                    <button
+                      className="p-2 hover:bg-gray-100 rounded-lg text-gray-600"
+                      onClick={() => navigate("/admin/edit-card")}
+                    >
+                      <Edit3 className="w-4 h-4" />
                     </button>
                     <button className="p-2 hover:bg-gray-100 rounded-lg text-gray-600">
                       <Eye className="w-4 h-4" />

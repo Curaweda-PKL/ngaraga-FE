@@ -1,9 +1,11 @@
-import {useState} from "react";
-import {Plus, Search, MessageSquare, Edit, Eye, Trash2} from "lucide-react";
+import { useState } from "react";
+import { Plus, Search, MessageSquare, Edit, Eye, Trash2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export const Events = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedEvents, setSelectedEvents] = useState<string[]>([]);
+  const navigate = useNavigate();
 
   const events = [
     {
@@ -11,34 +13,6 @@ export const Events = () => {
       name: "Starship Odyssey",
       schedule: "10:00 - 20:00, 20 Mar 2026",
       type: "Virtual Gathering at Cosmic Hub",
-      image: "/api/placeholder/48/48",
-    },
-    {
-      id: "2",
-      name: "Astro Pilot",
-      schedule: "10:00 - 20:00, 20 Mar 2026",
-      type: "Webinar Session",
-      image: "/api/placeholder/48/48",
-    },
-    {
-      id: "3",
-      name: "Starlight Voyager",
-      schedule: "10:00 - 20:00, 20 Mar 2026",
-      type: "Virtual Gathering at Starbase Alpha",
-      image: "/api/placeholder/48/48",
-    },
-    {
-      id: "4",
-      name: "Galactic Captain",
-      schedule: "10:00 - 20:00, 20 Mar 2026",
-      type: "Online Conference",
-      image: "/api/placeholder/48/48",
-    },
-    {
-      id: "5",
-      name: "Asteroid Hunter",
-      schedule: "10:00 - 20:00, 20 Mar 2026",
-      type: "Virtual Gathering at Comet Station",
       image: "/api/placeholder/48/48",
     },
   ];
@@ -70,12 +44,12 @@ export const Events = () => {
       <h1 className="text-2xl font-semibold mb-6">Event List</h1>
 
       <div className="flex justify-between items-center mb-6">
-        <button className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg flex items-center gap-2">
+        <button
+          className="bg-call-to-actions-900 hover:bg-call-to-actions-800 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+          onClick={() => navigate("/admin/add-event")}
+        >
           <Plus className="w-4 h-4" />
-          <span>
-            {" "}
-            <a href="/admin/add-event">Add Events</a>
-          </span>
+          <span> Add Events</span>
         </button>
 
         <div className="relative">
@@ -110,10 +84,7 @@ export const Events = () => {
           </thead>
           <tbody>
             {events.map((event) => (
-              <tr
-                key={event.id}
-                className="border-b"
-              >
+              <tr key={event.id} className="border-b">
                 <td className="p-4">
                   <input
                     type="checkbox"
@@ -141,10 +112,11 @@ export const Events = () => {
                     <button className="p-2 hover:bg-gray-100 rounded-lg text-gray-600">
                       <MessageSquare className="w-4 h-4" />
                     </button>
-                    <button className="p-2 hover:bg-gray-100 rounded-lg text-gray-600">
-                      <a href="/admin/add-event">
-                        <Edit className="w-4 h-4" />
-                      </a>
+                    <button
+                      className="p-2 hover:bg-gray-100 rounded-lg text-gray-600"
+                      onClick={() => navigate("/admin/add-event")}
+                    >
+                      <Edit className="w-4 h-4" />
                     </button>
                     <button className="p-2 hover:bg-gray-100 rounded-lg text-gray-600">
                       <Eye className="w-4 h-4" />
@@ -161,9 +133,7 @@ export const Events = () => {
       </div>
 
       <div className="flex justify-end mt-4 gap-1">
-        <button className="px-3 py-1 rounded bg-yellow-500 text-white">
-          1
-        </button>
+        <button className="px-3 py-1 rounded bg-yellow-500 text-white">1</button>
         <button className="px-3 py-1 rounded text-gray-600">2</button>
         <button className="px-3 py-1 rounded text-gray-600">3</button>
         <button className="px-3 py-1 rounded text-gray-600">...</button>

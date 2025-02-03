@@ -1,10 +1,14 @@
-import axios from "axios";
-import { Upload } from "lucide-react";
 import React, { ChangeEvent, useEffect, useState } from "react";
-import ReactQuill from "react-quill";
+import axios from "axios";
 import "react-quill/dist/quill.snow.css";
+import { useNavigate } from "react-router-dom";
+
+import CardForm from "./components/cardForm";
+import CardSettings from "./components/cardSetting";
 
 export const AddCard = () => {
+  const navigate = useNavigate();
+
   // Categories state
   const [apiCategories, setApiCategories] = useState<
     { name: string; image: string | null }[]
@@ -96,6 +100,18 @@ export const AddCard = () => {
     fetchCreators();
   }, []);
 
+  // Preload creator images so they're cached on first toggle.
+  useEffect(() => {
+    if (!creatorsLoading && !creatorsError) {
+      apiCreators.forEach((creator) => {
+        if (creator.image) {
+          const img = new Image();
+          img.src = creator.image;
+        }
+      });
+    }
+  }, [creatorsLoading, creatorsError, apiCreators]);
+
   // Fetch tags (only take the name)
   useEffect(() => {
     const fetchTags = async () => {
@@ -164,321 +180,65 @@ export const AddCard = () => {
     }
   };
 
+  // Handler for Cancel button
+  const handleCancel = () => {
+    navigate("/admin/card");
+  };
+
+  // Handler for Save button (update)
+  const handleSave = () => {
+
+    navigate("/admin/card");
+  };
+
   return (
     <div className="max-w-7xl mx-auto p-6">
       <h1 className="text-2xl font-semibold mb-6">Add Card</h1>
 
       <div className="grid grid-cols-2 gap-6">
         {/* Left Column - Form Fields */}
-        <div className="space-y-6">
-          <div>
-            <label className="block mb-2 text-sm">Card Image *</label>
-            <div
-              className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center bg-gray-50"
-              onDragOver={handleDragOver}
-              onDrop={handleDrop}
-            >
-              {formData.cardImage ? (
-                <img
-                  src={formData.cardImage.toString()}
-                  alt="Card"
-                  className="w-full h-48 object-cover rounded-lg"
-                />
-              ) : (
-                <div className="space-y-4">
-                  <div className="flex justify-center">
-                    <button className="px-4 py-2 bg-yellow-500 text-white rounded-lg flex items-center gap-2">
-                      <Upload size={20} />
-                      Browse
-                    </button>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={handleImageUpload}
-                    />
-                  </div>
-                  <p className="text-sm text-gray-500">
-                    Click to Upload or Drag & Drop
-                  </p>
-                  <p className="text-xs text-gray-400">
-                    jpeg, jpg, png, max 4mb
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
-
-          <div>
-            <label className="block mb-2 text-sm">Card Name *</label>
-            <input
-              type="text"
-              name="cardName"
-              value={formData.cardName}
-              onChange={handleInputChange}
-              className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
-            />
-          </div>
-
-          <div>
-            <label className="block mb-2 text-sm">SKU *</label>
-            <input
-              type="text"
-              name="sku"
-              value={formData.sku}
-              onChange={handleInputChange}
-              className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
-            />
-          </div>
-
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <label className="text-sm">Price *</label>
-              <label className="inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  name="salePrice"
-                  checked={formData.salePrice}
-                  onChange={handleInputChange}
-                  className="sr-only peer"
-                />
-                <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600 dark:peer-checked:bg-blue-600"></div>
-              </label>
-            </div>
-            <input
-              type="text"
-              name="price"
-              value={formData.price}
-              onChange={handleInputChange}
-              className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
-            />
-          </div>
-
-          <div>
-            <label className="block mb-2 text-sm">Stock *</label>
-            <input
-              type="text"
-              name="stock"
-              value={formData.stock}
-              onChange={handleInputChange}
-              className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
-            />
-          </div>
-
-          <div>
-            <label className="block mb-2 text-sm">Card Details</label>
-            <div className="border rounded-lg">
-              <ReactQuill
-                value={formData.cardDetails}
-                onChange={(value) =>
-                  setFormData((prev) => ({ ...prev, cardDetails: value }))
-                }
-                placeholder="Write your card details..."
-              />
-            </div>
-          </div>
-        </div>
+        <CardForm
+          formData={formData}
+          handleInputChange={handleInputChange}
+          handleImageUpload={handleImageUpload}
+          handleDragOver={handleDragOver}
+          handleDrop={handleDrop}
+          setFormData={setFormData}
+        />
 
         {/* Right Column - Categories and Settings */}
-        <div className="space-y-6 ">
-          {/* Categories Section */}
-          <div>
-            <label className="block mb-2 text-sm">Categories *</label>
-            <div className="space-y-2 bg-white p-4 rounded-lg border">
-              {categoriesLoading ? (
-                <div className="text-gray-500">Loading categories...</div>
-              ) : categoriesError ? (
-                <div className="text-red-500">{categoriesError}</div>
-              ) : (
-                apiCategories.map((category) => {
-                  const id = `category-${category.name}`;
-                  return (
-                    <div
-                      key={category.name}
-                      className="category-checkbox flex items-center gap-y-2 mb-2"
-                    >
-                      <input
-                        type="checkbox"
-                        id={id}
-                        className="hidden"
-                        checked={formData.categories.includes(category.name)}
-                        onChange={(e) => {
-                          const newCategories = e.target.checked
-                            ? [...formData.categories, category.name]
-                            : formData.categories.filter(
-                                (c) => c !== category.name
-                              );
-                          setFormData((prev) => ({
-                            ...prev,
-                            categories: newCategories,
-                          }));
-                        }}
-                      />
-                      <label htmlFor={id} className="flex items-center gap-2">
-                        {category.image && (
-                          <img
-                            src={category.image}
-                            alt={category.name}
-                            className="w-4 h-4 object-contain inline-block"
-                            onError={(e) => {
-                              (e.target as HTMLImageElement).style.display =
-                                "none";
-                            }}
-                          />
-                        )}
-                        <span className="inline-block ml-2">
-                          {category.name}
-                        </span>
-                      </label>
-                    </div>
-                  );
-                })
-              )}
-            </div>
-          </div>
-
-          {/* Creator Section */}
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <label className="text-sm">Creator</label>
-              <label className="inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  name="creator"
-                  checked={formData.creator}
-                  onChange={handleInputChange}
-                  className="sr-only peer"
-                />
-                <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600 dark:peer-checked:bg-blue-600"></div>
-              </label>
-            </div>
-            {formData.creator && (
-              <div className="space-y-2 bg-white p-4 rounded-lg border">
-                {creatorsLoading ? (
-                  <div className="text-gray-500">Loading creators...</div>
-                ) : creatorsError ? (
-                  <div className="text-red-500">{creatorsError}</div>
-                ) : (
-                  apiCreators.map((creator) => (
-                    <label
-                      key={creator.name}
-                      className="flex items-center gap-2 p-2 hover:bg-gray-50 rounded-lg cursor-pointer"
-                    >
-                      <input
-                        type="radio"
-                        name="selectedCreator"
-                        value={creator.name}
-                        checked={formData.selectedCreator === creator.name}
-                        onChange={handleInputChange}
-                        className="form-radio"
-                      />
-                      {creator.image && (
-                        <img
-                          src={creator.image}
-                          alt={creator.name}
-                          className="w-8 h-8 rounded-full object-contain"
-                        />
-                      )}
-                      <span>{creator.name}</span>
-                    </label>
-                  ))
-                )}
-              </div>
-            )}
-          </div>
-
-          {/* Tag Section */}
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <label className="text-sm">Tag</label>
-              <label className="inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  name="tag"
-                  checked={formData.tag}
-                  onChange={handleInputChange}
-                  className="sr-only peer"
-                />
-                <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600 dark:peer-checked:bg-blue-600"></div>
-              </label>
-            </div>
-            {formData.tag && (
-              <div className="space-y-2 bg-white p-4 rounded-lg border">
-                {tagsLoading ? (
-                  <div className="text-gray-500">Loading tags...</div>
-                ) : tagsError ? (
-                  <div className="text-red-500">{tagsError}</div>
-                ) : (
-                  apiTags.map((tag) => {
-                    const id = `tag-${tag.id}`;
-                    return (
-                      <div key={tag.id} className="tag-checkbox">
-                        <input
-                          type="checkbox"
-                          id={id}
-                          className="hidden"
-                          checked={formData.tags.includes(tag.name)}
-                          onChange={(e) => {
-                            const newTags = e.target.checked
-                              ? [...formData.tags, tag.name]
-                              : formData.tags.filter((t) => t !== tag.name);
-                            setFormData((prev) => ({
-                              ...prev,
-                              tags: newTags,
-                            }));
-                          }}
-                        />
-                        <label htmlFor={id}>{tag.name}</label>
-                      </div>
-                    );
-                  })
-                )}
-              </div>
-            )}
-          </div>
-
-          {/* Source Section */}
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <label className="text-sm">Source</label>
-              <label className="inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  name="source"
-                  checked={formData.source}
-                  onChange={handleInputChange}
-                  className="sr-only peer"
-                />
-                <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600 dark:peer-checked:bg-blue-600"></div>
-              </label>
-            </div>
-            {formData.source && (
-              <div className="space-y-2">
-                <input
-                  type="text"
-                  placeholder="View on Etherscan"
-                  className="w-full p-2 border rounded-lg"
-                />
-                <input
-                  type="text"
-                  placeholder="View Original"
-                  className="w-full p-2 border rounded-lg"
-                />
-              </div>
-            )}
-          </div>
-        </div>
+        <CardSettings
+          formData={formData}
+          handleInputChange={handleInputChange}
+          setFormData={setFormData}
+          apiCategories={apiCategories}
+          categoriesLoading={categoriesLoading}
+          categoriesError={categoriesError}
+          apiCreators={apiCreators}
+          creatorsLoading={creatorsLoading}
+          creatorsError={creatorsError}
+          apiTags={apiTags}
+          tagsLoading={tagsLoading}
+          tagsError={tagsError}
+        />
       </div>
 
       {/* Action Buttons */}
       <div className="flex justify-end gap-4 mt-6">
-        <button className="px-6 py-2 border rounded-lg hover:bg-gray-50">
+        <button
+          onClick={handleCancel}
+          className="px-6 py-2 border rounded-lg hover:bg-gray-50"
+        >
           Cancel
         </button>
-        <button className="px-6 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600">
+        <button
+          onClick={handleSave}
+          className="px-6 py-2 bg-call-to-actions-900 text-white rounded-lg hover:bg-call-to-actions-800"
+        >
           Save
         </button>
       </div>
     </div>
   );
 };
+
