@@ -1,364 +1,542 @@
-import React, {useState, ChangeEvent} from "react";
-import {Upload} from "lucide-react";
-import {
-  Palette,
-  Shapes,
-  Music,
-  Camera,
-  Video,
-  Wrench,
-  Trophy,
-  Glasses,
-} from "lucide-react";
+import React, { useState, useEffect, ChangeEvent } from "react";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
+import { Upload } from "lucide-react";
+import axios from "axios";
+import Select, { components, OptionProps } from "react-select";
+import { useParams, useNavigate } from "react-router-dom";
 
-export const EditEvent = () => {
+// Define a type for your card data
+interface Card {
+  id: number;
+  image: string;
+  sku: string;
+  characterName: string;
+  categoryName: string;
+  price: string;
+  stock: number;
+}
+
+interface CardOption {
+  value: number;
+  label: string;
+  image: string;
+}
+
+export const EditEvents = () => {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+
+  // Form state
   const [formData, setFormData] = useState({
-    cardImage: null as string | ArrayBuffer | null,
-    cardName: "",
-    sku: "",
-    price: "",
-    salePrice: false,
-    stock: "",
-    cardDetails: "",
-    categories: [] as string[],
-    creator: false,
-    tag: false,
-    source: false,
+    eventImage: null as File | null,
+    eventName: "",
+    eventTime: "",
+    eventDate: "",
+    eventBenefit: false,
+    selectedCard: null as CardOption | null,
+    eventType: "",
+    linkZoom: "",
+    offlineLocation: "",
+    specialGuest: false,
+    guestName: "",
+    guestOccupation: "",
+    guestAvatar: null as File | null,
+    eventDetails: "",
   });
 
-  const categories = [
-    {name: "Art", icon: <Palette className="w-4 h-4" />},
-    {name: "Collectibles", icon: <Shapes className="w-4 h-4" />},
-    {name: "Music", icon: <Music className="w-4 h-4" />},
-    {name: "Photography", icon: <Camera className="w-4 h-4" />},
-    {name: "Video", icon: <Video className="w-4 h-4" />},
-    {name: "Utility", icon: <Wrench className="w-4 h-4" />},
-    {name: "Sport", icon: <Trophy className="w-4 h-4" />},
-    {name: "Virtual Worlds", icon: <Glasses className="w-4 h-4" />},
-  ];
+  // Preview state for images
+  const [eventImagePreview, setEventImagePreview] = useState<string | null>(null);
+  const [guestAvatarPreview, setGuestAvatarPreview] = useState<string | null>(null);
 
-  const creators = [
-    {name: "Astrovia", avatar: "/api/placeholder/32/32"},
-    {name: "Cosmara", avatar: "/api/placeholder/32/32"},
-    {name: "Stellaris", avatar: "/api/placeholder/32/32"},
-    {name: "Nebulion", avatar: "/api/placeholder/32/32"},
-    {name: "Galactica", avatar: "/api/placeholder/32/32"},
-  ];
+  // States for fetching cards
+  const [cards, setCards] = useState<Card[]>([]);
+  const [cardsLoading, setCardsLoading] = useState<boolean>(false);
+  const [cardsError, setCardsError] = useState<string>("");
 
-  const tags = [
-    "Animation Voyager",
-    "Illustration Culture",
-    "Moon Hopper",
-    "Animation Traveler",
-    "Comet Illustration",
-  ];
+  // Fetch cards on mount
+  useEffect(() => {
+    const fetchCards = async () => {
+      setCardsLoading(true);
+      try {
+        const response = await axios.get("http://localhost:3000/api/cards/all");
+        setCards(response.data.cards);
+      } catch (error) {
+        console.error("Error fetching cards:", error);
+        setCardsError("Failed to fetch cards.");
+      } finally {
+        setCardsLoading(false);
+      }
+    };
+    fetchCards();
+  }, []);
 
-  const handleInputChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const {name, value, type} = e.target;
-    const newValue =
-      type === "checkbox" ? (e.target as HTMLInputElement).checked : value;
+  // Fetch existing event details and populate form fields
+  useEffect(() => {
+    if (id) {
+      const fetchEventDetails = async () => {
+        try {
+          const response = await axios.get(`http://localhost:3000/api/events/${id}`);
+          const event = response.data;
+          // Populate basic fields
+          setFormData((prev) => ({
+            ...prev,
+            eventName: event.eventName || "",
+            eventDetails: event.eventDescription || "",
+            eventType: event.eventType || "",
+            linkZoom: event.onlineZoomLink || "",
+            offlineLocation: event.offlineLocation || "",
+            specialGuest: !!event.eventSpecialGuestName,
+            guestName: event.eventSpecialGuestName || "",
+            guestOccupation: event.eventSpecialGuestOccupation || "",
+          }));
+          // Format date: "YYYY-MM-DD"
+          if (event.eventDate) {
+            const date = new Date(event.eventDate);
+            const formattedDate = date.toISOString().substring(0, 10);
+            setFormData((prev) => ({ ...prev, eventDate: formattedDate }));
+          }
+          // Format time: "HH:MM"
+          if (event.eventTime) {
+            const time = new Date(event.eventTime);
+            const formattedTime = time.toISOString().substring(11, 16);
+            setFormData((prev) => ({ ...prev, eventTime: formattedTime }));
+          }
+          // Set image previews if available
+          if (event.eventImage) {
+            setEventImagePreview(`http://localhost:3000/src/uploads/event/${event.eventImage.replace(/\\/g, "/")}`);
+          }
+          if (event.eventSpecialGuestImage) {
+            setGuestAvatarPreview(`http://localhost:3000/src/uploads/event/${event.eventSpecialGuestImage.replace(/\\/g, "/")}`);
+          }
+          // If cardRewards exist, assume the first card as selected
+          if (event.cardRewards && event.cardRewards.length > 0) {
+            const card = event.cardRewards[0];
+            setFormData((prev) => ({
+              ...prev,
+              eventBenefit: true,
+              selectedCard: {
+                value: card.id,
+                label: card.characterName,
+                image: `http://localhost:3000/${card.image.replace(/\\/g, "/")}`,
+              },
+            }));
+          }
+        } catch (error) {
+          console.error("Error fetching event details:", error);
+        }
+      };
+      fetchEventDetails();
+    }
+  }, [id]);
+
+  // Create react-select options for cards
+  const cardOptions: CardOption[] = cards.map((card) => ({
+    value: card.id,
+    label: card.characterName,
+    image: `http://localhost:3000/${card.image.replace(/\\/g, "/")}`,
+  }));
+
+  // Custom option to show card image & name
+  const CustomOption = (props: OptionProps<CardOption, false>) => (
+    <components.Option {...props}>
+      <div style={{ display: "flex", alignItems: "center" }}>
+        <img
+          src={props.data.image}
+          alt={props.data.label}
+          style={{ width: 30, height: 30, objectFit: "cover", marginRight: 10 }}
+        />
+        <span>{props.data.label}</span>
+      </div>
+    </components.Option>
+  );
+
+  // Handlers for form inputs and file uploads
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value, type } = e.target;
+    const newValue = type === "checkbox" ? (e.target as HTMLInputElement).checked : value;
     setFormData((prev) => ({
       ...prev,
       [name]: newValue,
     }));
   };
 
-  const handleImageUpload = (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
+  const handleImageUpload = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setFormData((prev) => ({
-          ...prev,
-          cardImage: reader.result,
-        }));
-      };
-      reader.readAsDataURL(file);
+      setFormData((prev) => ({ ...prev, eventImage: file }));
+      setEventImagePreview(URL.createObjectURL(file));
     }
   };
 
-  const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
-    event.preventDefault();
+  const handleGuestAvatarUpload = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setFormData((prev) => ({ ...prev, guestAvatar: file }));
+      setGuestAvatarPreview(URL.createObjectURL(file));
+    }
   };
 
-  const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    const file = event.dataTransfer.files?.[0];
+  // Drag and drop handlers
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => e.preventDefault();
+  const handleImageDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    const file = e.dataTransfer.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setFormData((prev) => ({
-          ...prev,
-          cardImage: reader.result,
-        }));
-      };
-      reader.readAsDataURL(file);
+      setFormData((prev) => ({ ...prev, eventImage: file }));
+      setEventImagePreview(URL.createObjectURL(file));
+    }
+  };
+  const handleGuestAvatarDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    const file = e.dataTransfer.files?.[0];
+    if (file) {
+      setFormData((prev) => ({ ...prev, guestAvatar: file }));
+      setGuestAvatarPreview(URL.createObjectURL(file));
+    }
+  };
+
+  // ReactQuill handler
+  const handleEventDetailsChange = (value: string) => {
+    setFormData((prev) => ({ ...prev, eventDetails: value }));
+  };
+
+  // Submit handler for updating the event
+  const handleSubmit = async () => {
+    if (!formData.eventName || !formData.eventTime || !formData.eventDate) {
+      alert("Please fill in all required fields.");
+      return;
+    }
+    // Allow existing image (preview) if no new file is chosen.
+    if (!formData.eventImage && !eventImagePreview) {
+      alert("Please upload an event image.");
+      return;
+    }
+    const data = new FormData();
+    data.append("eventName", formData.eventName);
+    data.append("eventTime", formData.eventTime);
+    data.append("eventDate", formData.eventDate);
+    data.append("eventDescription", formData.eventDetails);
+    data.append("eventType", formData.eventType);
+    if (formData.eventImage) {
+      data.append("eventImage", formData.eventImage);
+    }
+    // Send card reward info if applicable
+    if (formData.eventBenefit && formData.selectedCard) {
+      data.append("cardRewards", formData.selectedCard.value.toString());
+    }
+    if (formData.eventType === "ONLINE") {
+      data.append("onlineZoomLink", formData.linkZoom);
+    } else if (formData.eventType === "OFFLINE") {
+      data.append("offlineLocation", formData.offlineLocation);
+    }
+    if (formData.specialGuest) {
+      data.append("eventSpecialGuestName", formData.guestName);
+      data.append("eventSpecialGuestOccupation", formData.guestOccupation);
+      if (formData.guestAvatar) {
+        data.append("eventSpecialGuestImage", formData.guestAvatar);
+      }
+    }
+    try {
+      await axios.put(`http://localhost:3000/api/events/${id}`, data, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      console.log("Event updated successfully");
+      navigate("/admin/events");
+    } catch (error) {
+      console.error("Error updating event:", error);
     }
   };
 
   return (
     <div className="max-w-7xl mx-auto p-6">
-      <h1 className="text-2xl font-semibold mb-6">Add Card</h1>
+      {/* Breadcrumb */}
+      <div className="flex items-center gap-2 text-sm text-gray-500 mb-6">
+        <span>Events</span>
+        <span>/</span>
+        <span>Events List</span>
+        <span>/</span>
+        <span className="text-gray-900">Edit Events</span>
+      </div>
+
+      <h1 className="text-2xl font-semibold mb-6">Edit Events</h1>
 
       <div className="grid grid-cols-2 gap-6">
-        {/* Left Column - Form Fields */}
+        {/* Left Column */}
         <div className="space-y-6">
+          {/* Event Image */}
           <div>
-            <label className="block mb-2 text-sm">Card Image *</label>
+            <label className="block mb-2 text-sm">Events Image *</label>
             <div
               className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center bg-gray-50"
               onDragOver={handleDragOver}
-              onDrop={handleDrop}
+              onDrop={handleImageDrop}
             >
-              {formData.cardImage ? (
+              {eventImagePreview ? (
                 <img
-                  src={formData.cardImage.toString()}
-                  alt="Card"
+                  src={eventImagePreview}
+                  alt="Event"
                   className="w-full h-48 object-cover rounded-lg"
                 />
               ) : (
                 <div className="space-y-4">
-                  <div className="flex justify-center">
-                    <button className="px-4 py-2 bg-yellow-500 text-white rounded-lg flex items-center gap-2">
-                      <Upload size={20} />
-                      Browse
-                    </button>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={handleImageUpload}
-                    />
-                  </div>
-                  <p className="text-sm text-gray-500">
-                    Click to Upload or Drag & Drop
-                  </p>
-                  <p className="text-xs text-gray-400">
-                    jpeg, jpg, png, max 4mb
-                  </p>
+                  <label
+                    htmlFor="upload-image"
+                    className="cursor-pointer px-4 py-2 bg-call-to-actions-900 text-white rounded-lg flex items-center gap-2"
+                  >
+                    <Upload size={20} />
+                    Browse
+                  </label>
+                  <input
+                    id="upload-image"
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleImageUpload}
+                  />
+                  <p className="text-sm text-gray-500">Click to Upload or Drag & Drop</p>
+                  <p className="text-xs text-gray-400">jpeg, jpg, png, max 4mb</p>
                 </div>
               )}
             </div>
           </div>
 
+          {/* Event Name */}
           <div>
-            <label className="block mb-2 text-sm">Card Name *</label>
+            <label className="block mb-2 text-sm">Event Name *</label>
             <input
               type="text"
-              name="cardName"
-              value={formData.cardName}
+              name="eventName"
+              value={formData.eventName}
               onChange={handleInputChange}
-              className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
+              className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-yellow-500"
             />
           </div>
 
-          <div>
-            <label className="block mb-2 text-sm">SKU *</label>
-            <input
-              type="text"
-              name="sku"
-              value={formData.sku}
-              onChange={handleInputChange}
-              className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
-            />
-          </div>
-
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <label className="text-sm">Price *</label>
-              <div className="relative inline-block w-10 mr-2 align-middle select-none">
-                <input
-                  type="checkbox"
-                  name="salePrice"
-                  checked={formData.salePrice}
-                  onChange={handleInputChange}
-                  className="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer"
-                />
-                <label className="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"></label>
-              </div>
-            </div>
-            <input
-              type="text"
-              name="price"
-              value={formData.price}
-              onChange={handleInputChange}
-              className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
-            />
-          </div>
-
-          <div>
-            <label className="block mb-2 text-sm">Stock *</label>
-            <input
-              type="text"
-              name="stock"
-              value={formData.stock}
-              onChange={handleInputChange}
-              className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
-            />
-          </div>
-
-          <div>
-            <label className="block mb-2 text-sm">Card Details</label>
-            <div className="border rounded-lg">
-              <div className="flex gap-2 p-2 border-b">
-                {/* Rich Text Editor Controls */}
-                <button className="p-1 hover:bg-gray-100 rounded">
-                  <svg
-                    className="w-4 h-4"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      fill="currentColor"
-                      d="M13 5h-2v6H5v2h6v6h2v-6h6v-2h-6z"
-                    />
-                  </svg>
-                </button>
-                {/* Add more editor controls as needed */}
-              </div>
-              <textarea
-                name="cardDetails"
-                value={formData.cardDetails}
+          {/* Event Time & Date */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block mb-2 text-sm">Event Time *</label>
+              <input
+                type="time"
+                name="eventTime"
+                value={formData.eventTime}
                 onChange={handleInputChange}
-                className="w-full p-4 min-h-[200px] focus:outline-none"
-                placeholder="Write your card details..."
+                className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-yellow-500"
+              />
+            </div>
+            <div>
+              <label className="block mb-2 text-sm">Event Date *</label>
+              <input
+                type="date"
+                name="eventDate"
+                value={formData.eventDate}
+                onChange={handleInputChange}
+                className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-yellow-500"
               />
             </div>
           </div>
+
+          {/* Event Benefit Toggle & Card Select */}
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <label className="text-sm">Event Benefit *</label>
+              <label htmlFor="eventBenefit" className="relative inline-block w-10 h-6">
+                <input
+                  type="checkbox"
+                  id="eventBenefit"
+                  name="eventBenefit"
+                  checked={formData.eventBenefit}
+                  onChange={handleInputChange}
+                  className="sr-only peer"
+                />
+                <div className="w-full h-full bg-gray-200 rounded-full peer peer-checked:bg-yellow-500 transition-colors"></div>
+                <div className="absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 peer-checked:translate-x-4" />
+              </label>
+            </div>
+            {cardsLoading ? (
+              <p>Loading Cards...</p>
+            ) : cardsError ? (
+              <p style={{ color: "red" }}>{cardsError}</p>
+            ) : (
+              <Select
+                isDisabled={!formData.eventBenefit}
+                options={cardOptions}
+                value={formData.selectedCard}
+                onChange={(selectedOption) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    selectedCard: selectedOption,
+                  }))
+                }
+                placeholder="Choose a Card"
+                components={{ Option: CustomOption }}
+                styles={{
+                  control: (provided) => ({
+                    ...provided,
+                    borderRadius: "0.5rem",
+                  }),
+                }}
+              />
+            )}
+          </div>
+
+          {/* Event Details with React Quill */}
+          <div>
+            <label className="block mb-2 text-sm">Event Details</label>
+            <ReactQuill
+              value={formData.eventDetails}
+              onChange={handleEventDetailsChange}
+              placeholder="Write your event details..."
+              className="min-h-[150px]"
+              modules={{
+                toolbar: [
+                  [{ header: [1, 2, false] }],
+                  ["bold", "italic", "underline", "strike"],
+                  [{ list: "ordered" }, { list: "bullet" }],
+                  ["link", "image"],
+                  ["clean"],
+                ],
+              }}
+            />
+          </div>
         </div>
 
-        {/* Right Column - Categories and Settings */}
+        {/* Right Column */}
         <div className="space-y-6">
+          {/* Event Type */}
           <div>
-            <label className="block mb-2 text-sm">Categories *</label>
-            <div className="space-y-2 bg-white p-4 rounded-lg border">
-              {categories.map((category) => (
-                <label
-                  key={category.name}
-                  className="flex items-center gap-2 p-2 hover:bg-gray-50 rounded-lg cursor-pointer"
-                >
+            <label className="block mb-2 text-sm">Event Type *</label>
+            <div className="space-y-2">
+              <label className="flex items-center gap-2">
+                <input
+                  type="radio"
+                  name="eventType"
+                  value="ONLINE"
+                  checked={formData.eventType === "ONLINE"}
+                  onChange={handleInputChange}
+                />
+                <span>Online Event</span>
+              </label>
+              <label className="flex items-center gap-2">
+                <input
+                  type="radio"
+                  name="eventType"
+                  value="OFFLINE"
+                  checked={formData.eventType === "OFFLINE"}
+                  onChange={handleInputChange}
+                />
+                <span>Offline Event</span>
+              </label>
+            </div>
+          </div>
+
+          {/* Online Event Link */}
+          {formData.eventType === "ONLINE" && (
+            <div>
+              <label className="block mb-2 text-sm">Online Event Link</label>
+              <input
+                type="text"
+                name="linkZoom"
+                value={formData.linkZoom}
+                onChange={handleInputChange}
+                className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-yellow-500"
+                placeholder="Enter online event link"
+              />
+            </div>
+          )}
+
+          {/* Offline Location */}
+          {formData.eventType === "OFFLINE" && (
+            <div>
+              <label className="block mb-2 text-sm mt-2">Event Location</label>
+              <input
+                type="text"
+                name="offlineLocation"
+                value={formData.offlineLocation}
+                onChange={handleInputChange}
+                className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-yellow-500"
+                placeholder="Enter event location"
+              />
+            </div>
+          )}
+
+          {/* Special Guest Toggle & Fields */}
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <label className="text-sm">Special Guest</label>
+              <label htmlFor="specialGuest" className="relative inline-block w-10 h-6">
+                <input
+                  type="checkbox"
+                  id="specialGuest"
+                  name="specialGuest"
+                  checked={formData.specialGuest}
+                  onChange={handleInputChange}
+                  className="sr-only peer"
+                />
+                <div className="w-full h-full bg-gray-200 rounded-full peer peer-checked:bg-yellow-500 transition-colors"></div>
+                <div className="absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 peer-checked:translate-x-4" />
+              </label>
+            </div>
+            {formData.specialGuest && (
+              <div className="space-y-4">
+                <div>
+                  <label className="block mb-2 text-sm">Guest Name</label>
                   <input
-                    type="checkbox"
-                    className="form-checkbox"
-                    checked={formData.categories.includes(category.name)}
-                    onChange={(e) => {
-                      const newCategories = e.target.checked
-                        ? [...formData.categories, category.name]
-                        : formData.categories.filter(
-                            (c) => c !== category.name
-                          );
-                      setFormData((prev) => ({
-                        ...prev,
-                        categories: newCategories,
-                      }));
-                    }}
+                    type="text"
+                    name="guestName"
+                    value={formData.guestName}
+                    onChange={handleInputChange}
+                    className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-yellow-500"
+                    placeholder="Enter guest name"
                   />
-                  <span className="flex items-center gap-2">
-                    {category.icon}
-                    {category.name}
-                  </span>
-                </label>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <label className="text-sm">Creator</label>
-              <div className="relative inline-block w-10 mr-2 align-middle select-none">
-                <input
-                  type="checkbox"
-                  name="creator"
-                  checked={formData.creator}
-                  onChange={handleInputChange}
-                  className="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer"
-                />
-                <label className="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"></label>
-              </div>
-            </div>
-            {formData.creator && (
-              <div className="space-y-2 bg-white p-4 rounded-lg border">
-                {creators.map((creator) => (
-                  <label
-                    key={creator.name}
-                    className="flex items-center gap-2 p-2 hover:bg-gray-50 rounded-lg cursor-pointer"
+                </div>
+                <div>
+                  <label className="block mb-2 text-sm">Guest Occupation</label>
+                  <input
+                    type="text"
+                    name="guestOccupation"
+                    value={formData.guestOccupation}
+                    onChange={handleInputChange}
+                    className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-yellow-500"
+                    placeholder="Enter guest occupation"
+                  />
+                </div>
+                <div>
+                  <label className="block mb-2 text-sm">Guest Avatar</label>
+                  <div
+                    className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center bg-gray-50"
+                    onDragOver={handleDragOver}
+                    onDrop={handleGuestAvatarDrop}
                   >
-                    <input
-                      type="radio"
-                      name="creator"
-                      className="form-radio"
-                    />
-                    <img
-                      src={creator.avatar}
-                      alt={creator.name}
-                      className="w-8 h-8 rounded-full"
-                    />
-                    <span>{creator.name}</span>
-                  </label>
-                ))}
-              </div>
-            )}
-          </div>
-
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <label className="text-sm">Tag</label>
-              <div className="relative inline-block w-10 mr-2 align-middle select-none">
-                <input
-                  type="checkbox"
-                  name="tag"
-                  checked={formData.tag}
-                  onChange={handleInputChange}
-                  className="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer"
-                />
-                <label className="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"></label>
-              </div>
-            </div>
-            {formData.tag && (
-              <div className="space-y-2 bg-white p-4 rounded-lg border">
-                {tags.map((tag) => (
-                  <label
-                    key={tag}
-                    className="flex items-center gap-2 p-2 hover:bg-gray-50 rounded-lg cursor-pointer"
-                  >
-                    <input
-                      type="checkbox"
-                      className="form-checkbox"
-                    />
-                    <span>{tag}</span>
-                  </label>
-                ))}
-              </div>
-            )}
-          </div>
-
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <label className="text-sm">Source</label>
-              <div className="relative inline-block w-10 mr-2 align-middle select-none">
-                <input
-                  type="checkbox"
-                  name="source"
-                  checked={formData.source}
-                  onChange={handleInputChange}
-                  className="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer"
-                />
-                <label className="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"></label>
-              </div>
-            </div>
-            {formData.source && (
-              <div className="space-y-2">
-                <input
-                  type="text"
-                  placeholder="View on Etherscan"
-                  className="w-full p-2 border rounded-lg"
-                />
-                <input
-                  type="text"
-                  placeholder="View Original"
-                  className="w-full p-2 border rounded-lg"
-                />
+                    {guestAvatarPreview ? (
+                      <img
+                        src={guestAvatarPreview}
+                        alt="Guest Avatar"
+                        className="w-24 h-24 object-cover rounded-full mx-auto"
+                      />
+                    ) : (
+                      <div className="space-y-4">
+                        <label
+                          htmlFor="upload-avatar"
+                          className="cursor-pointer px-4 py-2 bg-call-to-actions-900 text-white rounded-lg flex items-center gap-2"
+                        >
+                          <Upload size={20} />
+                          Browse
+                        </label>
+                        <input
+                          id="upload-avatar"
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={handleGuestAvatarUpload}
+                        />
+                        <p className="text-sm text-gray-500">Click to Upload or Drag & Drop</p>
+                        <p className="text-xs text-gray-400">jpeg, jpg, png, max 4mb</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
             )}
           </div>
@@ -367,10 +545,16 @@ export const EditEvent = () => {
 
       {/* Action Buttons */}
       <div className="flex justify-end gap-4 mt-6">
-        <button className="px-6 py-2 border rounded-lg hover:bg-gray-50">
+        <button
+          className="px-6 py-2 border rounded-lg hover:bg-gray-50"
+          onClick={() => navigate("/admin/events")}
+        >
           Cancel
         </button>
-        <button className="px-6 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600">
+        <button
+          onClick={handleSubmit}
+          className="px-6 py-2 bg-call-to-actions-900 text-white rounded-lg hover:bg-yellow-600"
+        >
           Save
         </button>
       </div>

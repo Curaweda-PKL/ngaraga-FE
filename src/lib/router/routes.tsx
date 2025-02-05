@@ -22,7 +22,7 @@ import {MarketplaceForm} from "../admin-pages/pages/marketplace";
 import {RankingsForm} from "../admin-pages/pages/rankings";
 import {EventsForm} from "../admin-pages/pages/events";
 import {Events} from "../admin-pages/event/events";
-import {EditEvent} from "../admin-pages/event/edit-event";
+import {EditEvents} from "../admin-pages/event/edit-event";
 import {AddEvents} from "../admin-pages/event/add-events";
 import {Coupon} from "../admin-pages/coupon/coupon";
 import {AddCouponForm} from "../admin-pages/coupon/add-coupon";
@@ -107,7 +107,7 @@ export const routes: Array<PathRouteProps> = [
   {path: "/view-detail", element: <ViewDetail />},
   {path: "/rankings", element: <TopCollectors />},
   {path: "/events", element: <BrowseEvents />},
-  {path: "/detail-events", element: <EventDetail />},
+  {path: "/detail-events/:id", element: <EventDetail />},
   {path: "/register-events", element: <EventRegistration />},
   {path: "/login/admin", element: <AdminLogin />},
   {path: "/sentEmail", element: <SentEmail />},
@@ -146,7 +146,7 @@ export const adminRoutes: Array<PathRouteProps> = [
   { path: "rankings", element: <RankingsForm /> },
   { path: "events", element: <EventsForm /> },
   { path: "event", element: <Events /> },
-  { path: "edit-event", element: <EditEvent /> },
+  { path: "edit-event/:id", element: <EditEvents /> },
   { path: "add-event", element: <AddEvents /> },
   { path: "coupon", element: <Coupon /> },
   { path: "add-coupon", element: <AddCouponForm /> },

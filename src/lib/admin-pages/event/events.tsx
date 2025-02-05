@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { Plus, Search, MessageSquare, Edit, Eye, Trash2 } from "lucide-react";
+import { Plus, Search, Edit, Eye, EyeOff, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 export const Events = () => {
@@ -13,17 +13,27 @@ export const Events = () => {
       schedule: string;
       type: string;
       image: string;
+      isSuspended: boolean;
     }[]
   >([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5; // Adjust as needed
+  const itemsPerPage = 5;
   const navigate = useNavigate();
+
+  // Modal state for suspend/unsuspend actions
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalEvent, setModalEvent] = useState<{
+    id: string;
+    name: string;
+    isSuspended: boolean;
+  } | null>(null);
+  const [modalAction, setModalAction] = useState<"suspend" | "unsuspend">("suspend");
 
   useEffect(() => {
     axios
-      .get("http://localhost:3000/api/events")
+      .get("http://localhost:3000/api/events/admin")
       .then((response) => {
-        // Transform API data to match the UI structure
+        // Correct the mapping to use the API's "isSuspensed" field
         const fetchedEvents = response.data.map((event: any) => ({
           id: event.id,
           name: event.eventName,
@@ -31,8 +41,10 @@ export const Events = () => {
             hour: "2-digit",
             minute: "2-digit",
           })} on ${new Date(event.eventDate).toLocaleDateString()}`,
-          type: event.offlineLocation || event.onlineZoomLink || "Unknown",
+          type: event.eventType || "Unknown",
           image: event.eventImage,
+          // Use "isSuspensed" from the API and convert it to a boolean if needed
+          isSuspended: event.isSuspensed === true,
         }));
         setEvents(fetchedEvents);
       })
@@ -41,32 +53,28 @@ export const Events = () => {
       });
   }, []);
 
-  // Reset to first page whenever search query changes
+  // Reset current page when search query changes
   useEffect(() => {
     setCurrentPage(1);
   }, [searchQuery]);
 
-  // Filter events based on the search query (case-insensitive)
   const filteredEvents = events.filter((event) =>
     event.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const totalPages = Math.ceil(filteredEvents.length / itemsPerPage);
 
-  // Slice the filtered events to only show the events for the current page
   const currentEvents = filteredEvents.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
 
-  // Check if all events on the current page are selected
   const allSelected =
     currentEvents.length > 0 &&
     currentEvents.every((event) => selectedEvents.includes(event.id));
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
-      // Add current page events to selection (if not already selected)
       const newSelected = [...selectedEvents];
       currentEvents.forEach((event) => {
         if (!newSelected.includes(event.id)) {
@@ -75,7 +83,6 @@ export const Events = () => {
       });
       setSelectedEvents(newSelected);
     } else {
-      // Remove current page events from selection
       const newSelected = selectedEvents.filter(
         (id) => !currentEvents.some((event) => event.id === id)
       );
@@ -91,7 +98,6 @@ export const Events = () => {
     }
   };
 
-  // Delete a single event using axios
   const handleDeleteEvent = (id: string) => {
     if (!window.confirm("Are you sure you want to delete this event?")) {
       return;
@@ -99,11 +105,9 @@ export const Events = () => {
     axios
       .delete(`http://localhost:3000/api/events/${id}`)
       .then(() => {
-        // Remove the deleted event from state
         setEvents((prevEvents) =>
           prevEvents.filter((event) => event.id !== id)
         );
-        // Also remove it from selected events if it was selected
         setSelectedEvents((prevSelected) =>
           prevSelected.filter((eventId) => eventId !== id)
         );
@@ -113,7 +117,6 @@ export const Events = () => {
       });
   };
 
-  // Delete all selected events
   const handleDeleteSelected = () => {
     if (selectedEvents.length === 0) return;
     if (!window.confirm("Are you sure you want to delete selected events?")) {
@@ -125,7 +128,6 @@ export const Events = () => {
       )
     )
       .then(() => {
-        // Remove all deleted events from the state
         setEvents((prevEvents) =>
           prevEvents.filter((event) => !selectedEvents.includes(event.id))
         );
@@ -138,7 +140,6 @@ export const Events = () => {
 
   const renderPaginationButtons = () => {
     const buttons = [];
-    // Generate a button for each page
     for (let page = 1; page <= totalPages; page++) {
       buttons.push(
         <button
@@ -155,6 +156,38 @@ export const Events = () => {
       );
     }
     return buttons;
+  };
+
+  const openSuspendModal = (event: { id: string; name: string; isSuspended: boolean }) => {
+    setModalEvent(event);
+    setModalAction(event.isSuspended ? "unsuspend" : "suspend");
+    setModalOpen(true);
+  };
+
+  const handleSuspendUnsuspend = () => {
+    if (!modalEvent) return;
+    const url = `http://localhost:3000/api/events/${modalEvent.id}/${modalAction}`;
+    axios
+      .put(url)
+      .then(() => {
+        setEvents((prevEvents) =>
+          prevEvents.map((ev) =>
+            ev.id === modalEvent.id ? { ...ev, isSuspended: modalAction === "suspend" } : ev
+          )
+        );
+      })
+      .catch((error) => {
+        console.error("Error updating event suspension:", error);
+      })
+      .finally(() => {
+        setModalOpen(false);
+        setModalEvent(null);
+      });
+  };
+
+  const handleCloseModal = () => {
+    setModalOpen(false);
+    setModalEvent(null);
   };
 
   return (
@@ -212,7 +245,7 @@ export const Events = () => {
               </th>
               <th className="p-4 text-left font-medium">Events Name</th>
               <th className="p-4 text-left font-medium">Schedule</th>
-              <th className="p-4 text-left font-medium">Events Location</th>
+              <th className="p-4 text-left font-medium">Events Type</th>
               <th className="p-4 text-left font-medium">Action</th>
             </tr>
           </thead>
@@ -224,15 +257,13 @@ export const Events = () => {
                     type="checkbox"
                     className="rounded border-gray-300"
                     checked={selectedEvents.includes(event.id)}
-                    onChange={(e) =>
-                      handleSelectEvent(event.id, e.target.checked)
-                    }
+                    onChange={(e) => handleSelectEvent(event.id, e.target.checked)}
                   />
                 </td>
                 <td className="p-4">
                   <div className="flex items-center gap-3">
                     <img
-                      src={`http://localhost:3000/uploads/event/${event.image}`} // Updated code with the prefix
+                      src={`http://localhost:3000/uploads/event/${event.image}`}
                       alt={event.name}
                       className="w-12 h-12 rounded-lg object-cover"
                     />
@@ -243,17 +274,27 @@ export const Events = () => {
                 <td className="p-4">{event.type}</td>
                 <td className="p-4">
                   <div className="flex gap-2">
-                    <button className="p-2 hover:bg-gray-100 rounded-lg text-gray-600">
-                      <Plus className="w-4 h-4" />
-                    </button>
                     <button
                       className="p-2 hover:bg-gray-100 rounded-lg text-gray-600"
                       onClick={() => navigate("/admin/add-event")}
                     >
+                      <Plus className="w-4 h-4" />
+                    </button>
+                    <button
+                      className="p-2 hover:bg-gray-100 rounded-lg text-gray-600"
+                      onClick={() => navigate(`/admin/edit-event/${event.id}`)}
+                    >
                       <Edit className="w-4 h-4" />
                     </button>
-                    <button className="p-2 hover:bg-gray-100 rounded-lg text-gray-600">
-                      <Eye className="w-4 h-4" />
+                    <button
+                      className="p-2 hover:bg-gray-100 rounded-lg text-gray-600"
+                      onClick={() => openSuspendModal(event)}
+                    >
+                      {event.isSuspended ? (
+                        <EyeOff className="w-4 h-4" />
+                      ) : (
+                        <Eye className="w-4 h-4" />
+                      )}
                     </button>
                     <button
                       className="p-2 hover:bg-gray-100 rounded-lg text-gray-600"
@@ -301,6 +342,39 @@ export const Events = () => {
           </>
         )}
       </div>
+
+      {/* Modal for Suspend/Unsuspend Confirmation */}
+      {modalOpen && modalEvent && (
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+          <div
+            className="absolute inset-0 bg-black opacity-50"
+            onClick={handleCloseModal}
+          ></div>
+          <div className="bg-white rounded-lg shadow-lg z-10 p-6 w-96">
+            <h2 className="text-xl font-semibold mb-4">
+              {modalAction === "suspend" ? "Suspend Event" : "Unsuspend Event"}
+            </h2>
+            <p className="mb-6">
+              Are you sure you want to {modalAction} the event{" "}
+              <span className="font-medium">{modalEvent.name}</span>?
+            </p>
+            <div className="flex justify-end gap-2">
+              <button
+                className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
+                onClick={handleCloseModal}
+              >
+                Cancel
+              </button>
+              <button
+                className="px-4 py-2 rounded bg-yellow-500 text-white hover:bg-yellow-600"
+                onClick={handleSuspendUnsuspend}
+              >
+                Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

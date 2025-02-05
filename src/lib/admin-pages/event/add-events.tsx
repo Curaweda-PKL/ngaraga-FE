@@ -7,8 +7,9 @@ import Select, { components, OptionProps } from "react-select";
 
 // Define a type for your card data
 interface Card {
+  id: number; // now using card id
   image: string;
-  sku: string;
+  sku: string; // still available if needed elsewhere
   characterName: string;
   categoryName: string;
   price: string;
@@ -16,7 +17,7 @@ interface Card {
 }
 
 interface CardOption {
-  value: string; // we use sku as value
+  value: number; // now using card id instead of sku
   label: string; // card name
   image: string; // image URL
 }
@@ -68,9 +69,9 @@ export const AddEvents = () => {
     fetchCards();
   }, []);
 
-  // Create options for react-select from your cards
+  // Create options for react-select from your cards using card id instead of sku
   const cardOptions: CardOption[] = cards.map((card) => ({
-    value: card.sku,
+    value: card.id,
     label: card.characterName,
     image: `http://localhost:3000/${card.image.replace(/\\/g, "/")}`,
   }));
@@ -160,16 +161,17 @@ export const AddEvents = () => {
     data.append("eventTime", formData.eventTime);
     data.append("eventDate", formData.eventDate);
     data.append("eventDescription", formData.eventDetails);
+    data.append("eventType", formData.eventType);
     if (formData.eventImage) {
       data.append("eventImage", formData.eventImage);
     }
-    // If event benefit is enabled and a card is selected, send its SKU
+    // If event benefit is enabled and a card is selected, send its id instead of sku
     if (formData.eventBenefit && formData.selectedCard) {
-      data.append("eventRewardCard", formData.selectedCard.value);
+      data.append("cardRewards", formData.selectedCard.value.toString());
     }
-    if (formData.eventType === "zoom") {
+    if (formData.eventType === "ONLINE") {
       data.append("onlineZoomLink", formData.linkZoom);
-    } else if (formData.eventType === "offline") {
+    } else if (formData.eventType === "OFFLINE") {
       data.append("offlineLocation", formData.offlineLocation);
     }
     if (formData.specialGuest) {
@@ -364,18 +366,18 @@ export const AddEvents = () => {
                 <input
                   type="radio"
                   name="eventType"
-                  value="zoom"
-                  checked={formData.eventType === "zoom"}
+                  value="ONLINE"
+                  checked={formData.eventType === "ONLINE"}
                   onChange={handleInputChange}
                 />
-                <span>Zoom Meeting</span>
+                <span>Online Event</span>
               </label>
               <label className="flex items-center gap-2">
                 <input
                   type="radio"
                   name="eventType"
-                  value="offline"
-                  checked={formData.eventType === "offline"}
+                  value="OFFLINE"
+                  checked={formData.eventType === "OFFLINE"}
                   onChange={handleInputChange}
                 />
                 <span>Offline Event</span>
@@ -383,11 +385,11 @@ export const AddEvents = () => {
             </div>
           </div>
 
-          {/* Zoom Link */}
-          {formData.eventType === "zoom" && (
+          {/* Online Event Link */}
+          {formData.eventType === "ONLINE" && (
             <div>
               <label className="block mb-2 text-sm">
-                Zoom Meeting Link
+                Online Event Link
               </label>
               <input
                 type="text"
@@ -395,13 +397,13 @@ export const AddEvents = () => {
                 value={formData.linkZoom}
                 onChange={handleInputChange}
                 className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-yellow-500"
-                placeholder="Enter Zoom meeting link"
+                placeholder="Enter online event link"
               />
             </div>
           )}
 
           {/* Offline Location */}
-          {formData.eventType === "offline" && (
+          {formData.eventType === "OFFLINE" && (
             <div>
               <label className="block mb-2 text-sm mt-2">
                 Event Location
