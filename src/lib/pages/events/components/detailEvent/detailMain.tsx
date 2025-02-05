@@ -6,6 +6,7 @@ import { DiscordIcon } from "../svgsIcon/discordIcon";
 import { IgIcon } from "../svgsIcon/igIcon";
 import { CopyIcon } from "../svgsIcon/copyIcon";
 import { WaIcon } from "../svgsIcon/waIcon";
+import { Link } from "react-router-dom";
 
 interface Reward {
   id: number;
@@ -16,6 +17,7 @@ interface Reward {
 
 interface MainContentProps {
   eventData?: {
+    id : string
     eventName: string;
     eventTime: string;
     eventDate: string;
@@ -133,11 +135,11 @@ const MainContent: React.FC<MainContentProps> = ({ eventData }) => {
             </div>
           </div>
           <div className="mt-8">
-            <a href="/register-events">
-              <button className="bg-call-to-actions-900 text-white px-6 py-3 rounded-lg font-bold hover:bg-call-to-actions-800 transition">
-                Register Now
-              </button>
-            </a>
+          <Link to={`/register-events/${eventData?.id}`}>
+  <button className="bg-call-to-actions-900 text-white px-6 py-3 rounded-lg font-bold hover:bg-call-to-actions-800 transition">
+    Register Now
+  </button>
+</Link>
           </div>
         </div>
 

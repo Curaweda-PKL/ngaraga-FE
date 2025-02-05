@@ -1,14 +1,36 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
-const SuccesRegist: React.FC = () => {
-  const [user, setUser] = useState<string>('');
+const SuccessRegist: React.FC = () => {
+  const [email, setEmail] = useState<string>('');
+  const [name, setName] = useState<string>('');
 
   useEffect(() => {
-    // Here, you can fetch or set the user data from your API or local storage.
-    // For example, if the user name is stored in localStorage:
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      setUser(storedUser);
+    // Attempt to get the email and name from localStorage first.
+    const storedEmail = localStorage.getItem('userEmail');
+    const storedName = localStorage.getItem('userName');
+
+    if (storedEmail) {
+      setEmail(storedEmail);
+    }
+    if (storedName) {
+      setName(storedName);
+    }
+
+    // If data isn't available in localStorage, fetch from the user profile API.
+    if (!storedEmail || !storedName) {
+      axios
+        .get('http://localhost:3000/api/account/profile', { withCredentials: true })
+        .then((response) => {
+          if (response.data) {
+            setEmail(response.data.email);
+            // Prefer fullName if available; otherwise, fall back to name.
+            setName(response.data.fullName || response.data.name || '');
+          }
+        })
+        .catch((error) => {
+          console.error('Error fetching profile:', error);
+        });
     }
   }, []);
 
@@ -53,12 +75,17 @@ const SuccesRegist: React.FC = () => {
           />
         </svg>
 
-        <h1 className="text-2xl font-semibold mt-4">Thank You, {user}</h1>
-        <p className="mt-2 text-lg">Your registration for the event is complete, we've sent a confirmation to your email: {user}</p>
+        <h1 className="text-2xl font-semibold mt-4">
+          Thank You{ name ? `, ${name}` : '' }!
+        </h1>
+        <p className="mt-2 text-lg">
+          Your registration for the event is complete. We’ve sent a confirmation to your email:
+          <strong> {email}</strong>
+        </p>
         <p className="mt-2 text-lg">See you there!</p>
       </div>
     </div>
   );
 };
 
-export default SuccesRegist;
+export default SuccessRegist;

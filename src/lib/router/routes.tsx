@@ -108,10 +108,10 @@ export const routes: Array<PathRouteProps> = [
   {path: "/rankings", element: <TopCollectors />},
   {path: "/events", element: <BrowseEvents />},
   {path: "/detail-events/:id", element: <EventDetail />},
-  {path: "/register-events", element: <EventRegistration />},
+  {path: "/register-events/:eventId", element: <EventRegistration />},
   {path: "/login/admin", element: <AdminLogin />},
   {path: "/sentEmail", element: <SentEmail />},
-  {path: "/success/regist", element: <SuccesRegist />},
+  {path: "/success/registered/event", element: <SuccesRegist />},
 ];
 
 export const privateRoutes: Array<PathRouteProps> = [
