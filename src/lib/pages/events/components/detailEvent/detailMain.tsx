@@ -1,3 +1,4 @@
+// MainContent.tsx
 import React, { useState } from "react";
 import { ClockIcon } from "../svgsIcon/clockIcon";
 import { DateIcon } from "../svgsIcon/dateIcon";
@@ -7,6 +8,7 @@ import { IgIcon } from "../svgsIcon/igIcon";
 import { CopyIcon } from "../svgsIcon/copyIcon";
 import { WaIcon } from "../svgsIcon/waIcon";
 import { Link } from "react-router-dom";
+import ShareModal from "./shareModal";
 
 interface Reward {
   id: number;
@@ -17,7 +19,7 @@ interface Reward {
 
 interface MainContentProps {
   eventData?: {
-    id : string
+    id: string;
     eventName: string;
     eventTime: string;
     eventDate: string;
@@ -36,6 +38,7 @@ const MainContent: React.FC<MainContentProps> = ({ eventData }) => {
   const [activeTab, setActiveTab] = useState<"description" | "benefit">(
     "description"
   );
+  const [isShareModalOpen, setShareModalOpen] = useState(false);
 
   const title = eventData?.eventName || "A Special Evening Celebration";
   const eventTime = eventData
@@ -52,8 +55,7 @@ const MainContent: React.FC<MainContentProps> = ({ eventData }) => {
       })
     : "07 Dec 2024";
 
-  // Determine what to display for the location.
-  // If the event is online, display the Zoom link as a clickable hyperlink.
+  // Determine location display (Zoom link if online)
   const locationDisplay =
     eventData && eventData.eventType === "ONLINE" ? (
       <a
@@ -78,7 +80,6 @@ const MainContent: React.FC<MainContentProps> = ({ eventData }) => {
   const description =
     eventData?.eventDescription ||
     `Step into a world of elegance and charm at A Special Evening Celebration. This exclusive event invites you to indulge in an enchanting night of sophistication, entertainment, and memorable experiences.`;
-
   const rewards = eventData?.cardRewards || [];
 
   return (
@@ -120,26 +121,39 @@ const MainContent: React.FC<MainContentProps> = ({ eventData }) => {
           <div className="mt-8">
             <h3 className="text-lg mb-4">Share Event</h3>
             <div className="flex gap-4">
-              <a href="#" className="text-gray-500 hover:text-black transition">
+              {/* Clicking any of these buttons opens the share modal */}
+              <button
+                onClick={() => setShareModalOpen(true)}
+                className="text-gray-500 hover:text-black transition"
+              >
                 <DiscordIcon />
-              </a>
-              <a href="#" className="text-gray-500 hover:text-black transition">
+              </button>
+              <button
+                onClick={() => setShareModalOpen(true)}
+                className="text-gray-500 hover:text-black transition"
+              >
                 <IgIcon />
-              </a>
-              <a href="#" className="text-gray-500 hover:text-black transition">
+              </button>
+              <button
+                onClick={() => setShareModalOpen(true)}
+                className="text-gray-500 hover:text-black transition"
+              >
                 <CopyIcon />
-              </a>
-              <a href="#">
+              </button>
+              <button
+                onClick={() => setShareModalOpen(true)}
+                className="text-gray-500 hover:text-black transition"
+              >
                 <WaIcon />
-              </a>
+              </button>
             </div>
           </div>
           <div className="mt-8">
-          <Link to={`/register-events/${eventData?.id}`}>
-  <button className="bg-call-to-actions-900 text-white px-6 py-3 rounded-lg font-bold hover:bg-call-to-actions-800 transition">
-    Register Now
-  </button>
-</Link>
+            <Link to={`/register-events/${eventData?.id}`}>
+              <button className="bg-call-to-actions-900 text-white px-6 py-3 rounded-lg font-bold hover:bg-call-to-actions-800 transition">
+                Register Now
+              </button>
+            </Link>
           </div>
         </div>
 
@@ -214,6 +228,8 @@ const MainContent: React.FC<MainContentProps> = ({ eventData }) => {
           )}
         </div>
       </div>
+      {/* Render the share modal */}
+      <ShareModal isOpen={isShareModalOpen} onClose={() => setShareModalOpen(false)} />
     </main>
   );
 };
