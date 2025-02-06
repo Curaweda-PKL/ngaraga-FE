@@ -1,5 +1,5 @@
 /**
- * @note
+ * @note 
  * for hook alternative of route element composition:
  * - https://reactrouter.com/docs/en/v6/upgrading/v5#use-useroutes-instead-of-react-router-config
  * - https://reactrouter.com/docs/en/v6/examples/route-objects
