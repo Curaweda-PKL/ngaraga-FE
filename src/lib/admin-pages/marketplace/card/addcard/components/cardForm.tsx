@@ -1,15 +1,37 @@
-import React, { ChangeEvent } from "react";
+import React, {ChangeEvent, useRef} from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
-import { Upload } from "lucide-react";
+import {Upload} from "lucide-react";
 
 interface CardFormProps {
-  formData: any;
-  handleInputChange: (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
-  handleImageUpload: (e: ChangeEvent<HTMLInputElement>) => void;
-  handleDragOver: (e: React.DragEvent<HTMLDivElement>) => void;
-  handleDrop: (e: React.DragEvent<HTMLDivElement>) => void;
-  setFormData: React.Dispatch<React.SetStateAction<any>>;
+  formData: {
+    cardImage: string | ArrayBuffer | null;
+    cardName: string;
+    sku: string;
+    price: string;
+    salePrice: string;
+    isSaleActive: boolean;
+    stock: string;
+    cardDetails: string;
+  };
+  handleInputChange: (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => void;
+  handleImageUpload: (event: ChangeEvent<HTMLInputElement>) => void;
+  handleDragOver: (event: React.DragEvent<HTMLDivElement>) => void;
+  handleDrop: (event: React.DragEvent<HTMLDivElement>) => void;
+  setFormData: React.Dispatch<
+    React.SetStateAction<{
+      cardImage: string | ArrayBuffer | null;
+      cardName: string;
+      sku: string;
+      price: string;
+      salePrice: string;
+      isSaleActive: boolean;
+      stock: string;
+      cardDetails: string;
+    }>
+  >;
 }
 
 const CardForm: React.FC<CardFormProps> = ({
@@ -20,11 +42,12 @@ const CardForm: React.FC<CardFormProps> = ({
   handleDrop,
   setFormData,
 }) => {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   return (
-    <div className="space-y-6">
-      {/* Card Image */}
+    <div className="bg-white p-6 rounded-lg shadow-md space-y-6">
       <div>
-        <label className="block mb-2 text-sm">Card Image *</label>
+        <label className="block mb-2 text-sm font-medium">Card Image *</label>
         <div
           className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center bg-gray-50"
           onDragOver={handleDragOver}
@@ -38,29 +61,31 @@ const CardForm: React.FC<CardFormProps> = ({
             />
           ) : (
             <div className="space-y-4">
-              <div className="flex justify-center">
-                <button className="px-4 py-2 bg-yellow-500 text-white rounded-lg flex items-center gap-2">
-                  <Upload size={20} /> Browse
-                </button>
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={handleImageUpload}
-                />
-              </div>
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="px-4 py-2 bg-yellow-600 text-white rounded-lg flex items-center gap-2"
+              >
+                <Upload size={20} /> Browse
+              </button>
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                ref={fileInputRef}
+                onChange={handleImageUpload}
+              />
               <p className="text-sm text-gray-500">
                 Click to Upload or Drag & Drop
               </p>
-              <p className="text-xs text-gray-400">jpeg, jpg, png, max 4mb</p>
+              <p className="text-xs text-gray-400">jpeg, jpg, png, max 4MB</p>
             </div>
           )}
         </div>
       </div>
 
-      {/* Card Name */}
       <div>
-        <label className="block mb-2 text-sm">Card Name *</label>
+        <label className="block mb-2 text-sm font-medium">Card Name *</label>
         <input
           type="text"
           name="cardName"
@@ -70,9 +95,8 @@ const CardForm: React.FC<CardFormProps> = ({
         />
       </div>
 
-      {/* SKU */}
       <div>
-        <label className="block mb-2 text-sm">SKU *</label>
+        <label className="block mb-2 text-sm font-medium">SKU *</label>
         <input
           type="text"
           name="sku"
@@ -82,21 +106,8 @@ const CardForm: React.FC<CardFormProps> = ({
         />
       </div>
 
-      {/* Price */}
       <div>
-        <div className="flex items-center justify-between mb-2">
-          <label className="text-sm">Price *</label>
-          <label className="inline-flex items-center cursor-pointer">
-            <input
-              type="checkbox"
-              name="salePrice"
-              checked={formData.salePrice}
-              onChange={handleInputChange}
-              className="sr-only peer"
-            />
-            <div className="relative w-11 h-6 bg-gray-200 rounded-full peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 dark:bg-gray-700 peer-checked:bg-blue-600"></div>
-          </label>
-        </div>
+        <label className="block mb-2 text-sm font-medium">Price *</label>
         <input
           type="text"
           name="price"
@@ -106,9 +117,45 @@ const CardForm: React.FC<CardFormProps> = ({
         />
       </div>
 
-      {/* Stock */}
       <div>
-        <label className="block mb-2 text-sm">Stock *</label>
+        <div className="flex items-center justify-between mb-2">
+          <label className="text-sm font-medium">Sale Price</label>
+          <label className="inline-flex items-center cursor-pointer">
+            <input
+              type="checkbox"
+              name="isSaleActive"
+              checked={formData.isSaleActive}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  isSaleActive: e.target.checked,
+                }))
+              }
+              className="sr-only peer"
+            />
+            <div className="relative w-11 h-6 bg-gray-200 rounded-full peer-checked:bg-blue-600">
+              <div
+                className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform transform ${
+                  formData.isSaleActive ? "translate-x-5" : ""
+                }`}
+              ></div>
+            </div>
+          </label>
+        </div>
+        <input
+          type="text"
+          name="salePrice"
+          value={formData.salePrice}
+          onChange={handleInputChange}
+          className={`w-full p-2 border rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 ${
+            formData.isSaleActive ? "line-through text-red-500" : ""
+          }`}
+          disabled={!formData.isSaleActive}
+        />
+      </div>
+
+      <div>
+        <label className="block mb-2 text-sm font-medium">Stock *</label>
         <input
           type="text"
           name="stock"
@@ -118,14 +165,13 @@ const CardForm: React.FC<CardFormProps> = ({
         />
       </div>
 
-      {/* Card Details using ReactQuill */}
       <div>
-        <label className="block mb-2 text-sm">Card Details</label>
+        <label className="block mb-2 text-sm font-medium">Card Details</label>
         <div className="border rounded-lg">
           <ReactQuill
             value={formData.cardDetails}
             onChange={(value) =>
-              setFormData((prev: any) => ({ ...prev, cardDetails: value }))
+              setFormData((prev) => ({...prev, cardDetails: value}))
             }
             placeholder="Write your card details..."
           />

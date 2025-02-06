@@ -4,6 +4,7 @@ import { FaLock, FaEnvelope } from "react-icons/fa";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import LoginImage from "@/assets/img/spacestarry.png";
 import axios from "axios";
+import { Link } from "react-router-dom";
 
 type LoginFormData = {
   email: string;
@@ -24,7 +25,9 @@ const Login: React.FC = () => {
   useEffect(() => {
     const fetchThumbnailData = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/api/auththumb/sign-in");
+        const response = await axios.get(
+          "http://localhost:3000/api/auththumb/sign-in"
+        );
         setThumbnailData(response.data.data);
       } catch (error) {
         console.error("Error fetching thumbnail data:", error);
@@ -129,9 +132,13 @@ const Login: React.FC = () => {
           {/* Display thumbnail image if available */}
           <img
             alt="login"
-            src={thumbnailData?.image ? `http://localhost:3000/${thumbnailData.image}` : LoginImage} 
+            src={
+              thumbnailData?.image
+                ? `http://localhost:3000/${thumbnailData.image}`
+                : LoginImage
+            }
             loading="lazy"
-            className="absolute inset-0 h-full w-full object-cover opacity-80"
+            className="absolute inset-0 h-full w-full object-cover   opacity-80"
           />
         </section>
 
@@ -152,10 +159,11 @@ const Login: React.FC = () => {
               {/* Display the title and description if available */}
               <div className="col-span-6">
                 <h2 className="text-3xl font-bold text-gray-800 mb-2">
-                  {thumbnailData?.title || "Log In"} 
+                  {thumbnailData?.title || "Log In"}
                 </h2>
                 <p className="text-lg text-gray-500">
-                  {thumbnailData?.description || "Welcome back! Please log in to your account."} 
+                  {thumbnailData?.description ||
+                    "Welcome back! Please log in to your account."}
                 </p>
               </div>
 
@@ -163,7 +171,9 @@ const Login: React.FC = () => {
               <div className="col-span-6 relative">
                 <div
                   className={`mt-1 flex items-center border rounded-md bg-white py-3 px-4 shadow-sm ${
-                    error.email ? "border-[#D22424]" : "focus-within:border-[var(--typing)]"
+                    error.email
+                      ? "border-[#D22424]"
+                      : "focus-within:border-[var(--typing)]"
                   }`}
                 >
                   <FaEnvelope className="text-gray-500 mr-2 text-sm" />
@@ -179,14 +189,18 @@ const Login: React.FC = () => {
                     required
                   />
                 </div>
-                {error.email && <p className="text-[#D22424] text-sm">{error.email}</p>}
+                {error.email && (
+                  <p className="text-[#D22424] text-sm">{error.email}</p>
+                )}
               </div>
 
               {/* Password */}
               <div className="col-span-6 relative">
                 <div
                   className={`mt-1 flex items-center border rounded-md bg-white py-3 px-4 shadow-sm ${
-                    error.password ? "border-[#D22424]" : "focus-within:border-[var(--typing)]"
+                    error.password
+                      ? "border-[#D22424]"
+                      : "focus-within:border-[var(--typing)]"
                   }`}
                 >
                   <FaLock className="text-gray-500 mr-2 text-sm" />
@@ -205,10 +219,16 @@ const Login: React.FC = () => {
                     className="text-gray-500 ml-2 cursor-pointer text-sm"
                     onClick={togglePasswordVisibility}
                   >
-                    {showPassword ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
+                    {showPassword ? (
+                      <AiOutlineEyeInvisible />
+                    ) : (
+                      <AiOutlineEye />
+                    )}
                   </div>
                 </div>
-                {error.password && <p className="text-[#D22424] text-sm">{error.password}</p>}
+                {error.password && (
+                  <p className="text-[#D22424] text-sm">{error.password}</p>
+                )}
 
                 {/* Forgot Password Link */}
                 <div className="mt-4 text-right">
@@ -235,13 +255,13 @@ const Login: React.FC = () => {
               {/* Sign Up Link */}
               <div className="col-span-6 text-center mt-4">
                 <p className="text-gray-600">
-                  Don't have an account?{" "}
-                  <a
-                    href="/signup"
-                    className="text-orange-500 hover:text-orange-600"
+                  Don't have an account?
+                  <Link
+                    to={"/signup"}
+                    className="text-orange-500 hover:text-orange-600 ml-2"
                   >
                     Sign up
-                  </a>
+                  </Link>
                 </p>
               </div>
             </motion.form>

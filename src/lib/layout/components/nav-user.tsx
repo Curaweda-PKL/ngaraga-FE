@@ -1,43 +1,82 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { FaBars, FaTimes, FaUserFriends } from "react-icons/fa";
 import { CiShoppingCart } from "react-icons/ci";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { usePermissions } from "../../context/permission-context";
 
 export const Navbar: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false); // Dropdown state
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const navigate = useNavigate();
-  const [username, setUsername] = useState(""); 
+  const [username, setUsername] = useState("");
 
+  // Use the permission context to determine authentication state
+  const { role, loading } = usePermissions();
+  const isAuthenticated = !loading && Boolean(role);
 
-  // mock
-  const isAuthenticated = true;
-  const [userAvatarUrl, setUserAvatarUrl] = useState("https://www.gravatar.com/avatar/abc123"); 
+  // We'll store just the normalized path from the API here.
+  const [userAvatarUrl, setUserAvatarUrl] = useState("");
 
+  // Default avatar image if none is returned
+  const defaultAvatar = "https://www.gravatar.com/avatar/abc123";
+
+  // Compute the full avatar URL. The API returns a relative path, so we prepend our base URL.
+  const avatarUrl = userAvatarUrl
+    ? `http://localhost:3000/${userAvatarUrl}`
+    : defaultAvatar;
+
+  // Ref for the dropdown container
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown if clicked outside
   useEffect(() => {
-    // Fetch user data from the API
-    const fetchUserData = async () => {
-      try {
-        const response = await axios.get(
-          "http://localhost:3000/api/account/profile",
-          { withCredentials: true }
-        );
-        // Extract image URL if available
-        const userImage = response.data.image;
-        setUsername(response.data.fullName); // Update username with fetched fullName
-        if (userImage) {
-          setUserAvatarUrl(userImage); // Set the image URL if it exists
-        }
-      } catch (error) {
-        console.error("Error fetching user data:", error);
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
       }
     };
-  
-    fetchUserData();
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
   }, []);
-  
-  
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      const fetchUserData = async () => {
+        try {
+          const response = await axios.get(
+            "http://localhost:3000/api/account/profile",
+            { withCredentials: true }
+          );
+
+          const userImage = response.data.image;
+          setUsername(response.data.fullName);
+
+          if (userImage) {
+            // Normalize path:
+            let normalizedPath = userImage
+              .replace(/\\/g, "/")
+              .replace(/^src\//, "");
+
+            // Ensure the correct structure "uploads/profile/"
+            normalizedPath = normalizedPath.replace(
+              "uploadsprofile",
+              "uploads/profile"
+            );
+
+            setUserAvatarUrl(normalizedPath);
+          }
+        } catch (error) {
+          console.error("Error fetching user data:", error);
+        }
+      };
+
+      fetchUserData();
+    }
+  }, [isAuthenticated]);
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -52,10 +91,17 @@ export const Navbar: React.FC = () => {
     toggleSidebar();
   };
 
-  const handleLogout = () => {
-    console.log("Logging out...");
-    // Add logout logic here
-    navigateToPage("login");
+  const handleLogout = async () => {
+    try {
+      await axios.post(
+        "http://localhost:3000/api/logout",
+        {},
+        { withCredentials: true }
+      );
+      navigateToPage("login");
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
   };
 
   return (
@@ -75,17 +121,17 @@ export const Navbar: React.FC = () => {
           </div>
 
           {/* Logo button */}
-          <a
-            href="/"
-            className="btn btn-ghost text-xl flex items-center text-black"
+          <Link
+            to={"/"}
+            className="btn btn-ghost text-xl flex items-center text-black hover:bg-transparent"
           >
             <img
               src="/src/assets/img/LOGO.png"
               alt="Ngaraga Logo"
-              className="w-8 h-8 mr-2 -ml-8 lg:ml-0"
+              className="w-8 h-8 mr-2 -ml-4 lg:ml-2"
             />
             NGARAGA
-          </a>
+          </Link>
         </div>
 
         {/* Navbar center */}
@@ -134,18 +180,14 @@ export const Navbar: React.FC = () => {
               </a>
             </>
           ) : (
-            // Logged in
-            <div className="relative flex items-center space-x-2">
+            // Logged in view with dropdown (ref added here)
+            <div className="relative flex items-center space-x-2" ref={dropdownRef}>
               <span className="hidden sm:block text-sm font-medium ml-2">
                 {username || "Loading..."}
               </span>
-              <button
-                className="avatar btn btn-ghost"
-                onClick={toggleDropdown}
-              >
+              <button className="avatar btn btn-ghost" onClick={toggleDropdown}>
                 <div className="w-8 h-8 rounded-full">
-                  <img src={userAvatarUrl ? `http://localhost:3000/${userAvatarUrl}` : "https://www.gravatar.com/avatar/abc123"}
-                  alt="User Avatar" />
+                  <img src={avatarUrl} alt="User Avatar" />
                 </div>
               </button>
 
@@ -153,7 +195,7 @@ export const Navbar: React.FC = () => {
               {isDropdownOpen && (
                 <div
                   className="absolute right-0 mt w-40 bg-white rounded-lg shadow-lg border z-50"
-                  style={{ top: "100%" }} // Optional: Can also use mt-12 for spacing
+                  style={{ top: "100%" }}
                 >
                   <ul className="py-1">
                     <li>
@@ -231,7 +273,7 @@ export const Navbar: React.FC = () => {
                   onClick={() => navigateToPage("user")}
                 >
                   <div className="w-8 h-8 rounded-full">
-                    <img src={userAvatarUrl} alt="User Avatar" />
+                    <img src={avatarUrl} alt="User Avatar" />
                   </div>
                 </button>
               </div>
