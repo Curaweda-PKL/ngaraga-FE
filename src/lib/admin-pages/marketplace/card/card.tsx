@@ -74,10 +74,17 @@ export const Card = () => {
           </button>
         </div>
       </div>
+
       <div className="overflow-x-auto border rounded-lg">
         <table className="w-full text-left">
           <thead>
-            <tr className="text-gray-600">
+            <tr className="text-neutral-700">
+              <th className="px-4 py-3">
+                <input
+                  type="checkbox"
+                  className="checkbox"
+                />
+              </th>
               <th className="px-4 py-3">SKU</th>
               <th className="px-4 py-3">Product Name</th>
               <th className="px-4 py-3">Categories</th>
