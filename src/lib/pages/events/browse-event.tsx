@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 interface EventCardProps {
   title: string;
@@ -7,6 +8,7 @@ interface EventCardProps {
   date: string;
   location: string;
   imageUrl: string;
+  id?: string;
 }
 
 const EventCard: React.FC<EventCardProps> = ({
@@ -15,9 +17,23 @@ const EventCard: React.FC<EventCardProps> = ({
   date,
   location,
   imageUrl,
+  id,
 }) => {
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    if (id) {
+      navigate(`/detail-events/${id}`);
+    } else {
+      navigate("/detail-events");
+    }
+  };
+
   return (
-    <div className="card w-full bg-white shadow-xl rounded-lg overflow-hidden">
+    <div
+      onClick={handleClick}
+      className="cursor-pointer card w-full bg-white shadow-xl rounded-lg overflow-hidden"
+    >
       <figure>
         <img
           src={imageUrl}
@@ -90,63 +106,144 @@ const BrowseEvents: React.FC = () => {
     title: "Browse Events",
     description: "Explore a wide variety of events in our Event Directory.",
   });
+  const [searchTerm, setSearchTerm] = useState("");
+  const [events, setEvents] = useState<any[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
-  const eventCards = [
-    {
-      title: "A Special Evening Celebration",
-      time: "08.00 - 20.00",
-      date: "07 Dec 2024",
-      location: "Jakarta",
-      imageUrl: "https://via.placeholder.com/300x200?text=Event+Image+1",
-    },
-    {
-      title: "A Special Evening Celebration",
-      time: "08.00 - 20.00",
-      date: "07 Dec 2024",
-      location: "Zoom Meeting",
-      imageUrl: "https://via.placeholder.com/300x200?text=Event+Image+2",
-    },
-    {
-      title: "A Special Evening Celebration",
-      time: "08.00 - 20.00",
-      date: "07 Dec 2024",
-      location: "Jakarta",
-      imageUrl: "https://via.placeholder.com/300x200?text=Event+Image+3",
-    },
-  ];
-
+  // Fetch page content from API
   useEffect(() => {
-    // Fetch page content from API
     const fetchPageContent = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/api/page-content/browsevent");
+        const response = await axios.get(
+          "http://localhost:3000/api/page-content/browsevent"
+        );
         if (response.data) {
           setPageContent({
             title: response.data.title || pageContent.title,
-            description: response.data.description || pageContent.description,
+            description:
+              response.data.description || pageContent.description,
           });
         }
-      } catch (error) {
-        console.error("Error fetching page content:", error);
+      } catch (err) {
+        console.error("Error fetching page content:", err);
       }
     };
 
     fetchPageContent();
   }, []);
 
+  // Fetch events from API using axios
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const response = await axios.get("http://localhost:3000/api/events");
+        if (response.data) {
+          setEvents(response.data);
+        }
+      } catch (err: any) {
+        console.error("Error fetching events:", err);
+        setError("Failed to load events. Please try again later.");
+      }
+    };
+
+    fetchEvents();
+  }, []);
+
+  // Map API events into the format for the EventCard.
+  const mappedEvents =
+    events.length > 0
+      ? events.map((event) => {
+          // Format the event time and date.
+          const eventTime = new Date(event.eventTime).toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          });
+          const eventDate = new Date(event.eventDate).toLocaleDateString([], {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+          });
+          // When event type is ONLINE, display "Online"
+          const eventLocation =
+            event.eventType === "ONLINE"
+              ? "Online"
+              : event.offlineLocation || "Location TBD";
+          // Adjust the image URL if needed.
+          const imageUrl = event.eventImage.startsWith("http")
+            ? event.eventImage
+            : event.eventImage; // e.g., prepend a base URL if required
+
+          return {
+            id: event.id,
+            title: event.eventName,
+            time: eventTime,
+            date: eventDate,
+            location: eventLocation,
+            imageUrl,
+          };
+        })
+      : [];
+
+  // Filter events based on the search term (case-insensitive)
+  const displayEvents = mappedEvents.filter((event) =>
+    event.title.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  // Fallback UI when there is an error or no events are available.
+  if (error || displayEvents.length === 0) {
+    return (
+      <div className="w-full max-w-[1280px] px-5 py-10 mx-auto">
+        <div className="flex flex-col items-center justify-center min-h-[60vh]">
+          {/* Animal SVG Illustration */}
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="150"
+            height="150"
+            viewBox="0 0 64 64"
+            fill="none"
+          >
+            <path
+              d="M32 2C15.432 2 2 15.432 2 32s13.432 30 30 30 30-13.432 30-30S48.568 2 32 2z"
+              fill="#FFE0B2"
+            />
+            <path
+              d="M20 24c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm24 0c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4z"
+              fill="#6D4C41"
+            />
+            <path
+              d="M32 54c-6.627 0-12-5.373-12-12h24c0 6.627-5.373 12-12 12z"
+              fill="#D84315"
+            />
+          </svg>
+          <p className="mt-6 text-xl text-center text-gray-700">
+            {error
+              ? error
+              : "There are no available events right now. Maybe come back later."}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full max-w-[1280px] px-5 py-10 mx-auto">
       {/* Header Section */}
       <div className="text-center mb-8">
-        <h1 className="text-4xl font-bold text-[#171717]">{pageContent.title}</h1>
-        <p className="mt-2 text-lg text-[#404040]">{pageContent.description}</p>
+        <h1 className="text-4xl font-bold text-[#171717]">
+          {pageContent.title}
+        </h1>
+        <p className="mt-2 text-lg text-[#404040]">
+          {pageContent.description}
+        </p>
       </div>
 
       {/* Search Input */}
       <div className="relative w-full max-w-[600px] mx-auto mb-10">
         <input
           type="text"
-          placeholder="Search for your favorite Event"
+          placeholder="Search for your favorite Event then hit enter"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
           className="w-full rounded-full bg-white text-[#404040] border-2 py-3 px-5 pl-5 pr-14 outline-none placeholder-gray-500"
         />
         <button
@@ -171,20 +268,19 @@ const BrowseEvents: React.FC = () => {
       </div>
 
       {/* Event Cards */}
-      <a href="/detail-events">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {eventCards.map((event, index) => (
-            <EventCard
-              key={index}
-              title={event.title}
-              time={event.time}
-              date={event.date}
-              location={event.location}
-              imageUrl={event.imageUrl}
-            />
-          ))}
-        </div>
-      </a>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {displayEvents.map((event, index) => (
+          <EventCard
+            key={index}
+            id={event.id}
+            title={event.title}
+            time={event.time}
+            date={event.date}
+            location={event.location}
+            imageUrl={`http://localhost:3000/uploads/event/${event.imageUrl}`}
+          />
+        ))}
+      </div>
     </div>
   );
 };

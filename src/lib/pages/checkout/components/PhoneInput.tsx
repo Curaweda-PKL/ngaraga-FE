@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef,  } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 
 interface Country {
@@ -12,6 +12,7 @@ interface PhoneInputProps {
   countryCode: string;
   phoneNumber: string;
   onChange: (countryCode: string, phoneNumber: string) => void;
+  disabled?: boolean; // Added disabled prop
 }
 
 const countries: Country[] = [
@@ -19,11 +20,17 @@ const countries: Country[] = [
   { name: "Belgium", prefix: 32, flag: "be" },
   { name: "Bulgaria", prefix: 359, flag: "bg" },
   { name: "Netherlands", prefix: 31, flag: "nl" },
-  { name: "Indonesia", prefix: 62, flag: "id" }, 
+  { name: "Indonesia", prefix: 62, flag: "id" },
   // Add more countries here
 ];
 
-const PhoneInput: React.FC<PhoneInputProps> = ({ className,  countryCode, phoneNumber, onChange }) => {
+const PhoneInput: React.FC<PhoneInputProps> = ({
+  className,
+  countryCode,
+  phoneNumber,
+  onChange,
+  disabled = false, // Default to false if not provided
+}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [selectedCountry, setSelectedCountry] = useState<Country>(countries[0]);
@@ -32,6 +39,7 @@ const PhoneInput: React.FC<PhoneInputProps> = ({ className,  countryCode, phoneN
   const dropdownRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
+  // Close dropdown if clicked outside
   useEffect(() => {
     const handleOutsideClick = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -43,24 +51,25 @@ const PhoneInput: React.FC<PhoneInputProps> = ({ className,  countryCode, phoneN
     return () => document.removeEventListener("click", handleOutsideClick);
   }, []);
 
+  // Focus the search input when dropdown opens
   useEffect(() => {
     if (isOpen && searchInputRef.current) {
       searchInputRef.current.focus();
     }
   }, [isOpen]);
 
+  // Keyboard navigation for the dropdown
   useEffect(() => {
-    const handleKeyDown = (e: globalThis.KeyboardEvent) => {
+    const handleKeyDown = (e: KeyboardEvent) => {
       if (!isOpen) return;
-
       switch (e.key) {
         case "ArrowDown":
           e.preventDefault();
-          setFocusedIndex(prev => Math.min(prev + 1, filteredCountries.length - 1));
+          setFocusedIndex((prev) => Math.min(prev + 1, filteredCountries.length - 1));
           break;
         case "ArrowUp":
           e.preventDefault();
-          setFocusedIndex(prev => Math.max(prev - 1, -1));
+          setFocusedIndex((prev) => Math.max(prev - 1, -1));
           break;
         case "Enter":
           if (focusedIndex >= 0) {
@@ -77,20 +86,19 @@ const PhoneInput: React.FC<PhoneInputProps> = ({ className,  countryCode, phoneN
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [isOpen, filteredCountries, focusedIndex]);
 
-
+  // Update the selected country based on the provided countryCode
   useEffect(() => {
-    const numericCode = countryCode ? parseInt(countryCode.replace('+', '')) : NaN;
-    const country = countries.find(c => c.prefix === numericCode) || countries[0];
+    const numericCode = countryCode ? parseInt(countryCode.replace("+", "")) : NaN;
+    const country = countries.find((c) => c.prefix === numericCode) || countries[0];
     setSelectedCountry(country);
   }, [countryCode]);
-
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.toLowerCase();
     setSearch(value);
     setFilteredCountries(
       countries.filter(
-        country =>
+        (country) =>
           country.name.toLowerCase().includes(value) ||
           country.prefix.toString().startsWith(value)
       )
@@ -103,7 +111,6 @@ const PhoneInput: React.FC<PhoneInputProps> = ({ className,  countryCode, phoneN
     setIsOpen(false);
     setFocusedIndex(-1);
     onChange(`+${country.prefix}`, phoneNumber);
-
   };
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -116,8 +123,13 @@ const PhoneInput: React.FC<PhoneInputProps> = ({ className,  countryCode, phoneN
       <div className="flex items-center">
         <button
           type="button"
-          onClick={() => setIsOpen(!isOpen)}
-          className="flex items-center justify-between border border-r-0 border-neutral-500 rounded-l-lg w-1/3 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          onClick={() => {
+            if (!disabled) {
+              setIsOpen(!isOpen);
+            }
+          }}
+          disabled={disabled}
+          className="flex items-center justify-between border border-r-0 border-neutral-500 rounded-l-lg w-1/3 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:bg-gray-100"
           aria-haspopup="listbox"
           aria-expanded={isOpen}
         >
@@ -136,7 +148,7 @@ const PhoneInput: React.FC<PhoneInputProps> = ({ className,  countryCode, phoneN
           )}
         </button>
 
-        {isOpen && (
+        {isOpen && !disabled && (
           <div className="absolute z-10 w-1/3 bg-white border border-neutral-500 rounded-lg shadow-lg mt-1 top-full">
             <input
               ref={searchInputRef}
@@ -184,8 +196,9 @@ const PhoneInput: React.FC<PhoneInputProps> = ({ className,  countryCode, phoneN
           type="tel"
           value={phoneNumber}
           onChange={handlePhoneChange}
+          disabled={disabled}
           placeholder="Enter phone number"
-          className="flex-1 border border-neutral-500 rounded-r-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="flex-1 border border-neutral-500 rounded-r-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:bg-gray-100"
           aria-label="Phone number"
         />
       </div>
