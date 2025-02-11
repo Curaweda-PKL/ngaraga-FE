@@ -9,22 +9,22 @@ import CardSettings from "./components/cardSetting";
 export const AddCard = () => {
   const navigate = useNavigate();
 
-  // Categories state (now including id)
+  // Categories state
   const [apiCategories, setApiCategories] = useState<
-    {id: number; name: string; image: string | null}[]
+    Array<{id: number; name: string; image: string | null}>
   >([]);
   const [categoriesLoading, setCategoriesLoading] = useState(true);
   const [categoriesError, setCategoriesError] = useState<string | null>(null);
 
-  // Creators state (fetched from API, now including id)
+  // Creators state
   const [apiCreators, setApiCreators] = useState<
-    {id: number; name: string; image: string | null}[]
+    Array<{id: number; name: string; image: string | null}>
   >([]);
   const [creatorsLoading, setCreatorsLoading] = useState(true);
   const [creatorsError, setCreatorsError] = useState<string | null>(null);
 
-  // Tags state (fetched from API)
-  const [apiTags, setApiTags] = useState<{id: number; name: string}[]>([]);
+  // Tags state
+  const [apiTags, setApiTags] = useState<Array<{id: number; name: string}>>([]);
   const [tagsLoading, setTagsLoading] = useState(true);
   const [tagsError, setTagsError] = useState<string | null>(null);
 
@@ -144,27 +144,24 @@ export const AddCard = () => {
     const {name, value, type} = e.target;
     const newValue =
       type === "checkbox" ? (e.target as HTMLInputElement).checked : value;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: newValue,
-    }));
+    setFormData((prev) => ({...prev, [name]: newValue}));
   };
 
   // Image upload handler
   const handleImageUpload = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      setCardFile(file); // Store file for upload
+      setCardFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
-        setFormData((prev) => ({
-          ...prev,
-          cardImage: reader.result, // For preview
-        }));
+        setFormData((prev) => ({...prev, cardImage: reader.result}));
       };
       reader.readAsDataURL(file);
     }
   };
+
+  // Cancel handler
+  const handleCancel = () => navigate("/admin/card");
 
   // Drag over and drop handlers for image upload
   const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
@@ -187,15 +184,9 @@ export const AddCard = () => {
     }
   };
 
-  // Cancel handler
-  const handleCancel = () => {
-    navigate("/admin/card");
-  };
-
   // Save handler (create new card(s))
   const handleSave = async () => {
     try {
-      // Create FormData payload for multipart/form-data
       const payload = new FormData();
       payload.append("characterName", formData.cardName);
       payload.append("sku", formData.sku);
@@ -209,42 +200,23 @@ export const AddCard = () => {
         throw new Error("Please select a category.");
       }
 
-      // Convert the selected tag IDs and creator ID into JSON strings
-      payload.append(
-        "tagIds",
-        JSON.stringify(formData.tags.map((tag) => Number(tag)))
-      );
+      payload.append("tagIds", JSON.stringify(formData.tags.map(Number)));
       payload.append(
         "creatorIds",
         JSON.stringify([Number(formData.selectedCreator)])
       );
-
-      // Owner ID is optional – here we leave it empty
       payload.append("ownerId", "");
 
-      // Append image file if available
       if (cardFile) {
         payload.append("image", cardFile);
       }
 
-      // Send POST request to the API endpoint
-      const response = await axios.post(
-        "http://localhost:3000/api/cards/create",
-        payload,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+      await axios.post("http://localhost:3000/api/cards/create", payload, {
+        headers: {"Content-Type": "multipart/form-data"},
+      });
 
-      console.log("Response:", response.data);
       navigate("/admin/card");
     } catch (error: any) {
-      console.error(
-        "Error creating card:",
-        error.response?.data || error.message
-      );
       alert(
         "Error creating card: " +
           (error.response?.data?.message || error.message)
