@@ -1,22 +1,26 @@
+import { useNavigate } from "react-router-dom";
+
 export const BrowseCategories = () => {
+  const navigate = useNavigate();
+  
   const trendingData = [
     {
       id: 1,
       title: "Art",
       image: "/src/assets/img/lumba.png",
-      svgPath: "https://i.ibb.co.com/dpFHmCp/EPIC.png",
+      svgPath: "/src/assets/svg/PaintBrush.svg",
     },
     {
       id: 2,
       title: "Collectibles",
       image: "/src/assets/img/monkey.png",
-      svgPath: "https://i.ibb.co.com/5sG5gVZ/LEGENDARY.png",
+      svgPath: "/src/assets/svg/Swatches.svg",
     },
     {
       id: 3,
       title: "Music",
       image: "/src/assets/img/gitar.png",
-      svgPath: "https://i.ibb.co.com/0rbMtGv/LIMITED.png",
+      svgPath: "/src/assets/svg/MusicNotes.svg",
     },
     {
       id: 4,
@@ -63,17 +67,15 @@ export const BrowseCategories = () => {
         {/* Cards Grid */}
         <div
           className="grid grid-cols-2 md:grid-cols-4 gap-6 w-full px-4"
-          style={{gap: "30px"}}
+          style={{ gap: "30px" }}
         >
           {trendingData.map((card) => (
             <div
               key={card.id}
-              className="w-full flex flex-col items-start gap-[15px] shadow-xl rounded-lg bg-[#3B3B3B] transition-transform hover:scale-[1.02]"
+              onClick={() => navigate("/marketplace")}
+              className="cursor-pointer w-full flex flex-col items-start gap-[15px] shadow-xl rounded-lg bg-[#3B3B3B] transition-transform hover:scale-[1.02]"
             >
-              <figure
-                className="relative w-full"
-                style={{height: "316px"}}
-              >
+              <figure className="relative w-full" style={{ height: "316px" }}>
                 {card.image ? (
                   <>
                     {/* Blurred Background Image */}
@@ -87,7 +89,7 @@ export const BrowseCategories = () => {
                       <img
                         src={card.svgPath}
                         alt={`${card.title} Icon`}
-                        className="w-24 h-24 object-contain"
+                        className="w-24 h-24"
                       />
                     </div>
                   </>
