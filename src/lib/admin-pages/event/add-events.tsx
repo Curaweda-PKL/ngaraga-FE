@@ -4,6 +4,7 @@ import "react-quill/dist/quill.snow.css";
 import { Upload } from "lucide-react";
 import axios from "axios";
 import Select, { components, OptionProps } from "react-select";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 
 // Define a type for your card data
 interface Card {
@@ -23,6 +24,9 @@ interface CardOption {
 }
 
 export const AddEvents = () => {
+  // Initialize useNavigate
+  const navigate = useNavigate();
+
   // Existing form state, now with selectedCard as a CardOption or null
   const [formData, setFormData] = useState({
     eventImage: null as File | null,
@@ -120,8 +124,7 @@ export const AddEvents = () => {
   };
 
   // For drag and drop functionality
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) =>
-    e.preventDefault();
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => e.preventDefault();
 
   const handleImageDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -190,6 +193,8 @@ export const AddEvents = () => {
         }
       );
       console.log("Event created:", response.data);
+      // Navigate to /admin/event on successful save
+      navigate("/admin/event");
     } catch (error) {
       console.error("Error creating event:", error);
     }
