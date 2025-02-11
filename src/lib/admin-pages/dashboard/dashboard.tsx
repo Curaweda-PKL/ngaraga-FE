@@ -57,7 +57,7 @@ export default function Dashboard() {
 
   return (
     <div className="p-4 space-y-4">
-      <h1 className="text-xl mb-6">Hello, Animakid</h1>
+      <h1 className="text-xl mb-6">Hello, mastermind!</h1>
 
       {/* Stats Grid */}
       <div className="grid grid-cols-4 gap-4">

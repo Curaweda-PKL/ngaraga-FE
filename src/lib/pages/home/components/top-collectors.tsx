@@ -1,12 +1,16 @@
 import { FaRocket } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 export const CollectorCards = () => {
+  // Initialize the navigate function
+  const navigate = useNavigate();
+
   const trendingData = [
     {
       id: 4,
       username: "Kakarotto",
       avatar:
-        "https://i.ibb.co.com/XVfqyHw/COMBINE-MATANGAJI.png",
+        "https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg",
       totalCards: 25,
       rank: 1,
     },
@@ -14,25 +18,26 @@ export const CollectorCards = () => {
       id: 3,
       username: "Kakarotto",
       avatar:
-        "https://i.ibb.co.com/0JjGYHg/IMG-0351.png",
+        "https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg",
       totalCards: 25,
       rank: 1,
-    },  
-      {
+    },
+    {
       id: 1,
       username: "Kakarotto",
       avatar:
         "https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg",
       totalCards: 25,
       rank: 1,
-    },    {
+    },
+    {
       id: 1,
       username: "Kakarotto",
       avatar:
         "https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg",
       totalCards: 25,
       rank: 1,
-    },   
+    },
   ];
 
   return (
@@ -50,9 +55,12 @@ export const CollectorCards = () => {
           </div>
 
           {/* View Rankings Button */}
-          <button className="flex items-center gap-2 bg-[#DDB11F] border-2 border-call-to-action text-white py-2 px-4 rounded-lg shadow-md hover:bg-call-to-actions-800 transition-all">
+          <button
+            onClick={() => navigate('/artist')}
+            className="flex items-center gap-2 bg-[#DDB11F] border-2 border-call-to-action text-white py-2 px-4 rounded-lg shadow-md hover:bg-call-to-actions-800 transition-all"
+          >
             <FaRocket className="text-white" />
-            <span><a href="/rankings">View Rankings</a></span>
+            <span>View Rankings</span>
           </button>
         </div>
 
@@ -61,7 +69,8 @@ export const CollectorCards = () => {
           {trendingData.map((card) => (
             <div
               key={card.id}
-              className="relative flex flex-col items-center gap-6 w-full h-[238px] rounded-xl bg-[#F2F2F2] p-6 shadow-xl transition-transform hover:scale-105"
+              onClick={() => navigate('/artist')}
+              className="cursor-pointer relative flex flex-col items-center gap-6 w-full h-[238px] rounded-xl bg-[#F2F2F2] p-6 shadow-xl transition-transform hover:scale-105"
             >
               {/* Rank Badge */}
               <div className="absolute left-2 top-2 bg-black text-[#FFFFFF] text-xs font-bold py-1 px-2 rounded-full">

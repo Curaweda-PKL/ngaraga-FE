@@ -1,5 +1,6 @@
-import React from "react";
-import {CgProfile} from "react-icons/cg";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { CgProfile } from "react-icons/cg";
 import {
   FaDiscord,
   FaGlobe,
@@ -9,6 +10,75 @@ import {
 } from "react-icons/fa";
 
 export const ProfilePage: React.FC = () => {
+  // Local state for profile data, loading, and errors.
+  const [profile, setProfile] = useState<any>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch the user profile when the component mounts.
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:3000/api/account/profile",
+          { withCredentials: true }
+        );
+        setProfile(response.data);
+      } catch (err: any) {
+        console.error("Error fetching profile:", err);
+        setError("Failed to load profile.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfile();
+  }, []);
+
+  // Show a loading state or error message if necessary.
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        Loading...
+      </div>
+    );
+  }
+  if (error) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        {error}
+      </div>
+    );
+  }
+
+  // Normalize and compute the avatar URL.
+  let avatarUrl = "https://www.gravatar.com/avatar/abc123"; // default avatar
+  if (profile && profile.image) {
+    let normalizedPath = profile.image
+      .replace(/\\/g, "/")
+      .replace(/^src\//, "");
+    normalizedPath = normalizedPath.replace("uploadsprofile", "uploads/profile");
+    avatarUrl = `http://localhost:3000/${normalizedPath}`;
+  }
+
+  // Fallback for display name: if fullName is missing, use name.
+  const displayName = profile.fullName || profile.name || "User";
+
+  // Use the length of ownedCards as the Cards count.
+  const cardsCount = profile.ownedCards ? profile.ownedCards.length : 0;
+
+  // Use provided socialLinks if available; otherwise, fallback to default links.
+  const socialLinks = profile.socialLinks || {
+    website: "https://example.com",
+    discord: "https://discord.com",
+    youtube: "https://youtube.com",
+    twitter: "https://twitter.com",
+    instagram: "https://instagram.com",
+  };
+
+  // Use the profile bio if available; otherwise a default text.
+  const bio = profile.bio || "The Internet's Friendliest Designer Kid.";
+
   return (
     <div className="flex flex-col">
       {/* Background Section (Banner) */}
@@ -35,16 +105,16 @@ export const ProfilePage: React.FC = () => {
             <div className="relative mb-8 lg:mb-12 order-1 lg:order-none">
               <div className="relative w-24 h-24 mx-auto lg:mx-0 -mt-12 lg:-mt-16">
                 <img
-                  src="https://demos.creative-tim.com/notus-js/assets/img/team-2-800x800.jpg"
+                  src={avatarUrl}
                   alt="Profile"
                   className="absolute w-full h-full shadow-xl rounded-2xl border-4 border-gray-800 object-cover"
                 />
               </div>
             </div>
 
-            {/* Buttons */}
+            {/* Buttons (for smaller screens) */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 lg:hidden">
-              <button className="transition duration-300 text-white bg-call-to-actions-900 transform border-2 border-call-to-action font-bold py-2 px-6 rounded-lg flex items-center justify-center space-x-2 hover:bg-call-to-actions-800 hover:text-white  ">
+              <button className="transition duration-300 text-white bg-call-to-actions-900 transform border-2 border-call-to-action font-bold py-2 px-6 rounded-lg flex items-center justify-center space-x-2 hover:bg-call-to-actions-800 hover:text-white">
                 <CgProfile />
                 <span>Edit Profile</span>
               </button>
@@ -52,13 +122,15 @@ export const ProfilePage: React.FC = () => {
 
             {/* Profile Name */}
             <h2 className="text-4xl font-bold text-[#171717] mb-4 lg:mb-8 text-center lg:text-left">
-              Animakid
+              {displayName}
             </h2>
 
             {/* Stats */}
             <div className="flex justify-center lg:justify-start space-x-8 mb-6">
               <div>
-                <span className="text-xl font-bold text-[#262626]">250k+</span>
+                <span className="text-xl font-bold text-[#262626]">
+                  {cardsCount}
+                </span>
                 <p className="text-base text-[#525252]">Cards</p>
               </div>
               <div>
@@ -74,9 +146,7 @@ export const ProfilePage: React.FC = () => {
             {/* Bio */}
             <div className="text-left mb-8">
               <h3 className="text-xl font-bold text-[#525252] mb-2">Bio</h3>
-              <p className="text-base text-[#525252]">
-                The Internet's Friendliest Designer Kid.
-              </p>
+              <p className="text-base text-[#525252]">{bio}</p>
             </div>
 
             {/* Links */}
@@ -84,7 +154,7 @@ export const ProfilePage: React.FC = () => {
               <h3 className="text-xl font-bold text-[#525252] mb-2">Links</h3>
               <div className="flex justify-center lg:justify-start space-x-6 text-3xl">
                 <a
-                  href="https://example.com"
+                  href={socialLinks.website}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="transition transform duration-300 text-[#858584] hover:text-[#ff9800]"
@@ -92,7 +162,7 @@ export const ProfilePage: React.FC = () => {
                   <FaGlobe />
                 </a>
                 <a
-                  href="https://discord.com"
+                  href={socialLinks.discord}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="transition transform duration-300 text-[#858584] hover:text-[#5865F2]"
@@ -100,7 +170,7 @@ export const ProfilePage: React.FC = () => {
                   <FaDiscord />
                 </a>
                 <a
-                  href="https://youtube.com"
+                  href={socialLinks.youtube}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="transition transform duration-300 text-[#858584] hover:text-[#FF0000]"
@@ -108,7 +178,7 @@ export const ProfilePage: React.FC = () => {
                   <FaYoutube />
                 </a>
                 <a
-                  href="https://twitter.com"
+                  href={socialLinks.twitter}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="transition transform duration-300 text-[#858584] hover:text-[#1DA1F2]"
@@ -116,7 +186,7 @@ export const ProfilePage: React.FC = () => {
                   <FaTwitter />
                 </a>
                 <a
-                  href="https://instagram.com"
+                  href={socialLinks.instagram}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="transition transform duration-300 text-[#858584] hover:text-[#E1306C]"
@@ -127,9 +197,9 @@ export const ProfilePage: React.FC = () => {
             </div>
           </div>
 
-          {/* Buttons for lg */}
+          {/* Buttons for larger screens */}
           <div className="hidden lg:flex mt-6 lg:mt-0 justify-end space-x-4 order-2 lg:order-none">
-            <button className="transition duration-300 bg-call-to-actions-900 text-white  transform border-2 border-call-to-action font-bold py-2 px-6 rounded-lg flex items-center justify-center space-x-2 hover:bg-call-to-actions-800 hover:text-white shadow-md ">
+            <button className="transition duration-300 bg-call-to-actions-900 text-white transform border-2 border-call-to-action font-bold py-2 px-6 rounded-lg flex items-center justify-center space-x-2 hover:bg-call-to-actions-800 hover:text-white shadow-md">
               <CgProfile />
               <span>Edit Profile</span>
             </button>

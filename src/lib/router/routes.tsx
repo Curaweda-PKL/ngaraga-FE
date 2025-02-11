@@ -108,7 +108,6 @@ export const routes: Array<PathRouteProps> = [
   {path: "/rankings", element: <TopCollectors />},
   {path: "/events", element: <BrowseEvents />},
   {path: "/detail-events/:id", element: <EventDetail />},
-  {path: "/register-events/:eventId", element: <EventRegistration />},
   {path: "/login/admin", element: <AdminLogin />},
   {path: "/sentEmail", element: <SentEmail />},
   {path: "/success/registered/event", element: <SuccesRegist />},
@@ -122,6 +121,7 @@ export const privateRoutes: Array<PathRouteProps> = [
   {path: "/payments", element: <PaymentPage />},
   {path: "/complete", element: <OrderComplete />},
   {path: "/order-detail", element: <OrderDetails />},
+  {path: "/register-events/:eventId", element: <EventRegistration />},
   {path: "/cart", element: <Cart />},
 ];
 
