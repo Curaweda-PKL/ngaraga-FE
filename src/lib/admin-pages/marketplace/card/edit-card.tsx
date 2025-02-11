@@ -100,7 +100,7 @@ export const EditCard = () => {
 
   return (
     <div className="max-w-7xl mx-auto p-6">
-      <h1 className="text-2xl font-semibold mb-6">Add Card</h1>
+      <h1 className="text-2xl font-semibold mb-6">Edit Card</h1>
 
       <div className="grid grid-cols-2 gap-6">
         {/* Left Column - Form Fields */}

@@ -8,8 +8,9 @@ export const HeroFrame = () => {
   const navigate = useNavigate();
   const xRef = useRef<NodeJS.Timeout | null>(null); 
 
+  // Update the click handler to navigate to "/detail-cards"
   const getStartedHandleClick = () => {
-    navigate("/marketplace");
+    navigate("/detail-cards");
   };
 
   useEffect(() => {
@@ -20,69 +21,70 @@ export const HeroFrame = () => {
     script.async = true;
     document.body.appendChild(script);
 
-    // jQuery code
+    // jQuery code for card animation effects
     const $cards = $(".card-container");
     const $style = $(".hover");
 
     $cards
-    .on("mousemove touchmove", function(e) { 
-      let pos: [number, number] = [0, 0]; // Default values
+      .on("mousemove touchmove", function (e) { 
+        let pos: [number, number] = [0, 0]; // Default values
   
-      if (e.type === "touchmove" && e.touches) {
-        pos = [e.touches[0].clientX, e.touches[0].clientY];
-      } else if (e.type === "mousemove") {
-        pos = [e.offsetX ?? 0, e.offsetY ?? 0]; // Fallback to 0 if undefined
-      }
+        if (e.type === "touchmove" && e.touches) {
+          pos = [e.touches[0].clientX, e.touches[0].clientY];
+        } else if (e.type === "mousemove") {
+          pos = [e.offsetX ?? 0, e.offsetY ?? 0]; // Fallback to 0 if undefined
+        }
   
-      e.preventDefault();
-      const $card = $(this);
-      const l = pos[0];
-      const t = pos[1];
-      const h = $card.height();
-      const w = $card.width();
+        e.preventDefault();
+        const $card = $(this);
+        const l = pos[0];
+        const t = pos[1];
+        const h = $card.height();
+        const w = $card.width();
   
-      if (typeof l === 'number' && typeof t === 'number' && h && w) {
-        const px = Math.abs(Math.floor(100 / w * l) - 100);
-        const py = Math.abs(Math.floor(100 / h * t) - 100);
-        const pa = (50 - px) + (50 - py);
-        const lp = (50 + (px - 50) / 1.5);
-        const tp = (50 + (py - 50) / 1.5);
-        const px_spark = (50 + (px - 50) / 7);
-        const py_spark = (50 + (py - 50) / 7);
-        const p_opc = 20 + (Math.abs(pa) * 1.5);
-        const ty = ((tp - 50) / 2) * -1;
-        const tx = ((lp - 50) / 1.5) * .5;
-        const grad_pos = `background-position: ${lp}% ${tp}%;`;
-        const sprk_pos = `background-position: ${px_spark}% ${py_spark}%;`;
-        const opc = `opacity: ${p_opc / 100};`;
-        const tf = `transform: rotateX(${ty}deg) rotateY(${tx}deg)`;
-        const style = `
-          .card-container:hover:before { ${grad_pos} }
-          .card-container:hover:after { ${sprk_pos} ${opc} }
-        `;
-        $cards.removeClass("active");
-        $card.removeClass("animated");
-        $card.attr("style", tf);
-        $style.html(style);
-      }
+        if (typeof l === 'number' && typeof t === 'number' && h && w) {
+          const px = Math.abs(Math.floor((100 / w) * l) - 100);
+          const py = Math.abs(Math.floor((100 / h) * t) - 100);
+          const pa = (50 - px) + (50 - py);
+          const lp = (50 + (px - 50) / 1.5);
+          const tp = (50 + (py - 50) / 1.5);
+          const px_spark = (50 + (px - 50) / 7);
+          const py_spark = (50 + (py - 50) / 7);
+          const p_opc = 20 + (Math.abs(pa) * 1.5);
+          const ty = ((tp - 50) / 2) * -1;
+          const tx = ((lp - 50) / 1.5) * 0.5;
+          const grad_pos = `background-position: ${lp}% ${tp}%;`;
+          const sprk_pos = `background-position: ${px_spark}% ${py_spark}%;`;
+          const opc = `opacity: ${p_opc / 100};`;
+          const tf = `transform: rotateX(${ty}deg) rotateY(${tx}deg)`;
+          const style = `
+            .card-container:hover:before { ${grad_pos} }
+            .card-container:hover:after { ${sprk_pos} ${opc} }
+          `;
+          $cards.removeClass("active");
+          $card.removeClass("animated");
+          $card.attr("style", tf);
+          $style.html(style);
+        }
   
-      if (e.type === "touchmove") {
-        return false; 
-      }
-      if (xRef.current) {
-        clearTimeout(xRef.current);
-      }
-    }).on("mouseout touchend touchcancel", function() {
-      const $card = $(this);
-      $style.html("");
-      $card.removeAttr("style");
-      xRef.current = setTimeout(function() {
-        $card.addClass("animated");
-      }, 2500);
-    });
+        if (e.type === "touchmove") {
+          return false; 
+        }
+        if (xRef.current) {
+          clearTimeout(xRef.current);
+        }
+      })
+      .on("mouseout touchend touchcancel", function () {
+        const $card = $(this);
+        $style.html("");
+        $card.removeAttr("style");
+        xRef.current = setTimeout(function () {
+          $card.addClass("animated");
+        }, 2500);
+      });
 
     return () => {
-      // Cleanup the script when the component is unmounted
+      // Cleanup the dynamically added script when the component is unmounted
       document.body.removeChild(script);
       // Cleanup jQuery event listeners
       $cards.off("mousemove touchmove mouseout touchend touchcancel");
@@ -105,7 +107,8 @@ export const HeroFrame = () => {
           </p>
           <button 
             onClick={getStartedHandleClick}
-            className="bg-call-to-action text-white py-3 px-8 sm:px-10 rounded-2xl text-lg font-medium flex items-center gap-3 sm:gap-4 hover:opacity-90">
+            className="bg-call-to-action text-white py-3 px-8 sm:px-10 rounded-2xl text-lg font-medium flex items-center gap-3 sm:gap-4 hover:opacity-90"
+          >
             <RiRocketFill className="text-3xl sm:text-4xl" />
             Get Started
           </button>
@@ -133,7 +136,11 @@ export const HeroFrame = () => {
 
         {/* Right Section */}
         <div className="flex flex-col items-center lg:items-start gap-6 sm:gap-8 w-full lg:w-1/2 p-4 sm:p-6">
-          <div className="card-container pika animated p-0"></div>
+          {/* Added onClick handler to navigate to "/detail-cards" */}
+          <div 
+            className="card-container pika animated p-0"
+            onClick={() => navigate("/detail-cards")}
+          ></div>
 
           {/* Content Below the Card */}
           <div className="flex flex-col items-start gap-4 p-4 sm:p-6">
