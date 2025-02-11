@@ -1,9 +1,9 @@
-import { useEffect, useState, useRef } from "react";
-import { FaBars, FaTimes, FaUserFriends } from "react-icons/fa";
-import { CiShoppingCart } from "react-icons/ci";
-import { Link, useNavigate } from "react-router-dom";
+import {useEffect, useState, useRef} from "react";
+import {FaBars, FaTimes, FaUserFriends} from "react-icons/fa";
+import {CiShoppingCart} from "react-icons/ci";
+import {Link, useNavigate} from "react-router-dom";
 import axios from "axios";
-import { usePermissions } from "../../context/permission-context";
+import {usePermissions} from "../../context/permission-context";
 
 export const Navbar: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -12,7 +12,7 @@ export const Navbar: React.FC = () => {
   const [username, setUsername] = useState("");
 
   // Use the permission context to determine authentication state
-  const { role, loading } = usePermissions();
+  const {role, loading} = usePermissions();
   const isAuthenticated = !loading && Boolean(role);
 
   // We'll store just the normalized path from the API here.
@@ -32,7 +32,10 @@ export const Navbar: React.FC = () => {
   // Close dropdown if clicked outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setIsDropdownOpen(false);
       }
     };
@@ -49,7 +52,7 @@ export const Navbar: React.FC = () => {
         try {
           const response = await axios.get(
             "http://localhost:3000/api/account/profile",
-            { withCredentials: true }
+            {withCredentials: true}
           );
 
           // Use fullName if available, otherwise fall back to name.
@@ -97,7 +100,7 @@ export const Navbar: React.FC = () => {
       await axios.post(
         "http://localhost:3000/api/logout",
         {},
-        { withCredentials: true }
+        {withCredentials: true}
       );
       navigateToPage("login");
     } catch (error) {
@@ -157,7 +160,10 @@ export const Navbar: React.FC = () => {
             className="cursor-pointer flex items-center"
             onClick={() => navigateToPage("cart")}
           >
-            <CiShoppingCart size={31} className="lg:mr-3 ShoppingCartIcon" />
+            <CiShoppingCart
+              size={31}
+              className="lg:mr-3 ShoppingCartIcon"
+            />
           </a>
 
           {/* Conditional rendering for Sign In / Sign Up buttons or Avatar */}
@@ -168,6 +174,7 @@ export const Navbar: React.FC = () => {
                 className="btn bg-white border-call-to-action rounded-lg text-orange-300 sm:flex lg:flex items-center gap-2 lg:mr-2 ml-2 hover:bg-call-to-actions-800 hover:text-white transition"
                 onClick={() => navigateToPage("login")}
               >
+                <FaUserFriends size={18} />
                 Sign In
               </a>
 
@@ -182,13 +189,22 @@ export const Navbar: React.FC = () => {
             </>
           ) : (
             // Logged in view with dropdown (ref added here)
-            <div className="relative flex items-center space-x-2" ref={dropdownRef}>
+            <div
+              className="relative flex items-center space-x-2"
+              ref={dropdownRef}
+            >
               <span className="hidden sm:block text-sm font-medium ml-2">
                 {username || "Loading..."}
               </span>
-              <button className="avatar btn btn-ghost" onClick={toggleDropdown}>
+              <button
+                className="avatar btn btn-ghost"
+                onClick={toggleDropdown}
+              >
                 <div className="w-8 h-8 rounded-full">
-                  <img src={avatarUrl} alt="User Avatar" />
+                  <img
+                    src={avatarUrl}
+                    alt="User Avatar"
+                  />
                 </div>
               </button>
 
@@ -196,7 +212,7 @@ export const Navbar: React.FC = () => {
               {isDropdownOpen && (
                 <div
                   className="absolute right-0 mt w-40 bg-white rounded-lg shadow-lg border z-50"
-                  style={{ top: "100%" }}
+                  style={{top: "100%"}}
                 >
                   <ul className="py-1">
                     <li>
@@ -230,12 +246,18 @@ export const Navbar: React.FC = () => {
         lg:hidden text-black overflow-x-hidden`}
       >
         <div className="flex justify-between items-center p-4 border-b">
-          <button onClick={toggleSidebar} className="btn btn-ghost text-black">
+          <button
+            onClick={toggleSidebar}
+            className="btn btn-ghost text-black"
+          >
             <FaTimes size={20} />
           </button>
 
           {/* Logo */}
-          <a href="/" className="flex items-center text-xl text-black ml-4">
+          <a
+            href="/"
+            className="flex items-center text-xl text-black ml-4"
+          >
             <img
               src="/src/assets/img/LOGO.png"
               alt="Ngaraga Logo"
@@ -274,7 +296,10 @@ export const Navbar: React.FC = () => {
                   onClick={() => navigateToPage("user")}
                 >
                   <div className="w-8 h-8 rounded-full">
-                    <img src={avatarUrl} alt="User Avatar" />
+                    <img
+                      src={avatarUrl}
+                      alt="User Avatar"
+                    />
                   </div>
                 </button>
               </div>

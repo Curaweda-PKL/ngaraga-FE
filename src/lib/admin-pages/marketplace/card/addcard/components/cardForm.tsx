@@ -1,7 +1,7 @@
 import React, {ChangeEvent, useRef} from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
-import {Upload} from "lucide-react";
+import {Upload, Trash} from "lucide-react";
 
 interface CardFormProps {
   formData: {
@@ -13,6 +13,12 @@ interface CardFormProps {
     isSaleActive: boolean;
     stock: string;
     cardDetails: string;
+    categories?: string[];
+    creator?: boolean;
+    selectedCreator?: string;
+    tag?: boolean;
+    tags?: string[];
+    source?: boolean;
   };
   handleInputChange: (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -30,6 +36,12 @@ interface CardFormProps {
       isSaleActive: boolean;
       stock: string;
       cardDetails: string;
+      categories?: string[];
+      creator?: boolean;
+      selectedCreator?: string;
+      tag?: boolean;
+      tags?: string[];
+      source?: boolean;
     }>
   >;
 }
@@ -44,21 +56,36 @@ const CardForm: React.FC<CardFormProps> = ({
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Handle image removal
+  const handleRemoveImage = () => {
+    setFormData((prev) => ({...prev, cardImage: null}));
+  };
+
   return (
     <div className="bg-white p-6 rounded-lg shadow-md space-y-6">
+      {/* Image Upload Section */}
       <div>
         <label className="block mb-2 text-sm font-medium">Card Image *</label>
         <div
-          className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center bg-gray-50"
+          className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center bg-gray-50 relative"
           onDragOver={handleDragOver}
           onDrop={handleDrop}
         >
           {formData.cardImage ? (
-            <img
-              src={formData.cardImage.toString()}
-              alt="Card"
-              className="w-full h-48 object-cover rounded-lg"
-            />
+            <div className="relative">
+              <img
+                src={formData.cardImage.toString()}
+                alt="Card"
+                className="w-full h-48 object-cover rounded-lg"
+              />
+              <button
+                type="button"
+                className="absolute top-2 right-2 bg-red-600 text-white p-1 rounded-full"
+                onClick={handleRemoveImage}
+              >
+                <Trash size={16} />
+              </button>
+            </div>
           ) : (
             <div className="space-y-4">
               <button
@@ -84,6 +111,7 @@ const CardForm: React.FC<CardFormProps> = ({
         </div>
       </div>
 
+      {/* Form Inputs */}
       <div>
         <label className="block mb-2 text-sm font-medium">Card Name *</label>
         <input
@@ -95,6 +123,7 @@ const CardForm: React.FC<CardFormProps> = ({
         />
       </div>
 
+      {/* SKU Input */}
       <div>
         <label className="block mb-2 text-sm font-medium">SKU *</label>
         <input
@@ -106,76 +135,69 @@ const CardForm: React.FC<CardFormProps> = ({
         />
       </div>
 
+      {/* Price Input */}
       <div>
         <label className="block mb-2 text-sm font-medium">Price *</label>
         <input
-          type="text"
+          type="number"
           name="price"
           value={formData.price}
           onChange={handleInputChange}
           className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
+          min="0"
         />
       </div>
 
+      {/* Sale Price */}
       <div>
         <div className="flex items-center justify-between mb-2">
           <label className="text-sm font-medium">Sale Price</label>
-          <label className="inline-flex items-center cursor-pointer">
-            <input
-              type="checkbox"
-              name="isSaleActive"
-              checked={formData.isSaleActive}
-              onChange={(e) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  isSaleActive: e.target.checked,
-                }))
-              }
-              className="sr-only peer"
-            />
-            <div className="relative w-11 h-6 bg-gray-200 rounded-full peer-checked:bg-blue-600">
-              <div
-                className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform transform ${
-                  formData.isSaleActive ? "translate-x-5" : ""
-                }`}
-              ></div>
-            </div>
-          </label>
+          <input
+            type="checkbox"
+            name="isSaleActive"
+            checked={formData.isSaleActive}
+            onChange={(e) =>
+              setFormData((prev) => ({
+                ...prev,
+                isSaleActive: e.target.checked,
+              }))
+            }
+          />
         </div>
         <input
-          type="text"
+          type="number"
           name="salePrice"
           value={formData.salePrice}
           onChange={handleInputChange}
-          className={`w-full p-2 border rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 ${
-            formData.isSaleActive ? "line-through text-red-500" : ""
-          }`}
+          className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
           disabled={!formData.isSaleActive}
+          min="0"
         />
       </div>
 
+      {/* Stock Input */}
       <div>
         <label className="block mb-2 text-sm font-medium">Stock *</label>
         <input
-          type="text"
+          type="number"
           name="stock"
           value={formData.stock}
           onChange={handleInputChange}
           className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
+          min="1"
         />
       </div>
 
+      {/* Card Details */}
       <div>
         <label className="block mb-2 text-sm font-medium">Card Details</label>
-        <div className="border rounded-lg">
-          <ReactQuill
-            value={formData.cardDetails}
-            onChange={(value) =>
-              setFormData((prev) => ({...prev, cardDetails: value}))
-            }
-            placeholder="Write your card details..."
-          />
-        </div>
+        <ReactQuill
+          value={formData.cardDetails}
+          onChange={(value) =>
+            setFormData((prev) => ({...prev, cardDetails: value}))
+          }
+          placeholder="Write your card details..."
+        />
       </div>
     </div>
   );

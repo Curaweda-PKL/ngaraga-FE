@@ -1,7 +1,7 @@
-import React, { ChangeEvent, useEffect, useState } from "react";
+import React, {ChangeEvent, useEffect, useState} from "react";
 import axios from "axios";
 import "react-quill/dist/quill.snow.css";
-import { useNavigate } from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 
 import CardForm from "./components/cardForm";
 import CardSettings from "./components/cardSetting";
@@ -11,20 +11,20 @@ export const AddCard = () => {
 
   // Categories state (now including id)
   const [apiCategories, setApiCategories] = useState<
-    { id: number; name: string; image: string | null }[]
+    {id: number; name: string; image: string | null}[]
   >([]);
   const [categoriesLoading, setCategoriesLoading] = useState(true);
   const [categoriesError, setCategoriesError] = useState<string | null>(null);
 
   // Creators state (fetched from API, now including id)
   const [apiCreators, setApiCreators] = useState<
-    { id: number; name: string; image: string | null }[]
+    {id: number; name: string; image: string | null}[]
   >([]);
   const [creatorsLoading, setCreatorsLoading] = useState(true);
   const [creatorsError, setCreatorsError] = useState<string | null>(null);
 
   // Tags state (fetched from API)
-  const [apiTags, setApiTags] = useState<{ id: number; name: string }[]>([]);
+  const [apiTags, setApiTags] = useState<{id: number; name: string}[]>([]);
   const [tagsLoading, setTagsLoading] = useState(true);
   const [tagsError, setTagsError] = useState<string | null>(null);
 
@@ -34,7 +34,8 @@ export const AddCard = () => {
     cardName: "",
     sku: "",
     price: "",
-    salePrice: false,
+    salePrice: "",
+    isSaleActive: false,
     stock: "",
     cardDetails: "",
     categories: [] as string[], // stores selected category IDs as strings
@@ -140,7 +141,7 @@ export const AddCard = () => {
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    const { name, value, type } = e.target;
+    const {name, value, type} = e.target;
     const newValue =
       type === "checkbox" ? (e.target as HTMLInputElement).checked : value;
     setFormData((prev) => ({
