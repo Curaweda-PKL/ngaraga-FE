@@ -18,6 +18,21 @@ interface UserProfile {
   socialLinks: any;
 }
 
+interface EventData {
+  id: string;
+  eventName: string;
+  eventTime: string;
+  eventDate: string;
+  eventImage: string;
+  eventDescription: string;
+  onlineZoomLink: string | null;
+  offlineLocation: string | null;
+  eventSpecialGuestName: string;
+  eventSpecialGuestOccupation: string;
+  eventSpecialGuestImage: string;
+  eventType: string;
+}
+
 interface RouteParams extends Record<string, string | undefined> {
   eventId: string;
 }
@@ -29,9 +44,13 @@ const EventRegistration: React.FC = () => {
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
-    countryCode: "+62", // Default country code
+    countryCode: "+62",
     phoneNumber: "",
   });
+
+  const [eventData, setEventData] = useState<EventData | null>(null);
+  const [loadingEvent, setLoadingEvent] = useState(true);
+  const [errorEvent, setErrorEvent] = useState<string | null>(null);
 
   const [registrationStatus, setRegistrationStatus] = useState<{
     loading: boolean;
@@ -39,7 +58,7 @@ const EventRegistration: React.FC = () => {
     error: string | null;
   }>({ loading: false, success: false, error: null });
 
-  // Fetch user profile on component mount
+  // Fetch user profile
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
@@ -62,23 +81,27 @@ const EventRegistration: React.FC = () => {
     fetchUserProfile();
   }, []);
 
-  // Input handler (fields remain read-only)
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
+  // Fetch event data
+  useEffect(() => {
+    if (!eventId) return;
 
-  const handlePhoneChange = (countryCode: string, phoneNumber: string) => {
-    setFormData((prev) => ({ ...prev, countryCode, phoneNumber }));
-  };
+    const fetchEventData = async () => {
+      try {
+        const response = await axios.get<EventData>(
+          `http://localhost:3000/api/events/${eventId}`
+        );
+        setEventData(response.data);
+        setLoadingEvent(false);
+      } catch (error: any) {
+        console.error("Failed to fetch event data:", error.message);
+        setErrorEvent("Failed to load event details.");
+        setLoadingEvent(false);
+      }
+    };
 
-  // Local submission handler if needed for form state
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Form Data Submitted:", formData);
-  };
+    fetchEventData();
+  }, [eventId]);
 
-  // Registration endpoint handler with enhanced error handling and redirection on success
   const handleRegistration = async () => {
     if (!eventId) {
       setRegistrationStatus({
@@ -88,114 +111,113 @@ const EventRegistration: React.FC = () => {
       });
       return;
     }
+
     setRegistrationStatus({ loading: true, success: false, error: null });
+
     try {
-      console.log("Submitting registration for event:", eventId);
       const response = await axios.post(
-        `http://localhost:3000/api/event/${eventId}`,
-        {}, // Additional data can be added here if needed
+        `http://localhost:3000/api/event/${eventId}/register`,
+        {},
         { withCredentials: true }
       );
-      console.log("Registration success:", response.data);
+
       setRegistrationStatus({ loading: false, success: true, error: null });
-      // Redirect to success page after registration
       navigate("/success/registered/event");
     } catch (error: any) {
-      console.error("Registration failed:", error);
       let errorMessage = "Registration failed. Please try again.";
-  
-      if (error.response) {
-        // If the HTTP status is 409, or the error message contains the unique constraint failure text,
-        // then show a user-friendly error.
-        if (error.response.status === 409) {
-          errorMessage = "You are already registered for this event.";
-        } else if (error.response.data && error.response.data.message) {
-          if (
-            error.response.data.message.includes("Unique constraint failed") ||
-            error.response.data.message.includes("already exists")
-          ) {
-            errorMessage = "You are already registered for this event.";
-          } else {
-            errorMessage = error.response.data.message;
-          }
-        }
+      if (error.response?.status === 409) {
+        errorMessage = "You are already registered for this event.";
+      } else if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
       } else if (error.request) {
-        errorMessage = "No response from server. Please check your connection.";
+        errorMessage = "No response from server. Check your connection.";
       } else {
         errorMessage = error.message;
       }
-  
-      setRegistrationStatus({
-        loading: false,
-        success: false,
-        error: errorMessage,
-      });
+      setRegistrationStatus({ loading: false, success: false, error: errorMessage });
     }
   };
-  
 
   return (
     <div className="min-h-screen p-4 md:p-8">
-      {/* Heading */}
       <h1 className="text-4xl text-[#171717] font-bold mb-8 ml-8">Register</h1>
 
-      {/* Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Registration Form */}
         <div className="lg:col-span-2 -mt-4">
-          <form onSubmit={handleSubmit} className="space-y-6 bg-white p-6 rounded-lg">
-            <div>
-              <input
-                type="text"
-                name="fullName"
-                placeholder="Full Name"
-                value={formData.fullName}
-                onChange={handleInputChange}
-                readOnly
-                className="w-full px-4 py-3 border rounded-lg text-gray-700 bg-gray-100 cursor-not-allowed"
-              />
-            </div>
-            <div>
-              <input
-                type="email"
-                name="email"
-                placeholder="Email"
-                value={formData.email}
-                onChange={handleInputChange}
-                readOnly
-                className="w-full px-4 py-3 border rounded-lg text-gray-700 bg-gray-100 cursor-not-allowed"
-              />
-            </div>
-            <div className="flex items-center">
-              <PhoneInput
-                countryCode={formData.countryCode}
-                phoneNumber={formData.phoneNumber}
-                onChange={handlePhoneChange}
-                disabled={true} // Prevent editing of phone number and country code
-              />
-            </div>
+          <form className="space-y-6 bg-white p-6 rounded-lg">
+            <input
+              type="text"
+              name="fullName"
+              placeholder="Full Name"
+              value={formData.fullName}
+              readOnly
+              className="w-full px-4 py-3 border rounded-lg text-gray-700 bg-gray-100 cursor-not-allowed"
+            />
+            <input
+              type="email"
+              name="email"
+              placeholder="Email"
+              value={formData.email}
+              readOnly
+              className="w-full px-4 py-3 border rounded-lg text-gray-700 bg-gray-100 cursor-not-allowed"
+            />
+            <PhoneInput
+              countryCode={formData.countryCode}
+              phoneNumber={formData.phoneNumber}
+              onChange={() => {}}
+              className="mt-6"
+              disabled
+            />
           </form>
         </div>
 
-        {/* Event Summary */}
         <div className="bg-gray-50 border p-6 rounded-lg shadow-md lg:mt-0 lg:ml-8">
-          <h2 className="text-lg font-bold text-gray-800 mb-4">Summary Event</h2>
-          <div className="bg-gray-100 border-t rounded-lg flex items-center p-4 mb-4">
-            <img
-              src="/src/assets/img/dall-e.png"
-              alt="Event Thumbnail"
-              className="w-32 h-24 object-cover rounded-lg mr-4"
-            />
-            <div className="flex-col">
-              <h3 className="text-gray-800 text-left font-semibold mb-2">
-                A Special Evening Celebration
-              </h3>
-              <p className="text-gray-500 text-left text-sm mb-2">
-                <span>08:00 - 20:00</span> | <span>07 Dec 2024</span>
-              </p>
-              <p className="text-gray-500 text-left text-sm">Zoom Meeting</p>
+          <h2 className="text-lg font-bold text-gray-800 mb-4">Event Summary</h2>
+
+          {loadingEvent ? (
+            <p className="text-gray-500">Loading event details...</p>
+          ) : errorEvent ? (
+            <p className="text-red-500">{errorEvent}</p>
+          ) : eventData ? (
+            <div className="bg-gray-100 border-t rounded-lg flex items-center p-4 mb-4">
+              <img
+                      src={`http://localhost:3000/uploads/event/${eventData.eventImage}`}
+                      alt="Event Thumbnail"
+                className="w-32 h-24 object-cover rounded-lg mr-4"
+              />
+              <div className="flex-col">
+                <h3 className="text-gray-800 text-left font-semibold mb-2">
+                  {eventData.eventName}
+                </h3>
+                <p className="text-gray-500 text-left text-sm mb-2">
+                  <span>{new Date(eventData.eventTime).toLocaleTimeString()}</span> |{" "}
+                  <span>{new Date(eventData.eventDate).toLocaleDateString()}</span>
+                </p>
+                <p className="text-gray-500 text-left text-sm">
+  {eventData.eventType === "ONLINE" ? (
+    <>
+      Zoom Link: <br />
+      <a
+        href={eventData.onlineZoomLink}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-blue-500 underline hover:text-blue-700"
+      >
+        {eventData.onlineZoomLink}
+      </a>
+    </>
+  ) : (
+    <>
+      Location: <br />
+      <span className="font-semibold">{eventData.offlineLocation}</span>
+    </>
+  )}
+</p>
+
+              </div>
             </div>
-          </div>
+          ) : null}
+
           <button
             type="button"
             onClick={handleRegistration}
@@ -204,12 +226,9 @@ const EventRegistration: React.FC = () => {
           >
             {registrationStatus.loading ? "Registering..." : "Register"}
           </button>
-          {registrationStatus.error && (
-            <p className="text-red-500 mt-2">{registrationStatus.error}</p>
-          )}
-          {registrationStatus.success && (
-            <p className="text-green-500 mt-2">Registration successful! Redirecting...</p>
-          )}
+
+          {registrationStatus.error && <p className="text-red-500 mt-2">{registrationStatus.error}</p>}
+          {registrationStatus.success && <p className="text-green-500 mt-2">Registration successful! Redirecting...</p>}
         </div>
       </div>
     </div>

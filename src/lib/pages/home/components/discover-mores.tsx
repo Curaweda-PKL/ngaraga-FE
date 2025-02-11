@@ -1,4 +1,8 @@
+import { useNavigate } from "react-router-dom";
+
 export const DiscoverMoreCards = () => {
+  const navigate = useNavigate();
+
   const discoverData = [
     {
       id: 1,
@@ -37,7 +41,10 @@ export const DiscoverMoreCards = () => {
             </p>
           </div>
           {/* Button for Large Screens */}
-          <button className="hidden lg:block bg-call-to-action text-white px-4 py-2 rounded-md hover:bg-call-to-actions-800 transition-colors font-[Poppins]">
+          <button
+            onClick={() => navigate("/detail-cards")}
+            className="hidden lg:block bg-call-to-action text-white px-4 py-2 rounded-md hover:bg-call-to-actions-800 transition-colors font-[Poppins]"
+          >
             See All
           </button>
         </div>
@@ -47,7 +54,8 @@ export const DiscoverMoreCards = () => {
           {discoverData.map((card) => (
             <div
               key={card.id}
-              className="w-full flex flex-col items-start gap-4 bg-[#F2F2F2] rounded-2xl shadow-xl transition-transform hover:scale-[1.02]"
+              onClick={() => navigate("/detail-cards")}
+              className="cursor-pointer w-full flex flex-col items-start gap-4 bg-[#F2F2F2] rounded-2xl shadow-xl transition-transform hover:scale-[1.02]"
             >
               <figure className="w-full rounded-t-2xl overflow-hidden">
                 {card.image ? (
@@ -77,7 +85,10 @@ export const DiscoverMoreCards = () => {
 
         {/* Button for Small and Medium Screens */}
         <div className="flex justify-center lg:hidden px-8">
-          <button className="bg-call-to-action text-white px-6 py-3 rounded-md hover:bg-call-to-actions-800 transition-colors font-[Poppins]">
+          <button
+            onClick={() => navigate("/detail-cards")}
+            className="bg-call-to-action text-white px-6 py-3 rounded-md hover:bg-call-to-actions-800 transition-colors font-[Poppins]"
+          >
             See All
           </button>
         </div>

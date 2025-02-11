@@ -1,4 +1,7 @@
+import { useNavigate } from "react-router-dom";
+
 export const TrendingCards = () => {
+  const navigate = useNavigate();
   const trendingData = [
     {
       id: 1,
@@ -38,7 +41,8 @@ export const TrendingCards = () => {
           {trendingData.map((card) => (
             <div
               key={card.id}
-              className="w-full max-w-[330px] flex flex-col items-start gap-[15px] flex-shrink-0  rounded-lg transition-transform hover:scale-[1.02] mx-auto"
+              onClick={() => navigate("/detail-cards")}
+              className="cursor-pointer w-full max-w-[330px] flex flex-col items-start gap-[15px] flex-shrink-0 rounded-lg transition-transform hover:scale-[1.02] mx-auto"
             >
               <figure className="w-full">
                 {card.image ? (

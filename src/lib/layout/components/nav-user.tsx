@@ -52,9 +52,10 @@ export const Navbar: React.FC = () => {
             { withCredentials: true }
           );
 
-          const userImage = response.data.image;
-          setUsername(response.data.fullName);
+          // Use fullName if available, otherwise fall back to name.
+          setUsername(response.data.fullName || response.data.name);
 
+          const userImage = response.data.image;
           if (userImage) {
             // Normalize path:
             let normalizedPath = userImage
