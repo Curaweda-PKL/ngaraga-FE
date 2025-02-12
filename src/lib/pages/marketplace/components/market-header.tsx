@@ -3,6 +3,7 @@ import { MdArrowDropDown } from "react-icons/md";
 import { PiSlidersHorizontalDuotone } from "react-icons/pi"; 
 import { DropdownMarket } from "./dropdown-market"; 
 import FilterModal from "./modal-sm"; 
+import { SERVER_URL } from "@/middleware/utils";
 
 export const MarketHeader: React.FC = () => {
   // State to track the selected filter
@@ -21,7 +22,7 @@ export const MarketHeader: React.FC = () => {
   useEffect(() => {
     const fetchPageContent = async () => {
       try {
-        const response = await fetch("http://localhost:3000/api/page-content/marketplace");
+        const response = await fetch(`${SERVER_URL}/api/page-content/marketplace`);
         if (!response.ok) {
           throw new Error("Failed to fetch data");
         }

@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { FaUser, FaLock, FaEnvelope } from "react-icons/fa";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import LoginImage from "@/assets/img/spacestarry.png";
 import axios from "axios";
+import { SERVER_URL } from "@/middleware/utils"; // Import centralized server URL
 
 type SignUpFormData = {
   name: string;
@@ -43,13 +44,13 @@ const SignUp: React.FC = () => {
   useEffect(() => {
     const fetchThumbnailData = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/api/auththumb/sign-up");
+        const response = await axios.get(`${SERVER_URL}/api/auththumb/sign-up`);
         const { title, description, image } = response.data.data;
 
         setApiData({
           title: title || "Sign Up",
           description: description || "Create an account to start using our service.",
-          image: image ? `http://localhost:3000/${image}` : LoginImage,
+          image: image ? `${SERVER_URL}/${image}` : LoginImage,
         });
       } catch (error) {
         console.error("Error fetching thumbnail data:", error);
@@ -78,7 +79,7 @@ const SignUp: React.FC = () => {
     }));
   };
 
-  // Validate form inputs before submitting
+  // Validate form before submitting
   const validateForm = () => {
     let valid = true;
     const newError: { [key: string]: string } = {};
@@ -139,7 +140,7 @@ const SignUp: React.FC = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:3000/api/register-user",
+        `${SERVER_URL}/api/register-user`,
         {
           name: formData.name,
           email: formData.email,
@@ -215,7 +216,6 @@ const SignUp: React.FC = () => {
             className="absolute inset-0 h-full w-full object-cover opacity-80"
           />
         </section>
-
         <main className="flex items-center justify-center px-8 py-8 sm:px-12 lg:col-span-7 lg:px-16 lg:py-12 xl:col-span-6">
           <motion.div className="max-w-xl lg:max-w-3xl" initial="hidden" animate="visible" variants={ariseVariant}>
             {/* Notification Banner */}
@@ -228,7 +228,6 @@ const SignUp: React.FC = () => {
                 {notification.message}
               </div>
             )}
-
             <motion.form
               onSubmit={handleSubmit}
               className="mt-8 grid grid-cols-6 gap-6"
@@ -241,7 +240,6 @@ const SignUp: React.FC = () => {
                 <h2 className="text-3xl font-bold text-gray-800 mb-2">{apiData.title}</h2>
                 <p className="text-lg text-gray-500">{apiData.description}</p>
               </div>
-
               {/* Name Input */}
               <div className="col-span-6 relative">
                 <div
@@ -264,7 +262,6 @@ const SignUp: React.FC = () => {
                 </div>
                 {error.name && <p className="text-[#D22424] text-sm">{error.name}</p>}
               </div>
-
               {/* Email Input */}
               <div className="col-span-6 relative">
                 <div
@@ -287,7 +284,6 @@ const SignUp: React.FC = () => {
                 </div>
                 {error.email && <p className="text-[#D22424] text-sm">{error.email}</p>}
               </div>
-
               {/* Password Input */}
               <div className="col-span-6 relative">
                 <div
@@ -307,13 +303,15 @@ const SignUp: React.FC = () => {
                     autoComplete="new-password"
                     required
                   />
-                  <div className="text-gray-500 ml-2 cursor-pointer text-sm" onClick={togglePasswordVisibility}>
+                  <div
+                    className="text-gray-500 ml-2 cursor-pointer text-sm"
+                    onClick={togglePasswordVisibility}
+                  >
                     {showPassword ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
                   </div>
                 </div>
                 {error.password && <p className="text-[#D22424] text-sm">{error.password}</p>}
               </div>
-
               {/* Confirm Password Input */}
               <div className="col-span-6 relative">
                 <div
@@ -333,13 +331,15 @@ const SignUp: React.FC = () => {
                     autoComplete="new-password"
                     required
                   />
-                  <div className="text-gray-500 ml-2 cursor-pointer text-sm" onClick={toggleConfirmPasswordVisibility}>
+                  <div
+                    className="text-gray-500 ml-2 cursor-pointer text-sm"
+                    onClick={toggleConfirmPasswordVisibility}
+                  >
                     {showConfirmPassword ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
                   </div>
                 </div>
                 {error.confirmPassword && <p className="text-[#D22424] text-sm">{error.confirmPassword}</p>}
               </div>
-
               {/* Submit Button */}
               <div className="col-span-6 sm:flex sm:items-center sm:gap-4">
                 <button
@@ -350,14 +350,13 @@ const SignUp: React.FC = () => {
                   {loading ? "Signing up..." : "Sign Up"}
                 </button>
               </div>
-
               {/* Sign In Link */}
               <div className="col-span-6 text-center mt-4">
                 <p className="text-gray-600">
                   Already have an account?{" "}
-                  <a href="/login" className="text-orange-500 hover:text-orange-600">
+                  <Link to={"/login"} className="text-orange-500 hover:text-orange-600 ml-2">
                     Sign in
-                  </a>
+                  </Link>
                 </p>
               </div>
             </motion.form>

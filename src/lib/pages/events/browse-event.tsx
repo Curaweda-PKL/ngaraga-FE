@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-
+import { SERVER_URL } from "@/middleware/utils";
+  
 interface EventCardProps {
   title: string;
   time: string;
@@ -10,7 +11,7 @@ interface EventCardProps {
   imageUrl: string;
   id?: string;
 }
-
+  
 const EventCard: React.FC<EventCardProps> = ({
   title,
   time,
@@ -20,7 +21,7 @@ const EventCard: React.FC<EventCardProps> = ({
   id,
 }) => {
   const navigate = useNavigate();
-
+  
   const handleClick = () => {
     if (id) {
       navigate(`/detail-events/${id}`);
@@ -28,7 +29,7 @@ const EventCard: React.FC<EventCardProps> = ({
       navigate("/detail-events");
     }
   };
-
+  
   return (
     <div
       onClick={handleClick}
@@ -100,7 +101,7 @@ const EventCard: React.FC<EventCardProps> = ({
     </div>
   );
 };
-
+  
 const BrowseEvents: React.FC = () => {
   const [pageContent, setPageContent] = useState({
     title: "Browse Events",
@@ -109,34 +110,31 @@ const BrowseEvents: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [events, setEvents] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
-
+  
   // Fetch page content from API
   useEffect(() => {
     const fetchPageContent = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:3000/api/page-content/browsevent"
-        );
+        const response = await axios.get(`${SERVER_URL}/api/page-content/browsevent`);
         if (response.data) {
           setPageContent({
             title: response.data.title || pageContent.title,
-            description:
-              response.data.description || pageContent.description,
+            description: response.data.description || pageContent.description,
           });
         }
       } catch (err) {
         console.error("Error fetching page content:", err);
       }
     };
-
+  
     fetchPageContent();
   }, []);
-
+  
   // Fetch events from API using axios
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/api/events");
+        const response = await axios.get(`${SERVER_URL}/api/events`);
         if (response.data) {
           setEvents(response.data);
         }
@@ -145,10 +143,10 @@ const BrowseEvents: React.FC = () => {
         setError("Failed to load events. Please try again later.");
       }
     };
-
+  
     fetchEvents();
   }, []);
-
+  
   // Map API events into the format for the EventCard.
   const mappedEvents =
     events.length > 0
@@ -171,8 +169,8 @@ const BrowseEvents: React.FC = () => {
           // Adjust the image URL if needed.
           const imageUrl = event.eventImage.startsWith("http")
             ? event.eventImage
-            : event.eventImage; // e.g., prepend a base URL if required
-
+            : event.eventImage;
+  
           return {
             id: event.id,
             title: event.eventName,
@@ -183,12 +181,12 @@ const BrowseEvents: React.FC = () => {
           };
         })
       : [];
-
+  
   // Filter events based on the search term (case-insensitive)
   const displayEvents = mappedEvents.filter((event) =>
     event.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
+  
   // Fallback UI when there is an error or no events are available.
   if (error || displayEvents.length === 0) {
     return (
@@ -224,7 +222,7 @@ const BrowseEvents: React.FC = () => {
       </div>
     );
   }
-
+  
   return (
     <div className="w-full max-w-[1280px] px-5 py-10 mx-auto">
       {/* Header Section */}
@@ -236,7 +234,7 @@ const BrowseEvents: React.FC = () => {
           {pageContent.description}
         </p>
       </div>
-
+  
       {/* Search Input */}
       <div className="relative w-full max-w-[600px] mx-auto mb-10">
         <input
@@ -266,7 +264,7 @@ const BrowseEvents: React.FC = () => {
           </svg>
         </button>
       </div>
-
+  
       {/* Event Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {displayEvents.map((event, index) => (
@@ -277,12 +275,12 @@ const BrowseEvents: React.FC = () => {
             time={event.time}
             date={event.date}
             location={event.location}
-            imageUrl={`http://localhost:3000/uploads/event/${event.imageUrl}`}
+            imageUrl={`${SERVER_URL}/uploads/event/${event.imageUrl}`}
           />
         ))}
       </div>
     </div>
   );
 };
-
+  
 export default BrowseEvents;
