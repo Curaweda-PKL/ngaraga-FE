@@ -201,7 +201,7 @@ const MainContent: React.FC<MainContentProps> = ({ eventData }) => {
                     <div className="flex items-center gap-4">
                       <img
                         src={`http://localhost:3000/${reward.image}`}
-                        alt={reward.characterName}
+                        alt={reward.characterName}  
                         className="w-20 h-20 rounded-lg object-contain"
                       />
                       <div>
