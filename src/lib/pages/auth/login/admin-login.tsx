@@ -5,6 +5,7 @@ import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import LoginImage from "@/assets/img/spacestarry.png";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import { SERVER_URL } from "@/middleware/utils"; // Import centralized server URL
 
 type LoginFormData = {
   email: string;
@@ -32,7 +33,7 @@ const AdminLogin: React.FC = () => {
     const fetchThumbnailData = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:3000/api/auththumb/sign-in"
+          `${SERVER_URL}/api/auththumb/sign-in`
         );
         setThumbnailData(response.data.data);
       } catch (error) {
@@ -87,7 +88,7 @@ const AdminLogin: React.FC = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:3000/api/login",
+        `${SERVER_URL}/api/login`,
         {
           email: formData.email,
           password: formData.password,
@@ -284,7 +285,7 @@ const AdminLogin: React.FC = () => {
             alt="login"
             src={
               thumbnailData?.image
-                ? `http://localhost:3000/${thumbnailData.image}`
+                ? `${SERVER_URL}/${thumbnailData.image}`
                 : LoginImage
             }
             loading="lazy"

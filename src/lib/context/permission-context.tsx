@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import axios from 'axios';
+import { SERVER_URL } from "@/middleware/utils"; // Import centralized server URL
 
 type PermissionContextType = {
   permissions: string[];
@@ -25,13 +26,11 @@ export const PermissionProvider = ({ children }: { children: React.ReactNode }) 
   const fetchPermissions = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('http://localhost:3000/api/me', { withCredentials: true });
+      const response = await axios.get(`${SERVER_URL}/api/me`, { withCredentials: true });
       
       // Update permissions from the response
       setPermissions(response.data.permissions || []);
-
-      setRole(response.data.role || null);  // ✅ Set the user's role correctly
-
+      setRole(response.data.role || null);  // Set the user's role correctly
     } catch (error) {
       console.error('Permission fetch failed:', error);
       setPermissions([]);
