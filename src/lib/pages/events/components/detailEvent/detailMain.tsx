@@ -200,8 +200,10 @@ const MainContent: React.FC<MainContentProps> = ({ eventData }) => {
                   >
                     <div className="flex items-center gap-4">
                       <img
+
                         src={`${SERVER_URL}/${reward.image}`}
                         alt={reward.characterName}
+
                         className="w-20 h-20 rounded-lg object-contain"
                       />
                       <div>
