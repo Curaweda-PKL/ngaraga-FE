@@ -1,5 +1,6 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { FaDiscord, FaInstagram, FaTwitter, FaYoutube } from "react-icons/fa";
+import { SERVER_URL } from "@/middleware/utils"; // Import centralized server URL
 
 export const Footer: React.FC = () => {
   const [email, setEmail] = useState<string>(""); // State for email input
@@ -14,7 +15,7 @@ export const Footer: React.FC = () => {
 
   const handleSubscription = async () => {
     try {
-      const response = await fetch("http://localhost:3000/api/subscribe", {
+      const response = await fetch(`${SERVER_URL}/api/subscribe`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { SERVER_URL } from "@/middleware/utils"; // Import centralized server URL
 
 const TopCollectors: React.FC = () => {
   const [pageContent, setPageContent] = useState({
@@ -38,7 +39,7 @@ const TopCollectors: React.FC = () => {
     // Fetch page content from API
     const fetchPageContent = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/api/page-content/rankings");
+        const response = await axios.get(`${SERVER_URL}/api/page-content/rankings`);
         if (response.data) {
           setPageContent({
             title: response.data.title || pageContent.title,

@@ -1,5 +1,4 @@
-// MainContent.tsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ClockIcon } from "../svgsIcon/clockIcon";
 import { DateIcon } from "../svgsIcon/dateIcon";
 import { LocationIcon } from "../svgsIcon/locationIcon";
@@ -9,6 +8,7 @@ import { CopyIcon } from "../svgsIcon/copyIcon";
 import { WaIcon } from "../svgsIcon/waIcon";
 import { Link } from "react-router-dom";
 import ShareModal from "./shareModal";
+import { SERVER_URL } from "@/middleware/utils";
 
 interface Reward {
   id: number;
@@ -75,7 +75,7 @@ const MainContent: React.FC<MainContentProps> = ({ eventData }) => {
     eventData?.eventSpecialGuestOccupation || "Founder Ngaraga";
   const guestImage =
     eventData && eventData.eventSpecialGuestImage
-      ? `http://localhost:3000/uploads/event/${eventData.eventSpecialGuestImage}`
+      ? `${SERVER_URL}/uploads/event/${eventData.eventSpecialGuestImage}`
       : "https://via.placeholder.com/60";
   const description =
     eventData?.eventDescription ||
@@ -200,7 +200,7 @@ const MainContent: React.FC<MainContentProps> = ({ eventData }) => {
                   >
                     <div className="flex items-center gap-4">
                       <img
-                        src={`http://localhost:3000/${reward.image}`}
+                        src={`${SERVER_URL}/${reward.image}`}
                         alt={reward.characterName}
                         className="w-20 h-20 rounded-lg object-contain"
                       />

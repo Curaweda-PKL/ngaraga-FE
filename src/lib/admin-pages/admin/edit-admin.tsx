@@ -1,3 +1,4 @@
+import { SERVER_URL } from "@/middleware/utils";
 import React, { useState, ChangeEvent, useEffect } from "react";
 import axios from "axios";
 import { X } from "lucide-react";
@@ -31,7 +32,7 @@ export const EditProfileAdmin = () => {
     const fetchUserData = async () => {
       try {
         const response = await fetch(
-          `http://localhost:3000/api/account/admin/edit/${id}`
+          `${SERVER_URL}/api/account/admin/edit/${id}`
         );
         if (!response.ok) throw new Error("Failed to fetch user");
         const responseData = await response.json();
@@ -41,7 +42,7 @@ export const EditProfileAdmin = () => {
 
         setExistingImage(
           userData.image
-            ? `http://localhost:3000/uploads/profile/${userData.image.split("\\").pop()}`
+            ? `${SERVER_URL}/uploads/profile/${userData.image.split("\\").pop()}`
             : null
         );
 
@@ -150,7 +151,7 @@ export const EditProfileAdmin = () => {
         formDataToSend.append("image", imageFile);
       }
 
-      const response = await fetch(`http://localhost:3000/api/account/update/${id}`, {
+      const response = await fetch(`${SERVER_URL}/api/account/update/${id}`, {
         method: "PUT",
         body: formDataToSend,
       });
@@ -185,7 +186,7 @@ export const EditProfileAdmin = () => {
       setError(null);
 
       // Replace :userId with the actual id
-      const endpoint = `http://localhost:3000/api/reserve/superadmin/reset-password/${id}`;
+      const endpoint = `${SERVER_URL}/api/reserve/superadmin/reset-password/${id}`;
 
       // Send the PATCH request with the new password
       const response = await axios.patch(endpoint, {
@@ -196,9 +197,7 @@ export const EditProfileAdmin = () => {
       console.log("Password reset successfully", response.data);
 
       // Optionally, close the modal and clear the password fields
-      
       setShowPasswordModal(false);
-
       window.location.reload();
       setPasswordData({ newPassword: "", confirmPassword: "" });
     } catch (err: any) {

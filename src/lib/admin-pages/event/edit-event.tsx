@@ -5,6 +5,7 @@ import { Upload } from "lucide-react";
 import axios from "axios";
 import Select, { components, OptionProps } from "react-select";
 import { useParams, useNavigate } from "react-router-dom";
+import { SERVER_URL } from "@/middleware/utils"; // Imported centralized server URL
 
 // Define a type for your card data
 interface Card {
@@ -59,7 +60,7 @@ export const EditEvents = () => {
     const fetchCards = async () => {
       setCardsLoading(true);
       try {
-        const response = await axios.get("http://localhost:3000/api/cards/all");
+        const response = await axios.get(`${SERVER_URL}/api/cards/all`);
         setCards(response.data.cards);
       } catch (error) {
         console.error("Error fetching cards:", error);
@@ -76,7 +77,7 @@ export const EditEvents = () => {
     if (id) {
       const fetchEventDetails = async () => {
         try {
-          const response = await axios.get(`http://localhost:3000/api/events/${id}`);
+          const response = await axios.get(`${SERVER_URL}/api/events/${id}`);
           const event = response.data;
           // Populate basic fields
           setFormData((prev) => ({
@@ -104,10 +105,14 @@ export const EditEvents = () => {
           }
           // Set image previews if available
           if (event.eventImage) {
-            setEventImagePreview(`http://localhost:3000/src/uploads/event/${event.eventImage.replace(/\\/g, "/")}`);
+            setEventImagePreview(
+              `${SERVER_URL}/src/uploads/event/${event.eventImage.replace(/\\/g, "/")}`
+            );
           }
           if (event.eventSpecialGuestImage) {
-            setGuestAvatarPreview(`http://localhost:3000/src/uploads/event/${event.eventSpecialGuestImage.replace(/\\/g, "/")}`);
+            setGuestAvatarPreview(
+              `${SERVER_URL}/src/uploads/event/${event.eventSpecialGuestImage.replace(/\\/g, "/")}`
+            );
           }
           // If cardRewards exist, assume the first card as selected
           if (event.cardRewards && event.cardRewards.length > 0) {
@@ -118,7 +123,7 @@ export const EditEvents = () => {
               selectedCard: {
                 value: card.id,
                 label: card.characterName,
-                image: `http://localhost:3000/${card.image.replace(/\\/g, "/")}`,
+                image: `${SERVER_URL}/${card.image.replace(/\\/g, "/")}`,
               },
             }));
           }
@@ -134,7 +139,7 @@ export const EditEvents = () => {
   const cardOptions: CardOption[] = cards.map((card) => ({
     value: card.id,
     label: card.characterName,
-    image: `http://localhost:3000/${card.image.replace(/\\/g, "/")}`,
+    image: `${SERVER_URL}/${card.image.replace(/\\/g, "/")}`,
   }));
 
   // Custom option to show card image & name
@@ -238,7 +243,7 @@ export const EditEvents = () => {
       }
     }
     try {
-      await axios.put(`http://localhost:3000/api/events/${id}`, data, {
+      await axios.put(`${SERVER_URL}/api/events/${id}`, data, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       console.log("Event updated successfully");

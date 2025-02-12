@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Pencil, Trash2, Search, Eye } from "lucide-react";
 import axios from "axios";
 import { CategoryModal } from "./CategoryModal"; // adjust the import path as needed
+import { SERVER_URL } from "@/middleware/utils"; // Import centralized server URL
 
 export const Categories = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -30,9 +31,7 @@ export const Categories = () => {
   const fetchSeries = async () => {
     try {
       setLoadingSeries(true);
-      const response = await fetch(
-        "http://localhost:3000/api/categories/series/all"
-      );
+      const response = await fetch(`${SERVER_URL}/api/categories/series/all`);
       if (!response.ok) {
         throw new Error("Failed to fetch series data");
       }
@@ -49,12 +48,15 @@ export const Categories = () => {
   const fetchCategories = async () => {
     try {
       setLoadingCategories(true);
-      const response = await axios.get(
-        "http://localhost:3000/api/categories/all"
-      );
+      const response = await axios.get(`${SERVER_URL}/api/categories/all`);
       console.log("Categories API Response:", response.data);
       const categories = response.data.categories || response.data.data || [];
-      setCategoriesList(categories);
+      // Map category image URL to use SERVER_URL
+      const mappedCategories = categories.map((cat: any) => ({
+        ...cat,
+        image: cat.image ? `${SERVER_URL}/${cat.image.replace(/\\/g, "/")}` : null,
+      }));
+      setCategoriesList(mappedCategories);
     } catch (err) {
       setErrorCategories((err as Error).message);
     } finally {
@@ -83,7 +85,7 @@ export const Categories = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:3000/api/categories/create",
+        `${SERVER_URL}/api/categories/create`,
         formData,
         {
           headers: {
@@ -121,7 +123,7 @@ export const Categories = () => {
       }
   
       const response = await fetch(
-        `http://localhost:3000/api/categories/edit/${id}`,
+        `${SERVER_URL}/api/categories/edit/${id}`,
         {
           method: "PUT",
           body: formData, 
@@ -142,12 +144,11 @@ export const Categories = () => {
       console.error("Error updating category:", error);
     }
   };
-  
 
   const handleDeleteCategory = async (id: number) => {
     try {
       const response = await fetch(
-        `http://localhost:3000/api/categories/delete/${id}`,
+        `${SERVER_URL}/api/categories/delete/${id}`,
         {
           method: "DELETE",
         }
@@ -268,7 +269,7 @@ export const Categories = () => {
                       <div className="w-8 h-8 flex items-center justify-center">
                         {category.image ? (
                           <img
-                            src={`http://localhost:3000/${category.image}`}
+                            src={`${SERVER_URL}/${category.image}`}
                             alt={category.name}
                             className="w-8 h-8 object-contain rounded-full"
                           />

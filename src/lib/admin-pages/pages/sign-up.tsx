@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import axios from "axios";
+import { SERVER_URL } from "@/middleware/utils"; // Import centralized server URL
 
 export const SignUpPage = () => {
   const [image, setImage] = useState<File | null>(null);
@@ -7,6 +8,8 @@ export const SignUpPage = () => {
   const [description, setDescription] = useState(
     "Enter your details to access your account and continue your journey of creating and collecting Cards."
   );
+
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -31,11 +34,15 @@ export const SignUpPage = () => {
     formData.append("description", description);
 
     try {
-      const response = await axios.post("http://localhost:3000/api/auththumb/sign-up", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      const response = await axios.post(
+        `${SERVER_URL}/api/auththumb/sign-up`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
 
       if (response.data.message === "Thumbnail uploaded successfully") {
         alert("Details updated successfully!");
@@ -59,7 +66,18 @@ export const SignUpPage = () => {
           <label className="block text-sm font-medium mb-2">
             Sign Up Image <span className="text-red-500">*</span>
           </label>
-          <div className="border-dashed border-2 border-yellow-500 rounded-lg p-4 text-center bg-yellow-50">
+          <div
+            className="border-dashed border-2 border-yellow-500 rounded-lg p-4 text-center bg-yellow-50 cursor-pointer"
+            onClick={() => fileInputRef.current?.click()}
+            onDragOver={(e) => e.preventDefault()}
+            onDrop={(e) => {
+              e.preventDefault();
+              const file = e.dataTransfer.files[0];
+              if (file) {
+                setImage(file);
+              }
+            }}
+          >
             {image ? (
               <div className="relative">
                 <img
@@ -72,10 +90,7 @@ export const SignUpPage = () => {
                     onClick={handleRemoveImage}
                     className="p-2 bg-red-500 text-white rounded-full"
                   >
-                    <span
-                      role="img"
-                      aria-label="delete"
-                    >
+                    <span role="img" aria-label="delete">
                       🗑️
                     </span>
                   </button>
@@ -88,6 +103,7 @@ export const SignUpPage = () => {
                   accept=".jpg,.jpeg,.png"
                   onChange={handleImageChange}
                   className="hidden"
+                  ref={fileInputRef}
                   id="image-upload"
                 />
                 <label

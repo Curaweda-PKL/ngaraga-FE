@@ -3,6 +3,7 @@ import axios from "axios";
 import QRCode from "react-qr-code";
 import { Plus, Search, Edit, Eye, EyeOff, Trash2, Link2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { SERVER_URL } from "@/middleware/utils"; // Imported centralized server URL
 
 export const Events = () => {
   // --- States for Events List ---
@@ -49,7 +50,7 @@ export const Events = () => {
   // --- Fetch Events ---
   useEffect(() => {
     axios
-      .get("http://localhost:3000/api/events/admin")
+      .get(`${SERVER_URL}/api/events/admin`)
       .then((response) => {
         const fetchedEvents = response.data.map((event: any) => ({
           id: event.id,
@@ -72,7 +73,7 @@ export const Events = () => {
   // --- Fetch Cards for the Generate Claim Link modal ---
   useEffect(() => {
     axios
-      .get("http://localhost:3000/api/cards/all")
+      .get(`${SERVER_URL}/api/cards/all`)
       .then((response) => {
         // Response is expected to be { cards: [...] }
         const cardsData = response.data.cards;
@@ -139,7 +140,7 @@ export const Events = () => {
       return;
     }
     axios
-      .delete(`http://localhost:3000/api/events/${id}`)
+      .delete(`${SERVER_URL}/api/events/${id}`)
       .then(() => {
         setEvents((prevEvents) =>
           prevEvents.filter((event) => event.id !== id)
@@ -160,7 +161,7 @@ export const Events = () => {
     }
     Promise.all(
       selectedEvents.map((id) =>
-        axios.delete(`http://localhost:3000/api/events/${id}`)
+        axios.delete(`${SERVER_URL}/api/events/${id}`)
       )
     )
       .then(() => {
@@ -203,7 +204,7 @@ export const Events = () => {
 
   const handleSuspendUnsuspend = () => {
     if (!modalEvent) return;
-    const url = `http://localhost:3000/api/events/${modalEvent.id}/${modalAction}`;
+    const url = `${SERVER_URL}/api/events/${modalEvent.id}/${modalAction}`;
     axios
       .put(url)
       .then(() => {
@@ -233,7 +234,7 @@ export const Events = () => {
     setIsGenerating(true);
     axios
       .post(
-        `http://localhost:3000/api/cardRewards/${selectedCardId}/generateClaimLink`,
+        `${SERVER_URL}/api/cardRewards/${selectedCardId}/generateClaimLink`,
         {}, // No data payload.
         { withCredentials: true } // Include credentials.
       )
@@ -255,7 +256,7 @@ export const Events = () => {
     setIsGenerating(true);
     axios
       .post(
-        `http://localhost:3000/api/cardRewards/${selectedCardId}/generateClaimLink`,
+        `${SERVER_URL}/api/cardRewards/${selectedCardId}/generateClaimLink`,
         {},
         { withCredentials: true }
       )
@@ -422,7 +423,7 @@ export const Events = () => {
                 <td className="p-4">
                   <div className="flex items-center gap-3">
                     <img
-                      src={`http://localhost:3000/uploads/event/${event.image}`}
+                      src={`${SERVER_URL}/uploads/event/${event.image}`}
                       alt={event.name}
                       className="w-12 h-12 rounded-lg object-cover"
                     />

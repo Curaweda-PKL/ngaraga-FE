@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Bell } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { SERVER_URL } from "@/middleware/utils"; // Use your server URL helper
 
 interface Notification {
   id: string;
@@ -13,7 +14,8 @@ interface Notification {
 const Navbar = () => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
-  const [profileImage, setProfileImage] = useState<string>("/api/placeholder/32/32");
+  // Use SERVER_URL for the placeholder image as well
+  const [profileImage, setProfileImage] = useState<string>(`${SERVER_URL}/api/placeholder/32/32`);
   const navigate = useNavigate();
 
   const [notifications] = useState<Notification[]>([
@@ -58,16 +60,16 @@ const Navbar = () => {
     // Fetch the admin profile on mount to retrieve the profile image
     const fetchProfileImage = async () => {
       try {
-        const response = await fetch("http://localhost:3000/api/account/admin/profile", {
+        const response = await fetch(`${SERVER_URL}/api/account/admin/profile`, {
           credentials: "include",
         });
         if (response.ok) {
           const result = await response.json();
           // Adjust the property access based on your response structure
-          const userData = result.data.data; 
+          const userData = result.data.data;
           if (userData?.image) {
-            // Construct the URL to the image (adjust path as needed)
-            const imageUrl = `http://localhost:3000/uploads/profile/${userData.image.split("\\").pop()}`;
+            // Construct the URL to the image using SERVER_URL
+            const imageUrl = `${SERVER_URL}/uploads/profile/${userData.image.split("\\").pop()}`;
             setProfileImage(imageUrl);
           }
         } else {
@@ -112,13 +114,13 @@ const Navbar = () => {
 
   const handleLogout = async () => {
     try {
-      const response = await fetch("http://localhost:3000/api/logout", {
+      const response = await fetch(`${SERVER_URL}/api/logout`, {
         method: "POST",
         credentials: "include",
       });
 
       if (response.ok) {
-        navigate("/login/admin"); 
+        navigate("/login/admin");
       } else {
         console.error("Logout failed");
       }
