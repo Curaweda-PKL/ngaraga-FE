@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { X, Pencil, Eye, Trash2, Plus, Search } from "lucide-react";
 import axios from "axios";
+import { SERVER_URL } from "@/middleware/utils"; // Import your server URL
 
 export const Creator = () => {
   const [image, setImage] = useState<File | null>(null);
@@ -16,7 +17,7 @@ export const Creator = () => {
   useEffect(() => {
     const fetchCreators = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/api/creator/all");
+        const response = await axios.get(`${SERVER_URL}/api/creator/all`);
         setCreators(response.data.creators);
       } catch (error) {
         console.error("Error fetching creators:", error);
@@ -57,7 +58,7 @@ export const Creator = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:3000/api/creator/create",
+        `${SERVER_URL}/api/creator/create`,
         formData,
         {
           headers: {
@@ -148,7 +149,7 @@ export const Creator = () => {
           >
             <div className="flex items-center gap-3">
               <img
-                src={`http://localhost:3000/uploads/creator/${creator.image}`}
+                src={`${SERVER_URL}/uploads/creator/${creator.image}`}
                 alt={creator.name}
                 className="w-10 h-10 rounded-lg"
               />

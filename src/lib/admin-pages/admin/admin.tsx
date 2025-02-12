@@ -3,6 +3,7 @@ import axios from "axios";
 import { Search, Edit3, Eye, EyeOff, Trash2, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Modal from './components/modalSpD';  // Import Modal component
+import { SERVER_URL } from "@/middleware/utils"; // Import your centralized server URL
 
 export const Admin = () => {
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
@@ -23,7 +24,7 @@ export const Admin = () => {
       setLoading(true);
       try {
         const response = await axios.get(
-          "http://localhost:3000/api/accounts/role/ADMIN"
+          `${SERVER_URL}/api/accounts/role/ADMIN`
         );
         setUsers(response.data.data || []);
         setError("");
@@ -47,7 +48,6 @@ export const Admin = () => {
   const handleEditUser = (user: any) => {
     navigate(`/admin/edit-profile/${user.id}`);
   };
-
 
   // Filter users based on search query before pagination
   const filteredUsers = users.filter((user) =>
@@ -82,8 +82,8 @@ export const Admin = () => {
     if (modalAction === "suspend") {
       try {
         const endpoint = modalUser.isSuspended
-          ? `http://localhost:3000/api/account/unsuspend/${modalUser.id}`
-          : `http://localhost:3000/api/account/suspend/${modalUser.id}`;
+          ? `${SERVER_URL}/api/account/unsuspend/${modalUser.id}`
+          : `${SERVER_URL}/api/account/suspend/${modalUser.id}`;
         await axios.put(endpoint);
 
         setUsers((prevUsers) =>
@@ -91,19 +91,27 @@ export const Admin = () => {
             u.id === modalUser.id ? { ...u, isSuspended: !modalUser.isSuspended } : u
           )
         );
-        alert(`User ${modalUser.fullName} has been ${modalUser.isSuspended ? "unsuspended" : "suspended"}.`);
+        alert(
+          `User ${modalUser.fullName} has been ${
+            modalUser.isSuspended ? "unsuspended" : "suspended"
+          }.`
+        );
       } catch (err) {
         console.error(err);
         alert(`Failed to update suspension status for ${modalUser.fullName}.`);
       }
     } else if (modalAction === "delete") {
       try {
-        await axios.delete(`http://localhost:3000/api/account/delete/${modalUser.id}`);
-        setUsers((prevUsers) => prevUsers.filter((u: any) => u.id !== modalUser.id));
+        await axios.delete(`${SERVER_URL}/api/account/delete/${modalUser.id}`);
+        setUsers((prevUsers) =>
+          prevUsers.filter((u: any) => u.id !== modalUser.id)
+        );
         alert(`Deleted user ${modalUser.fullName}`);
       } catch (err) {
         console.error(err);
-        alert(`Failed to delete user ${modalUser.fullName}. Please try again.`);
+        alert(
+          `Failed to delete user ${modalUser.fullName}. Please try again.`
+        );
       }
     }
     setIsModalOpen(false); // Close the modal after action
@@ -128,7 +136,7 @@ export const Admin = () => {
         );
         // Create an array of delete promises for each selected user
         const deletePromises = usersToDelete.map((user: any) =>
-          axios.delete(`http://localhost:3000/api/account/delete/${user.id}`)
+          axios.delete(`${SERVER_URL}/api/account/delete/${user.id}`)
         );
         // Wait for all deletions to complete
         await Promise.all(deletePromises);
@@ -197,7 +205,7 @@ export const Admin = () => {
             className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
             value={searchQuery}
             onChange={(e) => {
-              setSearchQuery(e.target.value); //
+              setSearchQuery(e.target.value);
               setCurrentPage(1);
             }}
           />
@@ -219,7 +227,10 @@ export const Admin = () => {
                   <input
                     type="checkbox"
                     className="rounded border-gray-300"
-                    checked={selectedUsers.length === filteredUsers.length && filteredUsers.length > 0}
+                    checked={
+                      selectedUsers.length === filteredUsers.length &&
+                      filteredUsers.length > 0
+                    }
                     onChange={(e) => handleSelectAll(e.target.checked)}
                   />
                 </th>
@@ -246,7 +257,11 @@ export const Admin = () => {
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-lg overflow-hidden">
                         <img
-                          src={user?.image ? `http://localhost:3000/${user.image}` : "/api/placeholder/40/40"}
+                          src={
+                            user?.image
+                              ? `${SERVER_URL}/${user.image}`
+                              : "/api/placeholder/40/40"
+                          }
                           alt={`${user.fullName}'s avatar`}
                           className="w-full h-full object-cover"
                         />
@@ -304,7 +319,9 @@ export const Admin = () => {
         {Array.from({ length: totalPages }, (_, i) => (
           <button
             key={i}
-            className={`px-3 py-1 rounded ${currentPage === i + 1 ? "bg-yellow-500 text-white" : "text-gray-600"}`}
+            className={`px-3 py-1 rounded ${
+              currentPage === i + 1 ? "bg-yellow-500 text-white" : "text-gray-600"
+            }`}
             onClick={() => handlePageChange(i + 1)}
           >
             {i + 1}
@@ -325,7 +342,7 @@ export const Admin = () => {
         onClose={() => setIsModalOpen(false)}
         onConfirm={handleModalConfirm}
         action={modalAction}
-        userName={modalUser?.fullName || ''}
+        userName={modalUser?.fullName || ""}
       />
     </div>
   );

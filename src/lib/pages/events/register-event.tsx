@@ -116,7 +116,7 @@ const EventRegistration: React.FC = () => {
 
     try {
       const response = await axios.post(
-        `http://localhost:3000/api/event/${eventId}/register`,
+        `http://localhost:3000/api/event/${eventId}`,
         {},
         { withCredentials: true }
       );

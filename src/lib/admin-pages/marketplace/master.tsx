@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Pencil, Eye, Trash2, Search, X } from "lucide-react";
+import { SERVER_URL } from "@/middleware/utils"; // Import centralized server URL
 
 interface ModalProps {
   isOpen: boolean;
@@ -21,7 +22,7 @@ export const Master = () => {
 
   const fetchMasterList = async () => {
     try {
-      const response = await fetch("http://localhost:3000/api/masters/all");
+      const response = await fetch(`${SERVER_URL}/api/masters/all`);
       if (!response.ok) {
         throw new Error("Failed to fetch data");
       }
@@ -39,7 +40,7 @@ export const Master = () => {
 
   const handleAddMaster = async (name: string) => {
     try {
-      const response = await fetch("http://localhost:3000/api/master/create", {
+      const response = await fetch(`${SERVER_URL}/api/master/create`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name }),
@@ -62,7 +63,7 @@ export const Master = () => {
 
   const handleEditMaster = async (id: number, name: string) => {
     try {
-      const response = await fetch(`http://localhost:3000/api/master/edit/${id}`, {
+      const response = await fetch(`${SERVER_URL}/api/master/edit/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name }),
@@ -89,7 +90,7 @@ export const Master = () => {
 
   const handleDeleteMaster = async (id: number) => {
     try {
-      const response = await fetch(`http://localhost:3000/api/master/delete/${id}`, {
+      const response = await fetch(`${SERVER_URL}/api/master/delete/${id}`, {
         method: "DELETE",
       });
 
