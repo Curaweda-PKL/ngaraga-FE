@@ -1,7 +1,11 @@
-import { useEffect, useRef, useState } from "react";
+import { ChangeEvent, useEffect, useState, useRef } from "react";
+import "react-quill/dist/quill.snow.css";
+import { useNavigate } from "react-router-dom";
+import { SERVER_URL } from "@/middleware/utils"; // Import centralized server URL
 
 export const AddMember = () => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     name: "",
@@ -100,7 +104,7 @@ export const AddMember = () => {
     };
 
     try {
-      const response = await fetch("http://localhost:3000/api/register-user", {
+      const response = await fetch(`${SERVER_URL}/api/register-user`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -355,7 +359,6 @@ export const AddMember = () => {
             />
           </div>
         </div>
-
 
         <div className="flex justify-end gap-4 pt-4">
           <button

@@ -1,7 +1,8 @@
-import { ChangeEvent, useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Edit3, Eye, Trash2, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { SERVER_URL } from "@/middleware/utils"; // Import centralized server URL
 
 export const Card = () => {
   const navigate = useNavigate();
@@ -23,7 +24,7 @@ export const Card = () => {
   useEffect(() => {
     const fetchCards = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/api/cards/all");
+        const response = await axios.get(`${SERVER_URL}/api/cards/all`);
         // Map the API response to match the table row fields.
         // Assuming your API returns a "cards" array and each card has:
         //   - sku (string)
@@ -56,7 +57,7 @@ export const Card = () => {
   };
 
   // Handler for selecting an individual row
-  const handleSelectRow = (index: number, e: ChangeEvent<HTMLInputElement>) => {
+  const handleSelectRow = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
     const { checked } = e.target;
     const updatedCards = [...cards];
     updatedCards[index].selected = checked;

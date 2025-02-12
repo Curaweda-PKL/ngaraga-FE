@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import DatePicker from "react-datepicker";
 import { FaPlus, FaEyeSlash, FaSearch, FaTrash } from "react-icons/fa";
 import "react-datepicker/dist/react-datepicker.css";
@@ -7,6 +7,7 @@ import { LensIcon } from "./components/svgsIconMember/lensIcon";
 import { EyeIcon } from "./components/svgsIconMember/eyeIcon";
 import { TrashIcon } from "./components/svgsIconMember/trashIcon";
 import { CheckboxIcons } from "./components/svgsIconMember/checkboxIcons";
+import { SERVER_URL } from "@/middleware/utils"; // Import centralized server URL
 
 interface Member {
   id: string;
@@ -22,7 +23,6 @@ interface Member {
   image?: string;
 }
 
-// (Optional) Start with an empty array – the data will be fetched
 const initialMembers: Member[] = [];
 
 export const Member = () => {
@@ -38,7 +38,7 @@ export const Member = () => {
     const fetchMembers = async () => {
       setLoading(true);
       try {
-        const response = await fetch("http://localhost:3000/api/accounts/role/USER");
+        const response = await fetch(`${SERVER_URL}/api/accounts/role/USER`);
         if (!response.ok) {
           throw new Error("Network response was not ok");
         }
@@ -47,9 +47,6 @@ export const Member = () => {
           throw new Error("API returned an error");
         }
         const accounts = json.data;
-        // Map the API response to your Member type.
-        // For fields that your table expects but which aren’t in the API,
-        // we assign "N/A" as a placeholder.
         const members: Member[] = accounts.map((account: any) => ({
           id: account.id,
           name: account.name || "N/A",
@@ -61,7 +58,7 @@ export const Member = () => {
           card: "N/A",
           specialCard: "N/A",
           checked: false,
-          image: account.image ? account.image : "/api/placeholder/40/40",
+          image: account.image ? account.image : `${SERVER_URL}/api/placeholder/40/40`,
         }));
         setMemberData(members);
         setError(null);
@@ -81,7 +78,6 @@ export const Member = () => {
       member.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       member.email.toLowerCase().includes(searchQuery.toLowerCase());
 
-    // When a start or end date is set, check that the registerDate is valid and in range.
     let dateMatch = true;
     if (startDate || endDate) {
       const parsedDate = new Date(member.registerDate);
@@ -140,7 +136,6 @@ export const Member = () => {
 
       <h1 className="text-2xl font-semibold mb-6">Member</h1>
 
-      {/* Show loading and error messages if needed */}
       {loading && <div>Loading...</div>}
       {error && <div className="text-red-500 mb-4">Error: {error}</div>}
 
@@ -260,7 +255,7 @@ export const Member = () => {
                     <div className="flex items-center gap-3 truncate">
                       <div className="w-8 h-8 bg-gray-200 rounded-lg overflow-hidden shrink-0">
                         <img
-                          src={member.image ? member.image : "/api/placeholder/40/40"}
+                          src={member.image ? member.image : `${SERVER_URL}/api/placeholder/40/40`}
                           alt="User avatar"
                           className="w-full h-full object-cover"
                         />
