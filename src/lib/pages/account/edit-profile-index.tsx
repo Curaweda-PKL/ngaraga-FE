@@ -1,3 +1,4 @@
+// src/EditProfilePage.tsx
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { SERVER_URL } from "@/middleware/utils";
@@ -177,7 +178,6 @@ const EditProfilePage: React.FC = () => {
           bio: data.bio || "",
         });
 
-        // Use the correct field names from your DB: "image" for profile and "imageBanner" for banner.
         if (data.image) {
           const normalizedUrl = normalizeImageUrl(data.image);
           setProfileImage(normalizedUrl);
@@ -187,7 +187,6 @@ const EditProfilePage: React.FC = () => {
           setBannerImage(normalizedBannerUrl);
         }
 
-        // Process socialLinks:
         let socialLinksData: any = {};
         if (data.socialLinks) {
           if (typeof data.socialLinks === "string") {
@@ -201,7 +200,6 @@ const EditProfilePage: React.FC = () => {
           }
         }
 
-        // Set columns and originalSocialLinks using the fetched data.
         const fetchedSocialLinks: SocialLinks = {
           website: socialLinksData.website || "https://www.example.com/",
           discord: socialLinksData.discord || "https://www.example.com/",
@@ -233,8 +231,6 @@ const EditProfilePage: React.FC = () => {
       setLoading(true);
       setError(null);
 
-      // Build the socialLinks object from the columns.
-      // If a column is disabled, use the original value.
       const socialLinksPayload = {
         website: columns[0].enabled ? columns[0].value : originalSocialLinks.website,
         discord: columns[1].enabled ? columns[1].value : originalSocialLinks.discord,
@@ -243,7 +239,6 @@ const EditProfilePage: React.FC = () => {
         instagram: columns[4].enabled ? columns[4].value : originalSocialLinks.instagram,
       };
 
-      // Use FormData to include file(s) if needed.
       const formPayload = new FormData();
       formPayload.append("name", formData.userName);
       formPayload.append("fullName", formData.fullName);
@@ -253,11 +248,9 @@ const EditProfilePage: React.FC = () => {
       formPayload.append("bio", formData.bio);
       formPayload.append("socialLinks", JSON.stringify(socialLinksPayload));
 
-      // Append flags so the backend knows if the image was removed.
       formPayload.append("removeProfileImage", profileImageRemoved ? "true" : "false");
       formPayload.append("removeBannerImage", bannerImageRemoved ? "true" : "false");
 
-      // Append files if a new one was chosen.
       if (profileFile) {
         formPayload.append("profileImage", profileFile);
       }
@@ -298,7 +291,6 @@ const EditProfilePage: React.FC = () => {
             backgroundPosition: "center",
           }}
         >
-          {/* Hidden file input for Banner */}
           <input
             type="file"
             accept="image/*"
@@ -306,7 +298,6 @@ const EditProfilePage: React.FC = () => {
             ref={bannerInputRef}
             onChange={handleBannerFileChange}
           />
-
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex space-x-4">
             <button
               type="button"
@@ -333,7 +324,6 @@ const EditProfilePage: React.FC = () => {
         >
           {/* Left Section: Tabs & Profile Picture */}
           <div className="flex flex-col sm:flex-row sm:w-1/3">
-            {/* Tabs */}
             <div className="flex flex-col items-center sm:items-start sm:pr-6 sm:border-r sm:border-gray-300 mt-4">
               <button
                 type="button"
@@ -359,9 +349,7 @@ const EditProfilePage: React.FC = () => {
               </button>
             </div>
 
-            {/* Profile Picture */}
             <div className="flex flex-col items-center ml-14 mt-6 sm:mt-0 sm:pl-6 relative">
-              {/* Hidden file input for Profile */}
               <input
                 type="file"
                 accept="image/*"
@@ -375,7 +363,6 @@ const EditProfilePage: React.FC = () => {
                   alt="Profile"
                   className="w-full h-full rounded-lg object-cover shadow-lg"
                 />
-                {/* Overlay remove button for Profile */}
                 {profileImage !== fallbackProfileImage && (
                   <button
                     type="button"
@@ -416,13 +403,16 @@ const EditProfilePage: React.FC = () => {
 
             {error && <div className="mt-4 text-red-500">{error}</div>}
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="mt-6 bg-call-to-actions-900 text-white py-3 px-5 rounded-md text-sm font-medium hover:bg-yellow-600 focus:ring-2 focus:ring-yellow-400"
-            >
-              {loading ? "Updating..." : "Update"}
-            </button>
+            {/* Conditionally render the submit button only on the "basic" tab */}
+            {activeTab === "basic" && (
+              <button
+                type="submit"
+                disabled={loading}
+                className="mt-6 bg-call-to-actions-900 text-white py-3 px-5 rounded-md text-sm font-medium hover:bg-yellow-600 focus:ring-2 focus:ring-yellow-400"
+              >
+                {loading ? "Updating..." : "Update"}
+              </button>
+            )}
           </div>
         </form>
       </div>

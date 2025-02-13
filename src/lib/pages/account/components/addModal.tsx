@@ -1,6 +1,7 @@
 import axios from "axios";
 import React, { useState, useEffect } from "react";
 import PhoneInput from "../../checkout/components/PhoneInput";
+import { SERVER_URL } from "@/middleware/utils";
 
 interface AddAddressModalProps {
   isOpen: boolean;
@@ -29,9 +30,15 @@ const AddAddressModal: React.FC<AddAddressModalProps> = ({ isOpen, onClose }) =>
   const [phoneCountryCode, setPhoneCountryCode] = useState("+62");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [country, setCountry] = useState("");
-  const [province, setProvince] = useState("");
-  const [city, setCity] = useState("");
-  const [subdistrict, setSubdistrict] = useState("");
+  
+  // For province, city, and subdistrict we now store both the ID and the name.
+  const [province, setProvince] = useState(""); // holds province id
+  const [provinceName, setProvinceName] = useState(""); // holds province name
+  const [city, setCity] = useState(""); // holds city id
+  const [cityName, setCityName] = useState(""); // holds city name
+  const [subdistrict, setSubdistrict] = useState(""); // holds subdistrict id
+  const [subdistrictName, setSubdistrictName] = useState(""); // holds subdistrict name
+
   const [postalCode, setPostalCode] = useState("");
   const [addressDetails, setAddressDetails] = useState("");
 
@@ -49,6 +56,11 @@ const AddAddressModal: React.FC<AddAddressModalProps> = ({ isOpen, onClose }) =>
     cities: "",
     subdistricts: "",
   });
+
+  // New state for saving the address
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState("");
+
   console.log("Current country:", country);
 
   useEffect(() => {
@@ -114,7 +126,47 @@ const AddAddressModal: React.FC<AddAddressModalProps> = ({ isOpen, onClose }) =>
     fetchSubdistricts();
   }, [city, country]);
 
+  // Return null if modal is not open
   if (!isOpen) return null;
+
+  const handleSaveAddress = async () => {
+    // Basic validation for required fields (adjust as needed)
+    if (!country || !province || !city || !subdistrict || !postalCode || !addressDetails) {
+      setSaveError("Please fill out all required fields.");
+      return;
+    }
+    setSaving(true);
+    setSaveError("");
+    try {
+      // Build payload including both id and name fields.
+      const payload = {
+        fullName,
+        country,
+        province: provinceName,     // the name of the province
+        provinceId: province,       // the id of the province
+        city: cityName,             // the name of the city
+        cityId: city,               // the id of the city
+        subdistrict: subdistrictName, // the name of the subdistrict
+        subdistrictId: subdistrict,   // the id of the subdistrict
+        postalCode,
+        addressDetails,             // Will be mapped to 'details' in the backend if needed
+      };
+
+      const response = await axios.post(
+        `${SERVER_URL}/api/account/addresses`,
+        payload,
+        { withCredentials: true }
+      );
+      console.log("Address created:", response.data);
+      // Optionally refresh addresses list here
+      onClose();
+    } catch (err: any) {
+      console.error("Error creating address", err);
+      setSaveError(err.response?.data?.message || "Failed to create address.");
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <div
@@ -127,7 +179,7 @@ const AddAddressModal: React.FC<AddAddressModalProps> = ({ isOpen, onClose }) =>
       }}
     >
       <div
-      className="bg-white modal-box relative rounded-lg shadow-lg w-11/12 max-w-lg p-6"
+        className="bg-white modal-box relative rounded-lg shadow-lg w-11/12 max-w-lg p-6"
         onClick={(e) => e.stopPropagation()}
       >
         <button
@@ -178,9 +230,12 @@ const AddAddressModal: React.FC<AddAddressModalProps> = ({ isOpen, onClose }) =>
               setCountry(e.target.value);
               // Reset location fields when country changes
               setProvince("");
+              setProvinceName("");
               setCity("");
+              setCityName("");
               setSubdistrict("");
-              console.log("Current country:", country);
+              setSubdistrictName("");
+              console.log("Current country:", e.target.value);
             }}
           >
             <option value="">Select Country</option>
@@ -191,6 +246,7 @@ const AddAddressModal: React.FC<AddAddressModalProps> = ({ isOpen, onClose }) =>
         </div>
 
         <div className="flex gap-6 mb-6">
+          {/* Province Select */}
           <div className="form-control w-1/2">
             <label className="label">
               <span className="label-text">Province</span>
@@ -200,7 +256,17 @@ const AddAddressModal: React.FC<AddAddressModalProps> = ({ isOpen, onClose }) =>
                 <select
                   className="select select-bordered"
                   value={province}
-                  onChange={(e) => setProvince(e.target.value)}
+                  onChange={(e) => {
+                    const selectedId = e.target.value;
+                    setProvince(selectedId);
+                    const selected = provinces.find((prov) => prov.id === selectedId);
+                    setProvinceName(selected ? selected.name : "");
+                    // Reset dependent fields
+                    setCity("");
+                    setCityName("");
+                    setSubdistrict("");
+                    setSubdistrictName("");
+                  }}
                   disabled={loading.provinces || !!error.provinces}
                 >
                   <option value="">Select Province</option>
@@ -227,6 +293,7 @@ const AddAddressModal: React.FC<AddAddressModalProps> = ({ isOpen, onClose }) =>
               />
             )}
           </div>
+          {/* City Select */}
           <div className="form-control w-1/2">
             <label className="label">
               <span className="label-text">City/Regency</span>
@@ -236,13 +303,21 @@ const AddAddressModal: React.FC<AddAddressModalProps> = ({ isOpen, onClose }) =>
                 <select
                   className="select select-bordered"
                   value={city}
-                  onChange={(e) => setCity(e.target.value)}
+                  onChange={(e) => {
+                    const selectedId = e.target.value;
+                    setCity(selectedId);
+                    const selected = cities.find((cty) => cty.id === selectedId);
+                    setCityName(selected ? selected.name : "");
+                    // Reset subdistrict fields
+                    setSubdistrict("");
+                    setSubdistrictName("");
+                  }}
                   disabled={!province || loading.cities || !!error.cities}
                 >
                   <option value="">Select City</option>
-                  {cities.map((city) => (
-                    <option key={city.id} value={city.id}>
-                      {city.name}
+                  {cities.map((cty) => (
+                    <option key={cty.id} value={cty.id}>
+                      {cty.name}
                     </option>
                   ))}
                 </select>
@@ -266,6 +341,7 @@ const AddAddressModal: React.FC<AddAddressModalProps> = ({ isOpen, onClose }) =>
         </div>
 
         <div className="flex gap-6 mb-6">
+          {/* Subdistrict Select */}
           <div className="form-control w-1/2">
             <label className="label">
               <span className="label-text">Subdistrict</span>
@@ -275,7 +351,12 @@ const AddAddressModal: React.FC<AddAddressModalProps> = ({ isOpen, onClose }) =>
                 <select
                   className="select select-bordered"
                   value={subdistrict}
-                  onChange={(e) => setSubdistrict(e.target.value)}
+                  onChange={(e) => {
+                    const selectedId = e.target.value;
+                    setSubdistrict(selectedId);
+                    const selected = subdistricts.find((sub) => sub.id === selectedId);
+                    setSubdistrictName(selected ? selected.name : "");
+                  }}
                   disabled={!city || loading.subdistricts || !!error.subdistricts}
                 >
                   <option value="">Select Subdistrict</option>
@@ -303,6 +384,7 @@ const AddAddressModal: React.FC<AddAddressModalProps> = ({ isOpen, onClose }) =>
             )}
           </div>
 
+          {/* Postal Code */}
           <div className="form-control w-1/2">
             <label className="label">
               <span className="label-text">Postal Code</span>
@@ -329,12 +411,17 @@ const AddAddressModal: React.FC<AddAddressModalProps> = ({ isOpen, onClose }) =>
           ></textarea>
         </div>
 
+        {saveError && (
+          <div className="text-red-500 text-sm mb-4">{saveError}</div>
+        )}
+
         <div className="modal-action">
           <button
             className="btn btn-primary bg-call-to-actions-900 border border-call-to-actions-900 hover:bg-call-to-actions-800 text-white ring-call-to-actions-900"
-            onClick={() => console.log("Save Address")}
+            onClick={handleSaveAddress}
+            disabled={saving}
           >
-            Save
+            {saving ? "Saving..." : "Save"}
           </button>
         </div>
       </div>
