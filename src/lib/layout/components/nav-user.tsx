@@ -1,19 +1,10 @@
-<<<<<<< HEAD
-import {useEffect, useState, useRef} from "react";
+import {useEffect, useRef, useState} from "react";
 import {FaBars, FaTimes, FaUserFriends} from "react-icons/fa";
 import {CiShoppingCart} from "react-icons/ci";
 import {Link, useNavigate} from "react-router-dom";
 import axios from "axios";
 import {usePermissions} from "../../context/permission-context";
-=======
-import { useEffect, useRef, useState } from "react";
-import { FaBars, FaTimes, FaUserFriends } from "react-icons/fa";
-import { CiShoppingCart } from "react-icons/ci";
-import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
-import { usePermissions } from "../../context/permission-context";
-import { SERVER_URL } from "@/middleware/utils"; // Import centralized server URL
->>>>>>> c91a9a81b14dd06e5413af88ea716cecb56287d7
+import {SERVER_URL} from "@/middleware/utils"; // Import centralized server URL
 
 export const Navbar: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -61,13 +52,8 @@ export const Navbar: React.FC = () => {
       const fetchUserData = async () => {
         try {
           const response = await axios.get(
-<<<<<<< HEAD
-            "http://localhost:3000/api/account/profile",
-            {withCredentials: true}
-=======
             `${SERVER_URL}/api/account/profile`,
-            { withCredentials: true }
->>>>>>> c91a9a81b14dd06e5413af88ea716cecb56287d7
+            {withCredentials: true}
           );
 
           // Use fullName if available, otherwise fall back to name.
@@ -112,11 +98,7 @@ export const Navbar: React.FC = () => {
 
   const handleLogout = async () => {
     try {
-      await axios.post(
-        `${SERVER_URL}/api/logout`,
-        {},
-        {withCredentials: true}
-      );
+      await axios.post(`${SERVER_URL}/api/logout`, {}, {withCredentials: true});
       navigateToPage("login");
     } catch (error) {
       console.error("Logout failed:", error);
@@ -130,7 +112,11 @@ export const Navbar: React.FC = () => {
         <div className="navbar-start flex items-center space-x-4">
           {/* Hamburger menu for small screens */}
           <div className="dropdown lg:hidden sm:mr-2 md:mr-3">
-            <div role="button" className="btn btn-ghost" onClick={toggleSidebar}>
+            <div
+              role="button"
+              className="btn btn-ghost"
+              onClick={toggleSidebar}
+            >
               <FaBars size={20} />
             </div>
           </div>
@@ -185,7 +171,6 @@ export const Navbar: React.FC = () => {
                 className="btn bg-white border-call-to-action rounded-lg text-orange-300 sm:flex lg:flex items-center gap-2 lg:mr-2 ml-2 hover:bg-call-to-actions-800 hover:text-white transition"
                 onClick={() => navigateToPage("login")}
               >
-                <FaUserFriends size={18} />
                 Sign In
               </a>
 

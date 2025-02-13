@@ -1,12 +1,8 @@
 import React, {useState, useEffect} from "react";
 import {Pencil, Trash2, Search, Eye} from "lucide-react";
 import axios from "axios";
-<<<<<<< HEAD
 import {CategoryModal} from "./CategoryModal"; // adjust the import path as needed
-=======
-import { CategoryModal } from "./CategoryModal"; // adjust the import path as needed
-import { SERVER_URL } from "@/middleware/utils"; // Import centralized server URL
->>>>>>> c91a9a81b14dd06e5413af88ea716cecb56287d7
+import {SERVER_URL} from "@/middleware/utils"; // Import centralized server URL
 
 export const Categories = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -58,7 +54,9 @@ export const Categories = () => {
       // Map category image URL to use SERVER_URL
       const mappedCategories = categories.map((cat: any) => ({
         ...cat,
-        image: cat.image ? `${SERVER_URL}/${cat.image.replace(/\\/g, "/")}` : null,
+        image: cat.image
+          ? `${SERVER_URL}/${cat.image.replace(/\\/g, "/")}`
+          : null,
       }));
       setCategoriesList(mappedCategories);
     } catch (err) {
@@ -126,13 +124,10 @@ export const Categories = () => {
         formData.append("image", imageFile);
       }
 
-      const response = await fetch(
-        `${SERVER_URL}/api/categories/edit/${id}`,
-        {
-          method: "PUT",
-          body: formData,
-        }
-      );
+      const response = await fetch(`${SERVER_URL}/api/categories/edit/${id}`, {
+        method: "PUT",
+        body: formData,
+      });
 
       if (!response.ok) {
         throw new Error("Failed to update category");

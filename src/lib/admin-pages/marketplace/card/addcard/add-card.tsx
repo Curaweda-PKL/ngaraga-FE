@@ -5,27 +5,27 @@ import {useNavigate} from "react-router-dom";
 
 import CardForm from "./components/cardForm";
 import CardSettings from "./components/cardSetting";
-import { SERVER_URL } from "@/middleware/utils"; // Import centralized server URL
+import {SERVER_URL} from "@/middleware/utils"; // Import centralized server URL
 
 export const AddCard = () => {
   const navigate = useNavigate();
 
-  // Categories state
+  // Categories state (now including id)
   const [apiCategories, setApiCategories] = useState<
-    Array<{id: number; name: string; image: string | null}>
+    {id: number; name: string; image: string | null}[]
   >([]);
   const [categoriesLoading, setCategoriesLoading] = useState(true);
   const [categoriesError, setCategoriesError] = useState<string | null>(null);
 
-  // Creators state
+  // Creators state (fetched from API, now including id)
   const [apiCreators, setApiCreators] = useState<
-    Array<{id: number; name: string; image: string | null}>
+    {id: number; name: string; image: string | null}[]
   >([]);
   const [creatorsLoading, setCreatorsLoading] = useState(true);
   const [creatorsError, setCreatorsError] = useState<string | null>(null);
 
-  // Tags state
-  const [apiTags, setApiTags] = useState<Array<{id: number; name: string}>>([]);
+  // Tags state (fetched from API)
+  const [apiTags, setApiTags] = useState<{id: number; name: string}[]>([]);
   const [tagsLoading, setTagsLoading] = useState(true);
   const [tagsError, setTagsError] = useState<string | null>(null);
 
@@ -35,8 +35,7 @@ export const AddCard = () => {
     cardName: "",
     sku: "",
     price: "",
-    salePrice: "",
-    isSaleActive: false,
+    salePrice: false,
     stock: "",
     cardDetails: "",
     categories: [] as string[], // stores selected category IDs as strings
@@ -84,7 +83,9 @@ export const AddCard = () => {
           id: creator.id,
           name: creator.name,
           image: creator.image
-            ? `${SERVER_URL}/uploads/creator/${encodeURIComponent(creator.image)}`
+            ? `${SERVER_URL}/uploads/creator/${encodeURIComponent(
+                creator.image
+              )}`
             : null,
         }));
         setApiCreators(creatorsData);
@@ -139,24 +140,27 @@ export const AddCard = () => {
     const {name, value, type} = e.target;
     const newValue =
       type === "checkbox" ? (e.target as HTMLInputElement).checked : value;
-    setFormData((prev) => ({...prev, [name]: newValue}));
+    setFormData((prev) => ({
+      ...prev,
+      [name]: newValue,
+    }));
   };
 
   // Image upload handler
   const handleImageUpload = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      setCardFile(file);
+      setCardFile(file); // Store file for upload
       const reader = new FileReader();
       reader.onloadend = () => {
-        setFormData((prev) => ({...prev, cardImage: reader.result}));
+        setFormData((prev) => ({
+          ...prev,
+          cardImage: reader.result, // For preview
+        }));
       };
       reader.readAsDataURL(file);
     }
   };
-
-  // Cancel handler
-  const handleCancel = () => navigate("/admin/card");
 
   // Drag over and drop handlers for image upload
   const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
@@ -179,9 +183,15 @@ export const AddCard = () => {
     }
   };
 
+  // Cancel handler
+  const handleCancel = () => {
+    navigate("/admin/card");
+  };
+
   // Save handler (create new card(s))
   const handleSave = async () => {
     try {
+      // Create FormData payload for multipart/form-data
       const payload = new FormData();
       payload.append("characterName", formData.cardName);
       payload.append("sku", formData.sku);
@@ -195,22 +205,24 @@ export const AddCard = () => {
         throw new Error("Please select a category.");
       }
 
-      payload.append("tagIds", JSON.stringify(formData.tags.map(Number)));
+      // Convert the selected tag IDs and creator ID into JSON strings
+      payload.append(
+        "tagIds",
+        JSON.stringify(formData.tags.map((tag) => Number(tag)))
+      );
       payload.append(
         "creatorIds",
         JSON.stringify([Number(formData.selectedCreator)])
       );
+
+      // Owner ID is optional – here we leave it empty
       payload.append("ownerId", "");
 
+      // Append image file if available
       if (cardFile) {
         payload.append("image", cardFile);
       }
 
-<<<<<<< HEAD
-      await axios.post("http://localhost:3000/api/cards/create", payload, {
-        headers: {"Content-Type": "multipart/form-data"},
-      });
-=======
       // Send POST request to the API endpoint
       const response = await axios.post(
         `${SERVER_URL}/api/cards/create`,
@@ -221,10 +233,14 @@ export const AddCard = () => {
           },
         }
       );
->>>>>>> c91a9a81b14dd06e5413af88ea716cecb56287d7
 
+      console.log("Response:", response.data);
       navigate("/admin/card");
     } catch (error: any) {
+      console.error(
+        "Error creating card:",
+        error.response?.data || error.message
+      );
       alert(
         "Error creating card: " +
           (error.response?.data?.message || error.message)
