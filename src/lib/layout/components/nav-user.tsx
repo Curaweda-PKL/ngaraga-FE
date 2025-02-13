@@ -20,7 +20,7 @@ export const Navbar: React.FC = () => {
   const [userAvatarUrl, setUserAvatarUrl] = useState("");
 
   // Default avatar image if none is returned
-  const defaultAvatar = "https://www.gravatar.com/avatar/abc123";
+  const defaultAvatar = "https://comickaze.in/wp-content/uploads/woocommerce-placeholder-600x600.png";
 
   // Compute the full avatar URL. The API returns a relative path, so we prepend our base URL.
   const avatarUrl = userAvatarUrl
