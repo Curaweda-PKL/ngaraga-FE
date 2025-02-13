@@ -3,6 +3,7 @@ node_modules
 dist
 dist-ssr
 *.local
+.env
 
 .env
 
@@ -25,3 +26,4 @@ coverage/
 # ESLint
 .eslintcache
 .vercel
+
