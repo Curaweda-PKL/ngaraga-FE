@@ -231,7 +231,7 @@ const MainContent: React.FC<MainContentProps> = ({ eventData }) => {
                   </div>
                 ))
               ) : (
-                <p className="text-gray-500">No benefits available.</p>
+                <p className="text-gray-200">No benefits available.</p>
               )}
             </div>
           )}
