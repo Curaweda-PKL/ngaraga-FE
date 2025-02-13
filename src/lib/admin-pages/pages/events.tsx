@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { SERVER_URL } from "@/middleware/utils"; // Import centralized server URL
 
 export const EventsForm: React.FC = () => {
   const [title, setTitle] = useState("Browse Events");
@@ -24,7 +25,7 @@ export const EventsForm: React.FC = () => {
     setSuccess("");
     try {
       const response = await axios.post(
-        "http://localhost:3000/api/page-content/browsevent",
+        `${SERVER_URL}/api/page-content/browsevent`,
         { title, description }
       );
       if (response.status === 200) {

@@ -5,6 +5,7 @@ import {useNavigate} from "react-router-dom";
 
 import CardForm from "./components/cardForm";
 import CardSettings from "./components/cardSetting";
+import { SERVER_URL } from "@/middleware/utils"; // Import centralized server URL
 
 export const AddCard = () => {
   const navigate = useNavigate();
@@ -53,14 +54,12 @@ export const AddCard = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:3000/api/categories/all"
-        );
+        const response = await axios.get(`${SERVER_URL}/api/categories/all`);
         const categoriesData = response.data.categories.map((cat: any) => ({
           id: cat.id,
           name: cat.name,
           image: cat.image
-            ? `http://localhost:3000/${cat.image.replace(/\\/g, "/")}`
+            ? `${SERVER_URL}/${cat.image.replace(/\\/g, "/")}`
             : null,
         }));
         setApiCategories(categoriesData);
@@ -80,16 +79,12 @@ export const AddCard = () => {
   useEffect(() => {
     const fetchCreators = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:3000/api/creator/all"
-        );
+        const response = await axios.get(`${SERVER_URL}/api/creator/all`);
         const creatorsData = response.data.creators.map((creator: any) => ({
           id: creator.id,
           name: creator.name,
           image: creator.image
-            ? `http://localhost:3000/uploads/creator/${encodeURIComponent(
-                creator.image
-              )}`
+            ? `${SERVER_URL}/uploads/creator/${encodeURIComponent(creator.image)}`
             : null,
         }));
         setApiCreators(creatorsData);
@@ -122,7 +117,7 @@ export const AddCard = () => {
   useEffect(() => {
     const fetchTags = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/api/tags/all");
+        const response = await axios.get(`${SERVER_URL}/api/tags/all`);
         setApiTags(response.data.tags);
         setTagsError(null);
       } catch (error) {
@@ -211,9 +206,22 @@ export const AddCard = () => {
         payload.append("image", cardFile);
       }
 
+<<<<<<< HEAD
       await axios.post("http://localhost:3000/api/cards/create", payload, {
         headers: {"Content-Type": "multipart/form-data"},
       });
+=======
+      // Send POST request to the API endpoint
+      const response = await axios.post(
+        `${SERVER_URL}/api/cards/create`,
+        payload,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+>>>>>>> c91a9a81b14dd06e5413af88ea716cecb56287d7
 
       navigate("/admin/card");
     } catch (error: any) {

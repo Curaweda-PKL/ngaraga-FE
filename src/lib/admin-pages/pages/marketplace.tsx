@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { SERVER_URL } from "@/middleware/utils"; // Import centralized server URL
 
 export const MarketplaceForm: React.FC = () => {
   const [title, setTitle] = useState("Browse Marketplace");
@@ -22,10 +23,10 @@ export const MarketplaceForm: React.FC = () => {
     setError("");
     setSuccess("");
     try {
-      const response = await axios.post("http://localhost:3000/api/page-content/marketplace", {
-        title,
-        description,
-      });
+      const response = await axios.post(
+        `${SERVER_URL}/api/page-content/marketplace`,
+        { title, description }
+      );
       if (response.status === 200) {
         setSuccess("Marketplace content updated successfully!");
       }

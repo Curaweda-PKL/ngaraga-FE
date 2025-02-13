@@ -5,6 +5,7 @@ import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import LoginImage from "@/assets/img/spacestarry.png";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import { SERVER_URL } from "@/middleware/utils";
 
 type LoginFormData = {
   email: string;
@@ -31,9 +32,7 @@ const Login: React.FC = () => {
   useEffect(() => {
     const fetchThumbnailData = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:3000/api/auththumb/sign-in"
-        );
+        const response = await axios.get(`${SERVER_URL}/api/auththumb/sign-in`);
         setThumbnailData(response.data.data);
       } catch (error) {
         console.error("Error fetching thumbnail data:", error);
@@ -100,14 +99,12 @@ const Login: React.FC = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:3000/api/login",
+        `${SERVER_URL}/api/login`,
         {
           email: formData.email,
           password: formData.password,
         },
-        {
-          withCredentials: true,
-        }
+        { withCredentials: true }
       );
 
       // Assume the API returns a user object with a role property
@@ -179,7 +176,7 @@ const Login: React.FC = () => {
             alt="login"
             src={
               thumbnailData?.image
-                ? `http://localhost:3000/${thumbnailData.image}`
+                ? `${SERVER_URL}/${thumbnailData.image}`
                 : LoginImage
             }
             loading="lazy"

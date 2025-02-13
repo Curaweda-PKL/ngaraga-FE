@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { FaTrash, FaSearch, FaCalendarAlt } from "react-icons/fa";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { SERVER_URL } from "@/middleware/utils"; // Import your centralized server URL
 
 interface Subscription {
   id: string;
@@ -22,7 +23,7 @@ export const Subscription = () => {
   useEffect(() => {
     const fetchSubscriptions = async () => {
       try {
-        const response = await fetch("http://localhost:3000/api/subscriptions/all");
+        const response = await fetch(`${SERVER_URL}/api/subscriptions/all`);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -68,7 +69,7 @@ export const Subscription = () => {
   // Single deletion: call the DELETE endpoint using the subscription id.
   const handleSingleDelete = async (id: string) => {
     try {
-      const response = await fetch(`http://localhost:3000/api/subscriptions/delete/${id}`, {
+      const response = await fetch(`${SERVER_URL}/api/subscriptions/delete/${id}`, {
         method: "DELETE",
       });
       if (!response.ok) {
@@ -87,7 +88,7 @@ export const Subscription = () => {
   const handleDelete = async () => {
     try {
       for (const id of selectedSubscriptionIds) {
-        const response = await fetch(`http://localhost:3000/api/subscriptions/delete/${id}`, {
+        const response = await fetch(`${SERVER_URL}/api/subscriptions/delete/${id}`, {
           method: "DELETE",
         });
         if (!response.ok) {

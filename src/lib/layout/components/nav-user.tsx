@@ -1,9 +1,19 @@
+<<<<<<< HEAD
 import {useEffect, useState, useRef} from "react";
 import {FaBars, FaTimes, FaUserFriends} from "react-icons/fa";
 import {CiShoppingCart} from "react-icons/ci";
 import {Link, useNavigate} from "react-router-dom";
 import axios from "axios";
 import {usePermissions} from "../../context/permission-context";
+=======
+import { useEffect, useRef, useState } from "react";
+import { FaBars, FaTimes, FaUserFriends } from "react-icons/fa";
+import { CiShoppingCart } from "react-icons/ci";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { usePermissions } from "../../context/permission-context";
+import { SERVER_URL } from "@/middleware/utils"; // Import centralized server URL
+>>>>>>> c91a9a81b14dd06e5413af88ea716cecb56287d7
 
 export const Navbar: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -23,7 +33,7 @@ export const Navbar: React.FC = () => {
 
   // Compute the full avatar URL. The API returns a relative path, so we prepend our base URL.
   const avatarUrl = userAvatarUrl
-    ? `http://localhost:3000/${userAvatarUrl}`
+    ? `${SERVER_URL}/${userAvatarUrl}`
     : defaultAvatar;
 
   // Ref for the dropdown container
@@ -51,8 +61,13 @@ export const Navbar: React.FC = () => {
       const fetchUserData = async () => {
         try {
           const response = await axios.get(
+<<<<<<< HEAD
             "http://localhost:3000/api/account/profile",
             {withCredentials: true}
+=======
+            `${SERVER_URL}/api/account/profile`,
+            { withCredentials: true }
+>>>>>>> c91a9a81b14dd06e5413af88ea716cecb56287d7
           );
 
           // Use fullName if available, otherwise fall back to name.
@@ -98,7 +113,7 @@ export const Navbar: React.FC = () => {
   const handleLogout = async () => {
     try {
       await axios.post(
-        "http://localhost:3000/api/logout",
+        `${SERVER_URL}/api/logout`,
         {},
         {withCredentials: true}
       );
@@ -115,11 +130,7 @@ export const Navbar: React.FC = () => {
         <div className="navbar-start flex items-center space-x-4">
           {/* Hamburger menu for small screens */}
           <div className="dropdown lg:hidden sm:mr-2 md:mr-3">
-            <div
-              role="button"
-              className="btn btn-ghost"
-              onClick={toggleSidebar}
-            >
+            <div role="button" className="btn btn-ghost" onClick={toggleSidebar}>
               <FaBars size={20} />
             </div>
           </div>

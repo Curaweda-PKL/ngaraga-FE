@@ -4,7 +4,8 @@ import "react-quill/dist/quill.snow.css";
 import { Upload } from "lucide-react";
 import axios from "axios";
 import Select, { components, OptionProps } from "react-select";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { useNavigate } from "react-router-dom";
+import { SERVER_URL } from "@/middleware/utils"; // Import the centralized server URL
 
 // Define a type for your card data
 interface Card {
@@ -59,7 +60,7 @@ export const AddEvents = () => {
     const fetchCards = async () => {
       setCardsLoading(true);
       try {
-        const response = await axios.get("http://localhost:3000/api/cards/all");
+        const response = await axios.get(`${SERVER_URL}/api/cards/all`);
         // Assumes API returns { cards: [ ... ] }
         setCards(response.data.cards);
       } catch (error) {
@@ -77,7 +78,7 @@ export const AddEvents = () => {
   const cardOptions: CardOption[] = cards.map((card) => ({
     value: card.id,
     label: card.characterName,
-    image: `http://localhost:3000/${card.image.replace(/\\/g, "/")}`,
+    image: `${SERVER_URL}/${card.image.replace(/\\/g, "/")}`,
   }));
 
   // Custom option for react-select that shows the image and name
@@ -186,7 +187,7 @@ export const AddEvents = () => {
     }
     try {
       const response = await axios.post(
-        "http://localhost:3000/api/events",
+        `${SERVER_URL}/api/events`,
         data,
         {
           headers: { "Content-Type": "multipart/form-data" },

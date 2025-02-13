@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { CgProfile } from "react-icons/cg";
 import {
@@ -8,6 +8,7 @@ import {
   FaTwitter,
   FaYoutube,
 } from "react-icons/fa";
+import { SERVER_URL } from "@/middleware/utils"; // Import centralized server URL
 
 export const ProfilePage: React.FC = () => {
   // Local state for profile data, loading, and errors.
@@ -20,7 +21,7 @@ export const ProfilePage: React.FC = () => {
     const fetchProfile = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:3000/api/account/profile",
+          `${SERVER_URL}/api/account/profile`,
           { withCredentials: true }
         );
         setProfile(response.data);
@@ -58,7 +59,7 @@ export const ProfilePage: React.FC = () => {
       .replace(/\\/g, "/")
       .replace(/^src\//, "");
     normalizedPath = normalizedPath.replace("uploadsprofile", "uploads/profile");
-    avatarUrl = `http://localhost:3000/${normalizedPath}`;
+    avatarUrl = `${SERVER_URL}/${normalizedPath}`;
   }
 
   // Fallback for display name: if fullName is missing, use name.

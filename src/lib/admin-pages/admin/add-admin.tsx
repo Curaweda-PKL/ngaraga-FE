@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { AccessComponents } from "./components/accessComponents";
 import { useNavigate } from "react-router-dom";
+import { SERVER_URL } from "@/middleware/utils"; // Import your centralized server URL
 
 export const AddAdmin = () => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -97,9 +98,9 @@ export const AddAdmin = () => {
   };
 
   const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const { name, value} = e.target;
+    const { name, value } = e.target;
     setFormData((prevData) => ({ ...prevData, [name]: value }));
-  }
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -137,7 +138,7 @@ export const AddAdmin = () => {
     formPayload.append("permissions", JSON.stringify(selectedPermissions));
 
     try {
-      const response = await fetch("http://localhost:3000/api/create-admin", {
+      const response = await fetch(`${SERVER_URL}/api/create-admin`, {
         method: "POST",
         body: formPayload, // Let browser set Content-Type with boundary
       });

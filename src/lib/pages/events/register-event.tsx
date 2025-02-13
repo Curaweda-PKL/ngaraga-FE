@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
 import PhoneInput from "../checkout/components/PhoneInput";
+import { SERVER_URL } from "@/middleware/utils";
 
 interface UserProfile {
   id: string;
@@ -63,7 +64,7 @@ const EventRegistration: React.FC = () => {
     const fetchUserProfile = async () => {
       try {
         const response = await axios.get<UserProfile>(
-          "http://localhost:3000/api/account/profile",
+          `${SERVER_URL}/api/account/profile`,
           { withCredentials: true }
         );
         const user = response.data;
@@ -88,7 +89,7 @@ const EventRegistration: React.FC = () => {
     const fetchEventData = async () => {
       try {
         const response = await axios.get<EventData>(
-          `http://localhost:3000/api/events/${eventId}`
+          `${SERVER_URL}/api/events/${eventId}`
         );
         setEventData(response.data);
         setLoadingEvent(false);
@@ -116,7 +117,9 @@ const EventRegistration: React.FC = () => {
 
     try {
       const response = await axios.post(
-        `http://localhost:3000/api/event/${eventId}/register`,
+
+        `${SERVER_URL}/api/event/${eventId}`,
+        
         {},
         { withCredentials: true }
       );
@@ -181,8 +184,8 @@ const EventRegistration: React.FC = () => {
           ) : eventData ? (
             <div className="bg-gray-100 border-t rounded-lg flex items-center p-4 mb-4">
               <img
-                      src={`http://localhost:3000/uploads/event/${eventData.eventImage}`}
-                      alt="Event Thumbnail"
+                src={`${SERVER_URL}/uploads/event/${eventData.eventImage}`}
+                alt="Event Thumbnail"
                 className="w-32 h-24 object-cover rounded-lg mr-4"
               />
               <div className="flex-col">
@@ -194,26 +197,25 @@ const EventRegistration: React.FC = () => {
                   <span>{new Date(eventData.eventDate).toLocaleDateString()}</span>
                 </p>
                 <p className="text-gray-500 text-left text-sm">
-  {eventData.eventType === "ONLINE" ? (
-    <>
-      Zoom Link: <br />
-      <a
-        href={eventData.onlineZoomLink}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="text-blue-500 underline hover:text-blue-700"
-      >
-        {eventData.onlineZoomLink}
-      </a>
-    </>
-  ) : (
-    <>
-      Location: <br />
-      <span className="font-semibold">{eventData.offlineLocation}</span>
-    </>
-  )}
-</p>
-
+                  {eventData.eventType === "ONLINE" ? (
+                    <>
+                      Zoom Link: <br />
+                      <a
+                        href={eventData.onlineZoomLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-500 underline hover:text-blue-700"
+                      >
+                        {eventData.onlineZoomLink}
+                      </a>
+                    </>
+                  ) : (
+                    <>
+                      Location: <br />
+                      <span className="font-semibold">{eventData.offlineLocation}</span>
+                    </>
+                  )}
+                </p>
               </div>
             </div>
           ) : null}

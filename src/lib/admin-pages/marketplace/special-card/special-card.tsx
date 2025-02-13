@@ -1,11 +1,23 @@
+<<<<<<< HEAD
 import {ChangeEvent, useEffect, useState} from "react";
 import {Edit3, Eye, Trash2, Plus} from "lucide-react";
 import {useNavigate} from "react-router-dom";
+=======
+import React, { ChangeEvent, useEffect, useState } from "react";
+import { Edit3, Eye, Trash2, Plus } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+>>>>>>> c91a9a81b14dd06e5413af88ea716cecb56287d7
 import axios from "axios";
+import { SERVER_URL } from "@/middleware/utils"; // Import centralized server URL
 
 export const SpecialCard = () => {
   const navigate = useNavigate();
+<<<<<<< HEAD
   // State for cards; note that each card object now includes the fields we need:
+=======
+
+  // State for cards; each card object includes the fields we need:
+>>>>>>> c91a9a81b14dd06e5413af88ea716cecb56287d7
   // sku, name, category, stock, price, and selected.
   const [cards, setCards] = useState<
     {
@@ -22,7 +34,7 @@ export const SpecialCard = () => {
   useEffect(() => {
     const fetchCards = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/api/cards/all");
+        const response = await axios.get(`${SERVER_URL}/api/cards/all`);
         // Map the API response to match the table row fields.
         // Assuming your API returns a "cards" array and each card has:
         //   - sku (string)
