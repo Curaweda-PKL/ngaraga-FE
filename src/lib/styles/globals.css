@@ -125,12 +125,37 @@ input::-webkit-inner-spin-button {
   color: var(--call-to-actions-900)
 }
 
+.FaShoppingCartCMS {
+  color: var(--neutral-colors-700)
+}
+
 /* Style when the checkbox is not checked */
 label {
   background-color: white;
   color: var(--neutral-colors-500); 
   
 }
+
+.scrollCMSside {
+  overflow: auto;
+  /* Hide scrollbar in Firefox */
+  scrollbar-width: none;
+  /* Hide scrollbar in IE, Edge */
+  -ms-overflow-style: none;
+}
+
+/* For Chrome, Safari, and Opera */
+.scrollCMSside::-webkit-scrollbar {
+  width: 8px;              /* Adjust width if needed */
+  opacity: 0;              /* Make it invisible by default */
+  transition: opacity 0.3s; /* Smooth transition on hover */
+}
+
+.scrollCMSside:hover::-webkit-scrollbar {
+  opacity: 1;              /* Show scrollbar when hovering */
+}
+
+
 
 .nav-link {
   display: flex;
