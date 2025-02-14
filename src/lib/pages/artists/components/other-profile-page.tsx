@@ -8,8 +8,7 @@ import {
   FaTwitter,
   FaYoutube,
 } from "react-icons/fa";
-import { SERVER_URL } from "@/middleware/utils";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 const ProfileSkeleton: React.FC = () => {
   return (
@@ -39,7 +38,10 @@ const ProfileSkeleton: React.FC = () => {
             {/* Skeleton Social Links */}
             <div className="flex justify-center lg:justify-start space-x-6">
               {Array.from({ length: 5 }).map((_, idx) => (
-                <div key={idx} className="w-10 h-10 bg-gray-300 rounded-full"></div>
+                <div
+                  key={idx}
+                  className="w-10 h-10 bg-gray-300 rounded-full"
+                ></div>
               ))}
             </div>
           </div>
@@ -54,18 +56,21 @@ const ProfileSkeleton: React.FC = () => {
   );
 };
 
-export const ProfilePage: React.FC = () => {
+export const ArtistsPage: React.FC = () => {
+  // Retrieve the dynamic "$name" parameter from the URL.
+  const { name } = useParams<{ name: string }>();
+
   // Local state for profile data, loading, and errors.
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch the user profile when the component mounts.
+  // Fetch the user profile when the component mounts or when "$name" changes.
   useEffect(() => {
     const fetchProfile = async () => {
       try {
         const response = await axios.get(
-          `${SERVER_URL}/api/account/profile`,
+          `http://localhost:3000/api/account/${name}`,
           { withCredentials: true }
         );
         setProfile(response.data);
@@ -77,18 +82,18 @@ export const ProfilePage: React.FC = () => {
       }
     };
 
-    fetchProfile();
-  }, []);
+    if (name) {
+      fetchProfile();
+    }
+  }, [name]);
 
-  // If loading, render the skeleton.
+  // Render the skeleton if loading.
   if (loading) {
     return <ProfileSkeleton />;
   }
   if (error) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        {error}
-      </div>
+      <div className="flex justify-center items-center h-screen">{error}</div>
     );
   }
 
@@ -99,19 +104,25 @@ export const ProfilePage: React.FC = () => {
     let normalizedPath = profile.image
       .replace(/\\/g, "/")
       .replace(/^src\//, "");
-    normalizedPath = normalizedPath.replace("uploadsprofile", "uploads/profile");
-    avatarUrl = `${SERVER_URL}/${normalizedPath}`;
+    normalizedPath = normalizedPath.replace(
+      "uploadsprofile",
+      "uploads/profile"
+    );
+    avatarUrl = `http://localhost:3000/${normalizedPath}`;
   }
 
   // Normalize and compute the banner URL.
   let bannerUrl =
-    "https://images.unsplash.com/photo-1499336315816-097655dcfbda?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2710&q=80"; // default banner
+    "https://images.unsplash.com/photo-1499336315816-097655dcfbda?ixlib=rb-1.2.1&auto=format&fit=crop&w=2710&q=80"; // default banner
   if (profile && profile.imageBanner) {
     let normalizedBannerPath = profile.imageBanner
       .replace(/\\/g, "/")
       .replace(/^src\//, "");
-    normalizedBannerPath = normalizedBannerPath.replace("uploadsprofile", "uploads/profile");
-    bannerUrl = `${SERVER_URL}/${normalizedBannerPath}`;
+    normalizedBannerPath = normalizedBannerPath.replace(
+      "uploadsprofile",
+      "uploads/profile"
+    );
+    bannerUrl = `http://localhost:3000/${normalizedBannerPath}`;
   }
 
   // Fallback for display name: if fullName is missing, use name.
@@ -128,7 +139,7 @@ export const ProfilePage: React.FC = () => {
       ? profile.bio
       : "Welp, the user hasn't set a bio.";
 
-  // Process socialLinks:
+  // Process socialLinks.
   let parsedSocialLinks: any = {};
   if (profile.socialLinks) {
     if (typeof profile.socialLinks === "string") {
@@ -144,28 +155,23 @@ export const ProfilePage: React.FC = () => {
 
   // Extract individual social links, using defaults if empty.
   const website =
-    parsedSocialLinks.website &&
-    parsedSocialLinks.website.trim().length > 0
+    parsedSocialLinks.website && parsedSocialLinks.website.trim().length > 0
       ? parsedSocialLinks.website
       : "https://ncase.me/trust/";
   const discord =
-    parsedSocialLinks.discord &&
-    parsedSocialLinks.discord.trim().length > 0
+    parsedSocialLinks.discord && parsedSocialLinks.discord.trim().length > 0
       ? parsedSocialLinks.discord
       : "https://discord.com";
   const youtube =
-    parsedSocialLinks.youtube &&
-    parsedSocialLinks.youtube.trim().length > 0
+    parsedSocialLinks.youtube && parsedSocialLinks.youtube.trim().length > 0
       ? parsedSocialLinks.youtube
       : "https://youtube.com";
   const twitter =
-    parsedSocialLinks.twitter &&
-    parsedSocialLinks.twitter.trim().length > 0
+    parsedSocialLinks.twitter && parsedSocialLinks.twitter.trim().length > 0
       ? parsedSocialLinks.twitter
       : "https://twitter.com";
   const instagram =
-    parsedSocialLinks.instagram &&
-    parsedSocialLinks.instagram.trim().length > 0
+    parsedSocialLinks.instagram && parsedSocialLinks.instagram.trim().length > 0
       ? parsedSocialLinks.instagram
       : "https://instagram.com";
 
@@ -292,13 +298,9 @@ export const ProfilePage: React.FC = () => {
 
           {/* Buttons for larger screens */}
           <div className="hidden lg:flex mt-6 lg:mt-0 justify-end space-x-4 order-2 lg:order-none">
-            <Link
-              to={"edit-profile"}
-              className="transition duration-300 bg-call-to-actions-900 text-white transform border-2 border-call-to-action font-bold py-2 px-6 rounded-lg flex items-center justify-center space-x-2 hover:bg-call-to-actions-800 hover:text-white shadow-md"
-            >
-              <CgProfile />
-              <span>Edit Profile</span>
-            </Link>
+            <button className="btn bg-call-to-actions-900 text-white hover:bg-call-to-actions-800">
+              <span>+ Follow</span>
+            </button>
           </div>
         </div>
       </div>

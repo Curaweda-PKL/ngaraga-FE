@@ -1,3 +1,4 @@
+// CardForm.tsx
 import React, { ChangeEvent, useRef } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
@@ -12,7 +13,15 @@ interface CardFormProps {
     salePrice: boolean;
     stock: string;
     cardDetails: string;
-    // ...other fields if needed
+    // Added new fields to match the AddCard state
+    categories: string[];
+    creator: boolean;
+    selectedCreator: string;
+    tag: boolean;
+    tags: string[];
+    source: boolean;
+    sourceImageWebsite: string;
+    sourceImageAlt: string;
   };
   handleInputChange: (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -35,6 +44,8 @@ interface CardFormProps {
       tag: boolean;
       tags: string[];
       source: boolean;
+      sourceImageWebsite: string;
+      sourceImageAlt: string;
     }>
   >;
 }

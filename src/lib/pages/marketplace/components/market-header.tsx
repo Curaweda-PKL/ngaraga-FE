@@ -15,8 +15,14 @@ export const MarketHeader: React.FC = () => {
   // State to hold the fetched page content data
   const [pageContent, setPageContent] = useState<{ title: string; description: string } | null>(null);
 
-  // State to handle fetch error
-  const [fetchError, setFetchError] = useState<string | null>(null);
+  // State to track loading status
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  // Default content to use as a fallback if no data is returned
+  const defaultContent = {
+    title: "Welcome to Our Marketplace!",
+    description: "Discover and explore amazing Cards."
+  };
 
   // Fetch the page content for "marketplace" from the API
   useEffect(() => {
@@ -28,10 +34,11 @@ export const MarketHeader: React.FC = () => {
         }
         const data = await response.json();
         setPageContent(data);
-        setFetchError(null); // Reset the error state if the fetch is successful
       } catch (error) {
         console.error("Error fetching page content:", error);
-        setFetchError("Failed to load marketplace content. Please try again later.");
+        // We don't update an error message state here because we'll fallback to defaultContent
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -48,16 +55,17 @@ export const MarketHeader: React.FC = () => {
       <div className="mx-auto ml-7">
         {/* Title and Subtitle */}
         <div className="mb-10">
-          {fetchError ? (
-            // Display error message if fetch fails
-            <p className="text-lg text-red-500">{fetchError}</p>
-          ) : pageContent ? (
-            <>
-              <h1 className="text-4xl font-bold text-[#171717] mb-2">{pageContent.title}</h1>
-              <p className="text-lg text-[#404040]">{pageContent.description}</p>
-            </>
+          {isLoading ? (
+            <p>Loading...</p>
           ) : (
-            <p>Loading...</p> 
+            <>
+              <h1 className="text-4xl font-bold text-[#171717] mb-2">
+                {pageContent?.title || defaultContent.title}
+              </h1>
+              <p className="text-lg text-[#404040]">
+                {pageContent?.description || defaultContent.description}
+              </p>
+            </>
           )}
         </div>
 
@@ -82,14 +90,14 @@ export const MarketHeader: React.FC = () => {
               }}
             >
               <ul>
-                <li className="py-2">d 1</li>
+                <li className="py-2">Item 1</li>
                 <li className="py-2">Item 2</li>
                 <li className="py-2">Item 3</li>
-                <li className="py-2">Item 3</li>
-                <li className="py-2">Item 3</li>
-                <li className="py-2">Item 3</li>
-                <li className="py-2">Item 3</li>
-                <li className="py-2">Item 3</li>
+                <li className="py-2">Item 4</li>
+                <li className="py-2">Item 5</li>
+                <li className="py-2">Item 6</li>
+                <li className="py-2">Item 7</li>
+                <li className="py-2">Item 8</li>
               </ul>
             </FilterModal>
           </div>
@@ -107,7 +115,7 @@ export const MarketHeader: React.FC = () => {
                   className="block px-4 py-2 text-gray-700 rounded-lg hover-border-call-to-actions"
                   onClick={() => handleSelectFilter("Item 1")}
                 >
-                  dropdown 1
+                  Dropdown 1
                 </a>
               </li>
               <li>

@@ -58,7 +58,7 @@ const Marketplace = React.lazy(
   () => import("@/lib/pages/marketplace/marketplace-index")
 );
 const Cart = React.lazy(() => import("@/lib/pages/cart"));
-const TopCollectors = React.lazy(() => import("@/lib/pages/top-players"));
+const TopCollectors = React.lazy(() => import("@/lib/pages/top-ranking-collectors/top-players"));
 const SpecialCardDetail = React.lazy(
   () => import("@/lib/pages/account/specialcard-details")
 );
@@ -99,7 +99,7 @@ export const routes: Array<PathRouteProps> = [
   {path: "/forgot-password", element: <ForgotPassword />},
   {path: "/reset-password", element: <ResetPassword />},
   {path: "/", element: <Home />},
-  {path: "/artist", element: <Artists />},
+  {path: "/account/:name", element: <Artists />},
   {path: "/marketplace", element: <Marketplace />},
   {path: "/detail-cards", element: <DetailCards />},
   {path: "/detail-special-card", element: <DetailSpecial />},
