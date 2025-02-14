@@ -1,6 +1,7 @@
 import { SERVER_URL } from "@/middleware/utils";
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import axios from "axios";
 import { ClockIcon } from "../svgsIcon/clockIcon";
 import { CopyIcon } from "../svgsIcon/copyIcon";
 import { DateIcon } from "../svgsIcon/dateIcon";
@@ -35,10 +36,9 @@ interface MainContentProps {
 }
 
 const MainContent: React.FC<MainContentProps> = ({ eventData }) => {
-  const [activeTab, setActiveTab] = useState<"description" | "benefit">(
-    "description"
-  );
+  const [activeTab, setActiveTab] = useState<"description" | "benefit">("description");
   const [isShareModalOpen, setShareModalOpen] = useState(false);
+  const [claimed, setClaimed] = useState(false);
 
   const title = eventData?.eventName || "A Special Evening Celebration";
   const eventTime = eventData
@@ -81,7 +81,15 @@ const MainContent: React.FC<MainContentProps> = ({ eventData }) => {
     eventData?.eventDescription ||
     `Step into a world of elegance and charm at A Special Evening Celebration. This exclusive event invites you to indulge in an enchanting night of sophistication, entertainment, and memorable experiences.`;
   const rewards = eventData?.cardRewards || [];
-  const [claimed, setClaimed] = useState(false);
+
+  const handleClaimReward = async () => {
+    try {
+      await axios.get(`${SERVER_URL}/api/cardRewards/claim`, { withCredentials: true });
+      setClaimed(true);
+    } catch (error) {
+      console.error("Error claiming reward", error);
+    }
+  };
 
   return (
     <main className="container p-12">
@@ -223,7 +231,7 @@ const MainContent: React.FC<MainContentProps> = ({ eventData }) => {
                           ? "bg-neutral-400 text-neutral-700 opacity-50"
                           : "bg-call-to-actions-900 text-neutral-colors-100 hover:bg-call-to-actions-700"
                       }`}
-                      onClick={() => setClaimed(true)}
+                      onClick={handleClaimReward}
                       disabled={claimed}
                     >
                       {claimed ? "Claimed" : "Claim"}
