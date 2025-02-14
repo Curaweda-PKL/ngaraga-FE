@@ -4,6 +4,8 @@ import "react-quill/dist/quill.snow.css";
 import { Upload } from "lucide-react";
 import axios from "axios";
 import Select, { components, OptionProps } from "react-select";
+import { useNavigate } from "react-router-dom";
+import { SERVER_URL } from "@/middleware/utils"; // Import the centralized server URL
 
 // Define a type for your card data
 interface Card {
@@ -23,6 +25,9 @@ interface CardOption {
 }
 
 export const AddEvents = () => {
+  // Initialize useNavigate
+  const navigate = useNavigate();
+
   // Existing form state, now with selectedCard as a CardOption or null
   const [formData, setFormData] = useState({
     eventImage: null as File | null,
@@ -55,7 +60,7 @@ export const AddEvents = () => {
     const fetchCards = async () => {
       setCardsLoading(true);
       try {
-        const response = await axios.get("http://localhost:3000/api/cards/all");
+        const response = await axios.get(`${SERVER_URL}/api/cards/all`);
         // Assumes API returns { cards: [ ... ] }
         setCards(response.data.cards);
       } catch (error) {
@@ -73,7 +78,7 @@ export const AddEvents = () => {
   const cardOptions: CardOption[] = cards.map((card) => ({
     value: card.id,
     label: card.characterName,
-    image: `http://localhost:3000/${card.image.replace(/\\/g, "/")}`,
+    image: `${SERVER_URL}/${card.image.replace(/\\/g, "/")}`,
   }));
 
   // Custom option for react-select that shows the image and name
@@ -120,8 +125,7 @@ export const AddEvents = () => {
   };
 
   // For drag and drop functionality
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) =>
-    e.preventDefault();
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => e.preventDefault();
 
   const handleImageDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -183,13 +187,15 @@ export const AddEvents = () => {
     }
     try {
       const response = await axios.post(
-        "http://localhost:3000/api/events",
+        `${SERVER_URL}/api/events`,
         data,
         {
           headers: { "Content-Type": "multipart/form-data" },
         }
       );
       console.log("Event created:", response.data);
+      // Navigate to /admin/event on successful save
+      navigate("/admin/event");
     } catch (error) {
       console.error("Error creating event:", error);
     }

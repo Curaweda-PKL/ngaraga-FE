@@ -1,88 +1,79 @@
-import {Edit3, Eye, Trash2, Plus} from "lucide-react";
+import React, { ChangeEvent, useEffect, useState } from "react";
+import { Edit3, Eye, Trash2, Plus } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { SERVER_URL } from "@/middleware/utils"; // Import centralized server URL
 
 export const SpecialCard = () => {
-  const cards = [
+  const navigate = useNavigate();
+
+  // State for cards; each card object includes the fields we need:
+  // sku, name, category, stock, price, and selected.
+  const [cards, setCards] = useState<
     {
-      sku: "ABC123",
-      name: "Galactic Explorer",
-      category: "Stellar Voyager",
-      card: 7,
-      stock: 75,
-    },
-    {
-      sku: "XYZ456",
-      name: "Cosmic Navigator",
-      category: "Astro Cruiser",
-      card: 9,
-      stock: 90,
-    },
-    {
-      sku: "LMN789",
-      name: "Nebula Explorer",
-      category: "Planet Hopper",
-      card: 6,
-      stock: 60,
-    },
-    {
-      sku: "OPQ101",
-      name: "Starship Commander",
-      category: "Galaxy Traveler",
-      card: 8,
-      stock: 85,
-    },
-    {
-      sku: "RST202",
-      name: "Asteroid Hunter",
-      category: "Comet Chaser",
-      card: 7,
-      stock: 70,
-    },
-    {
-      sku: "UVW303",
-      name: "Meteor Explorer",
-      category: "Solar Voyager",
-      card: 5,
-      stock: 95,
-    },
-    {
-      sku: "XYZ404",
-      name: "Lunar Rover",
-      category: "Starlight Cruiser",
-      card: 4,
-      stock: 65,
-    },
-    {
-      sku: "ABC505",
-      name: "Quantum Shuttle",
-      category: "Interstellar Voyager",
-      card: 2,
-      stock: 70,
-    },
-    {
-      sku: "DEF606",
-      name: "Warp Speed Cruiser",
-      category: "Celestial Navigator",
-      card: 3,
-      stock: 75,
-    },
-    {
-      sku: "GHI707",
-      name: "Astro Explorer",
-      category: "Galactic Voyager",
-      card: 1,
-      stock: 80,
-    },
-  ];
+      sku: string;
+      name: string;
+      category: string;
+      stock: number;
+      price: number;
+      selected: boolean;
+    }[]
+  >([]);
+
+  // Fetch cards from the API
+  useEffect(() => {
+    const fetchCards = async () => {
+      try {
+        const response = await axios.get(`${SERVER_URL}/api/cards/all`);
+        // Map the API response to match the table row fields.
+        // Assuming your API returns a "cards" array and each card has:
+        //   - sku (string)
+        //   - characterName (as product name)
+        //   - category (object with a name property)
+        //   - price (as string or number)
+        // For "stock" we assume each card represents one unit.
+        const mappedCards = response.data.cards.map((card: any) => ({
+          sku: card.sku,
+          name: card.characterName,
+          category: card.category ? card.category.name : "N/A",
+          stock: 1, // If each card is a unique record, you can display 1 (or adjust logic as needed)
+          price: Number(card.price),
+          selected: false,
+        }));
+        setCards(mappedCards);
+      } catch (error: any) {
+        console.error("Error fetching cards:", error.response?.data || error.message);
+      }
+    };
+
+    fetchCards();
+  }, []);
+
+  // Handler for selecting all rows
+  const handleSelectAll = (e: { target: { checked: boolean } }) => {
+    const { checked } = e.target;
+    const updatedCards = cards.map((card) => ({ ...card, selected: checked }));
+    setCards(updatedCards);
+  };
+
+  // Handler for selecting an individual row
+  const handleSelectRow = (index: number, e: ChangeEvent<HTMLInputElement>) => {
+    const { checked } = e.target;
+    const updatedCards = [...cards];
+    updatedCards[index].selected = checked;
+    setCards(updatedCards);
+  };
 
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-semibold">Card</h1>
-        <button className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg flex items-center gap-2">
+        <h1 className="text-2xl font-semibold">Special Card</h1>
+        <button
+          className="bg-call-to-actions-900 hover:bg-call-to-actions-800 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+          onClick={() => navigate("/admin/add-card")}
+        >
           <Plus className="w-4 h-4" />
-          <span>
-            <a href="/admin/add-special">Add Card</a>
-          </span>
+          <span>Add Card</span>
         </button>
       </div>
       <div className="overflow-x-auto">
@@ -93,13 +84,15 @@ export const SpecialCard = () => {
                 <input
                   type="checkbox"
                   className="checkbox"
+                  checked={cards.length > 0 && cards.every((card) => card.selected)}
+                  onChange={handleSelectAll}
                 />
               </th>
               <th>SKU</th>
               <th>Product Name</th>
               <th>Categories</th>
-              <th>Card</th>
               <th>Stock</th>
+              <th>Price</th>
               <th>Action</th>
             </tr>
           </thead>
@@ -110,19 +103,22 @@ export const SpecialCard = () => {
                   <input
                     type="checkbox"
                     className="checkbox"
+                    checked={card.selected}
+                    onChange={(e) => handleSelectRow(index, e)}
                   />
                 </td>
                 <td>{card.sku}</td>
                 <td>{card.name}</td>
                 <td>{card.category}</td>
-                <td>{card.card}</td>
                 <td>{card.stock}</td>
+                <td>Rp {card.price.toLocaleString()}</td>
                 <td>
                   <div className="flex items-center gap-2">
-                    <button className="p-2 hover:bg-gray-100 rounded-lg text-gray-600">
-                      <a href="/admin/edit-special">
-                        <Edit3 className="w-4 h-4" />
-                      </a>
+                    <button
+                      className="p-2 hover:bg-gray-100 rounded-lg text-gray-600"
+                      onClick={() => navigate("/admin/edit-card")}
+                    >
+                      <Edit3 className="w-4 h-4" />
                     </button>
                     <button className="p-2 hover:bg-gray-100 rounded-lg text-gray-600">
                       <Eye className="w-4 h-4" />
@@ -134,6 +130,13 @@ export const SpecialCard = () => {
                 </td>
               </tr>
             ))}
+            {cards.length === 0 && (
+              <tr>
+                <td colSpan={7} className="text-center py-4">
+                  No cards found.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>

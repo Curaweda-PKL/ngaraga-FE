@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import Header from "./components/detailEvent/detailHeader";
 import MainContent from "./components/detailEvent/detailMain";
+import { SERVER_URL } from "@/middleware/utils"; // Import centralized server URL
 
 // (Optional) Define an interface for your event data.
 interface EventDetailData {
@@ -29,7 +30,7 @@ const EventDetail: React.FC = () => {
     const fetchEventDetail = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:3000/api/events/${id}`
+          `${SERVER_URL}/api/events/${id}`
         );
         if (response.data) {
           setEventData(response.data);

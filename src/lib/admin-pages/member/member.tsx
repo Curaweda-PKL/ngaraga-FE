@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import DatePicker from "react-datepicker";
 import { FaPlus, FaEyeSlash, FaSearch, FaTrash } from "react-icons/fa";
 import "react-datepicker/dist/react-datepicker.css";
@@ -7,6 +7,7 @@ import { LensIcon } from "./components/svgsIconMember/lensIcon";
 import { EyeIcon } from "./components/svgsIconMember/eyeIcon";
 import { TrashIcon } from "./components/svgsIconMember/trashIcon";
 import { CheckboxIcons } from "./components/svgsIconMember/checkboxIcons";
+import { SERVER_URL } from "@/middleware/utils"; // Import centralized server URL
 
 interface Member {
   id: string;
@@ -19,51 +20,75 @@ interface Member {
   card: string;
   specialCard: string;
   checked: boolean;
+  image?: string;
 }
 
-const initialMembers: Member[] = [
-  {
-    id: "1",
-    name: "Ethan White",
-    username: "UserZeta",
-    email: "ethan.white@samplemail.com",
-    registerDate: "2025-01-20T09:30",
-    purchase: "25",
-    totalOrders: "Rp 3.500.000",
-    card: "25",
-    specialCard: "15",
-    checked: false,
-  },
-  {
-    id: "2",
-    name: "Emma Johnson",
-    username: "UserAlpha",
-    email: "emma.johnson@samplemail.com",
-    registerDate: "2025-01-21T10:15",
-    purchase: "30",
-    totalOrders: "Rp 4.200.000",
-    card: "20",
-    specialCard: "10",
-    checked: false,
-  },
-];
+const initialMembers: Member[] = [];
 
 export const Member = () => {
   const [memberData, setMemberData] = useState<Member[]>(initialMembers);
   const [startDate, setStartDate] = useState<Date | undefined>();
   const [endDate, setEndDate] = useState<Date | undefined>();
   const [searchQuery, setSearchQuery] = useState("");
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
 
+  // Fetch accounts with role "USER" when the component mounts
+  useEffect(() => {
+    const fetchMembers = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch(`${SERVER_URL}/api/accounts/role/USER`);
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        const json = await response.json();
+        if (!json.success) {
+          throw new Error("API returned an error");
+        }
+        const accounts = json.data;
+        const members: Member[] = accounts.map((account: any) => ({
+          id: account.id,
+          name: account.name || "N/A",
+          username: account.fullName || "N/A",
+          email: account.email || "N/A",
+          registerDate: account.createdAt || "N/A",
+          purchase: "N/A",
+          totalOrders: "N/A",
+          card: "N/A",
+          specialCard: "N/A",
+          checked: false,
+          image: account.image ? account.image : `${SERVER_URL}/api/placeholder/40/40`,
+        }));
+        setMemberData(members);
+        setError(null);
+      } catch (err: any) {
+        setError(err.message || "Failed to fetch members");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMembers();
+  }, []);
+
+  // Filter members based on search text and the date range.
   const filteredMembers = memberData.filter((member) => {
     const queryMatch =
       member.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       member.email.toLowerCase().includes(searchQuery.toLowerCase());
 
-    const registerDate = new Date(member.registerDate);
-    const dateMatch =
-      (!startDate || registerDate >= startDate) &&
-      (!endDate || registerDate <= endDate);
-
+    let dateMatch = true;
+    if (startDate || endDate) {
+      const parsedDate = new Date(member.registerDate);
+      const validDate = !isNaN(parsedDate.getTime());
+      if (!validDate) {
+        dateMatch = false;
+      } else {
+        if (startDate && parsedDate < startDate) dateMatch = false;
+        if (endDate && parsedDate > endDate) dateMatch = false;
+      }
+    }
     return queryMatch && dateMatch;
   });
 
@@ -110,6 +135,9 @@ export const Member = () => {
       </div>
 
       <h1 className="text-2xl font-semibold mb-6">Member</h1>
+
+      {loading && <div>Loading...</div>}
+      {error && <div className="text-red-500 mb-4">Error: {error}</div>}
 
       <div className="flex justify-evenly items-center mb-6">
         <div className="flex items-center">
@@ -203,65 +231,82 @@ export const Member = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredMembers.map((member) => (
-              <tr key={member.id} className="border-t">
-                <td className="p-4 text-center">
-                  <div
-                    onClick={() => handleCheckboxChange(member.id)}
-                    className="cursor-pointer"
-                  >
-                    <CheckboxIcons
-                      className="mx-auto"
-                      checked={member.checked}
-                    />
-                  </div>
-                </td>
-                <td className="p-4">
-                  <div className="flex items-center gap-3 truncate">
-                    <div className="w-8 h-8 bg-gray-200 rounded-lg overflow-hidden shrink-0">
-                      <img
-                        src="/api/placeholder/40/40"
-                        alt="User avatar"
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <div className="truncate">
-                      <div className="font-[500] text-neutral-colors-600 truncate">
-                        {member.name}
-                      </div>
-                      <div className="text-sm text-neutral-colors-600 truncate">
-                        {member.username}
-                      </div>
-                    </div>
-                  </div>
-                </td>
-                <td className="p-4 truncate text-sm">{member.email}</td>
-                <td className="p-4 hidden md:table-cell text-sm">
-                  {new Date(member.registerDate).toLocaleDateString()}
-                </td>
-                <td className="p-4">{member.purchase}</td>
-                <td className="p-4 hidden sm:table-cell whitespace-nowrap min-w-[120px] overflow-hidden">{member.totalOrders}</td>
-                <td className="p-4 hidden sm:table-cell">{member.card}</td>
-                <td className="p-4 hidden sm:table-cell whitespace-nowrap min-w-[120px] overflow-hidden">
-                  {member.specialCard}
-                </td>
-                <td className="p-4">
-                <div className="flex gap-1 ">
-                    <button className="p-1.5 hover:bg-gray-100 rounded-full">
-                      <a href="/admin/detail-member">
-                        <LensIcon />
-                      </a>
-                    </button>
-                    <button className="p-1.5 hover:bg-gray-100 text-neutral-colors-700 rounded-full">
-                      <EyeIcon />
-                    </button>
-                    <button className="p-1.5 hover:bg-gray-100 rounded-full text-red-500">
-                      <TrashIcon />
-                    </button>
-                  </div>
+            {filteredMembers.length === 0 ? (
+              <tr>
+                <td colSpan={9} className="p-4 text-center">
+                  No members found
                 </td>
               </tr>
-            ))}
+            ) : (
+              filteredMembers.map((member) => (
+                <tr key={member.id} className="border-t">
+                  <td className="p-4 text-center">
+                    <div
+                      onClick={() => handleCheckboxChange(member.id)}
+                      className="cursor-pointer"
+                    >
+                      <CheckboxIcons
+                        className="mx-auto"
+                        checked={member.checked}
+                      />
+                    </div>
+                  </td>
+                  <td className="p-4">
+                    <div className="flex items-center gap-3 truncate">
+                      <div className="w-8 h-8 bg-gray-200 rounded-lg overflow-hidden shrink-0">
+                        <img
+                          src={member.image ? member.image : `${SERVER_URL}/api/placeholder/40/40`}
+                          alt="User avatar"
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div className="truncate">
+                        <div className="font-[500] text-neutral-colors-600 truncate">
+                          {member.name || "N/A"}
+                        </div>
+                        <div className="text-sm text-neutral-colors-600 truncate">
+                          {member.username || "N/A"}
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="p-4 truncate text-sm">
+                    {member.email || "N/A"}
+                  </td>
+                  <td className="p-4 hidden md:table-cell text-sm">
+                    {member.registerDate !== "N/A" &&
+                    !isNaN(new Date(member.registerDate).getTime())
+                      ? new Date(member.registerDate).toLocaleDateString()
+                      : "N/A"}
+                  </td>
+                  <td className="p-4">{member.purchase || "N/A"}</td>
+                  <td className="p-4 hidden sm:table-cell whitespace-nowrap min-w-[120px] overflow-hidden">
+                    {member.totalOrders || "N/A"}
+                  </td>
+                  <td className="p-4 hidden sm:table-cell">
+                    {member.card || "N/A"}
+                  </td>
+                  <td className="p-4 hidden sm:table-cell whitespace-nowrap min-w-[120px] overflow-hidden">
+                    {member.specialCard || "N/A"}
+                  </td>
+                  <td className="p-4">
+                    <div className="flex gap-1">
+                      <button className="p-1.5 hover:bg-gray-100 rounded-full">
+                        <a href="/admin/detail-member">
+                          <LensIcon />
+                        </a>
+                      </button>
+                      <button className="p-1.5 hover:bg-gray-100 text-neutral-colors-700 rounded-full">
+                        <EyeIcon />
+                      </button>
+                      <button className="p-1.5 hover:bg-gray-100 rounded-full text-red-500">
+                        <TrashIcon />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>

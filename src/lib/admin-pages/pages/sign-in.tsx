@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import axios from "axios";
+import { SERVER_URL } from "@/middleware/utils"; // Import centralized server URL
 
 export const SignInPage = () => {
   const [image, setImage] = useState<File | null>(null);
@@ -7,6 +8,8 @@ export const SignInPage = () => {
   const [description, setDescription] = useState(
     "Enter your details to access your account and continue your journey of creating and collecting Cards."
   );
+
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -17,6 +20,20 @@ export const SignInPage = () => {
 
   const handleRemoveImage = () => {
     setImage(null);
+  };
+
+  // If you already have drag handlers defined elsewhere, keep them.
+  // For completeness, here are simple implementations:
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    const file = e.dataTransfer.files[0];
+    if (file) {
+      setImage(file);
+    }
   };
 
   const handleUpdate = async () => {
@@ -31,11 +48,15 @@ export const SignInPage = () => {
     formData.append("description", description);
 
     try {
-      const response = await axios.post("http://localhost:3000/api/auththumb/sign-in", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      const response = await axios.post(
+        `${SERVER_URL}/api/auththumb/sign-in`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
 
       if (response.data.message === "Thumbnail uploaded successfully") {
         alert("Details updated successfully!");
@@ -59,7 +80,12 @@ export const SignInPage = () => {
           <label className="block text-sm font-medium mb-2">
             Sign In Image <span className="text-red-500">*</span>
           </label>
-          <div className="border-dashed border-2 border-yellow-500 rounded-lg p-4 text-center bg-yellow-50">
+          <div
+            className="border-dashed border-2 border-yellow-500 rounded-lg p-4 text-center bg-yellow-50 cursor-pointer"
+            onDragOver={handleDragOver}
+            onDrop={handleDrop}
+            onClick={() => fileInputRef.current?.click()}
+          >
             {image ? (
               <div className="relative">
                 <img
@@ -72,10 +98,7 @@ export const SignInPage = () => {
                     onClick={handleRemoveImage}
                     className="p-2 bg-red-500 text-white rounded-full"
                   >
-                    <span
-                      role="img"
-                      aria-label="delete"
-                    >
+                    <span role="img" aria-label="delete">
                       🗑️
                     </span>
                   </button>

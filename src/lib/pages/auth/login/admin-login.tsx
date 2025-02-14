@@ -4,10 +4,17 @@ import { FaLock, FaEnvelope } from "react-icons/fa";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import LoginImage from "@/assets/img/spacestarry.png";
 import axios from "axios";
+import { Link } from "react-router-dom";
+import { SERVER_URL } from "@/middleware/utils"; // Import centralized server URL
 
 type LoginFormData = {
   email: string;
   password: string;
+};
+
+type Notification = {
+  type: "error" | "success";
+  message: string;
 };
 
 const AdminLogin: React.FC = () => {
@@ -16,6 +23,7 @@ const AdminLogin: React.FC = () => {
     password: "",
   });
   const [error, setError] = useState<{ [key: string]: string }>({});
+  const [notification, setNotification] = useState<Notification | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [thumbnailData, setThumbnailData] = useState<any>(null);
@@ -24,7 +32,9 @@ const AdminLogin: React.FC = () => {
   useEffect(() => {
     const fetchThumbnailData = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/api/auththumb/sign-in");
+        const response = await axios.get(
+          `${SERVER_URL}/api/auththumb/sign-in`
+        );
         setThumbnailData(response.data.data);
       } catch (error) {
         console.error("Error fetching thumbnail data:", error);
@@ -41,9 +51,11 @@ const AdminLogin: React.FC = () => {
       ...prevData,
       [name]: value,
     }));
+    // Clear error for this field when user types
     setError((prev) => ({
       ...prev,
       [name]: "",
+      general: "",
     }));
   };
 
@@ -52,13 +64,10 @@ const AdminLogin: React.FC = () => {
     let valid = true;
     const newError: { [key: string]: string } = {};
 
-    // Email validation
     if (!formData.email) {
       newError.email = "Email cannot be empty!";
       valid = false;
     }
-
-    // Password validation
     if (!formData.password) {
       newError.password = "Password cannot be empty!";
       valid = false;
@@ -71,16 +80,15 @@ const AdminLogin: React.FC = () => {
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+    setNotification(null);
 
-    if (!validateForm()) {
-      setLoading(false);
-      return;
-    }
+    if (!validateForm()) return;
+
+    setLoading(true);
 
     try {
       const response = await axios.post(
-        "http://localhost:3000/api/login",
+        `${SERVER_URL}/api/login`,
         {
           email: formData.email,
           password: formData.password,
@@ -90,15 +98,23 @@ const AdminLogin: React.FC = () => {
         }
       );
 
-      // Handle successful login
-      alert("Logged in successfully!");
+      // On successful login, show a success notification instead of an alert
+      setNotification({
+        type: "success",
+        message: "Logged in successfully! Redirecting...",
+      });
       console.log("Login Response:", response.data);
 
-      // Optionally redirect the user
-      window.location.href = "/admin/dashboard";
+      // Redirect after a short delay (2 seconds)
+      setTimeout(() => {
+        window.location.href = "/admin/dashboard";
+      }, 2000);
     } catch (error: any) {
       console.error("Error during login:", error);
-      setError({ general: error.response?.data?.message || "Login failed!" });
+      const errorMessage =
+        error.response?.data?.message || "Login failed! Please try again.";
+      setError({ general: errorMessage });
+      setNotification({ type: "error", message: errorMessage });
     } finally {
       setLoading(false);
     }
@@ -132,6 +148,19 @@ const AdminLogin: React.FC = () => {
             animate="visible"
             variants={ariseVariant}
           >
+            {/* Notification Banner */}
+            {notification && (
+              <div
+                className={`mb-4 rounded-md p-3 text-center ${
+                  notification.type === "error"
+                    ? "bg-red-100 text-red-700"
+                    : "bg-green-100 text-green-700"
+                }`}
+              >
+                {notification.message}
+              </div>
+            )}
+
             <motion.form
               onSubmit={handleSubmit}
               className="mt-8 grid grid-cols-6 gap-6"
@@ -139,21 +168,22 @@ const AdminLogin: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4, duration: 0.7 }}
             >
-              {/* Display the title and description if available */}
+              {/* Title and Description */}
               <div className="col-span-6">
                 <h2 className="text-3xl font-bold text-gray-800 mb-2">
-                  {thumbnailData?.title || "Log In"} 
+                  {thumbnailData?.title || "Log In"}
                 </h2>
                 <p className="text-lg text-gray-500">
-                  {thumbnailData?.description || "Welcome back! Please log in to your account."} 
+                  {thumbnailData?.description ||
+                    "Welcome back! Please log in to your account."}
                 </p>
               </div>
 
-              {/* Email */}
+              {/* Email Input */}
               <div className="col-span-6 relative">
                 <div
                   className={`mt-1 flex items-center border rounded-md bg-white py-3 px-4 shadow-sm ${
-                    error.email ? "border-[#D22424]" : "focus-within:border-[var(--typing)]"
+                    error.email ? "border-red-500" : "focus-within:border-[var(--typing)]"
                   }`}
                 >
                   <FaEnvelope className="text-gray-500 mr-2 text-sm" />
@@ -169,14 +199,16 @@ const AdminLogin: React.FC = () => {
                     required
                   />
                 </div>
-                {error.email && <p className="text-[#D22424] text-sm">{error.email}</p>}
+                {error.email && (
+                  <p className="text-red-500 text-sm">{error.email}</p>
+                )}
               </div>
 
-              {/* Password */}
+              {/* Password Input */}
               <div className="col-span-6 relative">
                 <div
                   className={`mt-1 flex items-center border rounded-md bg-white py-3 px-4 shadow-sm ${
-                    error.password ? "border-[#D22424]" : "focus-within:border-[var(--typing)]"
+                    error.password ? "border-red-500" : "focus-within:border-[var(--typing)]"
                   }`}
                 >
                   <FaLock className="text-gray-500 mr-2 text-sm" />
@@ -198,7 +230,9 @@ const AdminLogin: React.FC = () => {
                     {showPassword ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
                   </div>
                 </div>
-                {error.password && <p className="text-[#D22424] text-sm">{error.password}</p>}
+                {error.password && (
+                  <p className="text-red-500 text-sm">{error.password}</p>
+                )}
 
                 {/* Forgot Password Link */}
                 <div className="mt-4 text-right">
@@ -210,6 +244,13 @@ const AdminLogin: React.FC = () => {
                   </a>
                 </div>
               </div>
+
+              {/* General Error Message */}
+              {error.general && (
+                <div className="col-span-6">
+                  <p className="text-red-500 text-center">{error.general}</p>
+                </div>
+              )}
 
               {/* Submit Button */}
               <div className="col-span-6 sm:flex sm:items-center sm:gap-4">
@@ -225,24 +266,28 @@ const AdminLogin: React.FC = () => {
               {/* Sign Up Link */}
               <div className="col-span-6 text-center mt-4">
                 <p className="text-gray-600">
-                  Don't have an account?{" "}
-                  <a
-                    href="/signup"
-                    className="text-orange-500 hover:text-orange-600"
+                  Don't have an account?
+                  <Link
+                    to={"/signup"}
+                    className="text-orange-500 hover:text-orange-600 ml-2"
                   >
                     Sign up
-                  </a>
+                  </Link>
                 </p>
               </div>
             </motion.form>
           </motion.div>
         </main>
 
+        {/* Thumbnail / Background Image Section */}
         <section className="relative flex h-32 items-end bg-gray-900 lg:col-span-5 lg:h-full xl:col-span-6">
-          {/* Display thumbnail image if available */}
           <img
             alt="login"
-            src={thumbnailData?.image ? `http://localhost:3000/${thumbnailData.image}` : LoginImage} 
+            src={
+              thumbnailData?.image
+                ? `${SERVER_URL}/${thumbnailData.image}`
+                : LoginImage
+            }
             loading="lazy"
             className="absolute inset-0 h-full w-full object-cover opacity-80"
           />

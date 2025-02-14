@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 
 import CardForm from "./components/cardForm";
 import CardSettings from "./components/cardSetting";
+import { SERVER_URL } from "@/middleware/utils"; 
 
 export const AddCard = () => {
   const navigate = useNavigate();
@@ -28,7 +29,7 @@ export const AddCard = () => {
   const [tagsLoading, setTagsLoading] = useState(true);
   const [tagsError, setTagsError] = useState<string | null>(null);
 
-  // Form data state
+  // Form data state including new fields for source image info
   const [formData, setFormData] = useState({
     cardImage: null as string | ArrayBuffer | null, // For preview
     cardName: "",
@@ -43,6 +44,8 @@ export const AddCard = () => {
     tag: false,
     tags: [] as string[], // stores selected tag IDs as strings
     source: false,
+    sourceImageWebsite: "",
+    sourceImageAlt: "",
   });
 
   // State to keep the actual file for upload
@@ -52,14 +55,12 @@ export const AddCard = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:3000/api/categories/all"
-        );
+        const response = await axios.get(`${SERVER_URL}/api/categories/all`);
         const categoriesData = response.data.categories.map((cat: any) => ({
           id: cat.id,
           name: cat.name,
           image: cat.image
-            ? `http://localhost:3000/${cat.image.replace(/\\/g, "/")}`
+            ? `${SERVER_URL}/${cat.image.replace(/\\/g, "/")}`
             : null,
         }));
         setApiCategories(categoriesData);
@@ -79,16 +80,12 @@ export const AddCard = () => {
   useEffect(() => {
     const fetchCreators = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:3000/api/creator/all"
-        );
+        const response = await axios.get(`${SERVER_URL}/api/creator/all`);
         const creatorsData = response.data.creators.map((creator: any) => ({
           id: creator.id,
           name: creator.name,
           image: creator.image
-            ? `http://localhost:3000/uploads/creator/${encodeURIComponent(
-                creator.image
-              )}`
+            ? `${SERVER_URL}/uploads/creator/${encodeURIComponent(creator.image)}`
             : null,
         }));
         setApiCreators(creatorsData);
@@ -121,7 +118,7 @@ export const AddCard = () => {
   useEffect(() => {
     const fetchTags = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/api/tags/all");
+        const response = await axios.get(`${SERVER_URL}/api/tags/all`);
         setApiTags(response.data.tags);
         setTagsError(null);
       } catch (error) {
@@ -194,6 +191,11 @@ export const AddCard = () => {
   // Save handler (create new card(s))
   const handleSave = async () => {
     try {
+      // Ensure a category is selected
+      if (formData.categories.length === 0) {
+        throw new Error("Please select a category.");
+      }
+
       // Create FormData payload for multipart/form-data
       const payload = new FormData();
       payload.append("characterName", formData.cardName);
@@ -202,11 +204,8 @@ export const AddCard = () => {
       payload.append("stock", formData.stock);
       payload.append("cardDetail", formData.cardDetails);
 
-      if (formData.categories.length > 0) {
-        payload.append("categoryId", formData.categories[0]);
-      } else {
-        throw new Error("Please select a category.");
-      }
+      // Append the first selected category (as per your current logic)
+      payload.append("categoryId", formData.categories[0]);
 
       // Convert the selected tag IDs and creator ID into JSON strings
       payload.append(
@@ -221,6 +220,20 @@ export const AddCard = () => {
       // Owner ID is optional – here we leave it empty
       payload.append("ownerId", "");
 
+      // Append cardType as DEFAULT (for a normal card)
+      payload.append("CardType", "DEFAULT");
+
+      // Append sourceImage if the source toggle is enabled
+      if (formData.source) {
+        payload.append(
+          "sourceImage",
+          JSON.stringify({
+            website: formData.sourceImageWebsite,
+            alt: formData.sourceImageAlt,
+          })
+        );
+      }
+
       // Append image file if available
       if (cardFile) {
         payload.append("image", cardFile);
@@ -228,7 +241,7 @@ export const AddCard = () => {
 
       // Send POST request to the API endpoint
       const response = await axios.post(
-        "http://localhost:3000/api/cards/create",
+        `${SERVER_URL}/api/cards/create`,
         payload,
         {
           headers: {

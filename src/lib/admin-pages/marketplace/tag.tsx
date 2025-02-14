@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Pencil, Eye, Trash2, X } from "lucide-react";
 import axios from "axios";
+import { SERVER_URL } from "@/middleware/utils"; // Import centralized server URL
 
 // Define the tag type with id and name.
 interface TagItem {
@@ -21,7 +22,7 @@ export const Tag = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [tagToEdit, setTagToEdit] = useState<TagItem | null>(null);
-  const [tags, setTags] = useState<TagItem[]>([]); // Now an array of tag objects
+  const [tags, setTags] = useState<TagItem[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
@@ -29,7 +30,7 @@ export const Tag = () => {
   useEffect(() => {
     const fetchTags = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/api/tags/all");
+        const response = await axios.get(`${SERVER_URL}/api/tags/all`);
         // Assume the API returns an array of tag objects with id and name.
         setTags(response.data.tags);
       } catch (error) {
@@ -49,7 +50,7 @@ export const Tag = () => {
   // Handle adding a new tag
   const handleAddTag = async (tagName: string) => {
     try {
-      const response = await axios.post("http://localhost:3000/api/tag/create", {
+      const response = await axios.post(`${SERVER_URL}/api/tag/create`, {
         name: tagName,
       });
       // Assuming the API returns the new tag object as response.data.tag
@@ -67,7 +68,7 @@ export const Tag = () => {
     if (tagToEdit) {
       try {
         const response = await axios.put(
-          `http://localhost:3000/api/tag/edit/${tagToEdit.id}`,
+          `${SERVER_URL}/api/tag/edit/${tagToEdit.id}`,
           { name: tagName }
         );
         // Use response.data.updatedTag instead of response.data.tag
@@ -85,7 +86,6 @@ export const Tag = () => {
       }
     }
   };
-  
 
   // Handle deleting a tag using the DELETE route
   const handleDeleteTag = async (tag: TagItem) => {
@@ -95,7 +95,7 @@ export const Tag = () => {
     if (!confirmDelete) return;
 
     try {
-      await axios.delete(`http://localhost:3000/api/tag/delete/${tag.id}`);
+      await axios.delete(`${SERVER_URL}/api/tag/delete/${tag.id}`);
       setTags((prevTags) => prevTags.filter((t) => t.id !== tag.id));
       setSuccessMessage("Tag deleted successfully!");
       setTimeout(() => setSuccessMessage(""), 3000);
@@ -132,10 +132,7 @@ export const Tag = () => {
         <div className="bg-white rounded-lg w-full max-w-md">
           <div className="flex justify-between items-center p-4 border-b">
             <h2 className="text-lg font-medium">{title}</h2>
-            <button
-              onClick={onClose}
-              className="text-gray-400 hover:text-gray-600"
-            >
+            <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
               <X className="w-5 h-5" />
             </button>
           </div>
@@ -233,7 +230,10 @@ export const Tag = () => {
             </div>
             <div className="flex items-center gap-4">
               <button
-                onClick={() => handleEdit(tag)}
+                onClick={() => {
+                  setTagToEdit(tag);
+                  setIsEditModalOpen(true);
+                }}
                 className="text-gray-400 hover:text-gray-600"
               >
                 <Pencil className="w-5 h-5" />

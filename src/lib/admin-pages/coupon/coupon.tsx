@@ -115,7 +115,7 @@ export const Coupon = () => {
       <h1 className="text-2xl font-semibold mb-6">Coupon</h1>
 
       <div className="flex justify-between items-center mb-6">
-        <button className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg flex items-center gap-2">
+        <button className="bg-call-to-actions-900 hover:bg-call-to-actions-800 text-white px-4 py-2 rounded-lg flex items-center gap-2">
           <Plus className="w-4 h-4" />
           <span>
             <a href="/admin/add-coupon">Add Coupon</a>

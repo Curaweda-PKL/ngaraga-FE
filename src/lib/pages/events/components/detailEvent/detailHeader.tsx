@@ -1,4 +1,5 @@
 import React from "react";
+import { SERVER_URL } from "@/middleware/utils";
 
 interface HeaderProps {
   eventData?: {
@@ -9,7 +10,7 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ eventData }) => {
   // Use the fetched event image if available; otherwise, fallback to the placeholder.
   const bgImage = eventData && eventData.eventImage
-    ? `http://localhost:3000/uploads/event/${eventData.eventImage}`
+    ? `${SERVER_URL}/uploads/event/${eventData.eventImage}`
     : "https://via.placeholder.com/1280x500?text=Event+Image";
 
   return (

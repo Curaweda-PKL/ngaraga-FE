@@ -1,13 +1,14 @@
-// MainContent.tsx
+import { SERVER_URL } from "@/middleware/utils";
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import axios from "axios";
 import { ClockIcon } from "../svgsIcon/clockIcon";
+import { CopyIcon } from "../svgsIcon/copyIcon";
 import { DateIcon } from "../svgsIcon/dateIcon";
-import { LocationIcon } from "../svgsIcon/locationIcon";
 import { DiscordIcon } from "../svgsIcon/discordIcon";
 import { IgIcon } from "../svgsIcon/igIcon";
-import { CopyIcon } from "../svgsIcon/copyIcon";
+import { LocationIcon } from "../svgsIcon/locationIcon";
 import { WaIcon } from "../svgsIcon/waIcon";
-import { Link } from "react-router-dom";
 import ShareModal from "./shareModal";
 
 interface Reward {
@@ -35,10 +36,9 @@ interface MainContentProps {
 }
 
 const MainContent: React.FC<MainContentProps> = ({ eventData }) => {
-  const [activeTab, setActiveTab] = useState<"description" | "benefit">(
-    "description"
-  );
+  const [activeTab, setActiveTab] = useState<"description" | "benefit">("description");
   const [isShareModalOpen, setShareModalOpen] = useState(false);
+  const [claimed, setClaimed] = useState(false);
 
   const title = eventData?.eventName || "A Special Evening Celebration";
   const eventTime = eventData
@@ -75,12 +75,21 @@ const MainContent: React.FC<MainContentProps> = ({ eventData }) => {
     eventData?.eventSpecialGuestOccupation || "Founder Ngaraga";
   const guestImage =
     eventData && eventData.eventSpecialGuestImage
-      ? `http://localhost:3000/uploads/event/${eventData.eventSpecialGuestImage}`
+      ? `${SERVER_URL}/uploads/event/${eventData.eventSpecialGuestImage}`
       : "https://via.placeholder.com/60";
   const description =
     eventData?.eventDescription ||
     `Step into a world of elegance and charm at A Special Evening Celebration. This exclusive event invites you to indulge in an enchanting night of sophistication, entertainment, and memorable experiences.`;
   const rewards = eventData?.cardRewards || [];
+
+  const handleClaimReward = async () => {
+    try {
+      await axios.get(`${SERVER_URL}/api/cardRewards/claim`, { withCredentials: true });
+      setClaimed(true);
+    } catch (error) {
+      console.error("Error claiming reward", error);
+    }
+  };
 
   return (
     <main className="container p-12">
@@ -200,7 +209,7 @@ const MainContent: React.FC<MainContentProps> = ({ eventData }) => {
                   >
                     <div className="flex items-center gap-4">
                       <img
-                        src={`http://localhost:3000/${reward.image}`}
+                        src={`${SERVER_URL}/${reward.image}`}
                         alt={reward.characterName}
                         className="w-20 h-20 rounded-lg object-contain"
                       />
@@ -216,20 +225,31 @@ const MainContent: React.FC<MainContentProps> = ({ eventData }) => {
                         />
                       </div>
                     </div>
-                    <button className="bg-neutral-colors-300 text-neutral-colors-500 px-4 py-2 rounded-lg">
-                      Claim
+                    <button
+                      className={`px-4 py-2 rounded-lg ${
+                        claimed
+                          ? "bg-neutral-400 text-neutral-700 opacity-50"
+                          : "bg-call-to-actions-900 text-neutral-colors-100 hover:bg-call-to-actions-700"
+                      }`}
+                      onClick={handleClaimReward}
+                      disabled={claimed}
+                    >
+                      {claimed ? "Claimed" : "Claim"}
                     </button>
                   </div>
                 ))
               ) : (
-                <p className="text-gray-500">No benefits available.</p>
+                <p className="text-gray-200">No benefits available.</p>
               )}
             </div>
           )}
         </div>
       </div>
       {/* Render the share modal */}
-      <ShareModal isOpen={isShareModalOpen} onClose={() => setShareModalOpen(false)} />
+      <ShareModal
+        isOpen={isShareModalOpen}
+        onClose={() => setShareModalOpen(false)}
+      />
     </main>
   );
 };

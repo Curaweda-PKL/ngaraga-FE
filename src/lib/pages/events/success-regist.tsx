@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { SERVER_URL } from "@/middleware/utils";
 
 const SuccessRegist: React.FC = () => {
   const [email, setEmail] = useState<string>('');
@@ -20,7 +21,7 @@ const SuccessRegist: React.FC = () => {
     // If data isn't available in localStorage, fetch from the user profile API.
     if (!storedEmail || !storedName) {
       axios
-        .get('http://localhost:3000/api/account/profile', { withCredentials: true })
+        .get(`${SERVER_URL}/api/account/profile`, { withCredentials: true })
         .then((response) => {
           if (response.data) {
             setEmail(response.data.email);
@@ -74,7 +75,6 @@ const SuccessRegist: React.FC = () => {
             fill="#04805A"
           />
         </svg>
-
         <h1 className="text-2xl font-semibold mt-4">
           Thank You{ name ? `, ${name}` : '' }!
         </h1>

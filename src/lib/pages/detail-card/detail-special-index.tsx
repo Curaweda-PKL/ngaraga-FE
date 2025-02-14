@@ -1,5 +1,5 @@
 import React from "react";
-import {ProfilePage} from "@/lib/pages/artists/components/profile-page";
+import {ProfilePage} from "@/lib/pages/artists/components/other-profile-page";
 import {MoreCardSection} from "./components/more-card";
 import {DetailBio} from "./components/detail-bio";
 

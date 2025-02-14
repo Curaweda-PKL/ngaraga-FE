@@ -3,6 +3,7 @@ import { X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import PhoneInput from "@/lib/pages/checkout/components/PhoneInput";
 import axios from "axios";
+import { SERVER_URL } from "@/middleware/utils"; // Import your server URL
 
 export const ProfileSettings = () => {
   const navigate = useNavigate();
@@ -29,7 +30,7 @@ export const ProfileSettings = () => {
     const fetchUserData = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:3000/api/account/admin/profile`,
+          `${SERVER_URL}/api/account/admin/profile`,
           { withCredentials: true }
         );
         const responseData = response.data;
@@ -39,7 +40,7 @@ export const ProfileSettings = () => {
 
         setExistingImage(
           userData.image
-            ? `http://localhost:3000/uploads/profile/${userData.image.split("\\").pop()}`
+            ? `${SERVER_URL}/uploads/profile/${userData.image.split("\\").pop()}`
             : null
         );
 
@@ -137,7 +138,7 @@ export const ProfileSettings = () => {
         formDataToSend.append("image", imageFile);
       }
 
-      const response = await fetch(`http://localhost:3000/api/account/admin/profile/update`, {
+      const response = await fetch(`${SERVER_URL}/api/account/admin/profile/update`, {
         method: "PUT",
         body: formDataToSend,
         credentials: "include",
@@ -162,7 +163,7 @@ export const ProfileSettings = () => {
     try {
       // Send PATCH request to reset password endpoint
       const response = await axios.patch(
-        "http://localhost:3000/api/general/account/reset-password",
+        `${SERVER_URL}/api/general/account/reset-password`,
         {
           newPassword: passwordData.newPassword,
           confirmPassword: passwordData.confirmPassword,

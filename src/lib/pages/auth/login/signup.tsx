@@ -1,15 +1,22 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { FaUser, FaLock, FaEnvelope } from "react-icons/fa";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
+import { useNavigate, Link } from "react-router-dom";
 import LoginImage from "@/assets/img/spacestarry.png";
 import axios from "axios";
+import { SERVER_URL } from "@/middleware/utils"; // Import centralized server URL
 
 type SignUpFormData = {
   name: string;
   email: string;
   password: string;
   confirmPassword: string;
+};
+
+type Notification = {
+  type: "error" | "success";
+  message: string;
 };
 
 const SignUp: React.FC = () => {
@@ -20,6 +27,7 @@ const SignUp: React.FC = () => {
     confirmPassword: "",
   });
   const [error, setError] = useState<{ [key: string]: string }>({});
+  const [notification, setNotification] = useState<Notification | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false);
@@ -29,21 +37,24 @@ const SignUp: React.FC = () => {
     description: "Create an account to start using our service.",
   });
 
+  // Initialize navigate from react-router-dom for redirection
+  const navigate = useNavigate();
 
+  // Fetch thumbnail and API text data
   useEffect(() => {
     const fetchThumbnailData = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/api/auththumb/sign-up");
+        const response = await axios.get(`${SERVER_URL}/api/auththumb/sign-up`);
         const { title, description, image } = response.data.data;
 
         setApiData({
           title: title || "Sign Up",
           description: description || "Create an account to start using our service.",
-          image: image ? `http://localhost:3000/${image}` : LoginImage,
+          image: image ? `${SERVER_URL}/${image}` : LoginImage,
         });
       } catch (error) {
         console.error("Error fetching thumbnail data:", error);
-        // Fallback in case of failure
+        // Fallback data
         setApiData({
           image: LoginImage,
           title: "Sign Up",
@@ -55,8 +66,7 @@ const SignUp: React.FC = () => {
     fetchThumbnailData();
   }, []);
 
-
-  // Handle form input changes
+  // Handle input change and clear field errors on change
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
@@ -74,12 +84,12 @@ const SignUp: React.FC = () => {
     let valid = true;
     const newError: { [key: string]: string } = {};
 
-    // name validation
+    // Name validation
     if (!formData.name) {
-      newError.name = "name cannot be empty!";
+      newError.name = "Name cannot be empty!";
       valid = false;
     } else if (formData.name.length < 3) {
-      newError.name = "name must be at least 3 characters!";
+      newError.name = "Name must be at least 3 characters!";
       valid = false;
     }
 
@@ -87,8 +97,31 @@ const SignUp: React.FC = () => {
     if (!formData.email) {
       newError.email = "Email cannot be empty!";
       valid = false;
+    } else {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(formData.email)) {
+        newError.email = "Please enter a valid email address.";
+        valid = false;
+      }
     }
 
+    // Password validation
+    if (!formData.password) {
+      newError.password = "Password cannot be empty!";
+      valid = false;
+    } else if (formData.password.length < 8) {
+      newError.password = "Password must be at least 8 characters long.";
+      valid = false;
+    }
+
+    // Confirm Password validation
+    if (!formData.confirmPassword) {
+      newError.confirmPassword = "Confirm Password cannot be empty!";
+      valid = false;
+    } else if (formData.confirmPassword !== formData.password) {
+      newError.confirmPassword = "Passwords do not match!";
+      valid = false;
+    }
 
     setError(newError);
     return valid;
@@ -98,15 +131,16 @@ const SignUp: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-  
+    setNotification(null);
+
     if (!validateForm()) {
       setLoading(false);
       return;
     }
-  
+
     try {
       const response = await axios.post(
-        "http://localhost:3000/api/register-user",
+        `${SERVER_URL}/api/register-user`,
         {
           name: formData.name,
           email: formData.email,
@@ -115,35 +149,53 @@ const SignUp: React.FC = () => {
         },
         { withCredentials: true }
       );
-  
+
       if (response.status === 201) {
-        alert("Account created successfully!");
+        setNotification({
+          type: "success",
+          message: "Account created successfully! Redirecting to login...",
+        });
         setFormData({
           name: "",
           email: "",
           password: "",
           confirmPassword: "",
         });
+        // Redirect to login page after 2 seconds
+        setTimeout(() => {
+          navigate("/login");
+        }, 2000);
       }
     } catch (error: any) {
+      console.error("Error during registration:", error);
+      let errorMessage = "Account creation failed! Please try again.";
       if (error.response && error.response.data) {
         const { message, errors } = error.response.data;
+        if (message) {
+          errorMessage = message;
+          // Replace confusing messages with friendlier text
+          if (errorMessage.toLowerCase().includes("must have number")) {
+            errorMessage = "Please ensure your password meets our requirements.";
+          }
+        }
         setError(errors || {});
-        alert(message || "An error occurred while creating the account.");
+        setNotification({ type: "error", message: errorMessage });
       } else {
-        alert("Something went wrong. Please try again later.");
+        setNotification({
+          type: "error",
+          message: "Something went wrong. Please try again later.",
+        });
       }
     } finally {
       setLoading(false);
     }
   };
 
-  // Toggle visibility for password and confirm password
+  // Toggle password visibility
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
-  const toggleConfirmPasswordVisibility = () =>
-    setShowConfirmPassword(!showConfirmPassword);
+  const toggleConfirmPasswordVisibility = () => setShowConfirmPassword(!showConfirmPassword);
 
-  // Animation variants for arise effect
+  // Animation variants for a smooth entrance
   const ariseVariant = {
     hidden: { opacity: 0, y: 50 },
     visible: {
@@ -154,12 +206,7 @@ const SignUp: React.FC = () => {
   };
 
   return (
-    <motion.section
-      className="bg-white"
-      initial="hidden"
-      animate="visible"
-      variants={ariseVariant}
-    >
+    <motion.section className="bg-white" initial="hidden" animate="visible" variants={ariseVariant}>
       <div className="lg:grid lg:min-h-screen lg:grid-cols-12">
         <section className="relative flex h-32 items-end bg-gray-900 lg:col-span-5 lg:h-full xl:col-span-6">
           <img
@@ -169,14 +216,18 @@ const SignUp: React.FC = () => {
             className="absolute inset-0 h-full w-full object-cover opacity-80"
           />
         </section>
-
         <main className="flex items-center justify-center px-8 py-8 sm:px-12 lg:col-span-7 lg:px-16 lg:py-12 xl:col-span-6">
-          <motion.div
-            className="max-w-xl lg:max-w-3xl"
-            initial="hidden"
-            animate="visible"
-            variants={ariseVariant}
-          >
+          <motion.div className="max-w-xl lg:max-w-3xl" initial="hidden" animate="visible" variants={ariseVariant}>
+            {/* Notification Banner */}
+            {notification && (
+              <div
+                className={`mb-4 rounded-md p-3 text-center ${
+                  notification.type === "error" ? "bg-red-100 text-red-700" : "bg-green-100 text-green-700"
+                }`}
+              >
+                {notification.message}
+              </div>
+            )}
             <motion.form
               onSubmit={handleSubmit}
               className="mt-8 grid grid-cols-6 gap-6"
@@ -186,17 +237,14 @@ const SignUp: React.FC = () => {
             >
               {/* Title and Description */}
               <div className="col-span-6">
-              <h2 className="text-3xl font-bold text-gray-800 mb-2">{apiData.title}</h2>
-              <p className="text-lg text-gray-500">{apiData.description}</p>
+                <h2 className="text-3xl font-bold text-gray-800 mb-2">{apiData.title}</h2>
+                <p className="text-lg text-gray-500">{apiData.description}</p>
               </div>
-
-              {/* name */}
+              {/* Name Input */}
               <div className="col-span-6 relative">
                 <div
                   className={`mt-1 flex items-center border rounded-md bg-white py-3 px-4 shadow-sm ${
-                    error.name
-                      ? "border-[#D22424]"
-                      : "focus-within:border-[var(--typing)]"
+                    error.name ? "border-[#D22424]" : "focus-within:border-[var(--typing)]"
                   }`}
                 >
                   <FaUser className="text-gray-500 mr-2 text-sm" />
@@ -212,18 +260,13 @@ const SignUp: React.FC = () => {
                     required
                   />
                 </div>
-                {error.name && (
-                  <p className="text-[#D22424] text-sm">{error.name}</p>
-                )}
+                {error.name && <p className="text-[#D22424] text-sm">{error.name}</p>}
               </div>
-
-              {/* Email */}
+              {/* Email Input */}
               <div className="col-span-6 relative">
                 <div
                   className={`mt-1 flex items-center border rounded-md bg-white py-3 px-4 shadow-sm ${
-                    error.email
-                      ? "border-[#D22424]"
-                      : "focus-within:border-[var(--typing)]"
+                    error.email ? "border-[#D22424]" : "focus-within:border-[var(--typing)]"
                   }`}
                 >
                   <FaEnvelope className="text-gray-500 mr-2 text-sm" />
@@ -239,18 +282,13 @@ const SignUp: React.FC = () => {
                     required
                   />
                 </div>
-                {error.email && (
-                  <p className="text-[#D22424] text-sm">{error.email}</p>
-                )}
+                {error.email && <p className="text-[#D22424] text-sm">{error.email}</p>}
               </div>
-
-              {/* Password */}
+              {/* Password Input */}
               <div className="col-span-6 relative">
                 <div
                   className={`mt-1 flex items-center border rounded-md bg-white py-3 px-4 shadow-sm ${
-                    error.password
-                      ? "border-[#D22424]"
-                      : "focus-within:border-[var(--typing)]"
+                    error.password ? "border-[#D22424]" : "focus-within:border-[var(--typing)]"
                   }`}
                 >
                   <FaLock className="text-gray-500 mr-2 text-sm" />
@@ -272,18 +310,13 @@ const SignUp: React.FC = () => {
                     {showPassword ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
                   </div>
                 </div>
-                {error.password && (
-                  <p className="text-[#D22424] text-sm">{error.password}</p>
-                )}
+                {error.password && <p className="text-[#D22424] text-sm">{error.password}</p>}
               </div>
-
-              {/* Confirm Password */}
+              {/* Confirm Password Input */}
               <div className="col-span-6 relative">
                 <div
                   className={`mt-1 flex items-center border rounded-md bg-white py-3 px-4 shadow-sm ${
-                    error.confirmPassword
-                      ? "border-[#D22424]"
-                      : "focus-within:border-[var(--typing)]"
+                    error.confirmPassword ? "border-[#D22424]" : "focus-within:border-[var(--typing)]"
                   }`}
                 >
                   <FaLock className="text-gray-500 mr-2 text-sm" />
@@ -305,11 +338,8 @@ const SignUp: React.FC = () => {
                     {showConfirmPassword ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
                   </div>
                 </div>
-                {error.confirmPassword && (
-                  <p className="text-[#D22424] text-sm">{error.confirmPassword}</p>
-                )}
+                {error.confirmPassword && <p className="text-[#D22424] text-sm">{error.confirmPassword}</p>}
               </div>
-
               {/* Submit Button */}
               <div className="col-span-6 sm:flex sm:items-center sm:gap-4">
                 <button
@@ -320,14 +350,13 @@ const SignUp: React.FC = () => {
                   {loading ? "Signing up..." : "Sign Up"}
                 </button>
               </div>
-
               {/* Sign In Link */}
               <div className="col-span-6 text-center mt-4">
                 <p className="text-gray-600">
                   Already have an account?{" "}
-                  <a href="/login" className="text-orange-500 hover:text-orange-600">
+                  <Link to={"/login"} className="text-orange-500 hover:text-orange-600 ml-2">
                     Sign in
-                  </a>
+                  </Link>
                 </p>
               </div>
             </motion.form>

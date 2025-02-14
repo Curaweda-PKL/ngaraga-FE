@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import {
   Pencil,
   Trash2,
@@ -8,6 +8,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
+import { SERVER_URL } from "@/middleware/utils"; // Import centralized server URL
 
 interface ModalProps {
   isOpen: boolean;
@@ -23,9 +24,9 @@ export const Series = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedSeries, setSelectedSeries] = useState<{ id: number; name: string } | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [masters, setMasters] = useState<{id: number; name: string}[]>([]);
+  const [masters, setMasters] = useState<{ id: number; name: string }[]>([]);
   const [seriesList, setSeriesList] = useState<
-    {id: number; name: string; masterId: number}[]
+    { id: number; name: string; masterId: number }[]
   >([]);
   const [loadingMasters, setLoadingMasters] = useState(true);
   const [errorMasters, setErrorMasters] = useState<string | null>(null);
@@ -39,7 +40,7 @@ export const Series = () => {
   useEffect(() => {
     const fetchMasters = async () => {
       try {
-        const response = await fetch("http://localhost:3000/api/series/masters/all");
+        const response = await fetch(`${SERVER_URL}/api/series/masters/all`);
         if (!response.ok) {
           throw new Error("Failed to fetch master data");
         }
@@ -50,7 +51,6 @@ export const Series = () => {
       } finally {
         setLoadingMasters(false);
       }
-
     };
 
     fetchMasters();
@@ -59,7 +59,7 @@ export const Series = () => {
   useEffect(() => {
     const fetchSeries = async () => {
       try {
-        const response = await fetch("http://localhost:3000/api/series/all");
+        const response = await fetch(`${SERVER_URL}/api/series/all`);
         if (!response.ok) {
           throw new Error("Failed to fetch series data");
         }
@@ -77,10 +77,10 @@ export const Series = () => {
 
   const handleAddSeries = async (name: string, masterId: number) => {
     try {
-      const response = await fetch("http://localhost:3000/api/series/create", {
+      const response = await fetch(`${SERVER_URL}/api/series/create`, {
         method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({name, masterId}),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, masterId }),
       });
 
       if (!response.ok) {
@@ -100,11 +100,11 @@ export const Series = () => {
   const handleEditSeries = async (id: number, name: string, masterId: number) => {
     try {
       const response = await fetch(
-        `http://localhost:3000/api/series/edit/${id}`,
+        `${SERVER_URL}/api/series/edit/${id}`,
         {
           method: "PUT",
-          headers: {"Content-Type": "application/json"},
-          body: JSON.stringify({name, masterId}),
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name, masterId }),
         }
       );
 
@@ -135,7 +135,7 @@ export const Series = () => {
   const handleDeleteSeries = async (id: number) => {
     try {
       const response = await fetch(
-        `http://localhost:3000/api/series/delete/${id}`,
+        `${SERVER_URL}/api/series/delete/${id}`,
         {
           method: "DELETE",
         }
@@ -179,7 +179,9 @@ export const Series = () => {
           </div>
 
           <div className="p-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Select Master*</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Select Master*
+            </label>
             {loadingMasters ? (
               <p>Loading Masters...</p>
             ) : errorMasters ? (
@@ -199,7 +201,9 @@ export const Series = () => {
               </select>
             )}
 
-            <label className="block text-sm font-medium text-gray-700 mb-1 mt-4">Series Name*</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1 mt-4">
+              Series Name*
+            </label>
             <input
               type="text"
               value={inputValue}
@@ -209,7 +213,10 @@ export const Series = () => {
           </div>
 
           <div className="flex justify-end gap-2 p-4 border-t">
-            <button onClick={onClose} className="px-4 py-2 border rounded-lg text-gray-600 hover:bg-gray-50">
+            <button
+              onClick={onClose}
+              className="px-4 py-2 border rounded-lg text-gray-600 hover:bg-gray-50"
+            >
               Cancel
             </button>
             <button
@@ -245,10 +252,7 @@ export const Series = () => {
       {/* Breadcrumb */}
       <div className="mb-4">
         <nav className="text-sm text-gray-500">
-          <a
-            href="/admin/marketplace"
-            className="hover:text-yellow-500"
-          >
+          <a href="/admin/marketplace" className="hover:text-yellow-500">
             Marketplace
           </a>
           <span className="mx-2">/</span>
@@ -288,67 +292,89 @@ export const Series = () => {
 
       {/* Series Table */}
       <div className="bg-white rounded-lg overflow-hidden">
-  <table className="w-full">
-    <thead>
-      <tr>
-        <th className="px-4 py-2 border-b text-left">Series Name</th>
-        <th className="px-4 py-2 border-b text-left">Master Name</th>
-        <th className="px-4 py-2 border-b text-center w-32">Actions</th>
-      </tr>
-    </thead>
-    <tbody className="divide-y divide-gray-200">
-      {loadingSeries ? (
-        <tr>
-          <td colSpan={3} className="px-6 py-4 text-center">
-            Loading series...
-          </td>
-        </tr>
-      ) : errorSeries ? (
-        <tr>
-          <td colSpan={3} className="px-6 py-4 text-center text-red-500">
-            {errorSeries}
-          </td>
-        </tr>
-      ) : (
-        visibleSeries.map((series) => (
-          <tr key={series.id} className="hover:bg-gray-50">
-            <td className="px-6 py-4 text-sm text-gray-600">
-              {series.name}
-            </td>
-            <td className="px-6 py-4 text-sm text-gray-600">
-              {masters.find((master) => master.id === series.masterId)?.name ||
-                "Unknown Master"}
-            </td>
-            <td className="px-6 py-4 text-center">
-              <div className="flex justify-center gap-4">
-                <button
-                  onClick={() => {
-                    setSelectedSeries(series);
-                    setSelectedMaster(series.masterId);
-                    setIsEditModalOpen(true);
-                  }}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  <Pencil className="w-4 h-4" />
-                </button>
-                <button className="text-gray-400 hover:text-gray-600">
-                  <Eye className="w-5 h-5" />
-                </button>
-                <button
-                  onClick={() => handleDeleteSeries(series.id)}
-                  className="text-red-400 hover:text-red-600"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              </div>
-            </td>
-          </tr>
-        ))
-      )}
-    </tbody>
-  </table>
-</div>
+        <table className="w-full">
+          <thead>
+            <tr>
+              <th className="px-4 py-2 border-b text-left">Series Name</th>
+              <th className="px-4 py-2 border-b text-left">Master Name</th>
+              <th className="px-4 py-2 border-b text-center w-32">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-200">
+            {loadingSeries ? (
+              <tr>
+                <td colSpan={3} className="px-6 py-4 text-center">
+                  Loading series...
+                </td>
+              </tr>
+            ) : errorSeries ? (
+              <tr>
+                <td colSpan={3} className="px-6 py-4 text-center text-red-500">
+                  {errorSeries}
+                </td>
+              </tr>
+            ) : (
+              visibleSeries.map((series) => (
+                <tr key={series.id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 text-sm text-gray-600">
+                    {series.name}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-600">
+                    {masters.find((master) => master.id === series.masterId)?.name ||
+                      "Unknown Master"}
+                  </td>
+                  <td className="px-6 py-4 text-center">
+                    <div className="flex justify-center gap-4">
+                      <button
+                        onClick={() => {
+                          setSelectedSeries(series);
+                          setSelectedMaster(series.masterId);
+                          setIsEditModalOpen(true);
+                        }}
+                        className="text-gray-400 hover:text-gray-600"
+                      >
+                        <Pencil className="w-5 h-5" />
+                      </button>
+                      <button className="text-gray-400 hover:text-gray-600">
+                        <Eye className="w-5 h-5" />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteSeries(series.id)}
+                        className="text-red-400 hover:text-red-600"
+                      >
+                        <Trash2 className="w-5 h-5" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
 
+      {/* Pagination */}
+      <div className="flex justify-between items-center mt-4">
+        <button
+          onClick={() => currentPage > 1 && setCurrentPage(currentPage - 1)}
+          disabled={currentPage === 1}
+          className="flex items-center gap-2 px-3 py-1 rounded bg-gray-100 hover:bg-gray-200 disabled:opacity-50"
+        >
+          <ChevronLeft className="w-5 h-5" />
+          Prev
+        </button>
+        <div>
+          Page {currentPage} of {totalPages}
+        </div>
+        <button
+          onClick={() => currentPage < totalPages && setCurrentPage(currentPage + 1)}
+          disabled={currentPage === totalPages}
+          className="flex items-center gap-2 px-3 py-1 rounded bg-gray-100 hover:bg-gray-200 disabled:opacity-50"
+        >
+          Next
+          <ChevronRight className="w-5 h-5" />
+        </button>
+      </div>
 
       {/* Add/Edit Modal */}
       <Modal
@@ -366,9 +392,7 @@ export const Series = () => {
             : (name, masterId) =>
                 handleEditSeries(selectedSeries?.id || 0, name, masterId)
         }
-        defaultValue={
-          isEditModalOpen && selectedSeries ? selectedSeries.name : ""
-        }
+        defaultValue={isEditModalOpen && selectedSeries ? selectedSeries.name : ""}
       />
     </div>
   );
