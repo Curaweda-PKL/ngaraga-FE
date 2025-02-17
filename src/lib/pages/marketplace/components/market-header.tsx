@@ -36,14 +36,14 @@ export const MarketHeader: React.FC = () => {
         setPageContent(data);
       } catch (error) {
         console.error("Error fetching page content:", error);
-        // We don't update an error message state here because we'll fallback to defaultContent
+        // Fallback to defaultContent if there is an error
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchPageContent();
-  }, []); // Empty dependency array ensures this runs once when the component mounts
+  }, []); // Runs once when the component mounts
 
   // Function to handle the selection of a filter item
   const handleSelectFilter = (filter: string) => {
@@ -51,10 +51,12 @@ export const MarketHeader: React.FC = () => {
   };
 
   return (
-    <div className="bg-background-color w-full px-8 py-20">
-      <div className="mx-auto ml-7">
+    // Updated responsive padding: smaller padding on mobile/md, original for lg screens
+    <div className="bg-background-color w-full px-4 py-10 lg:px-8 lg:py-20">
+      {/* Adjusted margin: no left margin on mobile/md; applied on lg */}
+      <div className="mx-auto ml-0 lg:ml-7">
         {/* Title and Subtitle */}
-        <div className="mb-10">
+        <div className="mb-10 ml-4 lg:ml-0">
           {isLoading ? (
             <p>Loading...</p>
           ) : (
@@ -105,11 +107,10 @@ export const MarketHeader: React.FC = () => {
           {/* Dropdown for Medium and Larger Screens */}
           <div className="hidden md:block">
             <DropdownMarket
-              buttonText={selectedFilter} // Dynamically update the button text
-              iconLeft={<PiSlidersHorizontalDuotone className="w-5 h-5" />} // Left icon (filter icon)
-              iconRight={<MdArrowDropDown className="w-5 h-5 text-gray-400" />} // Right icon (dropdown arrow)
+              buttonText={selectedFilter}
+              iconLeft={<PiSlidersHorizontalDuotone className="w-5 h-5" />}
+              iconRight={<MdArrowDropDown className="w-5 h-5 text-gray-400" />}
             >
-              {/* Dropdown items with click handlers */}
               <li>
                 <a
                   className="block px-4 py-2 text-gray-700 rounded-lg hover-border-call-to-actions"
