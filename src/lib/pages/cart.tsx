@@ -57,16 +57,21 @@ const Cart: React.FC = () => {
     0
   );
 
+  const hasSelectedItems = selectedItems.length > 0;
+
   return (
-    <div className="ml-16 p-4 md:p-8 min-h-screen">
-      <h1 className="text-2xl text-[#171717] font-bold mb-2">My Cart</h1>
-      <p className="text-[#404040] mb-6">
+    <div className="p-4 md:p-8 min-h-screen">
+      <h1 className="text-2xl text-[#171717] font-bold mb-2 text-center md:text-left">
+        My Cart
+      </h1>
+      <p className="text-[#404040] mb-6 text-center md:text-left">
         Review your selected items, adjust quantities, and proceed to checkout
         seamlessly.
       </p>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="col-span-2">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div className="col-span-1 lg:col-span-2">
+          {/* Select All & Delete */}
           <div className="flex items-center border-[#D4D4D4] border-2 rounded-xl py-3 px-5 justify-between mb-4">
             <div className="flex items-center space-x-2">
               <input
@@ -80,7 +85,7 @@ const Cart: React.FC = () => {
               </p>
             </div>
             <button
-              className="btn bg-call-to-action border-transparent rounded-lg text-white flex items-center space-x-2"
+              className="bg-call-to-action text-white px-4 py-2 rounded-lg flex items-center space-x-2"
               onClick={deleteSelected}
             >
               <FaTrash />
@@ -88,12 +93,13 @@ const Cart: React.FC = () => {
             </button>
           </div>
 
+          {/* Cart Items */}
           {cartItems.map((item) => (
             <div
               key={item.id}
-              className="flex items-center justify-between p-4 mb-4 bg-white border border-neutral-colors-500 rounded-lg"
+              className="flex flex-wrap items-center justify-between p-4 mb-4 bg-white border rounded-lg"
             >
-              <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-4 w-full sm:w-auto">
                 <input
                   type="checkbox"
                   className="w-4 h-4"
@@ -103,23 +109,23 @@ const Cart: React.FC = () => {
                 <img
                   src={item.image}
                   alt={item.name}
-                  className="w-16 h-16 rounded-md"
+                  className="w-16 h-16 object-cover rounded-md"
                 />
                 <div>
                   <h2 className="font-semibold text-gray-800">{item.name}</h2>
                   <p className="text-gray-500 text-sm">Orbitian</p>
                 </div>
               </div>
-              <div className="flex flex-col items-end space-y-2">
+              <div className="flex flex-col items-end space-y-2 w-full sm:w-auto">
                 <p className="text-gray-700 font-semibold">
                   Rp {item.price.toLocaleString("id-ID")}
                 </p>
                 <div className="flex items-center space-x-2">
                   <button
-                    className="text-gray-300 flex items-center space-x-1"
+                    className="text-gray-300"
                     onClick={() => handleDeleteItem(item.id)}
                   >
-                    <FaTrash className="mr-2" />
+                    <FaTrash />
                   </button>
                   <div className="flex items-center bg-gray-200 border border-gray-300 rounded-md">
                     <button
@@ -130,18 +136,9 @@ const Cart: React.FC = () => {
                     </button>
                     <input
                       type="number"
-                      className="w-8 text-center py-1 px-1 border-none bg-gray-200 appereance-none -webkit-appearance-none -moz-appearance-none"
+                      className="w-10 text-center py-1 px-1 border-none bg-gray-200"
                       value={item.quantity}
-                      onChange={(e) => {
-                        const newQuantity = parseInt(e.target.value, 10);
-
-                        if (!isNaN(newQuantity) && newQuantity > 0) {
-                          handleQuantityChange(
-                            item.id,
-                            newQuantity - item.quantity
-                          );
-                        }
-                      }}
+                      readOnly
                     />
                     <button
                       className="px-2 py-1 text-gray-700"
@@ -156,7 +153,14 @@ const Cart: React.FC = () => {
           ))}
         </div>
 
-        <div className="p-4 border border-#D4D4D4 mr-24 rounded-lg shadow-md">
+        {/* Conditionally render Order Summary only when an item is selected */}
+        <div
+          className={`order-summary transition-transform ${
+            hasSelectedItems
+              ? "transform translate-y-0"
+              : "transform translate-y-full"
+          } lg:col-span-1 lg:static lg:translate-y-0 fixed bottom-0 left-0 w-full p-4 border border-#D4D4D4 bg-white shadow-lg rounded-t-lg`}
+        >
           <h2 className="text-lg font-bold mb-4 text-[#171717] border-b border-gray-300 pb-2">
             Summary Order
           </h2>

@@ -54,7 +54,7 @@ const PickupForm: React.FC<PickupFormProps> = ({
         />
       </div>
 
-      <PhoneInput />
+      <PhoneInput className="mb-4"/>
 
       <div className="space-y-3">
         <p className="text-base font-medium">Pick a Pickup Time</p>

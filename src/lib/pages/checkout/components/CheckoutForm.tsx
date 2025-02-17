@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import {   IoRadioButtonOn } from "react-icons/io5";
+import { IoRadioButtonOn } from "react-icons/io5";
 import { TbTruckDelivery } from "react-icons/tb";
-import {PiPackageLight} from "react-icons/pi";
+import { PiPackageLight } from "react-icons/pi";
 import axios from "axios";
 import DeliveryForm from "./DeliveryForm";
 import PickupForm from "./PickupForm";
@@ -39,7 +39,9 @@ export interface Subdistrict {
 }
 
 const CheckoutForm: React.FC = () => {
-  const [selectedTab, setSelectedTab] = useState<"delivery" | "pickup">("delivery");
+  const [selectedTab, setSelectedTab] = useState<"delivery" | "pickup">(
+    "delivery"
+  );
   const [paymentMethod, setPaymentMethod] = useState<string>("Bank BCA");
   const [formData, setFormData] = useState<FormData>({
     fullName: "",
@@ -114,7 +116,9 @@ const CheckoutForm: React.FC = () => {
   }, [formData.city]);
 
   const handleFormChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -134,14 +138,22 @@ const CheckoutForm: React.FC = () => {
       <div className="mt-10 space-y-4">
         <div className="flex gap-5 items-center mb-8">
           <button
-            className={`btn ${selectedTab === "delivery" ? "bg-call-to-actions-100" : "bg-neutral-colors-200"} border rounded-lg`}
+            className={`btn ${
+              selectedTab === "delivery"
+                ? "bg-call-to-actions-100"
+                : "bg-neutral-colors-200"
+            } border rounded-lg`}
             onClick={() => setSelectedTab("delivery")}
           >
             <TbTruckDelivery size={18} />
             Delivery
           </button>
           <button
-            className={`btn ${selectedTab === "pickup" ? "bg-call-to-actions-100" : "bg-neutral-colors-200"} border rounded-lg`}
+            className={`btn ${
+              selectedTab === "pickup"
+                ? "bg-call-to-actions-100"
+                : "bg-neutral-colors-200"
+            } border rounded-lg`}
             onClick={() => setSelectedTab("pickup")}
           >
             <PiPackageLight size={18} />
@@ -171,11 +183,11 @@ const CheckoutForm: React.FC = () => {
         {/* Payment Method Section */}
         <div className="mt-8 mb-8">
           <h2 className="font-bold text-lg mb-4">Payment Method</h2>
-          <div className="grid grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {["Bank BCA", "Bank BNI", "Bank BRI", "Qris"].map((method) => (
               <label
                 key={method}
-                className={`flex justify-center items-center border rounded-lg p-3 cursor-pointer mb-16 ${
+                className={`flex justify-center items-center border rounded-lg p-3 cursor-pointer mb-4 ${
                   paymentMethod === method ? "border-call-to-actions-900" : ""
                 }`}
               >
@@ -186,7 +198,9 @@ const CheckoutForm: React.FC = () => {
                 />
                 <span className="flex-grow">{method}</span>
                 <div className="relative flex flex-col items-end mb-10">
-                  {paymentMethod === method && <IoRadioButtonOn className="text-xl" />}
+                  {paymentMethod === method && (
+                    <IoRadioButtonOn className="text-xl" />
+                  )}
                 </div>
                 <input
                   type="radio"

@@ -53,7 +53,7 @@ const DeliveryForm: React.FC<DeliveryFormProps> = ({
           />
         </div>
 
-        <PhoneInput />
+        <PhoneInput className="mb-4"/>
 
         <div className="grid grid-cols-2 gap-4">
           <div>
