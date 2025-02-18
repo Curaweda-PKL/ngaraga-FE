@@ -40,7 +40,7 @@ import {ProfileSettings} from "../admin-pages/admin-profile";
 import AdminLogin from "../pages/auth/login/admin-login";
 import SentEmail from "../pages/auth/login/sentEmail";
 import SuccesRegist from "../pages/events/success-regist";
-import { EditProfileAdmin } from "../admin-pages/admin/edit-admin";
+import {EditProfileAdmin} from "../admin-pages/admin/edit-admin";
 
 // Lazy-loaded Pages
 const Home = React.lazy(() => import("@/lib/pages/home/Home"));
@@ -58,7 +58,9 @@ const Marketplace = React.lazy(
   () => import("@/lib/pages/marketplace/marketplace-index")
 );
 const Cart = React.lazy(() => import("@/lib/pages/cart"));
-const TopCollectors = React.lazy(() => import("@/lib/pages/top-players"));
+const TopCollectors = React.lazy(
+  () => import("@/lib/pages/top-ranking-collectors/top-players")
+);
 const SpecialCardDetail = React.lazy(
   () => import("@/lib/pages/account/specialcard-details")
 );
@@ -88,10 +90,10 @@ const Checkout = React.lazy(
 );
 const CheckoutExisting = React.lazy(
   () => import("@/lib/pages/checkout/chekout-existing-index")
-)
+);
 const EditProfile = React.lazy(
   () => import("@/lib/pages/account/edit-profile-index")
-)
+);
 
 export const routes: Array<PathRouteProps> = [
   {path: "/signup", element: <Signup />},
@@ -99,7 +101,7 @@ export const routes: Array<PathRouteProps> = [
   {path: "/forgot-password", element: <ForgotPassword />},
   {path: "/reset-password", element: <ResetPassword />},
   {path: "/", element: <Home />},
-  {path: "/artist", element: <Artists />},
+  {path: "/account/:name", element: <Artists />},
   {path: "/marketplace", element: <Marketplace />},
   {path: "/detail-cards", element: <DetailCards />},
   {path: "/detail-special-card", element: <DetailSpecial />},
@@ -126,40 +128,39 @@ export const privateRoutes: Array<PathRouteProps> = [
 ];
 
 export const adminRoutes: Array<PathRouteProps> = [
-  { path: "dashboard", element: <Dashboard /> },
-  { path: "order", element: <Order /> },
-  { path: "detail-order", element: <DetailsOrder /> },
-  { path: "card", element: <Card /> },
-  { path: "edit-card", element: <EditCard /> },
-  { path: "add-card", element: <AddCard /> },
-  { path: "special-card", element: <SpecialCard /> },
-  { path: "edit-special", element: <EditSpecialCard /> },
-  { path: "add-special", element: <AddSpecialCard /> },
-  { path: "master", element: <Master /> },
-  { path: "series", element: <Series /> },
-  { path: "categories", element: <Categories /> },
-  { path: "tag", element: <Tag /> },
-  { path: "sign-in", element: <SignInPage /> },
-  { path: "sign-up", element: <SignUpPage /> },
-  { path: "home", element: <HomeSection /> },
-  { path: "marketplace", element: <MarketplaceForm /> },
-  { path: "rankings", element: <RankingsForm /> },
-  { path: "events", element: <EventsForm /> },
-  { path: "event", element: <Events /> },
-  { path: "edit-event/:id", element: <EditEvents /> },
-  { path: "add-event", element: <AddEvents /> },
-  { path: "coupon", element: <Coupon /> },
-  { path: "add-coupon", element: <AddCouponForm /> },
-  { path: "creator", element: <Creator /> },
-  { path: "member", element: <Member /> },
-  { path: "add-member", element: <AddMember /> },
-  { path: "detail-member", element: <MemberDetails /> },
-  { path: "subscription", element: <Subscription /> },
-  { path: "shipping", element: <Shipping /> },
-  { path: "payment", element: <Payment /> },
-  { path: "admin", element: <Admin /> },
-  { path: "add-admin", element: <AddAdmin /> },
-  { path: "profile", element: <ProfileSettings /> },
-  { path: "edit-profile/:id", element: <EditProfileAdmin /> },
+  {path: "dashboard", element: <Dashboard />},
+  {path: "order", element: <Order />},
+  {path: "detail-order", element: <DetailsOrder />},
+  {path: "card", element: <Card />},
+  {path: "edit-card", element: <EditCard />},
+  {path: "add-card", element: <AddCard />},
+  {path: "special-card", element: <SpecialCard />},
+  {path: "edit-special", element: <EditSpecialCard />},
+  {path: "add-special", element: <AddSpecialCard />},
+  {path: "master", element: <Master />},
+  {path: "series", element: <Series />},
+  {path: "categories", element: <Categories />},
+  {path: "tag", element: <Tag />},
+  {path: "sign-in", element: <SignInPage />},
+  {path: "sign-up", element: <SignUpPage />},
+  {path: "home", element: <HomeSection />},
+  {path: "marketplace", element: <MarketplaceForm />},
+  {path: "rankings", element: <RankingsForm />},
+  {path: "events", element: <EventsForm />},
+  {path: "event", element: <Events />},
+  {path: "edit-event/:id", element: <EditEvents />},
+  {path: "add-event", element: <AddEvents />},
+  {path: "coupon", element: <Coupon />},
+  {path: "add-coupon", element: <AddCouponForm />},
+  {path: "creator", element: <Creator />},
+  {path: "member", element: <Member />},
+  {path: "add-member", element: <AddMember />},
+  {path: "detail-member", element: <MemberDetails />},
+  {path: "subscription", element: <Subscription />},
+  {path: "shipping", element: <Shipping />},
+  {path: "payment", element: <Payment />},
+  {path: "admin", element: <Admin />},
+  {path: "add-admin", element: <AddAdmin />},
+  {path: "profile", element: <ProfileSettings />},
+  {path: "edit-profile/:id", element: <EditProfileAdmin />},
 ];
-

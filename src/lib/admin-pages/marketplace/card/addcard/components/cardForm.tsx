@@ -1,7 +1,8 @@
+// CardForm.tsx
 import React, {ChangeEvent, useRef} from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
-import {Upload, Trash} from "lucide-react";
+import {Upload} from "lucide-react";
 
 interface CardFormProps {
   formData: {
@@ -9,16 +10,18 @@ interface CardFormProps {
     cardName: string;
     sku: string;
     price: string;
-    salePrice: string;
-    isSaleActive: boolean;
+    salePrice: boolean;
     stock: string;
     cardDetails: string;
-    categories?: string[];
-    creator?: boolean;
-    selectedCreator?: string;
-    tag?: boolean;
-    tags?: string[];
-    source?: boolean;
+    // Added new fields to match the AddCard state
+    categories: string[];
+    creator: boolean;
+    selectedCreator: string;
+    tag: boolean;
+    tags: string[];
+    source: boolean;
+    sourceImageWebsite: string;
+    sourceImageAlt: string;
   };
   handleInputChange: (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -32,16 +35,17 @@ interface CardFormProps {
       cardName: string;
       sku: string;
       price: string;
-      salePrice: string;
-      isSaleActive: boolean;
+      salePrice: boolean;
       stock: string;
       cardDetails: string;
-      categories?: string[];
-      creator?: boolean;
-      selectedCreator?: string;
-      tag?: boolean;
-      tags?: string[];
-      source?: boolean;
+      categories: string[];
+      creator: boolean;
+      selectedCreator: string;
+      tag: boolean;
+      tags: string[];
+      source: boolean;
+      sourceImageWebsite: string;
+      sourceImageAlt: string;
     }>
   >;
 }
@@ -54,66 +58,54 @@ const CardForm: React.FC<CardFormProps> = ({
   handleDrop,
   setFormData,
 }) => {
+  // Create a ref for the hidden file input
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Handle image removal
-  const handleRemoveImage = () => {
-    setFormData((prev) => ({...prev, cardImage: null}));
-  };
-
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md space-y-6">
-      {/* Image Upload Section */}
+    <div className="space-y-6">
       <div>
-        <label className="block mb-2 text-sm font-medium">Card Image *</label>
+        <label className="block mb-2 text-sm">Card Image *</label>
         <div
-          className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center bg-gray-50 relative"
+          className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center bg-gray-50"
           onDragOver={handleDragOver}
           onDrop={handleDrop}
         >
           {formData.cardImage ? (
-            <div className="relative">
-              <img
-                src={formData.cardImage.toString()}
-                alt="Card"
-                className="w-full h-48 object-cover rounded-lg"
-              />
-              <button
-                type="button"
-                className="absolute top-2 right-2 bg-red-600 text-white p-1 rounded-full"
-                onClick={handleRemoveImage}
-              >
-                <Trash size={16} />
-              </button>
-            </div>
+            <img
+              src={formData.cardImage.toString()}
+              alt="Card"
+              className="w-full h-48 object-cover rounded-lg"
+            />
           ) : (
             <div className="space-y-4">
-              <button
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                className="px-4 py-2 bg-yellow-600 text-white rounded-lg flex items-center gap-2"
-              >
-                <Upload size={20} /> Browse
-              </button>
-              <input
-                type="file"
-                accept="image/*"
-                className="hidden"
-                ref={fileInputRef}
-                onChange={handleImageUpload}
-              />
+              <div className="flex justify-center">
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="px-4 py-2 bg-call-to-actions-900 text-white rounded-lg flex items-center gap-2"
+                >
+                  <Upload size={20} />
+                  Browse
+                </button>
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  ref={fileInputRef}
+                  onChange={handleImageUpload}
+                />
+              </div>
               <p className="text-sm text-gray-500">
                 Click to Upload or Drag & Drop
               </p>
-              <p className="text-xs text-gray-400">jpeg, jpg, png, max 4MB</p>
+              <p className="text-xs text-gray-400">jpeg, jpg, png, max 4mb</p>
             </div>
           )}
         </div>
       </div>
 
-      {/* Form Inputs */}
       <div>
-        <label className="block mb-2 text-sm font-medium">Card Name *</label>
+        <label className="block mb-2 text-sm">Card Name *</label>
         <input
           type="text"
           name="cardName"
@@ -123,9 +115,8 @@ const CardForm: React.FC<CardFormProps> = ({
         />
       </div>
 
-      {/* SKU Input */}
       <div>
-        <label className="block mb-2 text-sm font-medium">SKU *</label>
+        <label className="block mb-2 text-sm">SKU *</label>
         <input
           type="text"
           name="sku"
@@ -135,69 +126,51 @@ const CardForm: React.FC<CardFormProps> = ({
         />
       </div>
 
-      {/* Price Input */}
       <div>
-        <label className="block mb-2 text-sm font-medium">Price *</label>
+        <div className="flex items-center justify-between mb-2">
+          <label className="text-sm">Price *</label>
+          <label className="inline-flex items-center cursor-pointer">
+            <input
+              type="checkbox"
+              name="salePrice"
+              checked={formData.salePrice}
+              onChange={handleInputChange}
+              className="sr-only peer"
+            />
+            <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600 dark:peer-checked:bg-blue-600"></div>
+          </label>
+        </div>
         <input
-          type="number"
+          type="text"
           name="price"
           value={formData.price}
           onChange={handleInputChange}
           className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
-          min="0"
         />
       </div>
 
-      {/* Sale Price */}
       <div>
-        <div className="flex items-center justify-between mb-2">
-          <label className="text-sm font-medium">Sale Price</label>
-          <input
-            type="checkbox"
-            name="isSaleActive"
-            checked={formData.isSaleActive}
-            onChange={(e) =>
-              setFormData((prev) => ({
-                ...prev,
-                isSaleActive: e.target.checked,
-              }))
-            }
-          />
-        </div>
+        <label className="block mb-2 text-sm">Stock *</label>
         <input
-          type="number"
-          name="salePrice"
-          value={formData.salePrice}
-          onChange={handleInputChange}
-          className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
-          disabled={!formData.isSaleActive}
-          min="0"
-        />
-      </div>
-
-      {/* Stock Input */}
-      <div>
-        <label className="block mb-2 text-sm font-medium">Stock *</label>
-        <input
-          type="number"
+          type="text"
           name="stock"
           value={formData.stock}
           onChange={handleInputChange}
           className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
-          min="1"
         />
       </div>
 
-      {/* Card Details */}
       <div>
-        <label className="block mb-2 text-sm font-medium">Card Details</label>
-        <ReactQuill
-          value={formData.cardDetails}
-          onChange={(value) =>
-            setFormData((prev) => ({...prev, cardDetails: value}))
-          }
-          placeholder="Write your card details..."
-        />
+        <label className="block mb-2 text-sm">Card Details</label>
+        <div className="border rounded-lg">
+          <ReactQuill
+            value={formData.cardDetails}
+            onChange={(value) =>
+              setFormData((prev) => ({...prev, cardDetails: value}))
+            }
+            placeholder="Write your card details..."
+          />
+        </div>
       </div>
     </div>
   );

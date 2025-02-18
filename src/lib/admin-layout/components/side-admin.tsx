@@ -76,7 +76,7 @@ const SidebarComponent = () => {
         className={`nav-link ${isActiveRoute(to) ? "active" : ""}`}
       >
         {icon}
-        <span>{label}</span>
+        <span className="text-gray-800">{label}</span>
       </div>
     </li>
   );
@@ -84,7 +84,7 @@ const SidebarComponent = () => {
   return (
     <div className="relative">
       <aside className="fixed top-0 left-0 z-50 h-screen w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-500">
-        <div className="h-full flex flex-col overflow-y-auto bg-[#FAFAFA] border-[#EBEBEB]">
+        <div className="h-full flex flex-col overflow-y-auto bg-[#FAFAFA] border-[#EBEBEB] scrollCMSside">
           {/* Logo */}
           <div className="flex items-center gap-3 px-6 py-5 dark:border-gray-600">
             <img
@@ -117,8 +117,8 @@ const SidebarComponent = () => {
                     onClick={() => toggleMenu('marketplace')}
                     className="flex items-center justify-between w-full px-4 py-3 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
                   >
-                    <span className="flex items-center gap-3 text-neutral-colors-500">
-                      <FaShoppingCart />
+                    <span className="flex items-center gap-3 ">
+                    <FaShoppingCart className="FaShoppingCartCMS"/>
                       Marketplace
                     </span>
                     {openMenus.marketplace ? (
@@ -158,7 +158,7 @@ const SidebarComponent = () => {
                     onClick={() => toggleMenu('pages')}
                     className="flex items-center justify-between w-full px-4 py-3 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
                   >
-                    <span className="flex items-center gap-3 text-neutral-colors-500">
+                    <span className="flex items-center gap-3 text-gray-800">
                       <FaSignInAlt />
                       Pages
                     </span>
