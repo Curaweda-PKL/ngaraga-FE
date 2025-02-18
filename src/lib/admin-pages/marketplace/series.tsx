@@ -15,18 +15,23 @@ interface ModalProps {
   onClose: () => void;
   title: string;
   submitText: string;
-  onSubmit: (name: string, masterId: number) => void;
+  onSubmit: (name: string, masterId: number, code: string) => void;
   defaultValue?: string;
+  defaultCode?: string;
 }
 
 export const Series = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [selectedSeries, setSelectedSeries] = useState<{ id: number; name: string } | null>(null);
+  const [selectedSeries, setSelectedSeries] = useState<{
+    id: number;
+    name: string;
+    code: string;
+  } | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [masters, setMasters] = useState<{ id: number; name: string }[]>([]);
   const [seriesList, setSeriesList] = useState<
-    { id: number; name: string; masterId: number }[]
+    { id: number; name: string; masterId: number; code: string }[]
   >([]);
   const [loadingMasters, setLoadingMasters] = useState(true);
   const [errorMasters, setErrorMasters] = useState<string | null>(null);
@@ -75,12 +80,16 @@ export const Series = () => {
     fetchSeries();
   }, []);
 
-  const handleAddSeries = async (name: string, masterId: number) => {
+  const handleAddSeries = async (
+    name: string,
+    masterId: number,
+    code: string
+  ) => {
     try {
       const response = await fetch(`${SERVER_URL}/api/series/create`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, masterId }),
+        body: JSON.stringify({ name, masterId, code: code || generateCode() }),
       });
 
       if (!response.ok) {
@@ -97,22 +106,26 @@ export const Series = () => {
     }
   };
 
-  const handleEditSeries = async (id: number, name: string, masterId: number) => {
+  const handleEditSeries = async (
+    id: number,
+    name: string,
+    masterId: number,
+    code: string
+  ) => {
     try {
-      const response = await fetch(
-        `${SERVER_URL}/api/series/edit/${id}`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name, masterId }),
-        }
-      );
+      const response = await fetch(`${SERVER_URL}/api/series/edit/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, masterId, code: code || generateCode() }),
+      });
 
       if (!response.ok) {
         throw new Error("Failed to update series");
       }
-      window.location.reload();
+
       const updatedSeries = await response.json();
+
+      // Update state secara langsung tanpa refresh halaman
       setSeriesList((prev) =>
         prev.map((series) =>
           series.id === id
@@ -120,6 +133,7 @@ export const Series = () => {
                 ...series,
                 name: updatedSeries.name,
                 masterId: updatedSeries.masterId,
+                code: updatedSeries.code,
               }
             : series
         )
@@ -130,16 +144,16 @@ export const Series = () => {
     } finally {
       setTimeout(() => setSuccessMessage(null), 3000);
     }
+    window.location.reload()
+    // Menutup modal setelah update
+    setIsEditModalOpen(false);
   };
 
   const handleDeleteSeries = async (id: number) => {
     try {
-      const response = await fetch(
-        `${SERVER_URL}/api/series/delete/${id}`,
-        {
-          method: "DELETE",
-        }
-      );
+      const response = await fetch(`${SERVER_URL}/api/series/delete/${id}`, {
+        method: "DELETE",
+      });
 
       if (!response.ok) {
         throw new Error("Failed to delete series");
@@ -154,6 +168,10 @@ export const Series = () => {
     }
   };
 
+  const generateCode = () => {
+    return `CODE-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
+  };
+
   const Modal: React.FC<ModalProps> = ({
     isOpen,
     onClose,
@@ -161,10 +179,13 @@ export const Series = () => {
     submitText,
     onSubmit,
     defaultValue = "",
+    defaultCode = "",
   }) => {
     const [inputValue, setInputValue] = useState(defaultValue);
+    const [inputCode, setInputCode] = useState(defaultCode);
 
     useEffect(() => setInputValue(defaultValue), [defaultValue]);
+    useEffect(() => setInputCode(defaultCode), [defaultCode]);
 
     if (!isOpen) return null;
 
@@ -173,7 +194,10 @@ export const Series = () => {
         <div className="bg-white rounded-lg w-full max-w-md">
           <div className="flex justify-between items-center p-4 border-b">
             <h2 className="text-lg font-medium">{title}</h2>
-            <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+            <button
+              onClick={onClose}
+              className="text-gray-400 hover:text-gray-600"
+            >
               <X className="w-5 h-5" />
             </button>
           </div>
@@ -210,6 +234,16 @@ export const Series = () => {
               onChange={(e) => setInputValue(e.target.value)}
               className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500"
             />
+
+            <label className="block text-sm font-medium text-gray-700 mb-1 mt-4">
+              Series Code
+            </label>
+            <input
+              type="text"
+              value={inputCode}
+              onChange={(e) => setInputCode(e.target.value)}
+              className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+            />
           </div>
 
           <div className="flex justify-end gap-2 p-4 border-t">
@@ -222,7 +256,7 @@ export const Series = () => {
             <button
               onClick={() => {
                 if (selectedMaster !== null) {
-                  onSubmit(inputValue, selectedMaster);
+                  onSubmit(inputValue, selectedMaster, inputCode);
                   onClose();
                 }
               }}
@@ -297,19 +331,20 @@ export const Series = () => {
             <tr>
               <th className="px-4 py-2 border-b text-left">Series Name</th>
               <th className="px-4 py-2 border-b text-left">Master Name</th>
+              <th className="px-4 py-2 border-b text-left">Code</th>
               <th className="px-4 py-2 border-b text-center w-32">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
             {loadingSeries ? (
               <tr>
-                <td colSpan={3} className="px-6 py-4 text-center">
+                <td colSpan={4} className="px-6 py-4 text-center">
                   Loading series...
                 </td>
               </tr>
             ) : errorSeries ? (
               <tr>
-                <td colSpan={3} className="px-6 py-4 text-center text-red-500">
+                <td colSpan={4} className="px-6 py-4 text-center text-red-500">
                   {errorSeries}
                 </td>
               </tr>
@@ -320,8 +355,11 @@ export const Series = () => {
                     {series.name}
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-600">
-                    {masters.find((master) => master.id === series.masterId)?.name ||
-                      "Unknown Master"}
+                    {masters.find((master) => master.id === series.masterId)
+                      ?.name || "Unknown Master"}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-600">
+                    {series.code}
                   </td>
                   <td className="px-6 py-4 text-center">
                     <div className="flex justify-center gap-4">
@@ -360,39 +398,46 @@ export const Series = () => {
           disabled={currentPage === 1}
           className="flex items-center gap-2 px-3 py-1 rounded bg-gray-100 hover:bg-gray-200 disabled:opacity-50"
         >
-          <ChevronLeft className="w-5 h-5" />
-          Prev
+          <ChevronLeft />
+          Previous
         </button>
-        <div>
+        <span className="text-gray-600">
           Page {currentPage} of {totalPages}
-        </div>
+        </span>
         <button
-          onClick={() => currentPage < totalPages && setCurrentPage(currentPage + 1)}
+          onClick={() =>
+            currentPage < totalPages && setCurrentPage(currentPage + 1)
+          }
           disabled={currentPage === totalPages}
           className="flex items-center gap-2 px-3 py-1 rounded bg-gray-100 hover:bg-gray-200 disabled:opacity-50"
         >
           Next
-          <ChevronRight className="w-5 h-5" />
+          <ChevronRight />
         </button>
       </div>
 
-      {/* Add/Edit Modal */}
+      {/* Modal Add */}
       <Modal
-        isOpen={isAddModalOpen || isEditModalOpen}
-        onClose={() => {
-          setIsAddModalOpen(false);
-          setIsEditModalOpen(false);
-          setSelectedSeries(null);
-        }}
-        title={isAddModalOpen ? "Add Series" : "Edit Series"}
-        submitText={isAddModalOpen ? "Add" : "Save Changes"}
-        onSubmit={
-          isAddModalOpen
-            ? handleAddSeries
-            : (name, masterId) =>
-                handleEditSeries(selectedSeries?.id || 0, name, masterId)
-        }
-        defaultValue={isEditModalOpen && selectedSeries ? selectedSeries.name : ""}
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        title="Add Series"
+        submitText="Add"
+        onSubmit={(name, masterId, code) =>
+          handleAddSeries(name, masterId, code)
+        } // Menambahkan parameter code
+      />
+
+      {/* Modal Edit */}
+      <Modal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        title="Edit Series"
+        submitText="Update"
+        defaultValue={selectedSeries?.name || ""}
+        defaultCode={selectedSeries?.code || ""}
+        onSubmit={(name, masterId, code) =>
+          handleEditSeries(selectedSeries?.id || 0, name, masterId, code)
+        } // Menambahkan parameter code
       />
     </div>
   );
