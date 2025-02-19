@@ -1,14 +1,14 @@
 import React from "react";
-import {ProfilePage} from "@/lib/pages/artists/components/other-profile-page";
-import {MoreCardSection} from "./components/more-card";
+import {ProfilePage} from "../artists/components/other-profile-page";
 import {DetailBio} from "./components/detail-bio";
+import {MoreCardSection} from "./components/more-card";
 
 const DetailSpecial: React.FC = () => {
   return (
     <div>
       <ProfilePage />
-      <MoreCardSection />
       <DetailBio />
+      <MoreCardSection />
     </div>
   );
 };

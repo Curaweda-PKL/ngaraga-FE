@@ -109,7 +109,7 @@ export const routes: Array<PathRouteProps> = [
   {path: "/view-detail", element: <ViewDetail />},
   {path: "/rankings", element: <TopCollectors />},
   {path: "/events", element: <BrowseEvents />},
-  {path: "/detail-events/:id", element: <EventDetail />},
+  {path: "/detail-events/id", element: <EventDetail />},
   {path: "/login/admin", element: <AdminLogin />},
   {path: "/sentEmail", element: <SentEmail />},
   {path: "/success/registered/event", element: <SuccesRegist />},

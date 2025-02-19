@@ -20,7 +20,8 @@ export const Navbar: React.FC = () => {
   const [userAvatarUrl, setUserAvatarUrl] = useState("");
 
   // Default avatar image if none is returned
-  const defaultAvatar = "https://comickaze.in/wp-content/uploads/woocommerce-placeholder-600x600.png";
+  const defaultAvatar =
+    "https://comickaze.in/wp-content/uploads/woocommerce-placeholder-600x600.png";
 
   // Compute the full avatar URL. The API returns a relative path, so we prepend our base URL.
   const avatarUrl = userAvatarUrl
@@ -171,6 +172,7 @@ export const Navbar: React.FC = () => {
                 className="btn bg-white border-call-to-action rounded-lg text-orange-300 sm:flex lg:flex items-center gap-2 lg:mr-2 ml-2 hover:bg-call-to-actions-800 hover:text-white transition"
                 onClick={() => navigateToPage("login")}
               >
+                <FaUserFriends size={18} />
                 Sign In
               </a>
 
