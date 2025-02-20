@@ -69,7 +69,7 @@ const DetailSpecial = React.lazy(
   () => import("@/lib/pages/detail-card/detail-special-index")
 );
 const DetailCards = React.lazy(
-  () => import("../pages/detail-card/detail-cards")
+  () => import("../pages/detail-card/detail-cards-index")
 );
 const PaymentPage = React.lazy(() => import("@/lib/pages/payment/payment"));
 const OrderComplete = React.lazy(() => import("@/lib/pages/payment/complete"));
@@ -79,8 +79,8 @@ const OrderDetails = React.lazy(
 const BrowseEvents = React.lazy(
   () => import("@/lib/pages/events/browse-event")
 );
-const EventDetail = React.lazy(
-  () => import("@/lib/pages/events/detail-events")
+const DetailEvents = React.lazy(
+  () => import("@/lib/pages/events/detail-event-index")
 );
 const EventRegistration = React.lazy(
   () => import("@/lib/pages/events/register-event")
@@ -109,7 +109,7 @@ export const routes: Array<PathRouteProps> = [
   {path: "/view-detail", element: <ViewDetail />},
   {path: "/rankings", element: <TopCollectors />},
   {path: "/events", element: <BrowseEvents />},
-  {path: "/detail-events/id", element: <EventDetail />},
+  {path: "/detail-events/id", element: <DetailEvents />},
   {path: "/login/admin", element: <AdminLogin />},
   {path: "/sentEmail", element: <SentEmail />},
   {path: "/success/registered/event", element: <SuccesRegist />},

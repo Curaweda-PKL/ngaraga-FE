@@ -237,7 +237,6 @@ const MainContent: React.FC<MainContentProps> = ({eventData}) => {
             </div>
           )}
         </div>
-
         <Link
           to={`/register-events/${eventData?.id}`}
           className="block mb-6"
@@ -246,7 +245,6 @@ const MainContent: React.FC<MainContentProps> = ({eventData}) => {
             Register Now
           </button>
         </Link>
-
         <div>
           <h3 className="text-lg mb-3">Share Event</h3>
           <div className="flex gap-4">
@@ -315,7 +313,6 @@ const MainContent: React.FC<MainContentProps> = ({eventData}) => {
               </div>
             </div>
           </div>
-
           <Link
             to={`/register-events/${eventData?.id}`}
             className="block mb-8"
@@ -324,7 +321,6 @@ const MainContent: React.FC<MainContentProps> = ({eventData}) => {
               Register Now
             </button>
           </Link>
-
           <div>
             <h3 className="text-xl mb-4">Share Event</h3>
             <div className="flex gap-4">
@@ -449,7 +445,10 @@ const MainContent: React.FC<MainContentProps> = ({eventData}) => {
       </div>
 
       {isShareModalOpen && (
-        <ShareModal onClose={() => setShareModalOpen(false)} />
+        <ShareModal
+          onClose={() => setShareModalOpen(false)}
+          isOpen={false}
+        />
       )}
     </div>
   );
