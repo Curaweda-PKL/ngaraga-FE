@@ -269,7 +269,7 @@ export const Categories = () => {
                       <div className="w-8 h-8 flex items-center justify-center">
                         {category.image ? (
                           <img
-                            src={`${SERVER_URL}/${category.image}`}
+                            src={`${category.image}`}
                             alt={category.name}
                             className="w-8 h-8 object-contain rounded-full"
                           />

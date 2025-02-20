@@ -22,6 +22,7 @@ interface CardFormProps {
     source: boolean;
     sourceImageWebsite: string;
     sourceImageAlt: string;
+    cardType: string;
   };
   handleInputChange: (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -46,6 +47,7 @@ interface CardFormProps {
       source: boolean;
       sourceImageWebsite: string;
       sourceImageAlt: string;
+      cardType: string;
     }>
   >;
 }

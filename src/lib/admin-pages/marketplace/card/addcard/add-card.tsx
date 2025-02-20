@@ -46,6 +46,7 @@ export const AddCard = () => {
     source: false,
     sourceImageWebsite: "",
     sourceImageAlt: "",
+    cardType: "NORMAL",
   });
 
   // State to keep the actual file for upload
@@ -221,7 +222,7 @@ export const AddCard = () => {
       payload.append("ownerId", "");
 
       // Append cardType as DEFAULT (for a normal card)
-      payload.append("CardType", "DEFAULT");
+      payload.append("CardType", "NORMAL");
 
       // Append sourceImage if the source toggle is enabled
       if (formData.source) {

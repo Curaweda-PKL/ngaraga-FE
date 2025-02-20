@@ -10,6 +10,7 @@ interface CardSettingsProps {
     source: boolean;
     sourceImageWebsite: string;
     sourceImageAlt: string;
+    cardType: string;
   };
   handleInputChange: (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -31,6 +32,7 @@ interface CardSettingsProps {
       source: boolean;
       sourceImageWebsite: string;
       sourceImageAlt: string;
+      cardType: string;
     }>
   >;
   apiCategories: { id: number; name: string; image: string | null }[];
