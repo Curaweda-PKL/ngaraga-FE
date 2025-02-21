@@ -1,8 +1,8 @@
 // src/components/EditAddressModal.tsx
 import axios from "axios";
-import React, { useState, useEffect } from "react";
+import React, {useState, useEffect} from "react";
 import PhoneInput from "../../checkout/components/PhoneInput";
-import { SERVER_URL } from "@/middleware/utils";
+import {SERVER_URL} from "@/middleware/utils";
 
 // Define the Address interface (adjust fields as needed)
 export interface Address {
@@ -53,7 +53,12 @@ interface Subdistrict {
   name: string;
 }
 
-const EditAddressModal: React.FC<EditAddressModalProps> = ({ isOpen, onClose, address, onAddressUpdated }) => {
+const EditAddressModal: React.FC<EditAddressModalProps> = ({
+  isOpen,
+  onClose,
+  address,
+  onAddressUpdated,
+}) => {
   // Prepopulate address-related fields:
   const [country, setCountry] = useState(address.country || "");
   const [province, setProvince] = useState(address.provinceId || "");
@@ -61,14 +66,22 @@ const EditAddressModal: React.FC<EditAddressModalProps> = ({ isOpen, onClose, ad
   const [city, setCity] = useState(address.cityId || "");
   const [cityName, setCityName] = useState(address.city || "");
   const [subdistrict, setSubdistrict] = useState(address.subdistrictId || "");
-  const [subdistrictName, setSubdistrictName] = useState(address.subdistrict || "");
+  const [subdistrictName, setSubdistrictName] = useState(
+    address.subdistrict || ""
+  );
   const [postalCode, setPostalCode] = useState(address.postalCode || "");
   const [addressDetails, setAddressDetails] = useState(address.details || "");
 
   // For account-related fields, initialize from the account object:
-  const [fullName, setFullName] = useState(address.fullName || address.account?.fullName || "");
-  const [phoneCountryCode, setCountryCode] = useState(address.account?.countryCode || "");
-  const [phoneNumber, setPhoneNumber] = useState(address.account?.phoneNumber || "");
+  const [fullName, setFullName] = useState(
+    address.fullName || address.account?.fullName || ""
+  );
+  const [phoneCountryCode, setCountryCode] = useState(
+    address.account?.countryCode || ""
+  );
+  const [phoneNumber, setPhoneNumber] = useState(
+    address.account?.phoneNumber || ""
+  );
 
   // API data states for location selects
   const [provinces, setProvinces] = useState<Province[]>([]);
@@ -93,17 +106,20 @@ const EditAddressModal: React.FC<EditAddressModalProps> = ({ isOpen, onClose, ad
   useEffect(() => {
     const fetchProvinces = async () => {
       if (country === "Indonesia") {
-        setLoading((prev) => ({ ...prev, provinces: true }));
-        setError((prev) => ({ ...prev, provinces: "" }));
+        setLoading((prev) => ({...prev, provinces: true}));
+        setError((prev) => ({...prev, provinces: ""}));
         try {
           const response = await axios.get<Province[]>(
             "https://curaweda-pkl.github.io/api-wilayah-indonesia/api/provinces.json"
           );
           setProvinces(response.data);
         } catch (err) {
-          setError((prev) => ({ ...prev, provinces: "Failed to load provinces" }));
+          setError((prev) => ({
+            ...prev,
+            provinces: "Failed to load provinces",
+          }));
         } finally {
-          setLoading((prev) => ({ ...prev, provinces: false }));
+          setLoading((prev) => ({...prev, provinces: false}));
         }
       }
     };
@@ -114,17 +130,17 @@ const EditAddressModal: React.FC<EditAddressModalProps> = ({ isOpen, onClose, ad
   useEffect(() => {
     const fetchCities = async () => {
       if (country === "Indonesia" && province) {
-        setLoading((prev) => ({ ...prev, cities: true }));
-        setError((prev) => ({ ...prev, cities: "" }));
+        setLoading((prev) => ({...prev, cities: true}));
+        setError((prev) => ({...prev, cities: ""}));
         try {
           const response = await axios.get<City[]>(
             `https://curaweda-pkl.github.io/api-wilayah-indonesia/api/regencies/${province}.json`
           );
           setCities(response.data);
         } catch (err) {
-          setError((prev) => ({ ...prev, cities: "Failed to load cities" }));
+          setError((prev) => ({...prev, cities: "Failed to load cities"}));
         } finally {
-          setLoading((prev) => ({ ...prev, cities: false }));
+          setLoading((prev) => ({...prev, cities: false}));
         }
       }
     };
@@ -135,17 +151,20 @@ const EditAddressModal: React.FC<EditAddressModalProps> = ({ isOpen, onClose, ad
   useEffect(() => {
     const fetchSubdistricts = async () => {
       if (country === "Indonesia" && city) {
-        setLoading((prev) => ({ ...prev, subdistricts: true }));
-        setError((prev) => ({ ...prev, subdistricts: "" }));
+        setLoading((prev) => ({...prev, subdistricts: true}));
+        setError((prev) => ({...prev, subdistricts: ""}));
         try {
           const response = await axios.get<Subdistrict[]>(
             `https://curaweda-pkl.github.io/api-wilayah-indonesia/api/districts/${city}.json`
           );
           setSubdistricts(response.data);
         } catch (err) {
-          setError((prev) => ({ ...prev, subdistricts: "Failed to load subdistricts" }));
+          setError((prev) => ({
+            ...prev,
+            subdistricts: "Failed to load subdistricts",
+          }));
         } finally {
-          setLoading((prev) => ({ ...prev, subdistricts: false }));
+          setLoading((prev) => ({...prev, subdistricts: false}));
         }
       }
     };
@@ -171,7 +190,14 @@ const EditAddressModal: React.FC<EditAddressModalProps> = ({ isOpen, onClose, ad
   }, [isOpen, address]);
 
   const handleSaveAddress = async () => {
-    if (!country || !province || !city || !subdistrict || !postalCode || !addressDetails) {
+    if (
+      !country ||
+      !province ||
+      !city ||
+      !subdistrict ||
+      !postalCode ||
+      !addressDetails
+    ) {
       setSaveError("Please fill out all required fields.");
       return;
     }
@@ -194,7 +220,7 @@ const EditAddressModal: React.FC<EditAddressModalProps> = ({ isOpen, onClose, ad
       const response = await axios.put(
         `${SERVER_URL}/api/account/addresses/${address.id}`,
         payload,
-        { withCredentials: true }
+        {withCredentials: true}
       );
       console.log("Address updated:", response.data);
       // Call the callback to update the parent's state
@@ -223,7 +249,10 @@ const EditAddressModal: React.FC<EditAddressModalProps> = ({ isOpen, onClose, ad
         className="bg-white modal-box relative rounded-lg shadow-lg w-11/12 max-w-lg p-6"
         onClick={(e) => e.stopPropagation()}
       >
-        <button className="btn btn-sm btn-circle absolute right-2 top-2" onClick={onClose}>
+        <button
+          className="btn btn-sm btn-circle absolute right-2 top-2"
+          onClick={onClose}
+        >
           ✕
         </button>
 
@@ -253,7 +282,7 @@ const EditAddressModal: React.FC<EditAddressModalProps> = ({ isOpen, onClose, ad
             countryCode={phoneCountryCode}
             phoneNumber={phoneNumber}
             disabled={true}
-            onChange={(code, number) => {}}
+            onChange={(_code, _number) => {}}
           />
         </div>
 
@@ -296,7 +325,9 @@ const EditAddressModal: React.FC<EditAddressModalProps> = ({ isOpen, onClose, ad
                   onChange={(e) => {
                     const selectedId = e.target.value;
                     setProvince(selectedId);
-                    const selected = provinces.find((prov) => prov.id === selectedId);
+                    const selected = provinces.find(
+                      (prov) => prov.id === selectedId
+                    );
                     setProvinceName(selected ? selected.name : "");
                     setCity("");
                     setCityName("");
@@ -307,13 +338,22 @@ const EditAddressModal: React.FC<EditAddressModalProps> = ({ isOpen, onClose, ad
                 >
                   <option value="">Select Province</option>
                   {provinces.map((prov) => (
-                    <option key={prov.id} value={prov.id}>
+                    <option
+                      key={prov.id}
+                      value={prov.id}
+                    >
                       {prov.name}
                     </option>
                   ))}
                 </select>
-                {loading.provinces && <span className="text-sm mt-1">Loading provinces...</span>}
-                {error.provinces && <span className="text-red-500 text-sm mt-1">{error.provinces}</span>}
+                {loading.provinces && (
+                  <span className="text-sm mt-1">Loading provinces...</span>
+                )}
+                {error.provinces && (
+                  <span className="text-red-500 text-sm mt-1">
+                    {error.provinces}
+                  </span>
+                )}
               </>
             ) : (
               <input
@@ -338,7 +378,9 @@ const EditAddressModal: React.FC<EditAddressModalProps> = ({ isOpen, onClose, ad
                   onChange={(e) => {
                     const selectedId = e.target.value;
                     setCity(selectedId);
-                    const selected = cities.find((cty) => cty.id === selectedId);
+                    const selected = cities.find(
+                      (cty) => cty.id === selectedId
+                    );
                     setCityName(selected ? selected.name : "");
                     setSubdistrict("");
                     setSubdistrictName("");
@@ -347,13 +389,22 @@ const EditAddressModal: React.FC<EditAddressModalProps> = ({ isOpen, onClose, ad
                 >
                   <option value="">Select City</option>
                   {cities.map((cty) => (
-                    <option key={cty.id} value={cty.id}>
+                    <option
+                      key={cty.id}
+                      value={cty.id}
+                    >
                       {cty.name}
                     </option>
                   ))}
                 </select>
-                {loading.cities && <span className="text-sm mt-1">Loading cities...</span>}
-                {error.cities && <span className="text-red-500 text-sm mt-1">{error.cities}</span>}
+                {loading.cities && (
+                  <span className="text-sm mt-1">Loading cities...</span>
+                )}
+                {error.cities && (
+                  <span className="text-red-500 text-sm mt-1">
+                    {error.cities}
+                  </span>
+                )}
               </>
             ) : (
               <input
@@ -381,20 +432,33 @@ const EditAddressModal: React.FC<EditAddressModalProps> = ({ isOpen, onClose, ad
                   onChange={(e) => {
                     const selectedId = e.target.value;
                     setSubdistrict(selectedId);
-                    const selected = subdistricts.find((sub) => sub.id === selectedId);
+                    const selected = subdistricts.find(
+                      (sub) => sub.id === selectedId
+                    );
                     setSubdistrictName(selected ? selected.name : "");
                   }}
-                  disabled={!city || loading.subdistricts || !!error.subdistricts}
+                  disabled={
+                    !city || loading.subdistricts || !!error.subdistricts
+                  }
                 >
                   <option value="">Select Subdistrict</option>
                   {subdistricts.map((sub) => (
-                    <option key={sub.id} value={sub.id}>
+                    <option
+                      key={sub.id}
+                      value={sub.id}
+                    >
                       {sub.name}
                     </option>
                   ))}
                 </select>
-                {loading.subdistricts && <span className="text-sm mt-1">Loading subdistricts...</span>}
-                {error.subdistricts && <span className="text-red-500 text-sm mt-1">{error.subdistricts}</span>}
+                {loading.subdistricts && (
+                  <span className="text-sm mt-1">Loading subdistricts...</span>
+                )}
+                {error.subdistricts && (
+                  <span className="text-red-500 text-sm mt-1">
+                    {error.subdistricts}
+                  </span>
+                )}
               </>
             ) : (
               <input
@@ -434,7 +498,9 @@ const EditAddressModal: React.FC<EditAddressModalProps> = ({ isOpen, onClose, ad
           ></textarea>
         </div>
 
-        {saveError && <div className="text-red-500 text-sm mb-4">{saveError}</div>}
+        {saveError && (
+          <div className="text-red-500 text-sm mb-4">{saveError}</div>
+        )}
 
         <div className="modal-action">
           <button

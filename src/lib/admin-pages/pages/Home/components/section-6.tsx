@@ -4,83 +4,82 @@ import {IoChevronDownOutline} from "react-icons/io5";
 
 export const SectionSixForm = () => {
   const [formData] = useState({
-    title: "Lorem Ipsum dolor amet zdzf",
-    description:
-      "Lorem ipsum dolor amet Lorem ipsum dolor amet Lorem ipsum dolor amet Lorem ipsum dolor amet Lorem ipsum dolor amet Lorem ipsum dolor",
-    cards: "240k+",
-    collectors: "100k+",
-    category: "240k+",
-    selectedCard: "Galactic Explorer",
+    title: "Special Card",
+    time: "24",
+    selectedCard: "Space Walking",
   });
 
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
   return (
-    <div className="p-6 bg-white">
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <h2 className="text-lg font-medium mb-6">Section 6</h2>
+    <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+      <div className="p-6">
+        <h2 className="text-lg font-medium mb-8">Section 6</h2>
 
-        <div className="grid grid-cols-3 gap-6">
-          {/* Left Column */}
-          <div className="space-y-6">
-            {/* Cards */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Cards *
-              </label>
-              <div className="relative">
-                <input
-                  type="text"
-                  value={formData.cards}
-                  className="w-full border rounded-lg px-4 py-2.5 pr-10"
-                />
-                <button className="absolute right-3 top-1/2 -translate-y-1/2">
-                  <IoMdClose className="text-gray-400 hover:text-gray-600" />
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Middle Column */}
-          <div className="space-y-6">
-            {/* Category */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Category *
-              </label>
-              <div className="relative">
-                <input
-                  type="text"
-                  value={formData.category}
-                  className="w-full border rounded-lg px-4 py-2.5 pr-10"
-                />
-                <button className="absolute right-3 top-1/2 -translate-y-1/2">
-                  <IoMdClose className="text-gray-400 hover:text-gray-600" />
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Right Column */}
+        <div className="grid grid-cols-3 gap-x-8">
+          {/* Title */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Select Card *
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Title <span className="text-red-500">*</span>
             </label>
             <div className="relative">
-              <button className="w-full border rounded-lg px-4 py-2.5 text-left flex items-center justify-between">
-                <span>Choose a Card</span>
-                <IoChevronDownOutline className="text-gray-400" />
+              <input
+                type="text"
+                value={formData.title}
+                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+              <button className="absolute right-3 top-1/2 -translate-y-1/2">
+                <IoMdClose className="text-gray-400 hover:text-gray-600 w-5 h-5" />
+              </button>
+            </div>
+          </div>
+
+          {/* Time */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Time <span className="text-red-500">*</span>
+            </label>
+            <div className="relative">
+              <input
+                type="text"
+                value={formData.time}
+                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+              <button className="absolute right-3 top-1/2 -translate-y-1/2">
+                <IoMdClose className="text-gray-400 hover:text-gray-600 w-5 h-5" />
+              </button>
+            </div>
+          </div>
+
+          {/* Card Selection */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Select Card <span className="text-red-500">*</span>
+            </label>
+            <div className="relative">
+              <button
+                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-left flex items-center justify-between bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              >
+                <span className="text-gray-500">Choose a Card</span>
+                <IoChevronDownOutline className="text-gray-400 w-5 h-5" />
               </button>
               {/* Selected Card Display */}
-              <div className="mt-2 border rounded-lg p-2 flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
-                    <span className="text-white text-xs">GE</span>
+              {formData.selectedCard && (
+                <div className="mt-2 border border-gray-300 rounded-lg p-3 flex items-center justify-between bg-white">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-lg flex items-center justify-center">
+                      <span className="text-white font-medium">SW</span>
+                    </div>
+                    <span className="font-medium text-gray-800">
+                      {formData.selectedCard}
+                    </span>
                   </div>
-                  <span>{formData.selectedCard}</span>
+                  <button className="text-red-500 hover:bg-red-50 rounded-full p-1">
+                    <IoMdClose className="w-4 h-4" />
+                  </button>
                 </div>
-                <button>
-                  <IoMdClose className="text-gray-400 hover:text-gray-600" />
-                </button>
-              </div>
+              )}
             </div>
           </div>
         </div>
@@ -88,3 +87,5 @@ export const SectionSixForm = () => {
     </div>
   );
 };
+
+export default SectionSixForm;

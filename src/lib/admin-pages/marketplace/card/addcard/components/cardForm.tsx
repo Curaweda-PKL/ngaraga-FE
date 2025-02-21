@@ -1,7 +1,8 @@
-import React, { ChangeEvent, useRef } from "react";
+// CardForm.tsx
+import React, {ChangeEvent, useRef} from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
-import { Upload } from "lucide-react";
+import {Upload} from "lucide-react";
 
 interface CardFormProps {
   formData: {
@@ -12,7 +13,15 @@ interface CardFormProps {
     salePrice: boolean;
     stock: string;
     cardDetails: string;
-    // ...other fields if needed
+    // Added new fields to match the AddCard state
+    categories: string[];
+    creator: boolean;
+    selectedCreator: string;
+    tag: boolean;
+    tags: string[];
+    source: boolean;
+    sourceImageWebsite: string;
+    sourceImageAlt: string;
   };
   handleInputChange: (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -35,6 +44,8 @@ interface CardFormProps {
       tag: boolean;
       tags: string[];
       source: boolean;
+      sourceImageWebsite: string;
+      sourceImageAlt: string;
     }>
   >;
 }
@@ -155,7 +166,7 @@ const CardForm: React.FC<CardFormProps> = ({
           <ReactQuill
             value={formData.cardDetails}
             onChange={(value) =>
-              setFormData((prev) => ({ ...prev, cardDetails: value }))
+              setFormData((prev) => ({...prev, cardDetails: value}))
             }
             placeholder="Write your card details..."
           />

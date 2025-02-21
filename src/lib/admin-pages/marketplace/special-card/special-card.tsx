@@ -1,12 +1,11 @@
-import React, { ChangeEvent, useEffect, useState } from "react";
-import { Edit3, Eye, Trash2, Plus } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import React, {ChangeEvent, useEffect, useState} from "react";
+import {Edit3, Eye, Trash2, Plus} from "lucide-react";
+import {useNavigate} from "react-router-dom";
 import axios from "axios";
-import { SERVER_URL } from "@/middleware/utils"; // Import centralized server URL
+import {SERVER_URL} from "@/middleware/utils"; // Import centralized server URL
 
 export const SpecialCard = () => {
   const navigate = useNavigate();
-
   // State for cards; each card object includes the fields we need:
   // sku, name, category, stock, price, and selected.
   const [cards, setCards] = useState<
@@ -42,7 +41,10 @@ export const SpecialCard = () => {
         }));
         setCards(mappedCards);
       } catch (error: any) {
-        console.error("Error fetching cards:", error.response?.data || error.message);
+        console.error(
+          "Error fetching cards:",
+          error.response?.data || error.message
+        );
       }
     };
 
@@ -50,15 +52,15 @@ export const SpecialCard = () => {
   }, []);
 
   // Handler for selecting all rows
-  const handleSelectAll = (e: { target: { checked: boolean } }) => {
-    const { checked } = e.target;
-    const updatedCards = cards.map((card) => ({ ...card, selected: checked }));
+  const handleSelectAll = (e: {target: {checked: boolean}}) => {
+    const {checked} = e.target;
+    const updatedCards = cards.map((card) => ({...card, selected: checked}));
     setCards(updatedCards);
   };
 
   // Handler for selecting an individual row
   const handleSelectRow = (index: number, e: ChangeEvent<HTMLInputElement>) => {
-    const { checked } = e.target;
+    const {checked} = e.target;
     const updatedCards = [...cards];
     updatedCards[index].selected = checked;
     setCards(updatedCards);
@@ -84,7 +86,9 @@ export const SpecialCard = () => {
                 <input
                   type="checkbox"
                   className="checkbox"
-                  checked={cards.length > 0 && cards.every((card) => card.selected)}
+                  checked={
+                    cards.length > 0 && cards.every((card) => card.selected)
+                  }
                   onChange={handleSelectAll}
                 />
               </th>
@@ -132,7 +136,10 @@ export const SpecialCard = () => {
             ))}
             {cards.length === 0 && (
               <tr>
-                <td colSpan={7} className="text-center py-4">
+                <td
+                  colSpan={7}
+                  className="text-center py-4"
+                >
                   No cards found.
                 </td>
               </tr>

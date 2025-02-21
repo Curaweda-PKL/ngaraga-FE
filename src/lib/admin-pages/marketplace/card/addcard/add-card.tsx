@@ -1,35 +1,35 @@
-import React, { ChangeEvent, useEffect, useState } from "react";
+import React, {ChangeEvent, useEffect, useState} from "react";
 import axios from "axios";
 import "react-quill/dist/quill.snow.css";
-import { useNavigate } from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 
 import CardForm from "./components/cardForm";
 import CardSettings from "./components/cardSetting";
-import { SERVER_URL } from "@/middleware/utils"; // Import centralized server URL
+import {SERVER_URL} from "@/middleware/utils";
 
 export const AddCard = () => {
   const navigate = useNavigate();
 
   // Categories state (now including id)
   const [apiCategories, setApiCategories] = useState<
-    { id: number; name: string; image: string | null }[]
+    {id: number; name: string; image: string | null}[]
   >([]);
   const [categoriesLoading, setCategoriesLoading] = useState(true);
   const [categoriesError, setCategoriesError] = useState<string | null>(null);
 
   // Creators state (fetched from API, now including id)
   const [apiCreators, setApiCreators] = useState<
-    { id: number; name: string; image: string | null }[]
+    {id: number; name: string; image: string | null}[]
   >([]);
   const [creatorsLoading, setCreatorsLoading] = useState(true);
   const [creatorsError, setCreatorsError] = useState<string | null>(null);
 
   // Tags state (fetched from API)
-  const [apiTags, setApiTags] = useState<{ id: number; name: string }[]>([]);
+  const [apiTags, setApiTags] = useState<{id: number; name: string}[]>([]);
   const [tagsLoading, setTagsLoading] = useState(true);
   const [tagsError, setTagsError] = useState<string | null>(null);
 
-  // Form data state
+  // Form data state including new fields for source image info
   const [formData, setFormData] = useState({
     cardImage: null as string | ArrayBuffer | null, // For preview
     cardName: "",
@@ -44,6 +44,8 @@ export const AddCard = () => {
     tag: false,
     tags: [] as string[], // stores selected tag IDs as strings
     source: false,
+    sourceImageWebsite: "",
+    sourceImageAlt: "",
   });
 
   // State to keep the actual file for upload
@@ -83,7 +85,9 @@ export const AddCard = () => {
           id: creator.id,
           name: creator.name,
           image: creator.image
-            ? `${SERVER_URL}/uploads/creator/${encodeURIComponent(creator.image)}`
+            ? `${SERVER_URL}/uploads/creator/${encodeURIComponent(
+                creator.image
+              )}`
             : null,
         }));
         setApiCreators(creatorsData);
@@ -135,7 +139,7 @@ export const AddCard = () => {
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    const { name, value, type } = e.target;
+    const {name, value, type} = e.target;
     const newValue =
       type === "checkbox" ? (e.target as HTMLInputElement).checked : value;
     setFormData((prev) => ({
@@ -189,6 +193,11 @@ export const AddCard = () => {
   // Save handler (create new card(s))
   const handleSave = async () => {
     try {
+      // Ensure a category is selected
+      if (formData.categories.length === 0) {
+        throw new Error("Please select a category.");
+      }
+
       // Create FormData payload for multipart/form-data
       const payload = new FormData();
       payload.append("characterName", formData.cardName);
@@ -197,11 +206,8 @@ export const AddCard = () => {
       payload.append("stock", formData.stock);
       payload.append("cardDetail", formData.cardDetails);
 
-      if (formData.categories.length > 0) {
-        payload.append("categoryId", formData.categories[0]);
-      } else {
-        throw new Error("Please select a category.");
-      }
+      // Append the first selected category (as per your current logic)
+      payload.append("categoryId", formData.categories[0]);
 
       // Convert the selected tag IDs and creator ID into JSON strings
       payload.append(
@@ -215,6 +221,20 @@ export const AddCard = () => {
 
       // Owner ID is optional – here we leave it empty
       payload.append("ownerId", "");
+
+      // Append cardType as DEFAULT (for a normal card)
+      payload.append("CardType", "DEFAULT");
+
+      // Append sourceImage if the source toggle is enabled
+      if (formData.source) {
+        payload.append(
+          "sourceImage",
+          JSON.stringify({
+            website: formData.sourceImageWebsite,
+            alt: formData.sourceImageAlt,
+          })
+        );
+      }
 
       // Append image file if available
       if (cardFile) {

@@ -15,8 +15,14 @@ export const MarketHeader: React.FC = () => {
   // State to hold the fetched page content data
   const [pageContent, setPageContent] = useState<{ title: string; description: string } | null>(null);
 
-  // State to handle fetch error
-  const [fetchError, setFetchError] = useState<string | null>(null);
+  // State to track loading status
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  // Default content to use as a fallback if no data is returned
+  const defaultContent = {
+    title: "Welcome to Our Marketplace!",
+    description: "Discover and explore amazing Cards."
+  };
 
   // Fetch the page content for "marketplace" from the API
   useEffect(() => {
@@ -28,15 +34,16 @@ export const MarketHeader: React.FC = () => {
         }
         const data = await response.json();
         setPageContent(data);
-        setFetchError(null); // Reset the error state if the fetch is successful
       } catch (error) {
         console.error("Error fetching page content:", error);
-        setFetchError("Failed to load marketplace content. Please try again later.");
+        // Fallback to defaultContent if there is an error
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchPageContent();
-  }, []); // Empty dependency array ensures this runs once when the component mounts
+  }, []); // Runs once when the component mounts
 
   // Function to handle the selection of a filter item
   const handleSelectFilter = (filter: string) => {
@@ -44,20 +51,23 @@ export const MarketHeader: React.FC = () => {
   };
 
   return (
-    <div className="bg-background-color w-full px-8 py-20">
-      <div className="mx-auto ml-7">
+    // Updated responsive padding: smaller padding on mobile/md, original for lg screens
+    <div className="bg-background-color w-full px-4 py-10 lg:px-8 lg:py-20">
+      {/* Adjusted margin: no left margin on mobile/md; applied on lg */}
+      <div className="mx-auto ml-0 lg:ml-7">
         {/* Title and Subtitle */}
-        <div className="mb-10">
-          {fetchError ? (
-            // Display error message if fetch fails
-            <p className="text-lg text-red-500">{fetchError}</p>
-          ) : pageContent ? (
-            <>
-              <h1 className="text-4xl font-bold text-[#171717] mb-2">{pageContent.title}</h1>
-              <p className="text-lg text-[#404040]">{pageContent.description}</p>
-            </>
+        <div className="mb-10 ml-4 lg:ml-0">
+          {isLoading ? (
+            <p>Loading...</p>
           ) : (
-            <p>Loading...</p> 
+            <>
+              <h1 className="text-4xl font-bold text-[#171717] mb-2">
+                {pageContent?.title || defaultContent.title}
+              </h1>
+              <p className="text-lg text-[#404040]">
+                {pageContent?.description || defaultContent.description}
+              </p>
+            </>
           )}
         </div>
 
@@ -82,14 +92,14 @@ export const MarketHeader: React.FC = () => {
               }}
             >
               <ul>
-                <li className="py-2">d 1</li>
+                <li className="py-2">Item 1</li>
                 <li className="py-2">Item 2</li>
                 <li className="py-2">Item 3</li>
-                <li className="py-2">Item 3</li>
-                <li className="py-2">Item 3</li>
-                <li className="py-2">Item 3</li>
-                <li className="py-2">Item 3</li>
-                <li className="py-2">Item 3</li>
+                <li className="py-2">Item 4</li>
+                <li className="py-2">Item 5</li>
+                <li className="py-2">Item 6</li>
+                <li className="py-2">Item 7</li>
+                <li className="py-2">Item 8</li>
               </ul>
             </FilterModal>
           </div>
@@ -97,17 +107,16 @@ export const MarketHeader: React.FC = () => {
           {/* Dropdown for Medium and Larger Screens */}
           <div className="hidden md:block">
             <DropdownMarket
-              buttonText={selectedFilter} // Dynamically update the button text
-              iconLeft={<PiSlidersHorizontalDuotone className="w-5 h-5" />} // Left icon (filter icon)
-              iconRight={<MdArrowDropDown className="w-5 h-5 text-gray-400" />} // Right icon (dropdown arrow)
+              buttonText={selectedFilter}
+              iconLeft={<PiSlidersHorizontalDuotone className="w-5 h-5" />}
+              iconRight={<MdArrowDropDown className="w-5 h-5 text-gray-400" />}
             >
-              {/* Dropdown items with click handlers */}
               <li>
                 <a
                   className="block px-4 py-2 text-gray-700 rounded-lg hover-border-call-to-actions"
                   onClick={() => handleSelectFilter("Item 1")}
                 >
-                  dropdown 1
+                  Dropdown 1
                 </a>
               </li>
               <li>

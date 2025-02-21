@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react";
-import { Pencil, Trash2, Search, Eye } from "lucide-react";
+import React, {useState, useEffect} from "react";
+import {Pencil, Trash2, Search, Eye} from "lucide-react";
 import axios from "axios";
-import { CategoryModal } from "./CategoryModal"; // adjust the import path as needed
-import { SERVER_URL } from "@/middleware/utils"; // Import centralized server URL
+import {CategoryModal} from "./CategoryModal"; // adjust the import path as needed
+import {SERVER_URL} from "@/middleware/utils"; // Import centralized server URL
 
 export const Categories = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -12,10 +12,10 @@ export const Categories = () => {
     name: string;
     seriesId?: number;
     image?: string;
-    series?: { master?: { name: string } };
+    series?: {master?: {name: string}};
   } | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [series, setSeries] = useState<{ id: number; name: string }[]>([]);
+  const [series, setSeries] = useState<{id: number; name: string}[]>([]);
   const [categoriesList, setCategoriesList] = useState<any[]>([]);
   const [loadingSeries, setLoadingSeries] = useState(true);
   const [errorSeries, setErrorSeries] = useState<string | null>(null);
@@ -54,7 +54,9 @@ export const Categories = () => {
       // Map category image URL to use SERVER_URL
       const mappedCategories = categories.map((cat: any) => ({
         ...cat,
-        image: cat.image ? `${SERVER_URL}/${cat.image.replace(/\\/g, "/")}` : null,
+        image: cat.image
+          ? `${SERVER_URL}/${cat.image.replace(/\\/g, "/")}`
+          : null,
       }));
       setCategoriesList(mappedCategories);
     } catch (err) {
@@ -111,32 +113,29 @@ export const Categories = () => {
     id: number,
     name: string,
     seriesId: number,
-    imageFile?: File 
+    imageFile?: File
   ) => {
     try {
       const formData = new FormData();
       formData.append("name", name);
       formData.append("seriesId", seriesId.toString());
-      
+
       if (imageFile) {
         formData.append("image", imageFile);
       }
-  
-      const response = await fetch(
-        `${SERVER_URL}/api/categories/edit/${id}`,
-        {
-          method: "PUT",
-          body: formData, 
-        }
-      );
-  
+
+      const response = await fetch(`${SERVER_URL}/api/categories/edit/${id}`, {
+        method: "PUT",
+        body: formData,
+      });
+
       if (!response.ok) {
         throw new Error("Failed to update category");
       }
-  
+
       // Re-fetch categories to get updated data
       await fetchCategories();
-  
+
       setIsEditModalOpen(false);
       setSuccessMessage("Category updated successfully!");
       setTimeout(() => setSuccessMessage(""), 3000);
@@ -181,7 +180,10 @@ export const Categories = () => {
     <div className="p-6">
       <div className="mb-4">
         <nav className="text-sm text-gray-500">
-          <a href="/admin/marketplace" className="hover:text-yellow-500">
+          <a
+            href="/admin/marketplace"
+            className="hover:text-yellow-500"
+          >
             Marketplace
           </a>
           <span className="mx-2">/</span>
@@ -238,7 +240,10 @@ export const Categories = () => {
           <tbody className="divide-y divide-gray-200">
             {loadingCategories ? (
               <tr>
-                <td colSpan={4} className="px-6 py-4 text-center text-sm">
+                <td
+                  colSpan={4}
+                  className="px-6 py-4 text-center text-sm"
+                >
                   Loading categories...
                 </td>
               </tr>
@@ -253,7 +258,10 @@ export const Categories = () => {
               </tr>
             ) : (
               visibleCategories.map((category) => (
-                <tr key={category.id} className="hover:bg-gray-50 leading-relaxed">
+                <tr
+                  key={category.id}
+                  className="hover:bg-gray-50 leading-relaxed"
+                >
                   <td className="px-4 py-4 text-sm text-gray-600">
                     {category.series?.master?.name || "No Master"}
                   </td>
@@ -263,7 +271,7 @@ export const Categories = () => {
                   </td>
                   <td
                     className="px-6 py-4 text-sm text-gray-600"
-                    style={{ textAlign: "justify" }}
+                    style={{textAlign: "justify"}}
                   >
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 flex items-center justify-center">

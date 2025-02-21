@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useEffect, useState } from "react";
+import React, {ChangeEvent, useEffect, useState} from "react";
 
 interface CardSettingsProps {
   formData: {
@@ -8,7 +8,8 @@ interface CardSettingsProps {
     tag: boolean;
     tags: string[]; // storing tag IDs as strings
     source: boolean;
-    // other fields in formData are not needed here
+    sourceImageWebsite: string;
+    sourceImageAlt: string;
   };
   handleInputChange: (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -28,15 +29,17 @@ interface CardSettingsProps {
       tag: boolean;
       tags: string[];
       source: boolean;
+      sourceImageWebsite: string;
+      sourceImageAlt: string;
     }>
   >;
-  apiCategories: { id: number; name: string; image: string | null }[];
+  apiCategories: {id: number; name: string; image: string | null}[];
   categoriesLoading: boolean;
   categoriesError: string | null;
-  apiCreators: { id: number; name: string; image: string | null }[];
+  apiCreators: {id: number; name: string; image: string | null}[];
   creatorsLoading: boolean;
   creatorsError: string | null;
-  apiTags: { id: number; name: string }[];
+  apiTags: {id: number; name: string}[];
   tagsLoading: boolean;
   tagsError: string | null;
 }
@@ -105,7 +108,10 @@ const CardSettings: React.FC<CardSettingsProps> = ({
                       }));
                     }}
                   />
-                  <label htmlFor={id} className="flex items-center gap-2">
+                  <label
+                    htmlFor={id}
+                    className="flex items-center gap-2"
+                  >
                     {category.image && (
                       <img
                         src={category.image}
@@ -116,9 +122,7 @@ const CardSettings: React.FC<CardSettingsProps> = ({
                         }}
                       />
                     )}
-                    <span className="inline-block ml-2">
-                      {category.name}
-                    </span>
+                    <span className="inline-block ml-2">{category.name}</span>
                   </label>
                 </div>
               );
@@ -167,9 +171,7 @@ const CardSettings: React.FC<CardSettingsProps> = ({
                   type="radio"
                   name="selectedCreator"
                   value={creator.id.toString()}
-                  checked={
-                    formData.selectedCreator === creator.id.toString()
-                  }
+                  checked={formData.selectedCreator === creator.id.toString()}
                   onChange={handleInputChange}
                   className="form-radio"
                 />
@@ -212,14 +214,15 @@ const CardSettings: React.FC<CardSettingsProps> = ({
               apiTags.map((tag) => {
                 const id = `tag-${tag.id}`;
                 return (
-                  <div key={tag.id} className="tag-checkbox">
+                  <div
+                    key={tag.id}
+                    className="tag-checkbox"
+                  >
                     <input
                       type="checkbox"
                       id={id}
                       className="hidden"
-                      checked={formData.tags.includes(
-                        tag.id.toString()
-                      )}
+                      checked={formData.tags.includes(tag.id.toString())}
                       onChange={(e) => {
                         const newTags = e.target.checked
                           ? [...formData.tags, tag.id.toString()]
@@ -239,6 +242,63 @@ const CardSettings: React.FC<CardSettingsProps> = ({
             )}
           </div>
         )}
+      </div>
+
+      {/* Source Image Section */}
+      <div>
+        <div className="flex items-center justify-between mb-2 mt-2">
+          <label className="text-sm">Source Image</label>
+          <label className="inline-flex items-center cursor-pointer">
+            <input
+              type="checkbox"
+              name="source"
+              checked={formData.source}
+              onChange={handleInputChange}
+              className="sr-only peer"
+            />
+            <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600 dark:peer-checked:bg-blue-600"></div>
+          </label>
+        </div>
+        <div
+          className={`space-y-2 bg-white p-4 rounded-lg border transition-all duration-150 overflow-hidden ${
+            formData.source ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+          }`}
+        >
+          <div className="flex flex-col">
+            <label
+              htmlFor="sourceImageWebsite"
+              className="text-sm mb-1"
+            >
+              Website
+            </label>
+            <input
+              type="text"
+              id="sourceImageWebsite"
+              name="sourceImageWebsite"
+              value={formData.sourceImageWebsite}
+              onChange={handleInputChange}
+              placeholder="www.comand.com"
+              className="border p-2 rounded"
+            />
+          </div>
+          <div className="flex flex-col">
+            <label
+              htmlFor="sourceImageAlt"
+              className="text-sm mb-1"
+            >
+              Alt Website
+            </label>
+            <input
+              type="text"
+              id="sourceImageAlt"
+              name="sourceImageAlt"
+              value={formData.sourceImageAlt}
+              onChange={handleInputChange}
+              placeholder="x"
+              className="border p-2 rounded"
+            />
+          </div>
+        </div>
       </div>
     </div>
   );

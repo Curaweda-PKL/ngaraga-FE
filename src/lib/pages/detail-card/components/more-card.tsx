@@ -1,5 +1,5 @@
 import React from "react";
-import { FaRocket } from "react-icons/fa"; // Importing the rocket icon
+import {FaRocket} from "react-icons/fa"; // Importing the rocket icon
 
 type Card = {
   id: number;
@@ -67,7 +67,7 @@ export const MoreCardSection: React.FC = () => {
         </div>
 
         {/* "More Cards" Button */}
-        <div className="flex justify-center sm:ml-4 sm:mt-0 mt-6 sm:w-auto w-full sm:mt-8">
+        <div className="flex justify-center sm:ml-4 sm:mt-0 mt-6 sm:w-auto w-full">
           <button className="flex items-center px-4 py-2 mr-10 bg-call-to-action text-white rounded-lg shadow-md hover:bg-call-to-actions-800 transition">
             <FaRocket className="mr-2 text-xl sm:text-lg" />
             <a href="/marketplace">
