@@ -3,11 +3,11 @@ import axios from "axios";
 import "react-quill/dist/quill.snow.css";
 import { useNavigate } from "react-router-dom";
 
-import CardForm from "./components/cardForm";
-import CardSettings from "./components/cardSetting";
+import CardForm from "./components/specialcardForm";
+import CardSettings from "./components/specialcardSetting";
 import { SERVER_URL } from "@/middleware/utils"; 
 
-export const AddCard = () => {
+export const AddSpecialCard = () => {
   const navigate = useNavigate();
 
   // Categories state (now including id)
@@ -46,7 +46,7 @@ export const AddCard = () => {
     source: false,
     sourceImageWebsite: "",
     sourceImageAlt: "",
-    cardType: "NORMAL",
+    cardType: "SPECIAL",
   });
 
   // State to keep the actual file for upload
@@ -186,7 +186,7 @@ export const AddCard = () => {
 
   // Cancel handler
   const handleCancel = () => {
-    navigate("/admin/card");
+    navigate("/admin/special-card");
   };
 
   // Save handler (create new card(s))
@@ -221,8 +221,8 @@ export const AddCard = () => {
       // Owner ID is optional – here we leave it empty
       payload.append("ownerId", "");
 
-      // Append cardType as DEFAULT (for a normal card)
-      payload.append("cardType", "NORMAL");
+      // Append cardType as DEFAULT (for a SPECIAL card)
+      payload.append("cardType", "SPECIAL");
 
       // Append sourceImage if the source toggle is enabled
       if (formData.source) {
@@ -252,7 +252,7 @@ export const AddCard = () => {
       );
 
       console.log("Response:", response.data);
-      navigate("/admin/card");
+      navigate("/admin/special-card");
     } catch (error: any) {
       console.error(
         "Error creating card:",

@@ -10,6 +10,7 @@ export const Categories = () => {
   const [selectedCategory, setSelectedCategory] = useState<{
     id: number;
     name: string;
+    code?: string; // Tambahkan code
     seriesId?: number;
     image?: string;
     series?: { master?: { name: string } };
@@ -54,7 +55,9 @@ export const Categories = () => {
       // Map category image URL to use SERVER_URL
       const mappedCategories = categories.map((cat: any) => ({
         ...cat,
-        image: cat.image ? `${SERVER_URL}/${cat.image.replace(/\\/g, "/")}` : null,
+        image: cat.image
+          ? `${SERVER_URL}/${cat.image.replace(/\\/g, "/")}`
+          : null,
       }));
       setCategoriesList(mappedCategories);
     } catch (err) {
@@ -72,74 +75,43 @@ export const Categories = () => {
     fetchCategories();
   }, []);
 
-  const handleAddCategory = async (name: string, seriesId: number) => {
-    if (!seriesId || !selectedImage) {
-      console.error("Series and image must be selected");
-      return;
-    }
-
+  const handleAddCategory = async (name: string, seriesId: number, image: File, code?: string) => {
     const formData = new FormData();
     formData.append("name", name);
     formData.append("seriesId", seriesId.toString());
-    formData.append("image", selectedImage);
-
+    formData.append("image", image);
+    if (code) {
+      formData.append("code", code); // Tambahkan code jika ada
+    }
+  
     try {
-      const response = await axios.post(
-        `${SERVER_URL}/api/categories/create`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-
+      const response = await axios.post(`${SERVER_URL}/api/categories/create`, formData);
       if (response.status === 201) {
-        // Re-fetch categories to get full nested info (including master)
         await fetchCategories();
         setIsAddModalOpen(false);
-        setSelectedImage(null);
         setSuccessMessage("Category added successfully!");
-        setTimeout(() => setSuccessMessage(""), 3000);
       }
     } catch (error) {
       console.error("Error adding category:", error);
     }
   };
-
-  const handleEditCategory = async (
-    id: number,
-    name: string,
-    seriesId: number,
-    imageFile?: File 
-  ) => {
+  
+  const handleEditCategory = async (id: number, name: string, seriesId: number, image: File, code?: string) => {
+    const formData = new FormData();
+    formData.append("name", name);
+    formData.append("seriesId", seriesId.toString());
+    formData.append("image", image);
+    if (code) {
+      formData.append("code", code); // Tambahkan code jika ada
+    }
+  
     try {
-      const formData = new FormData();
-      formData.append("name", name);
-      formData.append("seriesId", seriesId.toString());
-      
-      if (imageFile) {
-        formData.append("image", imageFile);
+      const response = await axios.put(`${SERVER_URL}/api/categories/edit/${id}`, formData);
+      if (response.status === 200) {
+        await fetchCategories();
+        setIsEditModalOpen(false);
+        setSuccessMessage("Category updated successfully!");
       }
-  
-      const response = await fetch(
-        `${SERVER_URL}/api/categories/edit/${id}`,
-        {
-          method: "PUT",
-          body: formData, 
-        }
-      );
-  
-      if (!response.ok) {
-        throw new Error("Failed to update category");
-      }
-  
-      // Re-fetch categories to get updated data
-      await fetchCategories();
-  
-      setIsEditModalOpen(false);
-      setSuccessMessage("Category updated successfully!");
-      setTimeout(() => setSuccessMessage(""), 3000);
     } catch (error) {
       console.error("Error updating category:", error);
     }
@@ -253,7 +225,10 @@ export const Categories = () => {
               </tr>
             ) : (
               visibleCategories.map((category) => (
-                <tr key={category.id} className="hover:bg-gray-50 leading-relaxed">
+                <tr
+                  key={category.id}
+                  className="hover:bg-gray-50 leading-relaxed"
+                >
                   <td className="px-4 py-4 text-sm text-gray-600">
                     {category.series?.master?.name || "No Master"}
                   </td>
@@ -325,13 +300,23 @@ export const Categories = () => {
         submitText={isAddModalOpen ? "Add" : "Save Changes"}
         onSubmit={
           isAddModalOpen
-            ? handleAddCategory
-            : (name: string, seriesId: number) =>
-                handleEditCategory(selectedCategory?.id || 0, name, seriesId)
+            ? (name, seriesId, image, code) =>
+                handleAddCategory(name, seriesId, image, code)
+            : (name, seriesId, image, code) =>
+                handleEditCategory(
+                  selectedCategory?.id || 0,
+                  name,
+                  seriesId,
+                  image,
+                  code
+                )
         }
         defaultValue={
           isEditModalOpen && selectedCategory ? selectedCategory.name : ""
         }
+        defaultCode={
+          isEditModalOpen && selectedCategory ? selectedCategory.code : ""
+        } // Tambahkan defaultCode
         loadingSeries={loadingSeries}
         errorSeries={errorSeries}
         series={series}
