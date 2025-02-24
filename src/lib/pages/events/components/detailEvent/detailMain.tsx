@@ -36,9 +36,13 @@ interface MainContentProps {
 }
 
 const MainContent: React.FC<MainContentProps> = ({ eventData }) => {
-  const [activeTab, setActiveTab] = useState<"description" | "benefit">("description");
+  const [activeTab, setActiveTab] = useState<"description" | "benefit">(
+    "description"
+  );
   const [isShareModalOpen, setShareModalOpen] = useState(false);
-  const [claimed, setClaimed] = useState(false);
+  const [claimedRewards, setClaimedRewards] = useState<{
+    [key: number]: string | null;
+  }>({});
 
   const title = eventData?.eventName || "A Special Evening Celebration";
   const eventTime = eventData
@@ -55,7 +59,7 @@ const MainContent: React.FC<MainContentProps> = ({ eventData }) => {
       })
     : "07 Dec 2024";
 
-  // Determine location display (Zoom link if online)
+  // Menentukan lokasi acara (Zoom link jika online)
   const locationDisplay =
     eventData && eventData.eventType === "ONLINE" ? (
       <a
@@ -82,10 +86,21 @@ const MainContent: React.FC<MainContentProps> = ({ eventData }) => {
     `Step into a world of elegance and charm at A Special Evening Celebration. This exclusive event invites you to indulge in an enchanting night of sophistication, entertainment, and memorable experiences.`;
   const rewards = eventData?.cardRewards || [];
 
-  const handleClaimReward = async () => {
+  // Fungsi untuk mengklaim reward berdasarkan cardId
+  const handleClaimReward = async (cardId: number) => {
     try {
-      await axios.get(`${SERVER_URL}/api/cardRewards/claim`, { withCredentials: true });
-      setClaimed(true);
+      const response = await axios.post(
+        `${SERVER_URL}/api/cardRewards/${cardId}/generateClaimLink`,
+        {},
+        { withCredentials: true }
+      );
+
+      if (response.data.claimUrl) {
+        setClaimedRewards((prev) => ({
+          ...prev,
+          [cardId]: response.data.claimUrl,
+        }));
+      }
     } catch (error) {
       console.error("Error claiming reward", error);
     }
@@ -126,43 +141,43 @@ const MainContent: React.FC<MainContentProps> = ({ eventData }) => {
                 <p className="text-gray-500">{guestOccupation}</p>
               </div>
             </div>
-          </div>
-          <div className="mt-8">
-            <h3 className="text-lg mb-4">Share Event</h3>
-            <div className="flex gap-4">
-              {/* Clicking any of these buttons opens the share modal */}
-              <button
-                onClick={() => setShareModalOpen(true)}
-                className="text-gray-500 hover:text-black transition"
-              >
-                <DiscordIcon />
-              </button>
-              <button
-                onClick={() => setShareModalOpen(true)}
-                className="text-gray-500 hover:text-black transition"
-              >
-                <IgIcon />
-              </button>
-              <button
-                onClick={() => setShareModalOpen(true)}
-                className="text-gray-500 hover:text-black transition"
-              >
-                <CopyIcon />
-              </button>
-              <button
-                onClick={() => setShareModalOpen(true)}
-                className="text-gray-500 hover:text-black transition"
-              >
-                <WaIcon />
-              </button>
+            <div className="mt-8">
+              <h3 className="text-lg mb-4">Share Event</h3>
+              <div className="flex gap-4">
+                {/* Clicking any of these buttons opens the share modal */}
+                <button
+                  onClick={() => setShareModalOpen(true)}
+                  className="text-gray-500 hover:text-black transition"
+                >
+                  <DiscordIcon />
+                </button>
+                <button
+                  onClick={() => setShareModalOpen(true)}
+                  className="text-gray-500 hover:text-black transition"
+                >
+                  <IgIcon />
+                </button>
+                <button
+                  onClick={() => setShareModalOpen(true)}
+                  className="text-gray-500 hover:text-black transition"
+                >
+                  <CopyIcon />
+                </button>
+                <button
+                  onClick={() => setShareModalOpen(true)}
+                  className="text-gray-500 hover:text-black transition"
+                >
+                  <WaIcon />
+                </button>
+              </div>
             </div>
-          </div>
-          <div className="mt-8">
-            <Link to={`/register-events/${eventData?.id}`}>
-              <button className="bg-call-to-actions-900 text-white px-6 py-3 rounded-lg font-bold hover:bg-call-to-actions-800 transition">
-                Register Now
-              </button>
-            </Link>
+            <div className="mt-8">
+              <Link to={`/register-events/${eventData?.id}`}>
+                <button className="bg-call-to-actions-900 text-white px-6 py-3 rounded-lg font-bold hover:bg-call-to-actions-800 transition">
+                  Register Now
+                </button>
+              </Link>
+            </div>
           </div>
         </div>
 
@@ -225,31 +240,40 @@ const MainContent: React.FC<MainContentProps> = ({ eventData }) => {
                         />
                       </div>
                     </div>
-                    <button
-                      className={`px-4 py-2 rounded-lg ${
-                        claimed
-                          ? "bg-neutral-400 text-neutral-700 opacity-50"
-                          : "bg-call-to-actions-900 text-neutral-colors-100 hover:bg-call-to-actions-700"
-                      }`}
-                      onClick={handleClaimReward}
-                      disabled={claimed}
-                    >
-                      {claimed ? "Claimed" : "Claim"}
-                    </button>
+
+                    {claimedRewards[reward.id] ? (
+                      <a
+                        href={claimedRewards[reward.id]!}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="bg-green-600 text-white px-4 py-2 rounded-lg"
+                      >
+                        Open Reward
+                      </a>
+                    ) : reward.isClaimable ? (
+                      <button
+                        className="bg-call-to-actions-900 text-white px-4 py-2 rounded-lg hover:bg-call-to-actions-700"
+                        onClick={() => handleClaimReward(reward.id)}
+                      >
+                        Claim
+                      </button>
+                    ) : (
+                      <button
+                        className="bg-neutral-colors-400 text-white px-4 py-2 rounded-lg cursor-not-allowed"
+                        disabled
+                      >
+                        Claim
+                      </button>
+                    )}
                   </div>
                 ))
               ) : (
-                <p className="text-gray-200">No benefits available.</p>
+                <p className="text-neutral-colors-200">No benefits available.</p>
               )}
             </div>
           )}
         </div>
       </div>
-      {/* Render the share modal */}
-      <ShareModal
-        isOpen={isShareModalOpen}
-        onClose={() => setShareModalOpen(false)}
-      />
     </main>
   );
 };

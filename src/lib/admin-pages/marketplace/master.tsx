@@ -7,15 +7,16 @@ interface ModalProps {
   onClose: () => void;
   title: string;
   submitText: string;
-  onSubmit: (value: string) => void;
+  onSubmit: (name: string, code: string) => void;
   defaultValue?: string;
+  defaultCode?: string; // For default code value
 }
 
 export const Master = () => {
   const [masterList, setMasterList] = useState<any[]>([]);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [selectedMaster, setSelectedMaster] = useState<{ id: number; name: string } | null>(null);
+  const [selectedMaster, setSelectedMaster] = useState<{ id: number; name: string; code: string } | null>(null);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
@@ -38,19 +39,19 @@ export const Master = () => {
     fetchMasterList();
   }, []);
 
-  const handleAddMaster = async (name: string) => {
+  const handleAddMaster = async (name: string, code: string) => {
     try {
       const response = await fetch(`${SERVER_URL}/api/master/create`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name }),
+        body: JSON.stringify({ name, code: code || undefined }), 
       });
-
+  
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || "Failed to add master");
       }
-
+  
       const newMaster = await response.json();
       setMasterList((prev) => [...prev, newMaster.master]);
       setSuccessMessage("Master successfully added.");
@@ -61,12 +62,12 @@ export const Master = () => {
     }
   };
 
-  const handleEditMaster = async (id: number, name: string) => {
+  const handleEditMaster = async (id: number, name: string, code: string) => {
     try {
       const response = await fetch(`${SERVER_URL}/api/master/edit/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name }),
+        body: JSON.stringify({ name, code }),
       });
 
       if (!response.ok) {
@@ -142,11 +143,16 @@ export const Master = () => {
     submitText,
     onSubmit,
     defaultValue = "",
+    defaultCode = "", // Tambahkan defaultCode
   }) => {
     const [inputValue, setInputValue] = useState(defaultValue);
-
-    useEffect(() => setInputValue(defaultValue), [defaultValue]);
-
+    const [inputCode, setInputCode] = useState(defaultCode); // Untuk input code
+  
+    useEffect(() => {
+      setInputValue(defaultValue);
+      setInputCode(defaultCode); // Set defaultCode
+    }, [defaultValue, defaultCode]);
+  
     if (!isOpen) return null;
 
     return (
@@ -169,6 +175,16 @@ export const Master = () => {
               onChange={(e) => setInputValue(e.target.value)}
               className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500"
             />
+            <label className="block text-sm font-medium text-gray-700 mb-1 mt-3">
+              Master Code (Optional)
+            </label>
+            <input
+              type="text"
+              value={inputCode}
+              onChange={(e) => setInputCode(e.target.value)}
+              placeholder="Leave blank for automatic code"
+              className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+            />
           </div>
 
           <div className="flex justify-end gap-2 p-4 border-t">
@@ -180,7 +196,7 @@ export const Master = () => {
             </button>
             <button
               onClick={() => {
-                onSubmit(inputValue);
+                onSubmit(inputValue, inputCode);
                 onClose();
               }}
               className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600"
@@ -242,7 +258,8 @@ export const Master = () => {
           .filter((master) =>
             master.name.toLowerCase().includes(searchQuery.toLowerCase())
           )
-          .map((master: { id: number; name: string; isSuspended: boolean }) => (
+
+          .map((master: { id: number; name: string; isSuspended: boolean; code: string }) => (
             <div
               key={master.id}
               className="bg-white rounded-lg p-4 flex items-center justify-between border border-gray-100"
@@ -295,10 +312,11 @@ export const Master = () => {
         onClose={() => setIsEditModalOpen(false)}
         title="Edit Master"
         submitText="Update"
-        onSubmit={(name) =>
-          selectedMaster && handleEditMaster(selectedMaster.id, name)
+        onSubmit={(name, code) =>
+          selectedMaster && handleEditMaster(selectedMaster.id, name, code)
         }
         defaultValue={selectedMaster?.name || ""}
+        defaultCode={selectedMaster?.code || ""}
       />
     </div>
   );
