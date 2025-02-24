@@ -6,8 +6,9 @@ interface CategoryModalProps {
   onClose: () => void;
   title: string;
   submitText: string;
-  onSubmit: (name: string, seriesId: number, image: File) => void;
+  onSubmit: (name: string, seriesId: number, image: File, code?: string) => void; // Tambahkan code
   defaultValue?: string;
+  defaultCode?: string; // Tambahkan defaultCode
   loadingSeries: boolean;
   errorSeries: string | null;
   series: { id: number; name: string }[];
@@ -24,6 +25,7 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
   submitText,
   onSubmit,
   defaultValue = "",
+  defaultCode = "", // Tambahkan defaultCode
   loadingSeries,
   errorSeries,
   series,
@@ -33,9 +35,11 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
   setSelectedImage,
 }) => {
   const [inputValue, setInputValue] = useState(defaultValue);
+  const [code, setCode] = useState(defaultCode); // Tambahkan state untuk code
   const [error, setError] = useState("");
 
   useEffect(() => setInputValue(defaultValue), [defaultValue]);
+  useEffect(() => setCode(defaultCode), [defaultCode]); // Set defaultCode saat prop berubah
 
   if (!isOpen) return null;
 
@@ -53,7 +57,7 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
       return;
     }
 
-    onSubmit(inputValue, selectedSeries, selectedImage);
+    onSubmit(inputValue, selectedSeries, selectedImage, code); // Sertakan code
     onClose();
   };
 
@@ -141,6 +145,18 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
               setInputValue(e.target.value);
               setError("");
             }}
+            className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+          />
+
+          {/* Code Input (Optional) */}
+          <label className="block text-sm font-medium text-gray-700 mb-1 mt-4">
+            Category Code (Optional)
+          </label>
+          <input
+            type="text"
+            value={code}
+            onChange={(e) => setCode(e.target.value)}
+            placeholder="Enter category code"
             className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500"
           />
 

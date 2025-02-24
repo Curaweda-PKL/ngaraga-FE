@@ -10,7 +10,7 @@ import {EditCard} from "../admin-pages/marketplace/card/edit-card";
 import {AddCard} from "../admin-pages/marketplace/card/addcard/add-card";
 import {SpecialCard} from "../admin-pages/marketplace/special-card/special-card";
 import {EditSpecialCard} from "../admin-pages/marketplace/special-card/edit-specialcard";
-import {AddSpecialCard} from "../admin-pages/marketplace/special-card/add-specialcard";
+import {AddSpecialCard} from "../admin-pages/marketplace/special-card/addspecialcard/add-specialcard";
 import {Categories} from "../admin-pages/marketplace/categories/categories";
 import {Master} from "../admin-pages/marketplace/master";
 import {Series} from "../admin-pages/marketplace/series";

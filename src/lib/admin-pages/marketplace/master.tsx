@@ -16,7 +16,11 @@ export const Master = () => {
   const [masterList, setMasterList] = useState<any[]>([]);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [selectedMaster, setSelectedMaster] = useState<{ id: number; name: string; code: string } | null>(null);
+  const [selectedMaster, setSelectedMaster] = useState<{
+    id: number;
+    name: string;
+    code: string;
+  } | null>(null);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
@@ -41,17 +45,22 @@ export const Master = () => {
 
   const handleAddMaster = async (name: string, code: string) => {
     try {
+      const bodyData: any = { name };
+      if (code) {
+        bodyData.code = code; // Hanya tambahkan jika code ada
+      }
+
       const response = await fetch(`${SERVER_URL}/api/master/create`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, code: code || undefined }), 
+        body: JSON.stringify(bodyData),
       });
-  
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || "Failed to add master");
       }
-  
+
       const newMaster = await response.json();
       setMasterList((prev) => [...prev, newMaster.master]);
       setSuccessMessage("Master successfully added.");
@@ -64,10 +73,15 @@ export const Master = () => {
 
   const handleEditMaster = async (id: number, name: string, code: string) => {
     try {
+      const bodyData: any = { name };
+      if (code) {
+        bodyData.code = code; // Hanya tambahkan jika ada
+      }
+
       const response = await fetch(`${SERVER_URL}/api/master/edit/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, code }),
+        body: JSON.stringify(bodyData),
       });
 
       if (!response.ok) {
@@ -147,12 +161,12 @@ export const Master = () => {
   }) => {
     const [inputValue, setInputValue] = useState(defaultValue);
     const [inputCode, setInputCode] = useState(defaultCode); // Untuk input code
-  
+
     useEffect(() => {
       setInputValue(defaultValue);
       setInputCode(defaultCode); // Set defaultCode
     }, [defaultValue, defaultCode]);
-  
+
     if (!isOpen) return null;
 
     return (
@@ -160,7 +174,10 @@ export const Master = () => {
         <div className="bg-white rounded-lg w-full max-w-md">
           <div className="flex justify-between items-center p-4 border-b">
             <h2 className="text-lg font-medium">{title}</h2>
-            <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+            <button
+              onClick={onClose}
+              className="text-gray-400 hover:text-gray-600"
+            >
               <X className="w-5 h-5" />
             </button>
           </div>
@@ -196,7 +213,7 @@ export const Master = () => {
             </button>
             <button
               onClick={() => {
-                onSubmit(inputValue, inputCode);
+                onSubmit(inputValue, inputCode.trim() !== "" ? inputCode : "");
                 onClose();
               }}
               className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600"

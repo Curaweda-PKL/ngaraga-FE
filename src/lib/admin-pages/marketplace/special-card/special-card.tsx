@@ -70,7 +70,7 @@ export const SpecialCard = () => {
         <h1 className="text-2xl font-semibold">Special Card</h1>
         <button
           className="bg-call-to-actions-900 hover:bg-call-to-actions-800 text-white px-4 py-2 rounded-lg flex items-center gap-2"
-          onClick={() => navigate("/admin/add-card")}
+          onClick={() => navigate("/admin/add-special")}
         >
           <Plus className="w-4 h-4" />
           <span>Add Card</span>

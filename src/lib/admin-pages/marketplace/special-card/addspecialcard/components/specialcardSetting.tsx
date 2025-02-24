@@ -46,7 +46,7 @@ interface CardSettingsProps {
   tagsError: string | null;
 }
 
-const CardSettings: React.FC<CardSettingsProps> = ({
+const SpecialCardSettings: React.FC<CardSettingsProps> = ({
   formData,
   handleInputChange,
   setFormData,
@@ -298,4 +298,4 @@ const CardSettings: React.FC<CardSettingsProps> = ({
   );
 };
 
-export default CardSettings;
+export default SpecialCardSettings;

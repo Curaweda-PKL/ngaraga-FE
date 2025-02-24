@@ -52,7 +52,7 @@ interface CardFormProps {
   >;
 }
 
-const CardForm: React.FC<CardFormProps> = ({
+const SpecialCardForm: React.FC<CardFormProps> = ({
   formData,
   handleInputChange,
   handleImageUpload,
@@ -178,4 +178,4 @@ const CardForm: React.FC<CardFormProps> = ({
   );
 };
 
-export default CardForm;
+export default SpecialCardForm;
