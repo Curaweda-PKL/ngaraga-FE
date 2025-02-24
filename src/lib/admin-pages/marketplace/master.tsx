@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Pencil, Eye, Trash2, Search, X } from "lucide-react";
+import { Pencil, Eye, EyeOff, Trash2, Search, X } from "lucide-react";
 import { SERVER_URL } from "@/middleware/utils"; // Import centralized server URL
 
 interface ModalProps {
@@ -104,6 +104,34 @@ export const Master = () => {
     } catch (error: any) {
       console.error("Error deleting master:", error);
       setErrorMessage(error?.message || "Failed to delete master.");
+    }
+  };
+
+  // New: Toggle suspend/unsuspend for a master
+  const handleToggleSuspend = async (id: number, currentStatus: boolean) => {
+    try {
+      const endpoint = currentStatus
+        ? `${SERVER_URL}/api/masters/${id}/unsuspend`
+        : `${SERVER_URL}/api/masters/${id}/suspend`;
+      const response = await fetch(endpoint, {
+        method: "PATCH",
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || `Failed to ${currentStatus ? "unsuspend" : "suspend"} master`);
+      }
+      const result = await response.json();
+      // Expecting result.master to contain the updated master
+      setMasterList((prev) =>
+        prev.map((master) =>
+          master.id === result.master.id ? result.master : master
+        )
+      );
+      setSuccessMessage(`Master successfully ${currentStatus ? "unsuspended" : "suspended"}.`);
+      setTimeout(() => setSuccessMessage(""), 3000);
+    } catch (error: any) {
+      console.error("Error toggling suspension:", error);
+      setErrorMessage(error?.message || `Failed to ${currentStatus ? "unsuspend" : "suspend"} master.`);
     }
   };
 
@@ -214,7 +242,7 @@ export const Master = () => {
           .filter((master) =>
             master.name.toLowerCase().includes(searchQuery.toLowerCase())
           )
-          .map((master: { id: number; name: string }) => (
+          .map((master: { id: number; name: string; isSuspended: boolean }) => (
             <div
               key={master.id}
               className="bg-white rounded-lg p-4 flex items-center justify-between border border-gray-100"
@@ -230,8 +258,17 @@ export const Master = () => {
                 >
                   <Pencil className="w-5 h-5" />
                 </button>
-                <button className="text-gray-400 hover:text-gray-600">
-                  <Eye className="w-5 h-5" />
+                <button
+                  onClick={() =>
+                    handleToggleSuspend(master.id, master.isSuspended)
+                  }
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  {master.isSuspended ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )}
                 </button>
                 <button
                   onClick={() => handleDeleteMaster(master.id)}

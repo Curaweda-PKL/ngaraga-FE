@@ -110,45 +110,52 @@ const TopCollectors: React.FC = () => {
   const displayedCollectors = collectors.length > 0 ? collectors : sampleCollectors;
 
   return (
-    <div className="px-20 py-16 rounded-lg min-h-screen w-screen">
+    // Responsive container: smaller padding on mobile and restored on md/lg screens.
+    <div className="px-4 md:px-20 py-8 md:py-16 rounded-lg min-h-screen w-full lg:w-screen">
       {/* Dynamic Title and Description */}
       <h1 className="text-2xl text-[#171717] font-bold">{pageContent.title}</h1>
       <p className="text-[#404040] mt-2">{pageContent.description}</p>
 
-      {/* Collectors Table */}
-      <div className="mt-6">
-        <div className="grid text-[#404040] grid-cols-5 border-2 bg-[#D4D4D4] border-background-secondary rounded-xl text-sm py-2">
-          <div className="flex items-center">
-            <span className="ml-4">#</span>
-            <span>Collector</span>
-          </div>
-          <div className="text-right">Card</div>
-          <div className="text-right">Special Card</div>
-          <div className="text-right">Follower</div>
-        </div>
-
-        {displayedCollectors.map((collector, index) => (
-          <div
-            key={collector.id}
-            className="grid grid-cols-5 items-center border-2 p-4 rounded-lg mt-4"
-          >
-            <div className="flex text-[#262626] items-center">
-              <span className="mr-2">{index + 1}</span>
-              <div className="flex items-center">
-                <img
-                  src={collector.avatar}
-                  alt="Avatar"
-                  className="w-8 h-8 rounded-full mr-3 cursor-pointer hover:opacity-80"
-                  onClick={() => navigate(`/account/${collector.name}`)}
-                />
-                {collector.name}
-              </div>
+      {/* Responsive Table Container */}
+      <div className="mt-6 overflow-x-auto">
+        {/* Set a minimum width to preserve the table layout on smaller screens */}
+        <div className="min-w-[600px]">
+          {/* Collectors Table Header */}
+          <div className="grid text-[#404040] grid-cols-5 border-2 bg-[#D4D4D4] border-background-secondary rounded-xl text-sm py-2">
+            <div className="flex items-center">
+              <span className="ml-4">#</span>
+              <span>Collector</span>
             </div>
-            <div className="text-right text-green-400">{collector.card}</div>
-            <div className="text-right text-[#171717]">{collector.specialCard}</div>
-            <div className="text-right text-[#171717]">{collector.followers}</div>
+            <div className="text-right">Card</div>
+            <div className="text-right">Special Card</div>
+            <div className="text-right">Follower</div>
+            {/* If there is a missing column intentionally, it will still maintain spacing */}
           </div>
-        ))}
+
+          {/* Collectors Table Rows */}
+          {displayedCollectors.map((collector, index) => (
+            <div
+              key={collector.id}
+              className="grid grid-cols-5 items-center border-2 p-4 rounded-lg mt-4"
+            >
+              <div className="flex text-[#262626] items-center">
+                <span className="mr-2">{index + 1}</span>
+                <div className="flex items-center">
+                  <img
+                    src={collector.avatar}
+                    alt="Avatar"
+                    className="w-8 h-8 rounded-full mr-3 cursor-pointer hover:opacity-80"
+                    onClick={() => navigate(`/account/${collector.name}`)}
+                  />
+                  {collector.name}
+                </div>
+              </div>
+              <div className="text-right text-green-400">{collector.card}</div>
+              <div className="text-right text-[#171717]">{collector.specialCard}</div>
+              <div className="text-right text-[#171717]">{collector.followers}</div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
