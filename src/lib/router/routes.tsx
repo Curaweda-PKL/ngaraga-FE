@@ -130,7 +130,7 @@ export const adminRoutes: Array<PathRouteProps> = [
   { path: "order", element: <Order /> },
   { path: "detail-order", element: <DetailsOrder /> },
   { path: "card", element: <Card /> },
-  { path: "edit-card", element: <EditCard /> },
+  { path: "edit-card/:id", element: <EditCard /> },
   { path: "add-card", element: <AddCard /> },
   { path: "special-card", element: <SpecialCard /> },
   { path: "edit-special", element: <EditSpecialCard /> },

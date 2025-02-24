@@ -10,7 +10,7 @@ export const Card = () => {
   // Notification state to show success/error messages.
   const [notification, setNotification] = useState<{ message: string; type: "success" | "error" } | null>(null);
 
-  // Define card state with additional isSuspended property.
+  // Define card state with additional isSuspended property and discountedPrice.
   const [cards, setCards] = useState<
     {
       sku: string;
@@ -21,6 +21,7 @@ export const Card = () => {
       image: string;
       stock: number | string;
       price: number | string;
+      discountedPrice: number | string;
       selected: boolean;
       isSuspended: boolean;
     }[]
@@ -36,8 +37,7 @@ export const Card = () => {
           uniqueCode: card.uniqueCode || "N/A",
           // Use card.name first, fallback to card.characterName if needed.
           name: card.name || card.characterName || "N/A",
-          // If card.category is an object, use its name property;
-          // otherwise, assume card.category is already the name.
+          // If card.category is an object, use its name property; otherwise, assume card.category is already the name.
           category:
             (typeof card.category === "object" ? card.category.name : card.category) ||
             card.categoryName ||
@@ -49,6 +49,13 @@ export const Card = () => {
           image: card.image || "N/A",
           stock: card.stock !== undefined ? card.stock : "N/A",
           price: card.price !== undefined ? Number(card.price) : "N/A",
+          // If discountedPrice is not provided, fall back to price.
+          discountedPrice:
+            card.discountedPrice !== undefined && card.discountedPrice !== null
+              ? Number(card.discountedPrice)
+              : card.price !== undefined
+              ? Number(card.price)
+              : "N/A",
           selected: false,
           isSuspended: card.isSuspended || false,
         }));
@@ -61,10 +68,18 @@ export const Card = () => {
         });
       }
     };
-  
+
     fetchCards();
   }, []);
-  
+
+  // Helper to format image URL
+  const formatImageUrl = (image?: string): string => {
+    if (!image || image === "N/A") return "N/A";
+    const normalizedPath = image.replace(/\\/g, "/");
+    return normalizedPath.startsWith("http")
+      ? normalizedPath
+      : `${SERVER_URL}/${normalizedPath}`;
+  };
 
   // Select/deselect all cards.
   const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -208,100 +223,108 @@ export const Card = () => {
           </button>
         </div>
       </div>
-      <div className="overflow-x-auto">
-        <table className="table w-full">
-          <thead>
-            <tr>
-              <th>
-                <input
-                  type="checkbox"
-                  className="checkbox"
-                  checked={cards.length > 0 && cards.every((card) => card.selected)}
-                  onChange={handleSelectAll}
+<div className="overflow-x-auto">
+  <table className="table w-full">
+    <thead>
+      <tr>
+        <th>
+          <input
+            type="checkbox"
+            className="checkbox"
+            checked={cards.length > 0 && cards.every((card) => card.selected)}
+            onChange={handleSelectAll}
+          />
+        </th>
+        <th>SKU &amp; Image</th>
+        <th className="whitespace-nowrap overflow-hidden text-ellipsis">Unique Code</th>
+        <th>Card Name</th>
+        <th>Category Name</th>
+        <th>Category Code</th>
+        <th>Stock</th>
+        <th className="whitespace-nowrap overflow-hidden text-ellipsis">Price</th>
+        <th className="whitespace-nowrap overflow-hidden text-ellipsis">
+          Discounted Price
+        </th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {cards.map((card, index) => (
+        <tr key={index}>
+          <td>
+            <input
+              type="checkbox"
+              className="checkbox"
+              checked={card.selected}
+              onChange={(e) => handleSelectRow(index, e)}
+            />
+          </td>
+          <td>
+            <div className="flex items-center gap-2">
+              {card.image && card.image !== "N/A" ? (
+                <img
+                  src={formatImageUrl(card.image)}
+                  alt={card.sku}
+                  className="w-10 h-auto object-cover rounded-lg"
                 />
-              </th>
-              <th>SKU</th>
-              <th>Unique Code</th>
-              <th>Image</th>
-              <th>Card Name</th>
-              <th>Category Name</th>
-              <th>Category Code</th>
-              <th>Stock</th>
-              <th>Price</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {cards.map((card, index) => (
-              <tr key={index}>
-                <td>
-                  <input
-                    type="checkbox"
-                    className="checkbox"
-                    checked={card.selected}
-                    onChange={(e) => handleSelectRow(index, e)}
-                  />
-                </td>
-                <td>{card.sku}</td>
-                <td>{card.uniqueCode}</td>
-                <td>
-                  {card.image && card.image !== "N/A" ? (
-                    <img
-                      src={card.image}
-                      alt={card.name}
-                      className="w-16 h-auto object-cover"
-                    />
-                  ) : (
-                    "N/A"
-                  )}
-                </td>
-                <td>{card.name}</td>
-                <td>{card.category}</td>
-                <td>{card.categoryCode}</td>
-                <td>{card.stock}</td>
-                <td>
-                  {typeof card.price === "number"
-                    ? `Rp ${card.price.toLocaleString()}`
-                    : card.price}
-                </td>
-                <td>
-                  <div className="flex items-center gap-2">
-                    <button
-                      className="p-2 hover:bg-gray-100 rounded-lg text-gray-600"
-                      onClick={() => navigate("/admin/edit-card")}
-                    >
-                      <Edit3 className="w-4 h-4" />
-                    </button>
-                    <button
-                      className="p-2 hover:bg-gray-100 rounded-lg text-gray-600"
-                      onClick={() => handleToggleSuspend(card)}
-                    >
-                      {card.isSuspended ? (
-                        <EyeOff className="w-4 h-4" />
-                      ) : (
-                        <Eye className="w-4 h-4" />
-                      )}
-                    </button>
-                    <button
-                      className="p-2 hover:bg-gray-100 rounded-lg text-red-500"
-                      onClick={() => handleDelete(card)}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-            {cards.length === 0 && (
-              <tr>
-                <td colSpan={10} className="text-center py-4">
-                  No cards found.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+              ) : null}
+              <span>{card.sku}</span>
+            </div>
+          </td>
+          <td className="">{card.uniqueCode}</td>
+          <td>{card.name}</td>
+          <td>{card.category}</td>
+          <td>{card.categoryCode}</td>
+          <td>{card.stock}</td>
+          <td className="whitespace-nowrap overflow-hidden text-ellipsis">
+            {typeof card.price === "number"
+              ? `Rp ${card.price.toLocaleString()}`
+              : card.price}
+          </td>
+          <td className="whitespace-nowrap overflow-hidden text-ellipsis">
+            {typeof card.discountedPrice === "number"
+              ? `Rp ${card.discountedPrice.toLocaleString()}`
+              : card.discountedPrice}
+          </td>
+          <td>
+            <div className="flex items-center gap-2">
+              <button
+                className="p-2 hover:bg-gray-100 rounded-lg text-gray-600"
+                onClick={() => navigate(`/admin/edit-card/${card.uniqueCode}`)}
+                >
+                <Edit3 className="w-4 h-4" />
+              </button>
+              <button
+                className="p-2 hover:bg-gray-100 rounded-lg text-gray-600"
+                onClick={() => handleToggleSuspend(card)}
+              >
+                {card.isSuspended ? (
+                  <EyeOff className="w-4 h-4" />
+                ) : (
+                  <Eye className="w-4 h-4" />
+                )}
+              </button>
+              <button
+                className="p-2 hover:bg-gray-100 rounded-lg text-red-500"
+                onClick={() => handleDelete(card)}
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            </div>
+          </td>
+        </tr>
+      ))}
+      {cards.length === 0 && (
+        <tr>
+          <td colSpan={10} className="text-center py-4">
+            No cards found.
+          </td>
+        </tr>
+      )}
+    </tbody>
+  </table>
+</div>
+
     </div>
   );
 };

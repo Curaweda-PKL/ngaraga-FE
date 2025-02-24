@@ -2,11 +2,19 @@ import React, { ChangeEvent, useEffect, useState } from "react";
 
 interface CardSettingsProps {
   formData: {
-    categories: string[]; // storing category IDs as strings
+    cardImage: string | ArrayBuffer | null;
+    cardName: string;
+    sku: string;
+    price: string;
+    salePrice: boolean;
+    discountedPrice: string; // NEW FIELD added here
+    stock: string;
+    cardDetails: string;
+    categories: string[];
     creator: boolean;
-    selectedCreator: string; // storing creator ID as string
+    selectedCreator: string;
     tag: boolean;
-    tags: string[]; // storing tag IDs as strings
+    tags: string[];
     source: boolean;
     sourceImageWebsite: string;
     sourceImageAlt: string;
@@ -22,6 +30,7 @@ interface CardSettingsProps {
       sku: string;
       price: string;
       salePrice: boolean;
+      discountedPrice: string; // NEW FIELD added here
       stock: string;
       cardDetails: string;
       categories: string[];
@@ -45,6 +54,7 @@ interface CardSettingsProps {
   tagsLoading: boolean;
   tagsError: string | null;
 }
+
 
 const CardSettings: React.FC<CardSettingsProps> = ({
   formData,
@@ -247,7 +257,7 @@ const CardSettings: React.FC<CardSettingsProps> = ({
       {/* Source Image Section */}
       <div>
         <div className="flex items-center justify-between mb-2 mt-2">
-          <label className="text-sm">Source Image</label>
+          <label className="text-sm">Source</label>
           <label className="inline-flex items-center cursor-pointer">
             <input
               type="checkbox"
