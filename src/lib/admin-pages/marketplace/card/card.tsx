@@ -30,7 +30,7 @@ export const Card = () => {
   useEffect(() => {
     const fetchCards = async () => {
       try {
-        const response = await axios.get(`${SERVER_URL}/api/cards/all`);
+        const response = await axios.get(`${SERVER_URL}/api/cards/normal`);
         const mappedCards = response.data.cards.map((card: any) => ({
           sku: card.sku || "N/A",
           uniqueCode: card.uniqueCode || "N/A",
@@ -185,7 +185,7 @@ export const Card = () => {
         </div>
       )}
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-semibold">Card</h1>
+        <h1 className="text-2xl font-semibold">Normal Card</h1>
         <div className="flex gap-2">
           <button
             className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
