@@ -43,7 +43,17 @@ export const Master = () => {
     fetchMasterList();
   }, []);
 
+  // Validate code format if provided (must be exactly three digits)
+  const isValidCode = (code: string) => {
+    return /^\d{3}$/.test(code);
+  };
+
   const handleAddMaster = async (name: string, code: string) => {
+    // If a code is provided, validate its format.
+    if (code && !isValidCode(code)) {
+      setErrorMessage("Input harus mengikuti format xxx");
+      return;
+    }
     try {
       const bodyData: any = { name };
       if (code) {
@@ -72,6 +82,11 @@ export const Master = () => {
   };
 
   const handleEditMaster = async (id: number, name: string, code: string) => {
+    // Validate code if provided
+    if (code && !isValidCode(code)) {
+      setErrorMessage("Input harus mengikuti format xxx");
+      return;
+    }
     try {
       const bodyData: any = { name };
       if (code) {
@@ -133,7 +148,10 @@ export const Master = () => {
       });
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || `Failed to ${currentStatus ? "unsuspend" : "suspend"} master`);
+        throw new Error(
+          errorData.message ||
+            `Failed to ${currentStatus ? "unsuspend" : "suspend"} master`
+        );
       }
       const result = await response.json();
       // Expecting result.master to contain the updated master
@@ -142,11 +160,16 @@ export const Master = () => {
           master.id === result.master.id ? result.master : master
         )
       );
-      setSuccessMessage(`Master successfully ${currentStatus ? "unsuspended" : "suspended"}.`);
+      setSuccessMessage(
+        `Master successfully ${currentStatus ? "unsuspended" : "suspended"}.`
+      );
       setTimeout(() => setSuccessMessage(""), 3000);
     } catch (error: any) {
       console.error("Error toggling suspension:", error);
-      setErrorMessage(error?.message || `Failed to ${currentStatus ? "unsuspend" : "suspend"} master.`);
+      setErrorMessage(
+        error?.message ||
+          `Failed to ${currentStatus ? "unsuspend" : "suspend"} master.`
+      );
     }
   };
 
@@ -193,15 +216,20 @@ export const Master = () => {
               className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500"
             />
             <label className="block text-sm font-medium text-gray-700 mb-1 mt-3">
-              Master Code (Optional)
+              Master Code (format: xxx; Number)
             </label>
             <input
               type="text"
               value={inputCode}
               onChange={(e) => setInputCode(e.target.value)}
-              placeholder="Leave blank for automatic code"
+              placeholder="input master code"
               className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500"
             />
+            {inputCode && !isValidCode(inputCode) && (
+              <p className="text-red-500 text-sm mt-1">
+                Input harus mengikuti format xxx
+              </p>
+            )}
           </div>
 
           <div className="flex justify-end gap-2 p-4 border-t">
@@ -213,6 +241,11 @@ export const Master = () => {
             </button>
             <button
               onClick={() => {
+                // Only submit if code is empty or valid
+                if (inputCode && !isValidCode(inputCode)) {
+                  setErrorMessage("Input harus mengikuti format xxx");
+                  return;
+                }
                 onSubmit(inputValue, inputCode.trim() !== "" ? inputCode : "");
                 onClose();
               }}
@@ -262,7 +295,7 @@ export const Master = () => {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search Master"
+            placeholder="Search and tap Enter"
             className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
           />
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -275,7 +308,6 @@ export const Master = () => {
           .filter((master) =>
             master.name.toLowerCase().includes(searchQuery.toLowerCase())
           )
-
           .map((master: { id: number; name: string; isSuspended: boolean; code: string }) => (
             <div
               key={master.id}
