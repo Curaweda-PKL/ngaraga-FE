@@ -31,7 +31,7 @@ export const Card = () => {
   useEffect(() => {
     const fetchCards = async () => {
       try {
-        const response = await axios.get(`${SERVER_URL}/api/cards/normal`);
+        const response = await axios.get(${SERVER_URL}/api/cards/normal);
         const mappedCards = response.data.cards.map((card: any) => ({
           sku: card.sku || "N/A",
           uniqueCode: card.uniqueCode || "N/A",
@@ -61,19 +61,16 @@ export const Card = () => {
         }));
         setCards(mappedCards);
       } catch (error: any) {
-
         console.error("Error fetching cards:", error.response?.data || error.message);
         setNotification({
           message: error.response?.data?.message || error.message,
           type: "error",
         });
-
       }
     };
 
     fetchCards();
   }, []);
-
 
   // Helper to format image URL
   const formatImageUrl = (image?: string): string => {
@@ -81,7 +78,7 @@ export const Card = () => {
     const normalizedPath = image.replace(/\\/g, "/");
     return normalizedPath.startsWith("http")
       ? normalizedPath
-      : `${SERVER_URL}/${normalizedPath}`;
+      : ${SERVER_URL}/${normalizedPath};
   };
 
   // Select/deselect all cards.
@@ -94,7 +91,6 @@ export const Card = () => {
   // Select/deselect a single card.
   const handleSelectRow = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
     const { checked } = e.target;
-
     const updatedCards = [...cards];
     updatedCards[index].selected = checked;
     setCards(updatedCards);
@@ -110,10 +106,10 @@ export const Card = () => {
       let response;
       if (card.isSuspended) {
         // If already suspended, unsuspend it.
-        response = await axios.patch(`${SERVER_URL}/api/cards/${card.uniqueCode}/unsuspend`);
+        response = await axios.patch(${SERVER_URL}/api/cards/${card.uniqueCode}/unsuspend);
       } else {
         // Otherwise, suspend the card.
-        response = await axios.patch(`${SERVER_URL}/api/cards/${card.uniqueCode}/suspend`);
+        response = await axios.patch(${SERVER_URL}/api/cards/${card.uniqueCode}/suspend);
       }
       // Update local card state with new suspension status.
       const updatedCard = response.data.card;
@@ -132,7 +128,7 @@ export const Card = () => {
   const handleDelete = async (card: any) => {
     if (!window.confirm("Are you sure you want to delete this card?")) return;
     try {
-      const response = await axios.delete(`${SERVER_URL}/api/cards/delete/${card.uniqueCode}`);
+      const response = await axios.delete(${SERVER_URL}/api/cards/delete/${card.uniqueCode});
       setCards((prev) => prev.filter((c) => c.uniqueCode !== card.uniqueCode));
       setNotification({ message: response.data.message, type: "success" });
     } catch (error: any) {
@@ -150,7 +146,7 @@ export const Card = () => {
     if (!window.confirm("Are you sure you want to delete the selected cards?")) return;
     try {
       const deletePromises = selectedCards.map(async (card) => {
-        await axios.delete(`${SERVER_URL}/api/cards/delete/${card.uniqueCode}`);
+        await axios.delete(${SERVER_URL}/api/cards/delete/${card.uniqueCode});
         return card.uniqueCode;
       });
       const deletedCodes = await Promise.all(deletePromises);
@@ -172,7 +168,7 @@ export const Card = () => {
     try {
       const suspendPromises = selectedCards.map(async (card) => {
         if (!card.isSuspended) {
-          const response = await axios.patch(`${SERVER_URL}/api/cards/${card.uniqueCode}/suspend`);
+          const response = await axios.patch(${SERVER_URL}/api/cards/${card.uniqueCode}/suspend);
           return response.data.card;
         } else {
           // Return the card if it's already suspended.
@@ -192,6 +188,9 @@ export const Card = () => {
     }
   };
 
+  // Check if all cards are selected.
+  const allSelected = cards.length > 0 && cards.every((card) => card.selected);
+
   return (
     <div className="p-6">
       {notification && (
@@ -206,18 +205,22 @@ export const Card = () => {
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-semibold">Normal Card</h1>
         <div className="flex gap-2">
-          <button
-            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
-            onClick={handleBulkSuspend}
-          >
-            Suspend All Selected Items
-          </button>
-          <button
-            className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
-            onClick={handleBulkDelete}
-          >
-            Delete All Selected Items
-          </button>
+          {allSelected && (
+            <>
+              <button
+                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+                onClick={handleBulkSuspend}
+              >
+                Suspend All Selected Items
+              </button>
+              <button
+                className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+                onClick={handleBulkDelete}
+              >
+                Delete All Selected Items
+              </button>
+            </>
+          )}
           <button
             className="bg-call-to-actions-900 hover:bg-call-to-actions-800 text-white px-4 py-2 rounded-lg flex items-center gap-2"
             onClick={() => navigate("/admin/add-card")}
@@ -227,110 +230,107 @@ export const Card = () => {
           </button>
         </div>
       </div>
-
-<div className="overflow-x-auto">
-  <table className="table w-full">
-    <thead>
-      <tr>
-        <th>
-          <input
-            type="checkbox"
-            className="checkbox"
-            checked={cards.length > 0 && cards.every((card) => card.selected)}
-            onChange={handleSelectAll}
-          />
-        </th>
-        <th>SKU &amp; Image</th>
-        <th className="whitespace-nowrap overflow-hidden text-ellipsis">Unique Code</th>
-        <th>Card Name</th>
-        <th>Category Name</th>
-        <th>Category Code</th>
-        <th>Stock</th>
-        <th className="whitespace-nowrap overflow-hidden text-ellipsis">Price</th>
-        <th className="whitespace-nowrap overflow-hidden text-ellipsis">
-          Discounted Price
-        </th>
-        <th>Action</th>
-      </tr>
-    </thead>
-    <tbody>
-      {cards.map((card, index) => (
-        <tr key={index}>
-          <td>
-            <input
-              type="checkbox"
-              className="checkbox"
-              checked={card.selected}
-              onChange={(e) => handleSelectRow(index, e)}
-            />
-          </td>
-          <td>
-            <div className="flex items-center gap-2">
-              {card.image && card.image !== "N/A" ? (
-                <img
-                  src={formatImageUrl(card.image)}
-                  alt={card.sku}
-                  className="w-10 h-auto object-cover rounded-lg"
+      <div className="overflow-x-auto">
+        <table className="table w-full">
+          <thead>
+            <tr>
+              <th>
+                <input
+                  type="checkbox"
+                  className="checkbox"
+                  checked={cards.length > 0 && cards.every((card) => card.selected)}
+                  onChange={handleSelectAll}
                 />
-              ) : null}
-              <span>{card.sku}</span>
-            </div>
-          </td>
-          <td className="">{card.uniqueCode}</td>
-          <td>{card.name}</td>
-          <td>{card.category}</td>
-          <td>{card.categoryCode}</td>
-          <td>{card.stock}</td>
-          <td className="whitespace-nowrap overflow-hidden text-ellipsis">
-            {typeof card.price === "number"
-              ? `Rp ${card.price.toLocaleString()}`
-              : card.price}
-          </td>
-          <td className="whitespace-nowrap overflow-hidden text-ellipsis">
-            {typeof card.discountedPrice === "number"
-              ? `Rp ${card.discountedPrice.toLocaleString()}`
-              : card.discountedPrice}
-          </td>
-          <td>
-            <div className="flex items-center gap-2">
-              <button
-                className="p-2 hover:bg-gray-100 rounded-lg text-gray-600"
-                onClick={() => navigate(`/admin/edit-card/${card.uniqueCode}`)}
-                >
-                <Edit3 className="w-4 h-4" />
-              </button>
-              <button
-                className="p-2 hover:bg-gray-100 rounded-lg text-gray-600"
-                onClick={() => handleToggleSuspend(card)}
-              >
-                {card.isSuspended ? (
-                  <EyeOff className="w-4 h-4" />
-                ) : (
-                  <Eye className="w-4 h-4" />
-                )}
-              </button>
-              <button
-                className="p-2 hover:bg-gray-100 rounded-lg text-red-500"
-                onClick={() => handleDelete(card)}
-              >
-                <Trash2 className="w-4 h-4" />
-              </button>
-            </div>
-          </td>
-        </tr>
-      ))}
-      {cards.length === 0 && (
-        <tr>
-          <td colSpan={10} className="text-center py-4">
-            No cards found.
-          </td>
-        </tr>
-      )}
-    </tbody>
-  </table>
-</div>
-
-
+              </th>
+              <th>SKU &amp; Image</th>
+              <th className="whitespace-nowrap overflow-hidden text-ellipsis">Unique Code</th>
+              <th>Card Name</th>
+              <th>Category Name</th>
+              <th>Category Code</th>
+              <th>Stock</th>
+              <th className="whitespace-nowrap overflow-hidden text-ellipsis">Price</th>
+              <th className="whitespace-nowrap overflow-hidden text-ellipsis">
+                Discounted Price
+              </th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {cards.map((card, index) => (
+              <tr key={index}>
+                <td>
+                  <input
+                    type="checkbox"
+                    className="checkbox"
+                    checked={card.selected}
+                    onChange={(e) => handleSelectRow(index, e)}
+                  />
+                </td>
+                <td>
+                  <div className="flex items-center gap-2">
+                    {card.image && card.image !== "N/A" ? (
+                      <img
+                        src={formatImageUrl(card.image)}
+                        alt={card.sku}
+                        className="w-10 h-auto object-cover rounded-lg"
+                      />
+                    ) : null}
+                    <span>{card.sku}</span>
+                  </div>
+                </td>
+                <td>{card.uniqueCode}</td>
+                <td>{card.name}</td>
+                <td>{card.category}</td>
+                <td>{card.categoryCode}</td>
+                <td>{card.stock}</td>
+                <td className="whitespace-nowrap overflow-hidden text-ellipsis">
+                  {typeof card.price === "number"
+                    ? Rp ${card.price.toLocaleString()}
+                    : card.price}
+                </td>
+                <td className="whitespace-nowrap overflow-hidden text-ellipsis">
+                  {typeof card.discountedPrice === "number"
+                    ? Rp ${card.discountedPrice.toLocaleString()}
+                    : card.discountedPrice}
+                </td>
+                <td>
+                  <div className="flex items-center gap-2">
+                    <button
+                      className="p-2 hover:bg-gray-100 rounded-lg text-gray-600"
+                      onClick={() => navigate(/admin/edit-card/${card.uniqueCode})}
+                    >
+                      <Edit3 className="w-4 h-4" />
+                    </button>
+                    <button
+                      className="p-2 hover:bg-gray-100 rounded-lg text-gray-600"
+                      onClick={() => handleToggleSuspend(card)}
+                    >
+                      {card.isSuspended ? (
+                        <EyeOff className="w-4 h-4" />
+                      ) : (
+                        <Eye className="w-4 h-4" />
+                      )}
+                    </button>
+                    <button
+                      className="p-2 hover:bg-gray-100 rounded-lg text-red-500"
+                      onClick={() => handleDelete(card)}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+            {cards.length === 0 && (
+              <tr>
+                <td colSpan={10} className="text-center py-4">
+                  No cards found.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };

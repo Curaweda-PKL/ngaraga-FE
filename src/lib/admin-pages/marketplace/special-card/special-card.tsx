@@ -11,8 +11,6 @@ export const SpecialCard = () => {
   // Notification state to show success/error messages.
   const [notification, setNotification] = useState<{ message: string; type: "success" | "error" } | null>(null);
 
-  // Define card state with additional isSuspended property.
-
   const [cards, setCards] = useState<
     {
       sku: string;
@@ -23,6 +21,7 @@ export const SpecialCard = () => {
       image: string;
       stock: number | string;
       price: number | string;
+      discountedPrice: number | string;
       selected: boolean;
       isSuspended: boolean;
     }[]
@@ -38,8 +37,7 @@ export const SpecialCard = () => {
           uniqueCode: card.uniqueCode || "N/A",
           // Use card.name first, fallback to card.characterName if needed.
           name: card.name || card.characterName || "N/A",
-          // If card.category is an object, use its name property;
-          // otherwise, assume card.category is already the name.
+          // If card.category is an object, use its name property; otherwise, assume card.category is already the name.
           category:
             (typeof card.category === "object" ? card.category.name : card.category) ||
             card.categoryName ||
@@ -51,6 +49,13 @@ export const SpecialCard = () => {
           image: card.image || "N/A",
           stock: card.stock !== undefined ? card.stock : "N/A",
           price: card.price !== undefined ? Number(card.price) : "N/A",
+          // If discountedPrice is not provided, fall back to price.
+          discountedPrice:
+            card.discountedPrice !== undefined && card.discountedPrice !== null
+              ? Number(card.discountedPrice)
+              : card.price !== undefined
+              ? Number(card.price)
+              : "N/A",
           selected: false,
           isSuspended: card.isSuspended || false,
         }));
@@ -65,10 +70,18 @@ export const SpecialCard = () => {
 
       }
     };
-  
+
     fetchCards();
   }, []);
-  
+
+  // Helper to format image URL
+  const formatImageUrl = (image?: string): string => {
+    if (!image || image === "N/A") return "N/A";
+    const normalizedPath = image.replace(/\\/g, "/");
+    return normalizedPath.startsWith("http")
+      ? normalizedPath
+      : `${SERVER_URL}/${normalizedPath}`;
+  };
 
 
   // Select/deselect all cards.
@@ -179,6 +192,9 @@ export const SpecialCard = () => {
     }
   };
 
+  // Check if all cards are selected.
+  const allSelected = cards.length > 0 && cards.every((card) => card.selected);
+
   return (
     <div className="p-6">
       {notification && (
@@ -193,21 +209,25 @@ export const SpecialCard = () => {
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-semibold">Special Card</h1>
         <div className="flex gap-2">
-          <button
-            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
-            onClick={handleBulkSuspend}
-          >
-            Suspend All Selected Items
-          </button>
-          <button
-            className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
-            onClick={handleBulkDelete}
-          >
-            Delete All Selected Items
-          </button>
+          {allSelected && (
+            <>
+              <button
+                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+                onClick={handleBulkSuspend}
+              >
+                Suspend All Selected Items
+              </button>
+              <button
+                className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+                onClick={handleBulkDelete}
+              >
+                Delete All Selected Items
+              </button>
+            </>
+          )}
           <button
             className="bg-call-to-actions-900 hover:bg-call-to-actions-800 text-white px-4 py-2 rounded-lg flex items-center gap-2"
-            onClick={() => navigate("/admin/add-card")}
+            onClick={() => navigate("/admin/add-special")}
           >
             <Plus className="w-4 h-4" />
             <span>Add Card</span>
@@ -228,14 +248,16 @@ export const SpecialCard = () => {
                   onChange={handleSelectAll}
                 />
               </th>
-              <th>SKU</th>
-              <th>Unique Code</th>
-              <th>Image</th>
+              <th>SKU &amp; Image</th>
+              <th className="whitespace-nowrap overflow-hidden text-ellipsis">Unique Code</th>
               <th>Card Name</th>
               <th>Category Name</th>
               <th>Category Code</th>
               <th>Stock</th>
-              <th>Price</th>
+              <th className="whitespace-nowrap overflow-hidden text-ellipsis">Price</th>
+              <th className="whitespace-nowrap overflow-hidden text-ellipsis">
+                Discounted Price
+              </th>
               <th>Action</th>
             </tr>
           </thead>
@@ -250,33 +272,38 @@ export const SpecialCard = () => {
                     onChange={(e) => handleSelectRow(index, e)}
                   />
                 </td>
-                <td>{card.sku}</td>
-                <td>{card.uniqueCode}</td>
                 <td>
-                  {card.image && card.image !== "N/A" ? (
-                    <img
-                      src={card.image}
-                      alt={card.name}
-                      className="w-16 h-auto object-cover"
-                    />
-                  ) : (
-                    "N/A"
-                  )}
+                  <div className="flex items-center gap-2">
+                    {card.image && card.image !== "N/A" ? (
+                      <img
+                        src={formatImageUrl(card.image)}
+                        alt={card.sku}
+                        className="w-10 h-auto object-cover rounded-lg"
+                      />
+                    ) : null}
+                    <span>{card.sku}</span>
+                  </div>
                 </td>
+                <td>{card.uniqueCode}</td>
                 <td>{card.name}</td>
                 <td>{card.category}</td>
                 <td>{card.categoryCode}</td>
                 <td>{card.stock}</td>
-                <td>
+                <td className="whitespace-nowrap overflow-hidden text-ellipsis">
                   {typeof card.price === "number"
                     ? `Rp ${card.price.toLocaleString()}`
                     : card.price}
+                </td>
+                <td className="whitespace-nowrap overflow-hidden text-ellipsis">
+                  {typeof card.discountedPrice === "number"
+                    ? `Rp ${card.discountedPrice.toLocaleString()}`
+                    : card.discountedPrice}
                 </td>
                 <td>
                   <div className="flex items-center gap-2">
                     <button
                       className="p-2 hover:bg-gray-100 rounded-lg text-gray-600"
-                      onClick={() => navigate("/admin/edit-card")}
+                      onClick={() => navigate(`/admin/edit-card/${card.uniqueCode}`)}
                     >
                       <Edit3 className="w-4 h-4" />
                     </button>

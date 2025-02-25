@@ -1,81 +1,113 @@
-import React from "react";
+// MarketplaceCardSection.tsx
+import React, { useEffect, useState } from "react"; 
+import { Link } from "react-router-dom";
+import axios from "axios";
+import { SERVER_URL } from "@/middleware/utils";
 
-type Card = {
+export type Card = {
   id: number;
-  title: string;
-  creator: string;
+  name: string;
+  category: string;
   image: string;
   price?: string;
+  discountedPrice?: string;
 };
 
-const cardData: Card[] = [
-  {
-    id: 1,
-    title: "Distant Galaxy",
-    creator: "Animakid",
-    image: "/src/assets/img/Distant-Galaxy.png",
-    price: "Rp. 200.000",
-  },
-  {
-    id: 1,
-    title: "Distant Galaxy",
-    creator: "Animakid",
-    image: "/src/assets/img/Distant-Galaxy.png",
-    price: "Rp. 200.000",
-  },
-  {
-    id: 1,
-    title: "Distant Galaxy",
-    creator: "Animakid",
-    image: "/src/assets/img/Distant-Galaxy.png",
-    price: "Rp. 200.000",
-  },
-  {
-    id: 1,
-    title: "Distant Galaxy",
-    creator: "Animakid",
-    image: "/src/assets/img/Distant-Galaxy.png",
-    price: "Rp. 200.000",
-  },
-];
+interface MarketplaceCardSectionProps {
+  filteredCards?: Card[];
+}
 
-export const MarketplaceCardSection: React.FC = () => {
+export const MarketplaceCardSection: React.FC<MarketplaceCardSectionProps> = ({ filteredCards }) => {
+  const [cards, setCards] = useState<Card[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string>("");
+
+  useEffect(() => {
+    // If filtered cards are provided, use them
+    if (filteredCards && filteredCards.length > 0) {
+      setCards(filteredCards);
+      setLoading(false);
+    } else {
+      // Otherwise, fetch the default marketplace cards
+      const fetchMarketplaceCards = async () => {
+        try {
+          const response = await axios.get(`${SERVER_URL}/api/available/marketplace/cards`);
+          if (response.data && Array.isArray(response.data.cards)) {
+            setCards(response.data.cards);
+          } else {
+            setError("Unexpected response format.");
+          }
+        } catch (err) {
+          console.error("Error fetching marketplace cards:", err);
+          setError("Failed to fetch marketplace cards. Please try again later.");
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchMarketplaceCards();
+    }
+  }, [filteredCards]);
+
+  if (loading) {
+    return (
+      <div className="w-full mb-10 lg:ml-8">
+        <p>Loading...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="w-full mb-10 lg:ml-8">
+        <p className="text-red-500">{error}</p>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full mb-10 lg:ml-8">
       {/* Cards Grid */}
       <div className="grid gap-6 px-6 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4">
-        {cardData.map((card) => (
-          <a href="/detail-cards">
-            <div
-              key={card.id}
-              className="w-full h-[400px] flex flex-col items-start gap-4 bg-[#F2F2F2] rounded-2xl shadow-xl transition-transform hover:scale-[1.02] lg:w-[90%] md:w-full sm:w-full"
-            >
-              <figure className="w-full h-[260px] rounded-t-2xl overflow-hidden">
+        {cards.map((card) => (
+          <Link key={card.id} to="/detail-cards">
+            <div className="w-full flex flex-col items-start gap-4 bg-[#F2F2F2] rounded-2xl shadow-xl transition-transform hover:scale-[1.02]">
+              <figure className="w-full aspect-video rounded-t-2xl overflow-hidden">
                 {card.image ? (
                   <img
-                    src={card.image}
-                    alt={card.title}
+                    src={`${SERVER_URL}/${card.image.replace(/\\/g, "/")}`}
+                    alt={card.name}
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-[#3B3B3B] text-gray-400 rounded-t-2xl" />
+                  <div className="w-full h-full flex items-center justify-center bg-[#3B3B3B] text-gray-400" />
                 )}
               </figure>
-              <div className="p-6 flex flex-col items-start gap-2 w-full flex-grow">
-                <h3 className="text-2xl font-bold text-[#171717] font-[Poppins]">
-                  {card.title}
+              <div className="p-6 flex flex-col items-start gap-2 w-full">
+                <h3 className="text-2xl font-bold text-[#171717] font-[Poppins] whitespace-normal">
+                  {card.name}
                 </h3>
-                <span className="text-base text-[#404040] font-[Nunito]">
-                  {card.creator}
+                <span className="text-base text-[#404040] font-[Nunito] whitespace-normal">
+                  {card.category}
                 </span>
-                {card.price && (
-                  <span className="text-base text-[#404040] font-[Nunito]">
-                    {card.price}
-                  </span>
-                )}
+                <div className="flex items-center gap-2">
+                  {card.discountedPrice && card.discountedPrice.trim() !== "" ? (
+                    <>
+                      <span className="text-base text-[#171717] font-[Nunito]">
+                        Rp {card.discountedPrice}
+                      </span>
+                      <span className="text-base text-[#404040] font-[Nunito] line-through">
+                        Rp {card.price}
+                      </span>
+                    </>
+                  ) : (
+                    <span className="text-base text-[#404040] font-[Nunito]">
+                      Rp {card.price}
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
-          </a>
+          </Link>
         ))}
       </div>
     </div>
