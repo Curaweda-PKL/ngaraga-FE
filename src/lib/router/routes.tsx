@@ -40,7 +40,7 @@ import {ProfileSettings} from "../admin-pages/admin-profile";
 import AdminLogin from "../pages/auth/login/admin-login";
 import SentEmail from "../pages/auth/login/sentEmail";
 import SuccesRegist from "../pages/events/success-regist";
-import { EditProfileAdmin } from "../admin-pages/admin/edit-admin";
+import {EditProfileAdmin} from "../admin-pages/admin/edit-admin";
 
 // Lazy-loaded Pages
 const Home = React.lazy(() => import("@/lib/pages/home/Home"));
@@ -58,7 +58,9 @@ const Marketplace = React.lazy(
   () => import("@/lib/pages/marketplace/marketplace-index")
 );
 const Cart = React.lazy(() => import("@/lib/pages/cart"));
-const TopCollectors = React.lazy(() => import("@/lib/pages/top-ranking-collectors/top-players"));
+const TopCollectors = React.lazy(
+  () => import("@/lib/pages/top-ranking-collectors/top-players")
+);
 const SpecialCardDetail = React.lazy(
   () => import("@/lib/pages/account/specialcard-details")
 );
@@ -67,7 +69,7 @@ const DetailSpecial = React.lazy(
   () => import("@/lib/pages/detail-card/detail-special-index")
 );
 const DetailCards = React.lazy(
-  () => import("../pages/detail-card/detail-cards")
+  () => import("../pages/detail-card/detail-cards-index")
 );
 const PaymentPage = React.lazy(() => import("@/lib/pages/payment/payment"));
 const OrderComplete = React.lazy(() => import("@/lib/pages/payment/complete"));
@@ -77,8 +79,8 @@ const OrderDetails = React.lazy(
 const BrowseEvents = React.lazy(
   () => import("@/lib/pages/events/browse-event")
 );
-const EventDetail = React.lazy(
-  () => import("@/lib/pages/events/detail-events")
+const DetailEvents = React.lazy(
+  () => import("@/lib/pages/events/detail-event-index")
 );
 const EventRegistration = React.lazy(
   () => import("@/lib/pages/events/register-event")
@@ -88,10 +90,10 @@ const Checkout = React.lazy(
 );
 const CheckoutExisting = React.lazy(
   () => import("@/lib/pages/checkout/chekout-existing-index")
-)
+);
 const EditProfile = React.lazy(
   () => import("@/lib/pages/account/edit-profile-index")
-)
+);
 
 export const routes: Array<PathRouteProps> = [
   {path: "/signup", element: <Signup />},
@@ -107,7 +109,7 @@ export const routes: Array<PathRouteProps> = [
   {path: "/view-detail", element: <ViewDetail />},
   {path: "/rankings", element: <TopCollectors />},
   {path: "/events", element: <BrowseEvents />},
-  {path: "/detail-events/:id", element: <EventDetail />},
+  {path: "/detail-events/id", element: <DetailEvents />},
   {path: "/login/admin", element: <AdminLogin />},
   {path: "/sentEmail", element: <SentEmail />},
   {path: "/success/registered/event", element: <SuccesRegist />},
@@ -126,6 +128,7 @@ export const privateRoutes: Array<PathRouteProps> = [
 ];
 
 export const adminRoutes: Array<PathRouteProps> = [
+
   { path: "dashboard", element: <Dashboard /> },
   { path: "order", element: <Order /> },
   { path: "detail-order", element: <DetailsOrder /> },
@@ -161,5 +164,5 @@ export const adminRoutes: Array<PathRouteProps> = [
   { path: "add-admin", element: <AddAdmin /> },
   { path: "profile", element: <ProfileSettings /> },
   { path: "edit-profile/:id", element: <EditProfileAdmin /> },
-];
 
+];
