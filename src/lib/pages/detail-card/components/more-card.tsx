@@ -23,20 +23,26 @@ export const MoreCardSection: React.FC = () => {
   return (
     <div className="w-full mb-10 lg:ml-8">
       {/* Header Section */}
-      <div className="flex justify-between items-center px-6 mb-6">
+      <div className="flex justify-between items-center px-6 mb-6 mr-6 ml-2">
         <h2 className="text-2xl ml-2 font-bold text-[#171717] sm:text-xl">
           Explore More Cards
         </h2>
+        <button className="flex items-center px-4 py-2 bg-call-to-action text-white rounded-lg shadow-md hover:bg-call-to-actions-800 transition lg:flex hidden">
+          <FaRocket className="mr-2 text-xl sm:text-lg" />
+          <a href="/marketplace">
+            <span>More Cards</span>
+          </a>
+        </button>
       </div>
 
       {/* Container for Cards and Button */}
       <div className="flex flex-col sm:flex-row justify-between items-center sm:items-start">
         {/* Cards Grid */}
-        <div className="grid gap-6 px-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 flex-grow">
+        <div className="grid gap-6 px-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 flex-grow ml-2">
           {cardData.map((card) => (
             <div
               key={card.id}
-              className="w-full h-[400px] flex flex-col items-start gap-4 bg-[#F2F2F2] rounded-2xl shadow-xl transition-transform hover:scale-[1.02] lg:w-full sm:w-full"
+              className="w-full h-[400px] flex flex-col items-start gap-4 bg-[#F2F2F2] rounded-2xl shadow-xl transition-transform hover:scale-[1.02] sm:w-full"
             >
               <figure className="w-full h-[260px] rounded-t-2xl overflow-hidden">
                 {card.image ? (
@@ -66,9 +72,9 @@ export const MoreCardSection: React.FC = () => {
           ))}
         </div>
 
-        {/* "More Cards" Button */}
-        <div className="flex justify-center sm:ml-4 sm:mt-0 mt-6 sm:w-auto w-full sm:mt-8">
-          <button className="flex items-center px-4 py-2 mr-10 bg-call-to-action text-white rounded-lg shadow-md hover:bg-call-to-actions-800 transition">
+        {/* "More Cards" Button for Smaller Screens */}
+        <div className="flex justify-center mt-6 sm:mt-8 w-full sm:w-auto lg:hidden">
+          <button className="flex items-center px-4 py-2 bg-call-to-action text-white rounded-lg shadow-md hover:bg-call-to-actions-800 transition">
             <FaRocket className="mr-2 text-xl sm:text-lg" />
             <a href="/marketplace">
               <span>More Cards</span>

@@ -204,7 +204,6 @@ export const ProfilePage: React.FC = () => {
             {/* Buttons (for smaller screens) */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 lg:hidden">
               <button className="transition duration-300 text-white bg-call-to-actions-900 transform border-2 border-call-to-action font-bold py-2 px-6 rounded-lg flex items-center justify-center space-x-2 hover:bg-call-to-actions-800 hover:text-white">
-                <CgProfile />
                 <span>Edit Profile</span>
               </button>
             </div>
@@ -296,7 +295,6 @@ export const ProfilePage: React.FC = () => {
               to={"edit-profile"}
               className="transition duration-300 bg-call-to-actions-900 text-white transform border-2 border-call-to-action font-bold py-2 px-6 rounded-lg flex items-center justify-center space-x-2 hover:bg-call-to-actions-800 hover:text-white shadow-md"
             >
-              <CgProfile />
               <span>Edit Profile</span>
             </Link>
           </div>
