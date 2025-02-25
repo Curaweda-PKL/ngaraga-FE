@@ -255,16 +255,25 @@ export const AddCard = () => {
         navigate("/admin/card");
       }, 1500);
     } catch (error: any) {
-      console.error(
-        "Error creating card:",
-        error.response?.data || error.message
-      );
+      console.error("Error creating card:", error.response?.data || error.message);
+    
+      let errorMessage = "Failed to create card.";
+      
+      if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.response?.status === 400 && error.response?.data?.error) {
+        if (error.response.data.error.includes("Unique constraint failed on the constraint: `Card_uniqueCode_key`")) {
+          errorMessage = "A card with this unique code already exists. Please try again with a different card.";
+        } else {
+          errorMessage = error.response.data.error;
+        }
+      } else {
+        errorMessage = error.message || errorMessage;
+      }
+    
       setMessage({
         type: "error",
-        text:
-          error.response?.data?.message ||
-          error.message ||
-          "Failed to create card.",
+        text: errorMessage,
       });
     }
   };
