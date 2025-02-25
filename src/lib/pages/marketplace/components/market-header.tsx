@@ -1,3 +1,4 @@
+// MarketHeader.tsx
 import React, { useState, useEffect } from "react";
 import { MdArrowDropDown } from "react-icons/md"; 
 import { PiSlidersHorizontalDuotone } from "react-icons/pi"; 
@@ -5,55 +6,64 @@ import { DropdownMarket } from "./dropdown-market";
 import FilterModal from "./modal-sm"; 
 import { SERVER_URL } from "@/middleware/utils";
 
-export const MarketHeader: React.FC = () => {
-  // State to track the selected filter
+interface MarketHeaderProps {
+  onFilteredCards: (cards: any[]) => void;
+}
+
+export const MarketHeader: React.FC<MarketHeaderProps> = ({ onFilteredCards }) => {
   const [selectedFilter, setSelectedFilter] = useState<string>("Filter");
-
-  // State to control the modal visibility
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-
-  // State to hold the fetched page content data
   const [pageContent, setPageContent] = useState<{ title: string; description: string } | null>(null);
-
-  // State to track loading status
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  // Default content to use as a fallback if no data is returned
   const defaultContent = {
     title: "Welcome to Our Marketplace!",
     description: "Discover and explore amazing Cards."
   };
 
-  // Fetch the page content for "marketplace" from the API
+  // Fetch page content
   useEffect(() => {
     const fetchPageContent = async () => {
       try {
         const response = await fetch(`${SERVER_URL}/api/page-content/marketplace`);
-        if (!response.ok) {
-          throw new Error("Failed to fetch data");
-        }
+        if (!response.ok) throw new Error("Failed to fetch data");
         const data = await response.json();
         setPageContent(data);
       } catch (error) {
         console.error("Error fetching page content:", error);
-        // Fallback to defaultContent if there is an error
       } finally {
         setIsLoading(false);
       }
     };
-
     fetchPageContent();
-  }, []); // Runs once when the component mounts
+  }, []);
 
-  // Function to handle the selection of a filter item
+  // Fetch filtered cards and pass them up via onFilteredCards prop
+  useEffect(() => {
+    if (selectedFilter === "NORMAL" || selectedFilter === "SPECIAL") {
+      const fetchFilteredCards = async () => {
+        try {
+          const response = await fetch(`${SERVER_URL}/api/filter/cards?type=${selectedFilter}`);
+          if (!response.ok) throw new Error("Failed to fetch filtered cards");
+          const data = await response.json();
+          onFilteredCards(data.cards); // Pass the cards up to the parent
+        } catch (error) {
+          console.error("Error fetching filtered cards:", error);
+          onFilteredCards([]); // Clear cards on error
+        }
+      };
+      fetchFilteredCards();
+    } else {
+      onFilteredCards([]); // No valid filter selected
+    }
+  }, [selectedFilter, onFilteredCards]);
+
   const handleSelectFilter = (filter: string) => {
     setSelectedFilter(filter);
   };
 
   return (
-    // Updated responsive padding: smaller padding on mobile/md, original for lg screens
     <div className="bg-background-color w-full px-4 py-10 lg:px-8 lg:py-20">
-      {/* Adjusted margin: no left margin on mobile/md; applied on lg */}
       <div className="mx-auto ml-0 lg:ml-7">
         {/* Title and Subtitle */}
         <div className="mb-10 ml-4 lg:ml-0">
@@ -71,9 +81,9 @@ export const MarketHeader: React.FC = () => {
           )}
         </div>
 
-        {/* Search Input and Filter */}
+        {/* Search and Filter Controls */}
         <div className="relative w-full flex items-center gap-4">
-          {/* Modal for Small Screens */}
+          {/* Mobile Modal */}
           <div className="block md:hidden">
             <button
               className="flex items-center gap-2 bg-white text-[#404040] border-2 py-3 px-5 rounded-full hover:bg-gray-100"
@@ -85,26 +95,20 @@ export const MarketHeader: React.FC = () => {
             <FilterModal
               isOpen={isModalOpen}
               onClose={() => setIsModalOpen(false)}
-              onApply={() => {
-                // Handle apply logic
-                console.log("Filters applied!");
-                setIsModalOpen(false);
-              }}
+              onApply={() => setIsModalOpen(false)}
             >
               <ul>
-                <li className="py-2">Item 1</li>
-                <li className="py-2">Item 2</li>
-                <li className="py-2">Item 3</li>
-                <li className="py-2">Item 4</li>
-                <li className="py-2">Item 5</li>
-                <li className="py-2">Item 6</li>
-                <li className="py-2">Item 7</li>
-                <li className="py-2">Item 8</li>
+                <li className="py-2" onClick={() => handleSelectFilter("NORMAL")}>
+                  NORMAL
+                </li>
+                <li className="py-2" onClick={() => handleSelectFilter("SPECIAL")}>
+                  SPECIAL
+                </li>
               </ul>
             </FilterModal>
           </div>
 
-          {/* Dropdown for Medium and Larger Screens */}
+          {/* Desktop Dropdown */}
           <div className="hidden md:block">
             <DropdownMarket
               buttonText={selectedFilter}
@@ -114,25 +118,17 @@ export const MarketHeader: React.FC = () => {
               <li>
                 <a
                   className="block px-4 py-2 text-gray-700 rounded-lg hover-border-call-to-actions"
-                  onClick={() => handleSelectFilter("Item 1")}
+                  onClick={() => handleSelectFilter("NORMAL")}
                 >
-                  Dropdown 1
+                  NORMAL
                 </a>
               </li>
               <li>
                 <a
                   className="block px-4 py-2 text-gray-700 rounded-lg hover-border-call-to-actions"
-                  onClick={() => handleSelectFilter("Item 2")}
+                  onClick={() => handleSelectFilter("SPECIAL")}
                 >
-                  Item 2
-                </a>
-              </li>
-              <li>
-                <a
-                  className="block px-4 py-2 text-gray-700 rounded-lg hover-border-call-to-actions"
-                  onClick={() => handleSelectFilter("Item 3")}
-                >
-                  Item 3
+                  SPECIAL
                 </a>
               </li>
             </DropdownMarket>
@@ -142,13 +138,10 @@ export const MarketHeader: React.FC = () => {
           <div className="relative flex-grow">
             <input
               type="text"
-              placeholder="Search your favourite NFTs"
+              placeholder="Search your favourite cards"
               className="w-full rounded-full bg-white text-[#404040] border-2 py-3 px-5 pr-14 outline-none placeholder-gray-500"
             />
-            <button
-              type="button"
-              className="absolute top-1/2 right-4 -translate-y-1/2 text-gray-400"
-            >
+            <button type="button" className="absolute top-1/2 right-4 -translate-y-1/2 text-gray-400">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -157,11 +150,7 @@ export const MarketHeader: React.FC = () => {
                 stroke="currentColor"
                 className="w-5 h-5"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M21 21l-4.35-4.35M10.5 18a7.5 7.5 0 100-15 7.5 7.5 0 000 15z"
-                />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M10.5 18a7.5 7.5 0 100-15 7.5 7.5 0 000 15z" />
               </svg>
             </button>
           </div>
