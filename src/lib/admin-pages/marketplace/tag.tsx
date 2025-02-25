@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { Pencil, Eye, Trash2, X } from "lucide-react";
+import { Pencil, Eye, EyeOff, Trash2, X } from "lucide-react";
 import axios from "axios";
-import { SERVER_URL } from "@/middleware/utils"; // Import centralized server URL
+import { SERVER_URL } from "@/middleware/utils";
 
-// Define the tag type with id and name.
+// Define the tag type with id, name, and isSuspended.
 interface TagItem {
   id: string;
   name: string;
+  isSuspended: boolean;
 }
 
 interface ModalProps {
@@ -25,16 +26,19 @@ export const Tag = () => {
   const [tags, setTags] = useState<TagItem[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   // Fetch all tags from the API
   useEffect(() => {
     const fetchTags = async () => {
       try {
         const response = await axios.get(`${SERVER_URL}/api/tags/all`);
-        // Assume the API returns an array of tag objects with id and name.
+        // Assume the API returns an array of tag objects with id, name, and isSuspended.
         setTags(response.data.tags);
       } catch (error) {
         console.error("Error fetching tags:", error);
+        setErrorMessage("Error fetching tags");
+        setTimeout(() => setErrorMessage(""), 3000);
       }
     };
 
@@ -60,6 +64,8 @@ export const Tag = () => {
       setTimeout(() => setSuccessMessage(""), 3000);
     } catch (error) {
       console.error("Error creating tag:", error);
+      setErrorMessage("Error creating tag");
+      setTimeout(() => setErrorMessage(""), 3000);
     }
   };
 
@@ -83,6 +89,8 @@ export const Tag = () => {
         setTimeout(() => setSuccessMessage(""), 3000);
       } catch (error) {
         console.error("Error updating tag:", error);
+        setErrorMessage("Error updating tag");
+        setTimeout(() => setErrorMessage(""), 3000);
       }
     }
   };
@@ -101,6 +109,37 @@ export const Tag = () => {
       setTimeout(() => setSuccessMessage(""), 3000);
     } catch (error) {
       console.error("Error deleting tag:", error);
+      setErrorMessage("Error deleting tag");
+      setTimeout(() => setErrorMessage(""), 3000);
+    }
+  };
+
+  // Handle suspend/unsuspend toggle for a tag using PATCH route
+  const handleToggleSuspend = async (tag: TagItem) => {
+    try {
+      let response;
+      if (tag.isSuspended) {
+        // Unsuspend the tag
+        response = await axios.patch(
+          `${SERVER_URL}/api/tag/${tag.id}/unsuspend`
+        );
+        setSuccessMessage("Tag unsuspended successfully!");
+      } else {
+        // Suspend the tag
+        response = await axios.patch(
+          `${SERVER_URL}/api/tag/${tag.id}/suspend`
+        );
+        setSuccessMessage("Tag suspended successfully!");
+      }
+      // Update the tag in the state with the returned updated tag
+      setTags((prevTags) =>
+        prevTags.map((t) => (t.id === tag.id ? response.data.tag : t))
+      );
+      setTimeout(() => setSuccessMessage(""), 3000);
+    } catch (error) {
+      console.error("Error toggling suspend state:", error);
+      setErrorMessage("Error toggling suspend state");
+      setTimeout(() => setErrorMessage(""), 3000);
     }
   };
 
@@ -132,7 +171,10 @@ export const Tag = () => {
         <div className="bg-white rounded-lg w-full max-w-md">
           <div className="flex justify-between items-center p-4 border-b">
             <h2 className="text-lg font-medium">{title}</h2>
-            <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+            <button
+              onClick={onClose}
+              className="text-gray-400 hover:text-gray-600"
+            >
               <X className="w-5 h-5" />
             </button>
           </div>
@@ -219,6 +261,12 @@ export const Tag = () => {
         </div>
       )}
 
+      {errorMessage && (
+        <div className="text-red-500 mb-4 p-2 border border-red-500 bg-red-100 rounded-lg">
+          {errorMessage}
+        </div>
+      )}
+
       <div className="grid grid-cols-2 gap-4">
         {filteredTags.map((tag) => (
           <div
@@ -238,8 +286,15 @@ export const Tag = () => {
               >
                 <Pencil className="w-5 h-5" />
               </button>
-              <button className="text-gray-400 hover:text-gray-600">
-                <Eye className="w-5 h-5" />
+              <button
+                onClick={() => handleToggleSuspend(tag)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                {tag.isSuspended ? (
+                  <EyeOff className="w-5 h-5" />
+                ) : (
+                  <Eye className="w-5 h-5" />
+                )}
               </button>
               <button
                 onClick={() => handleDeleteTag(tag)}

@@ -1,68 +1,58 @@
-import React, {ChangeEvent, useEffect, useState} from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
 import axios from "axios";
 import "react-quill/dist/quill.snow.css";
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
-import CardForm from "./components/cardForm";
-import CardSettings from "./components/cardSetting";
+import CardForm from "./components/specialcardForm";
+import CardSettings from "./components/specialcardSetting";
+import { SERVER_URL } from "@/middleware/utils"; 
 
-import { SERVER_URL } from "@/middleware/utils";
-
-
-export const AddCard = () => {
+export const AddSpecialCard = () => {
   const navigate = useNavigate();
 
-  // States for API data
+  // Categories state (now including id)
   const [apiCategories, setApiCategories] = useState<
-    {id: number; name: string; image: string | null}[]
+    { id: number; name: string; image: string | null }[]
   >([]);
   const [categoriesLoading, setCategoriesLoading] = useState(true);
   const [categoriesError, setCategoriesError] = useState<string | null>(null);
 
+  // Creators state (fetched from API, now including id)
   const [apiCreators, setApiCreators] = useState<
-    {id: number; name: string; image: string | null}[]
+    { id: number; name: string; image: string | null }[]
   >([]);
   const [creatorsLoading, setCreatorsLoading] = useState(true);
   const [creatorsError, setCreatorsError] = useState<string | null>(null);
 
-
+  // Tags state (fetched from API)
   const [apiTags, setApiTags] = useState<{ id: number; name: string }[]>([]);
-
-
   const [tagsLoading, setTagsLoading] = useState(true);
   const [tagsError, setTagsError] = useState<string | null>(null);
 
-  // Message state to display success or error messages
-  const [message, setMessage] = useState<{
-    type: "error" | "success";
-    text: string;
-  } | null>(null);
-
-  // Form data state (now including discountedPrice)
+  // Form data state including new fields for source image info
   const [formData, setFormData] = useState({
-    cardImage: null as string | ArrayBuffer | null,
+    cardImage: null as string | ArrayBuffer | null, // For preview
     cardName: "",
     sku: "",
     price: "",
     salePrice: false,
-    discountedPrice: "", // NEW FIELD
     stock: "",
     cardDetails: "",
-    categories: [] as string[],
+    categories: [] as string[], // stores selected category IDs as strings
     creator: false,
-    selectedCreator: "",
+    selectedCreator: "", // stores selected creator ID as string
     tag: false,
-    tags: [] as string[],
+    tags: [] as string[], // stores selected tag IDs as strings
     source: false,
     sourceImageWebsite: "",
     sourceImageAlt: "",
-    cardType: "NORMAL",
+    cardType: "SPECIAL",
   });
 
-  // Store file for upload
+  // State to keep the actual file for upload
   const [cardFile, setCardFile] = useState<File | null>(null);
 
-  // Fetch categories
+  // Fetch categories (include id)
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -87,7 +77,7 @@ export const AddCard = () => {
     fetchCategories();
   }, []);
 
-  // Fetch creators
+  // Fetch creators (include id)
   useEffect(() => {
     const fetchCreators = async () => {
       try {
@@ -96,9 +86,7 @@ export const AddCard = () => {
           id: creator.id,
           name: creator.name,
           image: creator.image
-            ? `${SERVER_URL}/uploads/creator/${encodeURIComponent(
-                creator.image
-              )}`
+            ? `${SERVER_URL}/uploads/creator/${encodeURIComponent(creator.image)}`
             : null,
         }));
         setApiCreators(creatorsData);
@@ -115,7 +103,7 @@ export const AddCard = () => {
     fetchCreators();
   }, []);
 
-  // Preload creator images for smoother toggle experience.
+  // Preload creator images so they're cached on first toggle.
   useEffect(() => {
     if (!creatorsLoading && !creatorsError) {
       apiCreators.forEach((creator) => {
@@ -150,10 +138,9 @@ export const AddCard = () => {
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-
     const { name, value, type } = e.target;
-    const newValue = type === "checkbox" ? (e.target as HTMLInputElement).checked : value;
-
+    const newValue =
+      type === "checkbox" ? (e.target as HTMLInputElement).checked : value;
     setFormData((prev) => ({
       ...prev,
       [name]: newValue,
@@ -164,19 +151,19 @@ export const AddCard = () => {
   const handleImageUpload = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      setCardFile(file);
+      setCardFile(file); // Store file for upload
       const reader = new FileReader();
       reader.onloadend = () => {
         setFormData((prev) => ({
           ...prev,
-          cardImage: reader.result,
+          cardImage: reader.result, // For preview
         }));
       };
       reader.readAsDataURL(file);
     }
   };
 
-  // Drag and drop handlers for image upload
+  // Drag over and drop handlers for image upload
   const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
   };
@@ -185,7 +172,7 @@ export const AddCard = () => {
     event.preventDefault();
     const file = event.dataTransfer.files?.[0];
     if (file) {
-      setCardFile(file);
+      setCardFile(file); // Store file for upload
       const reader = new FileReader();
       reader.onloadend = () => {
         setFormData((prev) => ({
@@ -199,18 +186,15 @@ export const AddCard = () => {
 
   // Cancel handler
   const handleCancel = () => {
-    navigate("/admin/card");
+    navigate("/admin/special-card");
   };
 
-  // Save handler (create new card)
+  // Save handler (create new card(s))
   const handleSave = async () => {
     try {
-      // Basic validations
+      // Ensure a category is selected
       if (formData.categories.length === 0) {
         throw new Error("Please select a category.");
-      }
-      if (!formData.cardName || !formData.sku || !formData.stock) {
-        throw new Error("Card name, SKU, and stock are required.");
       }
 
       // Create FormData payload for multipart/form-data
@@ -218,10 +202,13 @@ export const AddCard = () => {
       payload.append("characterName", formData.cardName);
       payload.append("sku", formData.sku);
       payload.append("price", formData.price);
-      payload.append("discountedPrice", formData.discountedPrice); // NEW FIELD
       payload.append("stock", formData.stock);
       payload.append("cardDetail", formData.cardDetails);
+
+      // Append the first selected category (as per your current logic)
       payload.append("categoryId", formData.categories[0]);
+
+      // Convert the selected tag IDs and creator ID into JSON strings
       payload.append(
         "tagIds",
         JSON.stringify(formData.tags.map((tag) => Number(tag)))
@@ -230,9 +217,14 @@ export const AddCard = () => {
         "creatorIds",
         JSON.stringify([Number(formData.selectedCreator)])
       );
-      payload.append("ownerId", "");
-      payload.append("cardType", "NORMAL");
 
+      // Owner ID is optional – here we leave it empty
+      payload.append("ownerId", "");
+
+      // Append cardType as DEFAULT (for a SPECIAL card)
+      payload.append("cardType", "SPECIAL");
+
+      // Append sourceImage if the source toggle is enabled
       if (formData.source) {
         payload.append(
           "sourceImage",
@@ -243,11 +235,12 @@ export const AddCard = () => {
         );
       }
 
+      // Append image file if available
       if (cardFile) {
         payload.append("image", cardFile);
       }
 
-      // Post to the API endpoint
+      // Send POST request to the API endpoint
       const response = await axios.post(
         `${SERVER_URL}/api/cards/create`,
         payload,
@@ -258,42 +251,23 @@ export const AddCard = () => {
         }
       );
 
-      // Set a success message and navigate away
-      setMessage({ type: "success", text: "Card created successfully!" });
-      setTimeout(() => {
-        navigate("/admin/card");
-      }, 1500);
+      console.log("Response:", response.data);
+      navigate("/admin/special-card");
     } catch (error: any) {
       console.error(
         "Error creating card:",
         error.response?.data || error.message
       );
-      setMessage({
-        type: "error",
-        text:
-          error.response?.data?.message ||
-          error.message ||
-          "Failed to create card.",
-      });
+      alert(
+        "Error creating card: " +
+          (error.response?.data?.message || error.message)
+      );
     }
   };
 
   return (
     <div className="max-w-7xl mx-auto p-6">
       <h1 className="text-2xl font-semibold mb-6">Add Card</h1>
-
-      {/* Message display */}
-      {message && (
-        <div
-          className={`p-4 rounded-lg mb-4 ${
-            message.type === "error"
-              ? "bg-red-100 text-red-700"
-              : "bg-green-100 text-green-700"
-          }`}
-        >
-          {message.text}
-        </div>
-      )}
 
       <div className="grid grid-cols-2 gap-6">
         {/* Left Column - Form Fields */}

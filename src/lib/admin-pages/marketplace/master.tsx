@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Pencil, Eye, Trash2, Search, X } from "lucide-react";
+import { Pencil, Eye, EyeOff, Trash2, Search, X } from "lucide-react";
 import { SERVER_URL } from "@/middleware/utils"; // Import centralized server URL
 
 interface ModalProps {
@@ -16,7 +16,11 @@ export const Master = () => {
   const [masterList, setMasterList] = useState<any[]>([]);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [selectedMaster, setSelectedMaster] = useState<{ id: number; name: string; code: string } | null>(null);
+  const [selectedMaster, setSelectedMaster] = useState<{
+    id: number;
+    name: string;
+    code: string;
+  } | null>(null);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
@@ -39,19 +43,34 @@ export const Master = () => {
     fetchMasterList();
   }, []);
 
+  // Validate code format if provided (must be exactly three digits)
+  const isValidCode = (code: string) => {
+    return /^\d{3}$/.test(code);
+  };
+
   const handleAddMaster = async (name: string, code: string) => {
+    // If a code is provided, validate its format.
+    if (code && !isValidCode(code)) {
+      setErrorMessage("Input harus mengikuti format xxx");
+      return;
+    }
     try {
+      const bodyData: any = { name };
+      if (code) {
+        bodyData.code = code; // Hanya tambahkan jika code ada
+      }
+
       const response = await fetch(`${SERVER_URL}/api/master/create`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, code: code || undefined }), 
+        body: JSON.stringify(bodyData),
       });
-  
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || "Failed to add master");
       }
-  
+
       const newMaster = await response.json();
       setMasterList((prev) => [...prev, newMaster.master]);
       setSuccessMessage("Master successfully added.");
@@ -63,11 +82,21 @@ export const Master = () => {
   };
 
   const handleEditMaster = async (id: number, name: string, code: string) => {
+    // Validate code if provided
+    if (code && !isValidCode(code)) {
+      setErrorMessage("Input harus mengikuti format xxx");
+      return;
+    }
     try {
+      const bodyData: any = { name };
+      if (code) {
+        bodyData.code = code; // Hanya tambahkan jika ada
+      }
+
       const response = await fetch(`${SERVER_URL}/api/master/edit/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, code }),
+        body: JSON.stringify(bodyData),
       });
 
       if (!response.ok) {
@@ -108,6 +137,42 @@ export const Master = () => {
     }
   };
 
+  // New: Toggle suspend/unsuspend for a master
+  const handleToggleSuspend = async (id: number, currentStatus: boolean) => {
+    try {
+      const endpoint = currentStatus
+        ? `${SERVER_URL}/api/masters/${id}/unsuspend`
+        : `${SERVER_URL}/api/masters/${id}/suspend`;
+      const response = await fetch(endpoint, {
+        method: "PATCH",
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(
+          errorData.message ||
+            `Failed to ${currentStatus ? "unsuspend" : "suspend"} master`
+        );
+      }
+      const result = await response.json();
+      // Expecting result.master to contain the updated master
+      setMasterList((prev) =>
+        prev.map((master) =>
+          master.id === result.master.id ? result.master : master
+        )
+      );
+      setSuccessMessage(
+        `Master successfully ${currentStatus ? "unsuspended" : "suspended"}.`
+      );
+      setTimeout(() => setSuccessMessage(""), 3000);
+    } catch (error: any) {
+      console.error("Error toggling suspension:", error);
+      setErrorMessage(
+        error?.message ||
+          `Failed to ${currentStatus ? "unsuspend" : "suspend"} master.`
+      );
+    }
+  };
+
   const Modal: React.FC<ModalProps> = ({
     isOpen,
     onClose,
@@ -119,12 +184,12 @@ export const Master = () => {
   }) => {
     const [inputValue, setInputValue] = useState(defaultValue);
     const [inputCode, setInputCode] = useState(defaultCode); // Untuk input code
-  
+
     useEffect(() => {
       setInputValue(defaultValue);
       setInputCode(defaultCode); // Set defaultCode
     }, [defaultValue, defaultCode]);
-  
+
     if (!isOpen) return null;
 
     return (
@@ -132,7 +197,10 @@ export const Master = () => {
         <div className="bg-white rounded-lg w-full max-w-md">
           <div className="flex justify-between items-center p-4 border-b">
             <h2 className="text-lg font-medium">{title}</h2>
-            <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+            <button
+              onClick={onClose}
+              className="text-gray-400 hover:text-gray-600"
+            >
               <X className="w-5 h-5" />
             </button>
           </div>
@@ -148,15 +216,20 @@ export const Master = () => {
               className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500"
             />
             <label className="block text-sm font-medium text-gray-700 mb-1 mt-3">
-              Master Code (Optional)
+              Master Code (format: xxx; Number)
             </label>
             <input
               type="text"
               value={inputCode}
               onChange={(e) => setInputCode(e.target.value)}
-              placeholder="Leave blank for automatic code"
+              placeholder="input master code"
               className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500"
             />
+            {inputCode && !isValidCode(inputCode) && (
+              <p className="text-red-500 text-sm mt-1">
+                Input harus mengikuti format xxx
+              </p>
+            )}
           </div>
 
           <div className="flex justify-end gap-2 p-4 border-t">
@@ -168,7 +241,12 @@ export const Master = () => {
             </button>
             <button
               onClick={() => {
-                onSubmit(inputValue, inputCode);
+                // Only submit if code is empty or valid
+                if (inputCode && !isValidCode(inputCode)) {
+                  setErrorMessage("Input harus mengikuti format xxx");
+                  return;
+                }
+                onSubmit(inputValue, inputCode.trim() !== "" ? inputCode : "");
                 onClose();
               }}
               className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600"
@@ -217,7 +295,7 @@ export const Master = () => {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search Master"
+            placeholder="Search and tap Enter"
             className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
           />
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -230,7 +308,7 @@ export const Master = () => {
           .filter((master) =>
             master.name.toLowerCase().includes(searchQuery.toLowerCase())
           )
-          .map((master: { id: number; name: string; code: string }) => (
+          .map((master: { id: number; name: string; isSuspended: boolean; code: string }) => (
             <div
               key={master.id}
               className="bg-white rounded-lg p-4 flex items-center justify-between border border-gray-100"
@@ -246,8 +324,17 @@ export const Master = () => {
                 >
                   <Pencil className="w-5 h-5" />
                 </button>
-                <button className="text-gray-400 hover:text-gray-600">
-                  <Eye className="w-5 h-5" />
+                <button
+                  onClick={() =>
+                    handleToggleSuspend(master.id, master.isSuspended)
+                  }
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  {master.isSuspended ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )}
                 </button>
                 <button
                   onClick={() => handleDeleteMaster(master.id)}
