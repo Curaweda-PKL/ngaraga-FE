@@ -1,7 +1,7 @@
 import React, { ChangeEvent, useRef } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
-import { Upload } from "lucide-react";
+import {Upload} from "lucide-react";
 
 interface CardFormProps {
   formData: {
@@ -182,7 +182,7 @@ const CardForm: React.FC<CardFormProps> = ({
           <ReactQuill
             value={formData.cardDetails}
             onChange={(value) =>
-              setFormData((prev) => ({ ...prev, cardDetails: value }))
+              setFormData((prev) => ({...prev, cardDetails: value}))
             }
             placeholder="Write your card details..."
           />

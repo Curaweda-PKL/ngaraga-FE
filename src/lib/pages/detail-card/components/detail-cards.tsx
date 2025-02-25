@@ -1,5 +1,5 @@
 import React from "react";
-import { CiShoppingCart } from "react-icons/ci";
+import {CiShoppingCart} from "react-icons/ci";
 
 export const DetailCards: React.FC = () => {
   return (
@@ -32,7 +32,7 @@ export const DetailCards: React.FC = () => {
         </div>
 
         {/* Action Buttons (positioned for desktop only) */}
-        <div className="absolute top-2 right-2 flex space-x-2 mr-5 sm:mr-3 hidden sm:flex">
+        <div className="absolute top-2 right-2 space-x-2 mr-5 sm:mr-3 hidden sm:flex">
           <button className="flex items-center bg-call-to-action text-white px-4 py-2 rounded-full hover:bg-call-to-actions-800 transition text-sm">
             <CiShoppingCart className="mr-2 text-xl" />
             Add to Cart

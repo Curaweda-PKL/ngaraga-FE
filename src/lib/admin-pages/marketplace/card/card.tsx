@@ -61,16 +61,19 @@ export const Card = () => {
         }));
         setCards(mappedCards);
       } catch (error: any) {
+
         console.error("Error fetching cards:", error.response?.data || error.message);
         setNotification({
           message: error.response?.data?.message || error.message,
           type: "error",
         });
+
       }
     };
 
     fetchCards();
   }, []);
+
 
   // Helper to format image URL
   const formatImageUrl = (image?: string): string => {
@@ -91,6 +94,7 @@ export const Card = () => {
   // Select/deselect a single card.
   const handleSelectRow = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
     const { checked } = e.target;
+
     const updatedCards = [...cards];
     updatedCards[index].selected = checked;
     setCards(updatedCards);
@@ -223,6 +227,7 @@ export const Card = () => {
           </button>
         </div>
       </div>
+
 <div className="overflow-x-auto">
   <table className="table w-full">
     <thead>
@@ -324,6 +329,7 @@ export const Card = () => {
     </tbody>
   </table>
 </div>
+
 
     </div>
   );

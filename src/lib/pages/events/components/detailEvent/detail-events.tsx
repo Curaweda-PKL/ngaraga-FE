@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import React, {useEffect, useState} from "react";
+import {useParams} from "react-router-dom";
 import axios from "axios";
-import Header from "./components/detailEvent/detailHeader";
-import MainContent from "./components/detailEvent/detailMain";
-import { SERVER_URL } from "@/middleware/utils"; // Import centralized server URL
+import Header from "./detailHeader";
+import MainContent from "./detailMain";
+import {SERVER_URL} from "@/middleware/utils"; // Import centralized server URL
 
 // (Optional) Define an interface for your event data.
 interface EventDetailData {
@@ -22,16 +22,14 @@ interface EventDetailData {
   // …other properties as needed
 }
 
-const EventDetail: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
+export const EventDetail: React.FC = () => {
+  const {id} = useParams<{id: string}>();
   const [eventData, setEventData] = useState<EventDetailData | null>(null);
 
   useEffect(() => {
     const fetchEventDetail = async () => {
       try {
-        const response = await axios.get(
-          `${SERVER_URL}/api/events/${id}`
-        );
+        const response = await axios.get(`${SERVER_URL}/api/events/${id}`);
         if (response.data) {
           setEventData(response.data);
         }
@@ -52,5 +50,3 @@ const EventDetail: React.FC = () => {
     </div>
   );
 };
-
-export default EventDetail;

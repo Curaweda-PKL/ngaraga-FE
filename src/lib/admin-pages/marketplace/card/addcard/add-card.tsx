@@ -1,29 +1,34 @@
-import React, { ChangeEvent, useEffect, useState } from "react";
+import React, {ChangeEvent, useEffect, useState} from "react";
 import axios from "axios";
 import "react-quill/dist/quill.snow.css";
-import { useNavigate } from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 
 import CardForm from "./components/cardForm";
 import CardSettings from "./components/cardSetting";
+
 import { SERVER_URL } from "@/middleware/utils";
+
 
 export const AddCard = () => {
   const navigate = useNavigate();
 
   // States for API data
   const [apiCategories, setApiCategories] = useState<
-    { id: number; name: string; image: string | null }[]
+    {id: number; name: string; image: string | null}[]
   >([]);
   const [categoriesLoading, setCategoriesLoading] = useState(true);
   const [categoriesError, setCategoriesError] = useState<string | null>(null);
 
   const [apiCreators, setApiCreators] = useState<
-    { id: number; name: string; image: string | null }[]
+    {id: number; name: string; image: string | null}[]
   >([]);
   const [creatorsLoading, setCreatorsLoading] = useState(true);
   const [creatorsError, setCreatorsError] = useState<string | null>(null);
 
+
   const [apiTags, setApiTags] = useState<{ id: number; name: string }[]>([]);
+
+
   const [tagsLoading, setTagsLoading] = useState(true);
   const [tagsError, setTagsError] = useState<string | null>(null);
 
@@ -91,7 +96,9 @@ export const AddCard = () => {
           id: creator.id,
           name: creator.name,
           image: creator.image
-            ? `${SERVER_URL}/uploads/creator/${encodeURIComponent(creator.image)}`
+            ? `${SERVER_URL}/uploads/creator/${encodeURIComponent(
+                creator.image
+              )}`
             : null,
         }));
         setApiCreators(creatorsData);
@@ -143,8 +150,10 @@ export const AddCard = () => {
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
+
     const { name, value, type } = e.target;
     const newValue = type === "checkbox" ? (e.target as HTMLInputElement).checked : value;
+
     setFormData((prev) => ({
       ...prev,
       [name]: newValue,

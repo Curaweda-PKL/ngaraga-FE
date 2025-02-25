@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Edit3, Eye, EyeOff, Trash2, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -11,6 +12,7 @@ export const SpecialCard = () => {
   const [notification, setNotification] = useState<{ message: string; type: "success" | "error" } | null>(null);
 
   // Define card state with additional isSuspended property.
+
   const [cards, setCards] = useState<
     {
       sku: string;
@@ -54,17 +56,20 @@ export const SpecialCard = () => {
         }));
         setCards(mappedCards);
       } catch (error: any) {
+
         console.error("Error fetching cards:", error.response?.data || error.message);
         setNotification({
           message: error.response?.data?.message || error.message,
           type: "error",
         });
+
       }
     };
   
     fetchCards();
   }, []);
   
+
 
   // Select/deselect all cards.
   const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -76,6 +81,7 @@ export const SpecialCard = () => {
   // Select/deselect a single card.
   const handleSelectRow = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
     const { checked } = e.target;
+
     const updatedCards = [...cards];
     updatedCards[index].selected = checked;
     setCards(updatedCards);
@@ -216,7 +222,9 @@ export const SpecialCard = () => {
                 <input
                   type="checkbox"
                   className="checkbox"
-                  checked={cards.length > 0 && cards.every((card) => card.selected)}
+                  checked={
+                    cards.length > 0 && cards.every((card) => card.selected)
+                  }
                   onChange={handleSelectAll}
                 />
               </th>
@@ -294,7 +302,9 @@ export const SpecialCard = () => {
             ))}
             {cards.length === 0 && (
               <tr>
+
                 <td colSpan={10} className="text-center py-4">
+
                   No cards found.
                 </td>
               </tr>
