@@ -17,6 +17,9 @@ export const Coupon = () => {
   const [coupons, setCoupons] = useState<any[]>([]);
   const [selectedCoupons, setSelectedCoupons] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [loadingIds, setLoadingIds] = useState<string[]>([]);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const couponsPerPage = 5; // adjust as needed
 
   // Fetch coupons from the backend.
@@ -28,6 +31,7 @@ export const Coupon = () => {
       setCoupons(response.data.coupons);
     } catch (err) {
       console.error("Error fetching coupons:", err);
+      setErrorMessage("Failed to fetch coupons. Please try again.");
     }
   };
 
@@ -71,6 +75,7 @@ export const Coupon = () => {
 
   const bulkDelete = async () => {
     try {
+      setLoadingIds(selectedCoupons);
       for (const id of selectedCoupons) {
         await axios.delete(`${SERVER_URL}/api/coupons/${id}`, {
           withCredentials: true,
@@ -78,15 +83,23 @@ export const Coupon = () => {
       }
       await fetchCoupons();
       setSelectedCoupons([]);
+      setErrorMessage(null);
+      setSuccessMessage("Selected coupons deleted successfully.");
     } catch (err) {
       console.error("Bulk delete error:", err);
+      setErrorMessage("Bulk delete failed. Please try again.");
+      setSuccessMessage(null);
+    } finally {
+      setLoadingIds([]);
     }
   };
 
   const bulkSuspend = async () => {
     try {
+      setLoadingIds(selectedCoupons);
       for (const id of selectedCoupons) {
         const coupon = coupons.find((c: any) => c.id === id);
+        // Only suspend if coupon is not already suspended
         if (coupon && !coupon.isSuspended) {
           await axios.patch(
             `${SERVER_URL}/api/coupons/${id}/suspend`,
@@ -97,36 +110,74 @@ export const Coupon = () => {
       }
       await fetchCoupons();
       setSelectedCoupons([]);
+      setErrorMessage(null);
+      setSuccessMessage("Selected coupons suspended successfully.");
     } catch (err) {
       console.error("Bulk suspend error:", err);
+      setErrorMessage("Bulk suspend failed. Please try again.");
+      setSuccessMessage(null);
+    } finally {
+      setLoadingIds([]);
     }
   };
 
   // Single coupon actions.
   const handleDeleteCoupon = async (id: string) => {
     try {
+      setLoadingIds((prev) => [...prev, id]);
       await axios.delete(`${SERVER_URL}/api/coupons/${id}`, {
         withCredentials: true,
       });
       await fetchCoupons();
       setSelectedCoupons((prev) => prev.filter((cid) => cid !== id));
+      setErrorMessage(null);
+      setSuccessMessage("Coupon deleted successfully.");
     } catch (err) {
       console.error("Error deleting coupon:", err);
+      setErrorMessage("Failed to delete coupon. Please try again.");
+      setSuccessMessage(null);
+    } finally {
+      setLoadingIds((prev) => prev.filter((loadingId) => loadingId !== id));
     }
   };
 
   const handleSuspendCoupon = async (id: string) => {
     try {
-      const coupon = coupons.find((c: any) => c.id === id);
-      if (coupon && coupon.isSuspended) return;
+      setLoadingIds((prev) => [...prev, id]);
       await axios.patch(
         `${SERVER_URL}/api/coupons/${id}/suspend`,
         {},
         { withCredentials: true }
       );
       await fetchCoupons();
+      setErrorMessage(null);
+      setSuccessMessage("Coupon suspended successfully.");
     } catch (err) {
       console.error("Error suspending coupon:", err);
+      setErrorMessage("Failed to suspend coupon. Please try again.");
+      setSuccessMessage(null);
+    } finally {
+      setLoadingIds((prev) => prev.filter((loadingId) => loadingId !== id));
+    }
+  };
+
+  const handleUnsuspendCoupon = async (id: string) => {
+    try {
+      setLoadingIds((prev) => [...prev, id]);
+      await axios.patch(
+        `${SERVER_URL}/api/coupons/${id}/unsuspend`,
+        {},
+        { withCredentials: true }
+      );
+      await fetchCoupons();
+      setErrorMessage(null);
+      setSuccessMessage("Coupon unsuspended successfully.");
+    } catch (err) {
+      console.error("Error unsuspending coupon:", err);
+      setErrorMessage("Failed to unsuspend coupon. Please try again.");
+      setSuccessMessage(null);
+    } finally {
+      setLoadingIds((prev) => prev.filter((loadingId) => loadingId !== id));
     }
   };
 
@@ -141,6 +192,18 @@ export const Coupon = () => {
 
   return (
     <div className="p-6">
+      {/* Message Display */}
+      {errorMessage && (
+        <div className="mb-4 p-2 bg-red-100 text-red-600 rounded">
+          {errorMessage}
+        </div>
+      )}
+      {successMessage && (
+        <div className="mb-4 p-2 bg-green-100 text-green-600 rounded">
+          {successMessage}
+        </div>
+      )}
+
       {/* Breadcrumb */}
       <div className="flex items-center text-sm text-gray-500 mb-4">
         <span>Coupon</span>
@@ -244,24 +307,35 @@ export const Coupon = () => {
                     >
                       <Edit className="w-4 h-4" />
                     </button>
-                    <button
-                      onClick={() => handleSuspendCoupon(coupon.id)}
-                      className={`p-2 hover:bg-gray-100 rounded-lg ${
-                        coupon.isSuspended
-                          ? "text-gray-400 cursor-not-allowed"
-                          : "text-gray-600"
-                      }`}
-                      title={coupon.isSuspended ? "Coupon suspended" : "Suspend Coupon"}
-                    >
-                      {coupon.isSuspended ? (
-                        <EyeOff className="w-4 h-4" />
-                      ) : (
+                    {coupon.isSuspended ? (
+                      <button
+                        onClick={() => handleUnsuspendCoupon(coupon.id)}
+                        className={`p-2 hover:bg-gray-100 rounded-lg ${
+                          loadingIds.includes(coupon.id) && "opacity-50"
+                        }`}
+                        title="Unsuspend Coupon"
+                        disabled={loadingIds.includes(coupon.id)}
+                      >
                         <Eye className="w-4 h-4" />
-                      )}
-                    </button>
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => handleSuspendCoupon(coupon.id)}
+                        className={`p-2 hover:bg-gray-100 rounded-lg ${
+                          loadingIds.includes(coupon.id) && "opacity-50"
+                        }`}
+                        title="Suspend Coupon"
+                        disabled={loadingIds.includes(coupon.id)}
+                      >
+                        <EyeOff className="w-4 h-4" />
+                      </button>
+                    )}
                     <button
                       onClick={() => handleDeleteCoupon(coupon.id)}
-                      className="p-2 hover:bg-gray-100 rounded-lg text-red-500"
+                      className={`p-2 hover:bg-gray-100 rounded-lg text-red-500 ${
+                        loadingIds.includes(coupon.id) && "opacity-50"
+                      }`}
+                      disabled={loadingIds.includes(coupon.id)}
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>

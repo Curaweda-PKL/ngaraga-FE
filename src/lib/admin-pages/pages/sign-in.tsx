@@ -4,10 +4,8 @@ import { SERVER_URL } from "@/middleware/utils"; // Import centralized server UR
 
 export const SignInPage = () => {
   const [image, setImage] = useState<File | null>(null);
-  const [title, setTitle] = useState("Welcome back!");
-  const [description, setDescription] = useState(
-    "Enter your details to access your account and continue your journey of creating and collecting Cards."
-  );
+  const [title, setTitle] = useState(""); // Changed to empty string
+  const [description, setDescription] = useState(""); // Changed to empty string
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -22,8 +20,6 @@ export const SignInPage = () => {
     setImage(null);
   };
 
-  // If you already have drag handlers defined elsewhere, keep them.
-  // For completeness, here are simple implementations:
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
   };
@@ -154,7 +150,7 @@ export const SignInPage = () => {
           </label>
           <input
             type="text"
-            value={title}
+            placeholder="Welcome back!"
             onChange={(e) => setTitle(e.target.value)}
             className="w-full border-gray-300 rounded-lg shadow-sm focus:border-yellow-500 focus:ring-yellow-500"
           />
@@ -166,7 +162,7 @@ export const SignInPage = () => {
             Sign Up Description <span className="text-red-500">*</span>
           </label>
           <textarea
-            value={description}
+            placeholder="Enter your details to access your account and continue your journey of creating and collecting Cards."
             onChange={(e) => setDescription(e.target.value)}
             rows={3}
             className="w-full border-gray-300 rounded-lg shadow-sm focus:border-yellow-500 focus:ring-yellow-500"

@@ -4,10 +4,8 @@ import { SERVER_URL } from "@/middleware/utils"; // Import centralized server UR
 
 export const SignUpPage = () => {
   const [image, setImage] = useState<File | null>(null);
-  const [title, setTitle] = useState("Welcome back!");
-  const [description, setDescription] = useState(
-    "Enter your details to access your account and continue your journey of creating and collecting Cards."
-  );
+  const [title, setTitle] = useState(""); // Set initial state to empty string
+  const [description, setDescription] = useState(""); // Set initial state to empty string
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -147,6 +145,7 @@ export const SignUpPage = () => {
           </label>
           <input
             type="text"
+            placeholder="Welcome back!"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             className="w-full border-gray-300 rounded-lg shadow-sm focus:border-yellow-500 focus:ring-yellow-500"
@@ -159,6 +158,7 @@ export const SignUpPage = () => {
             Sign Up Description <span className="text-red-500">*</span>
           </label>
           <textarea
+            placeholder="Enter your details to access your account and continue your journey of creating and collecting Cards."
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             rows={3}
@@ -185,3 +185,4 @@ export const SignUpPage = () => {
     </div>
   );
 };
+  

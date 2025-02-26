@@ -3,7 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { SERVER_URL } from "@/middleware/utils";
 
-export const AddCouponForm = () => {
+export const EditCouponForm = () => {
   const navigate = useNavigate();
 
   const [message, setMessage] = useState<{
@@ -116,10 +116,10 @@ export const AddCouponForm = () => {
   return (
     <div className="max-w-7xl mx-auto p-6">
       <div className="text-sm text-gray-500 mb-4">
-        Coupon / Coupon List / Add Coupon
+        Coupon / Coupon List / Edit Coupon
       </div>
 
-      <h1 className="text-2xl font-semibold mb-6">Add Coupon</h1>
+      <h1 className="text-2xl font-semibold mb-6">Edit Coupon</h1>
 
       {message && (
         <div
