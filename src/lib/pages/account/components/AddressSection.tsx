@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { IoRadioButtonOn } from "react-icons/io5";
+import { FaSadTear } from "react-icons/fa"; // Imported sad icon
 import { HomeIcon } from "./homeIcon";
 import AddAddressModal from "./addModal";
 import EditAddressModal from "./editModal";
@@ -184,7 +185,11 @@ const AddressSection: React.FC<AddressSectionProps> = ({ selectedAddress, handle
           </div>
         ))
       ) : (
-        <p>No addresses found.</p>
+        // Fallback display with sad icon when there are no addresses
+        <div className="flex flex-col items-center justify-center mt-4">
+          <FaSadTear className="text-gray-400 text-6xl" />
+          <p className="mt-2 text-gray-600">No addresses found.</p>
+        </div>
       )}
 
       <div className="flex justify-between mt-4">

@@ -294,7 +294,7 @@ export const AddCard = () => {
         {
           key: "Card_uniqueCode_key",
           message:
-            "A card with this unique code already exists. Please try again with a different card.",
+            "A card with this unique code already exists. Generate a new SKU or character name",
         },
         {
           key: "Card_qrCode_key",
