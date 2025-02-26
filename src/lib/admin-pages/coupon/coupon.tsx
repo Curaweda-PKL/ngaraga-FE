@@ -178,9 +178,6 @@ export const Coupon = () => {
                 <td className="p-4">
                   <div className="flex gap-2">
                     <button className="p-2 hover:bg-gray-100 rounded-lg text-gray-600">
-                      <MessageSquare className="w-4 h-4" />
-                    </button>
-                    <button className="p-2 hover:bg-gray-100 rounded-lg text-gray-600">
                       <Edit className="w-4 h-4" />
                     </button>
                     <button className="p-2 hover:bg-gray-100 rounded-lg text-gray-600">

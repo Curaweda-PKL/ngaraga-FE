@@ -276,7 +276,7 @@ export const DetailCards: React.FC = () => {
                 <div className="ml-4">
                   <h3 className="font-bold text-lg">{product?.name}</h3>
                   <p className="text-gray-600">
-                    ${Number(product?.price).toFixed(2)}
+                    Rp. {Number(product?.price).toFixed(2)}
                   </p>
                 </div>
               </div>
