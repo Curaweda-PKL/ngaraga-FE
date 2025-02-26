@@ -1,24 +1,30 @@
-import { useState } from "react";
+import React, { ChangeEvent, useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import { SERVER_URL } from "@/middleware/utils";
 
 export const AddCouponForm = () => {
+  const navigate = useNavigate();
+
+  const [message, setMessage] = useState<{
+    type: "error" | "success";
+    text: string;
+  } | null>(null);
+
   const [formData, setFormData] = useState({
     couponName: "",
     couponCode: "",
-    userType: "", // "guest", "member", "newMember" // later on
-    applyTo: "ALL_PRODUCTS", // default: ALL_PRODUCTS, PRODUCT_CATEGORIES, PRODUCT_LIST
+    userType: "", // "guest", "member", "newMember"
+    applyTo: "ALL_PRODUCTS", // ALL_PRODUCTS, PRODUCT_CATEGORIES, PRODUCT_LIST
     dateType: "unlimited", // "range" or "unlimited"
     startDate: "",
     endDate: "",
-    condition: "FIXED", // "FIXED", "PERCENT", "MIN_SPENT_FIXED", "MIN_SPENT_PERCENT"
+    condition: "FIXED", // FIXED, PERCENT, MIN_SPENT_FIXED, MIN_SPENT_PERCENT
     discountValue: "",
     minimumSpent: "",
     couponTotal: "unlimited", // "setQuantity" or "unlimited"
     totalQuantity: "",
   });
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
 
   const generateCode = () => {
     const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -26,36 +32,36 @@ export const AddCouponForm = () => {
     for (let i = 0; i < 8; i++) {
       code += characters.charAt(Math.floor(Math.random() * characters.length));
     }
-    setFormData({ ...formData, couponCode: code });
+    setFormData((prev) => ({ ...prev, couponCode: code }));
   };
 
-  const handleSubmit = async (e: { preventDefault: () => void; }) => {
-    e.preventDefault();
-    setError("");
-    setSuccess("");
+  const handleInputChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value, type } = e.target;
+    const newValue = type === "checkbox" ? (e.target as HTMLInputElement).checked : value;
+    setFormData((prev) => ({ ...prev, [name]: newValue }));
+  };
 
-    // Validate required fields
-    if (
-      !formData.couponName ||
-      !formData.couponCode ||
-      !formData.applyTo ||
-      !formData.condition ||
-      !formData.discountValue ||
-      !formData.userType
-    ) {
-      setError("Please fill in all required fields.");
-      return;
-    }
-    if (formData.dateType === "range" && (!formData.startDate || !formData.endDate)) {
-      setError("Please provide both start and end dates.");
-      return;
-    }
-    if (formData.couponTotal === "setQuantity" && !formData.totalQuantity) {
-      setError("Please set the total quantity for the coupon.");
-      return;
-    }
+  // Determine if the Save button should be enabled.
+  const isSaveDisabled =
+    !formData.couponName.trim() ||
+    !formData.couponCode.trim() ||
+    !formData.userType.trim() ||
+    !formData.applyTo.trim() ||
+    !formData.condition.trim() ||
+    !formData.discountValue.trim() ||
+    (formData.dateType === "range" && (!formData.startDate || !formData.endDate)) ||
+    (formData.couponTotal === "setQuantity" && !formData.totalQuantity);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setMessage(null);
+
+    // Additional validations already done via isSaveDisabled.
 
     const payload = {
+      couponCode: formData.couponCode,
       name: formData.couponName,
       discountType:
         formData.condition === "FIXED" || formData.condition === "MIN_SPENT_FIXED"
@@ -75,9 +81,12 @@ export const AddCouponForm = () => {
     };
 
     try {
-      const response = await axios.post(`${SERVER_URL}/api/coupons`, payload, { withCredentials: true });
-      setSuccess("Coupon created successfully.");
+      const response = await axios.post(`${SERVER_URL}/api/coupons`, payload, {
+        withCredentials: true,
+      });
+      setMessage({ type: "success", text: "Coupon created successfully." });
       console.log("Coupon response:", response.data);
+      // Optionally reset the form.
       setFormData({
         couponName: "",
         couponCode: "",
@@ -92,49 +101,56 @@ export const AddCouponForm = () => {
         couponTotal: "unlimited",
         totalQuantity: "",
       });
-    } catch (err) {
+      setTimeout(() => {
+        navigate("/admin/coupons");
+      }, 1500);
+    } catch (err: any) {
       console.error("Error creating coupon:", err);
-      setError(err.response?.data?.error || "Failed to create coupon. Please try again.");
+      setMessage({
+        type: "error",
+        text: err.response?.data?.error || "Failed to create coupon. Please try again.",
+      });
     }
   };
 
-  // Compute form validity; if any required field is missing, the form is not valid.
-  const isFormValid =
-    formData.couponName &&
-    formData.couponCode &&
-    formData.applyTo &&
-    formData.condition &&
-    formData.discountValue &&
-    formData.userType &&
-    (formData.dateType === "unlimited" || (formData.dateType === "range" && formData.startDate && formData.endDate)) &&
-    (formData.couponTotal === "unlimited" || (formData.couponTotal === "setQuantity" && formData.totalQuantity));
-
   return (
-    <div className="max-w-4xl mx-auto p-6">
+    <div className="max-w-7xl mx-auto p-6">
       <div className="text-sm text-gray-500 mb-4">
         Coupon / Coupon List / Add Coupon
       </div>
 
       <h1 className="text-2xl font-semibold mb-6">Add Coupon</h1>
 
-      {error && <div className="mb-4 text-red-500">{error}</div>}
-      {success && <div className="mb-4 text-green-500">{success}</div>}
+      {message && (
+        <div
+          className={`p-4 rounded-lg mb-4 ${
+            message.type === "error"
+              ? "bg-red-100 text-red-700"
+              : "bg-green-100 text-green-700"
+          }`}
+        >
+          {message.text}
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Left Section */}
         <div className="space-y-4 p-6 bg-white rounded-lg shadow">
+          {/* Coupon Name */}
           <div>
             <label className="block mb-2">
               Coupon Name <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
+              name="couponName"
               className="w-full p-2 border rounded-lg"
               value={formData.couponName}
-              onChange={(e) => setFormData({ ...formData, couponName: e.target.value })}
+              onChange={handleInputChange}
             />
           </div>
 
+          {/* Coupon Code */}
           <div>
             <label className="block mb-2">
               Coupon Code <span className="text-red-500">*</span>
@@ -142,9 +158,10 @@ export const AddCouponForm = () => {
             <div className="flex gap-2">
               <input
                 type="text"
+                name="couponCode"
                 className="flex-1 p-2 border rounded-lg"
                 value={formData.couponCode}
-                onChange={(e) => setFormData({ ...formData, couponCode: e.target.value })}
+                onChange={handleInputChange}
               />
               <button
                 type="button"
@@ -156,6 +173,7 @@ export const AddCouponForm = () => {
             </div>
           </div>
 
+          {/* Apply Discount To */}
           <div>
             <label className="block mb-2">
               Apply Discount To <span className="text-red-500">*</span>
@@ -168,13 +186,14 @@ export const AddCouponForm = () => {
                   className="form-radio"
                   value="ALL_PRODUCTS"
                   checked={formData.applyTo === "ALL_PRODUCTS"}
-                  onChange={(e) => setFormData({ ...formData, applyTo: e.target.value })}
+                  onChange={handleInputChange}
                 />
-                <span className="ml-2">All Product</span>
+                <span className="ml-2">All Products</span>
               </label>
             </div>
           </div>
 
+          {/* Date Type */}
           <div>
             <label className="block mb-2">
               Date Type <span className="text-red-500">*</span>
@@ -187,7 +206,7 @@ export const AddCouponForm = () => {
                   className="form-radio"
                   value="range"
                   checked={formData.dateType === "range"}
-                  onChange={(e) => setFormData({ ...formData, dateType: e.target.value })}
+                  onChange={handleInputChange}
                 />
                 <span className="ml-2">Start and End Date</span>
               </label>
@@ -198,7 +217,7 @@ export const AddCouponForm = () => {
                   className="form-radio"
                   value="unlimited"
                   checked={formData.dateType === "unlimited"}
-                  onChange={(e) => setFormData({ ...formData, dateType: e.target.value })}
+                  onChange={handleInputChange}
                 />
                 <span className="ml-2">Unlimited</span>
               </label>
@@ -209,24 +228,27 @@ export const AddCouponForm = () => {
                   <label className="block mb-2">Start Date</label>
                   <input
                     type="date"
+                    name="startDate"
                     className="w-full p-2 border rounded-lg"
                     value={formData.startDate}
-                    onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
+                    onChange={handleInputChange}
                   />
                 </div>
                 <div>
                   <label className="block mb-2">End Date</label>
                   <input
                     type="date"
+                    name="endDate"
                     className="w-full p-2 border rounded-lg"
                     value={formData.endDate}
-                    onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+                    onChange={handleInputChange}
                   />
                 </div>
               </div>
             )}
           </div>
 
+          {/* Condition */}
           <div>
             <label className="block mb-2">
               Condition <span className="text-red-500">*</span>
@@ -239,7 +261,7 @@ export const AddCouponForm = () => {
                   className="form-radio"
                   value="FIXED"
                   checked={formData.condition === "FIXED"}
-                  onChange={(e) => setFormData({ ...formData, condition: e.target.value })}
+                  onChange={handleInputChange}
                 />
                 <span className="ml-2">Discount Rp</span>
               </label>
@@ -250,7 +272,7 @@ export const AddCouponForm = () => {
                   className="form-radio"
                   value="PERCENT"
                   checked={formData.condition === "PERCENT"}
-                  onChange={(e) => setFormData({ ...formData, condition: e.target.value })}
+                  onChange={handleInputChange}
                 />
                 <span className="ml-2">Discount %</span>
               </label>
@@ -261,7 +283,7 @@ export const AddCouponForm = () => {
                   className="form-radio"
                   value="MIN_SPENT_FIXED"
                   checked={formData.condition === "MIN_SPENT_FIXED"}
-                  onChange={(e) => setFormData({ ...formData, condition: e.target.value })}
+                  onChange={handleInputChange}
                 />
                 <span className="ml-2">Minimum Spent, Discount Rp</span>
               </label>
@@ -272,7 +294,7 @@ export const AddCouponForm = () => {
                   className="form-radio"
                   value="MIN_SPENT_PERCENT"
                   checked={formData.condition === "MIN_SPENT_PERCENT"}
-                  onChange={(e) => setFormData({ ...formData, condition: e.target.value })}
+                  onChange={handleInputChange}
                 />
                 <span className="ml-2">Minimum Spent, Discount %</span>
               </label>
@@ -283,9 +305,10 @@ export const AddCouponForm = () => {
                 <label className="block mb-2">Minimum Spent</label>
                 <input
                   type="number"
+                  name="minimumSpent"
                   className="w-full p-2 border rounded-lg"
                   value={formData.minimumSpent}
-                  onChange={(e) => setFormData({ ...formData, minimumSpent: e.target.value })}
+                  onChange={handleInputChange}
                 />
               </div>
             )}
@@ -293,9 +316,10 @@ export const AddCouponForm = () => {
               <label className="block mb-2">Discount Value</label>
               <input
                 type="number"
+                name="discountValue"
                 className="w-full p-2 border rounded-lg"
                 value={formData.discountValue}
-                onChange={(e) => setFormData({ ...formData, discountValue: e.target.value })}
+                onChange={handleInputChange}
               />
             </div>
           </div>
@@ -315,7 +339,7 @@ export const AddCouponForm = () => {
                   className="form-radio"
                   value="guest"
                   checked={formData.userType === "guest"}
-                  onChange={(e) => setFormData({ ...formData, userType: e.target.value })}
+                  onChange={handleInputChange}
                 />
                 <span className="ml-2">User</span>
               </label>
@@ -334,7 +358,7 @@ export const AddCouponForm = () => {
                   className="form-radio"
                   value="setQuantity"
                   checked={formData.couponTotal === "setQuantity"}
-                  onChange={(e) => setFormData({ ...formData, couponTotal: e.target.value })}
+                  onChange={handleInputChange}
                 />
                 <span className="ml-2">Set Quantity</span>
               </label>
@@ -345,7 +369,7 @@ export const AddCouponForm = () => {
                   className="form-radio"
                   value="unlimited"
                   checked={formData.couponTotal === "unlimited"}
-                  onChange={(e) => setFormData({ ...formData, couponTotal: e.target.value })}
+                  onChange={handleInputChange}
                 />
                 <span className="ml-2">Unlimited</span>
               </label>
@@ -355,9 +379,10 @@ export const AddCouponForm = () => {
                 <label className="block mb-2">Total Quantity</label>
                 <input
                   type="number"
+                  name="totalQuantity"
                   className="w-full p-2 border rounded-lg"
                   value={formData.totalQuantity}
-                  onChange={(e) => setFormData({ ...formData, totalQuantity: e.target.value })}
+                  onChange={handleInputChange}
                 />
               </div>
             )}
@@ -366,17 +391,21 @@ export const AddCouponForm = () => {
       </form>
 
       <div className="flex justify-end gap-4 mt-6">
-        <button type="button" className="px-6 py-2 border rounded-lg hover:bg-gray-50">
+        <button
+          type="button"
+          onClick={() => navigate("/admin/coupons")}
+          className="px-6 py-2 border rounded-lg hover:bg-gray-50"
+        >
           Cancel
         </button>
         <button
           type="submit"
           onClick={handleSubmit}
-          disabled={!isFormValid}
-          className={`px-6 py-2 rounded-lg ${
-            isFormValid
-              ? "bg-yellow-500 text-white hover:bg-yellow-600"
-              : "bg-gray-300 text-gray-500 cursor-not-allowed"
+          disabled={isSaveDisabled}
+          className={`px-6 py-2 rounded-lg text-white ${
+            !isSaveDisabled
+              ? "bg-call-to-actions-900 hover:bg-call-to-actions-800"
+              : "bg-gray-400 cursor-not-allowed"
           }`}
         >
           Save
