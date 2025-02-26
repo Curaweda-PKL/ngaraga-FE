@@ -102,10 +102,11 @@ const MainContent: React.FC<MainContentProps> = ({ eventData }) => {
   };
 
   return (
-    <div className="w-[100vw]  px-4 sm:px-6 py-4 sm:py-8">
-      <div className="flex mx-auto">
-        <div className="flex-1 mx-6">
-          <h1 className="text-4xl font-bold mb-6">{title}</h1>
+    <div className="w-full px-4 sm:px-6 py-4 sm:py-8">
+      <div className="flex flex-col md:flex-row mx-auto">
+        {/* Left Column - becomes top section on mobile */}
+        <div className="w-full md:w-1/2 md:pr-6 mb-8 md:mb-0">
+          <h1 className="text-2xl sm:text-4xl font-bold mb-6">{title}</h1>
 
           <div className="mb-8">
             <h3 className="text-xl mb-4">Schedule</h3>
@@ -140,7 +141,7 @@ const MainContent: React.FC<MainContentProps> = ({ eventData }) => {
             </div>
           </div>
           <Link to={`/register-events/${eventData?.id}`} className="block mb-8">
-            <button className="max-w-[300px] w-[200px] bg-call-to-actions-900 text-white py-3 rounded-lg font-medium">
+            <button className="w-full sm:w-auto sm:min-w-[200px] bg-call-to-actions-900 text-white py-3 px-6 rounded-lg font-medium">
               Register Now
             </button>
           </Link>
@@ -175,14 +176,15 @@ const MainContent: React.FC<MainContentProps> = ({ eventData }) => {
           </div>
         </div>
 
-        <div className="flex-1">
-          <div className="flex gap-1 justify-end border-b border-gray-200 mb-6">
-            <div className="flex gap-8 mx-96">
+        {/* Right Column - becomes bottom section on mobile */}
+        <div className="w-full md:w-1/2">
+          <div className="flex border-b border-gray-200 mb-6 overflow-x-auto">
+            <div className="flex w-full justify-center md:justify-start gap-8">
               <button
                 onClick={() => setActiveTab("description")}
-                className={`text-lg pb-2 ${
+                className={`text-lg pb-2 whitespace-nowrap ${
                   activeTab === "description"
-                    ? "border-b-2 border-yellow-500  text-black font-medium"
+                    ? "border-b-2 border-yellow-500 text-black font-medium"
                     : "text-gray-400"
                 }`}
               >
@@ -190,7 +192,7 @@ const MainContent: React.FC<MainContentProps> = ({ eventData }) => {
               </button>
               <button
                 onClick={() => setActiveTab("benefit")}
-                className={`text-lg pb-2 ${
+                className={`text-lg pb-2 whitespace-nowrap ${
                   activeTab === "benefit"
                     ? "border-b-2 border-yellow-500 text-black font-medium"
                     : "text-gray-400"
@@ -204,7 +206,7 @@ const MainContent: React.FC<MainContentProps> = ({ eventData }) => {
           {activeTab === "description" ? (
             <div className="text-gray-600">
               <p
-                className="pl-[23vw]"
+                className="px-0 md:px-4"
                 dangerouslySetInnerHTML={{ __html: description }}
               />
             </div>
@@ -216,8 +218,8 @@ const MainContent: React.FC<MainContentProps> = ({ eventData }) => {
                     key={reward.id}
                     className="border border-gray-300 rounded-lg p-4 shadow-sm"
                   >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full sm:w-auto">
                         <img
                           src={`${SERVER_URL}/${reward.image}`}
                           alt={reward.characterName}
@@ -235,35 +237,37 @@ const MainContent: React.FC<MainContentProps> = ({ eventData }) => {
                           />
                         </div>
                       </div>
-                      {claimedRewards[reward.id] ? (
-                        <a
-                          href={claimedRewards[reward.id]!}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="bg-green-600 text-white px-4 py-2 rounded-lg"
-                        >
-                          Open Reward
-                        </a>
-                      ) : reward.isClaimable ? (
-                        <button
-                          className="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600"
-                          onClick={() => handleClaimReward(reward.id)}
-                        >
-                          Claim
-                        </button>
-                      ) : (
-                        <button
-                          className="bg-gray-400 text-white px-4 py-2 rounded-lg cursor-not-allowed"
-                          disabled
-                        >
-                          Claim
-                        </button>
-                      )}
+                      <div className="w-full sm:w-auto mt-4 sm:mt-0">
+                        {claimedRewards[reward.id] ? (
+                          <a
+                            href={claimedRewards[reward.id]!}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="block w-full sm:w-auto text-center bg-green-600 text-white px-4 py-2 rounded-lg"
+                          >
+                            Open Reward
+                          </a>
+                        ) : reward.isClaimable ? (
+                          <button
+                            className="w-full sm:w-auto bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600"
+                            onClick={() => handleClaimReward(reward.id)}
+                          >
+                            Claim
+                          </button>
+                        ) : (
+                          <button
+                            className="w-full sm:w-auto bg-gray-400 text-white px-4 py-2 rounded-lg cursor-not-allowed"
+                            disabled
+                          >
+                            Claim
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
                 ))
               ) : (
-                <p className="text-gray-400 pl-[23vw]">
+                <p className="text-gray-400 text-center md:text-left">
                   No benefits available.
                 </p>
               )}

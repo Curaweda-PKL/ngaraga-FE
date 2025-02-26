@@ -31,7 +31,7 @@ export const Card = () => {
   useEffect(() => {
     const fetchCards = async () => {
       try {
-        const response = await axios.get(${SERVER_URL}/api/cards/normal);
+        const response = await axios.get(`${SERVER_URL}/api/cards/normal`);
         const mappedCards = response.data.cards.map((card: any) => ({
           sku: card.sku || "N/A",
           uniqueCode: card.uniqueCode || "N/A",
@@ -78,7 +78,7 @@ export const Card = () => {
     const normalizedPath = image.replace(/\\/g, "/");
     return normalizedPath.startsWith("http")
       ? normalizedPath
-      : ${SERVER_URL}/${normalizedPath};
+      : `${SERVER_URL}/${normalizedPath}`;
   };
 
   // Select/deselect all cards.
@@ -106,10 +106,10 @@ export const Card = () => {
       let response;
       if (card.isSuspended) {
         // If already suspended, unsuspend it.
-        response = await axios.patch(${SERVER_URL}/api/cards/${card.uniqueCode}/unsuspend);
+        response = await axios.patch(`${SERVER_URL}/api/cards/${card.uniqueCode}/unsuspend`);
       } else {
         // Otherwise, suspend the card.
-        response = await axios.patch(${SERVER_URL}/api/cards/${card.uniqueCode}/suspend);
+        response = await axios.patch(`${SERVER_URL}/api/cards/${card.uniqueCode}/suspend`);
       }
       // Update local card state with new suspension status.
       const updatedCard = response.data.card;
@@ -128,7 +128,7 @@ export const Card = () => {
   const handleDelete = async (card: any) => {
     if (!window.confirm("Are you sure you want to delete this card?")) return;
     try {
-      const response = await axios.delete(${SERVER_URL}/api/cards/delete/${card.uniqueCode});
+      const response = await axios.delete(`${SERVER_URL}/api/cards/delete/${card.uniqueCode}`);
       setCards((prev) => prev.filter((c) => c.uniqueCode !== card.uniqueCode));
       setNotification({ message: response.data.message, type: "success" });
     } catch (error: any) {
@@ -146,7 +146,7 @@ export const Card = () => {
     if (!window.confirm("Are you sure you want to delete the selected cards?")) return;
     try {
       const deletePromises = selectedCards.map(async (card) => {
-        await axios.delete(${SERVER_URL}/api/cards/delete/${card.uniqueCode});
+        await axios.delete(`${SERVER_URL}/api/cards/delete/${card.uniqueCode}`);
         return card.uniqueCode;
       });
       const deletedCodes = await Promise.all(deletePromises);
@@ -168,7 +168,7 @@ export const Card = () => {
     try {
       const suspendPromises = selectedCards.map(async (card) => {
         if (!card.isSuspended) {
-          const response = await axios.patch(${SERVER_URL}/api/cards/${card.uniqueCode}/suspend);
+          const response = await axios.patch(`${SERVER_URL}/api/cards/${card.uniqueCode}/suspend`);
           return response.data.card;
         } else {
           // Return the card if it's already suspended.
@@ -285,19 +285,19 @@ export const Card = () => {
                 <td>{card.stock}</td>
                 <td className="whitespace-nowrap overflow-hidden text-ellipsis">
                   {typeof card.price === "number"
-                    ? Rp ${card.price.toLocaleString()}
+                    ? `Rp ${card.price.toLocaleString()}`
                     : card.price}
                 </td>
                 <td className="whitespace-nowrap overflow-hidden text-ellipsis">
                   {typeof card.discountedPrice === "number"
-                    ? Rp ${card.discountedPrice.toLocaleString()}
+                    ? `Rp ${card.discountedPrice.toLocaleString()}`
                     : card.discountedPrice}
                 </td>
                 <td>
                   <div className="flex items-center gap-2">
                     <button
                       className="p-2 hover:bg-gray-100 rounded-lg text-gray-600"
-                      onClick={() => navigate(/admin/edit-card/${card.uniqueCode})}
+                      onClick={() => navigate(`/admin/edit-card/${card.uniqueCode}`)}
                     >
                       <Edit3 className="w-4 h-4" />
                     </button>
