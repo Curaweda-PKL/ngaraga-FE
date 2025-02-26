@@ -224,12 +224,17 @@ export const AddCard = () => {
       if (!formData.tag || formData.tags.length === 0) {
         throw new Error("Please select at least one tag.");
       }
-
+  
+      // Convert tagIds & creatorIds to ensure they are valid
+      const tagIds = formData.tags.map((tag) => Number(tag)).filter((id) => !isNaN(id));
+      const creatorIds = [Number(formData.selectedCreator)].filter((id) => !isNaN(id));
+  
       // Create FormData payload for multipart/form-data
       const payload = new FormData();
       payload.append("characterName", formData.cardName);
       payload.append("sku", formData.sku);
       payload.append("price", formData.price);
+
       // Only append discountedPrice if salePrice is true, otherwise set to "0"
       if (formData.salePrice) {
         payload.append("discountedPrice", formData.discountedPrice);
@@ -239,18 +244,12 @@ export const AddCard = () => {
       payload.append("stock", formData.stock);
       payload.append("cardDetail", formData.cardDetails);
       payload.append("categoryId", formData.categories[0]);
-      payload.append(
-        "tagIds",
-        JSON.stringify(formData.tags.map((tag) => Number(tag)))
-      );
-      payload.append(
-        "creatorIds",
-        JSON.stringify([Number(formData.selectedCreator)])
-      );
+      payload.append("tagIds", JSON.stringify(tagIds));
+      payload.append("creatorIds", JSON.stringify(creatorIds));
       payload.append("ownerId", "");
       payload.append("cardType", "NORMAL");
-
-      if (formData.source) {
+  
+      if (formData.sourceImageWebsite && formData.sourceImageAlt) {
         payload.append(
           "sourceImage",
           JSON.stringify({
@@ -259,11 +258,14 @@ export const AddCard = () => {
           })
         );
       }
-
+  
       if (cardFile) {
         payload.append("image", cardFile);
       }
-
+  
+      // DEBUG: Log payload sebelum mengirim
+      console.log("Payload:", Object.fromEntries(payload.entries()));
+  
       // Post to the API endpoint
       const response = await axios.post(
         `${SERVER_URL}/api/cards/create`,
@@ -274,13 +276,14 @@ export const AddCard = () => {
           },
         }
       );
-
+  
       // Set a success message and navigate away
       setMessage({ type: "success", text: "Card created successfully!" });
       setTimeout(() => {
         navigate("/admin/card");
       }, 1500);
     } catch (error: any) {
+
       console.error(
         "Error creating card:",
         error.response?.data || error.message
@@ -313,13 +316,28 @@ export const AddCard = () => {
         if (errorString.includes(key)) {
           errorMessage = message;
           break;
+
+      console.error("Error creating card:", error.response?.data || error.message);
+  
+      let errorMessage = "Failed to create card.";
+  
+      if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.response?.status === 400 && error.response?.data?.error) {
+        if (error.response.data.error.includes("Unique constraint failed on the constraint: `Card_uniqueCode_key`")) {
+          errorMessage =
+            "A card with this unique code already exists. Please try again with a different card.";
+        } else {
+          errorMessage = error.response.data.error;
         }
       }
+
 
       if (error.response?.status === 400 && !errorMessage) {
         errorMessage =
           error.response.data.error || "Bad request. Please check your input.";
       }
+
 
       setMessage({
         type: "error",
