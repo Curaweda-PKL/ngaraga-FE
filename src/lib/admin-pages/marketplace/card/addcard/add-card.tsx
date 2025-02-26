@@ -203,28 +203,26 @@ export const AddCard = () => {
       if (!formData.cardName || !formData.sku || !formData.stock) {
         throw new Error("Card name, SKU, and stock are required.");
       }
-
+  
+      // Convert tagIds & creatorIds to ensure they are valid
+      const tagIds = formData.tags.map((tag) => Number(tag)).filter((id) => !isNaN(id));
+      const creatorIds = [Number(formData.selectedCreator)].filter((id) => !isNaN(id));
+  
       // Create FormData payload for multipart/form-data
       const payload = new FormData();
       payload.append("characterName", formData.cardName);
       payload.append("sku", formData.sku);
       payload.append("price", formData.price);
-      payload.append("discountedPrice", formData.discountedPrice); // NEW FIELD
+      payload.append("discountedPrice", formData.discountedPrice || "0"); // Default ke 0 jika tidak ada
       payload.append("stock", formData.stock);
       payload.append("cardDetail", formData.cardDetails);
       payload.append("categoryId", formData.categories[0]);
-      payload.append(
-        "tagIds",
-        JSON.stringify(formData.tags.map((tag) => Number(tag)))
-      );
-      payload.append(
-        "creatorIds",
-        JSON.stringify([Number(formData.selectedCreator)])
-      );
+      payload.append("tagIds", JSON.stringify(tagIds));
+      payload.append("creatorIds", JSON.stringify(creatorIds));
       payload.append("ownerId", "");
       payload.append("cardType", "NORMAL");
-
-      if (formData.source) {
+  
+      if (formData.sourceImageWebsite && formData.sourceImageAlt) {
         payload.append(
           "sourceImage",
           JSON.stringify({
@@ -233,11 +231,14 @@ export const AddCard = () => {
           })
         );
       }
-
+  
       if (cardFile) {
         payload.append("image", cardFile);
       }
-
+  
+      // DEBUG: Log payload sebelum mengirim
+      console.log("Payload:", Object.fromEntries(payload.entries()));
+  
       // Post to the API endpoint
       const response = await axios.post(
         `${SERVER_URL}/api/cards/create`,
@@ -248,7 +249,7 @@ export const AddCard = () => {
           },
         }
       );
-
+  
       // Set a success message and navigate away
       setMessage({ type: "success", text: "Card created successfully!" });
       setTimeout(() => {
@@ -256,21 +257,22 @@ export const AddCard = () => {
       }, 1500);
     } catch (error: any) {
       console.error("Error creating card:", error.response?.data || error.message);
-    
+  
       let errorMessage = "Failed to create card.";
-      
+  
       if (error.response?.data?.message) {
         errorMessage = error.response.data.message;
       } else if (error.response?.status === 400 && error.response?.data?.error) {
         if (error.response.data.error.includes("Unique constraint failed on the constraint: `Card_uniqueCode_key`")) {
-          errorMessage = "A card with this unique code already exists. Please try again with a different card.";
+          errorMessage =
+            "A card with this unique code already exists. Please try again with a different card.";
         } else {
           errorMessage = error.response.data.error;
         }
       } else {
         errorMessage = error.message || errorMessage;
       }
-    
+  
       setMessage({
         type: "error",
         text: errorMessage,
