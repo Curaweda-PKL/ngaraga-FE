@@ -3,6 +3,7 @@ import axios from "axios";
 import "react-quill/dist/quill.snow.css";
 import { useNavigate } from "react-router-dom";
 
+
 import CardForm from "../../card/addcard/components/cardForm";
 import CardSettings from "../../card/addcard/components/cardSetting";
 import { SERVER_URL } from "@/middleware/utils";
@@ -194,80 +195,114 @@ export const AddSpecialCard = () => {
   };
 
   // Save handler (create new card)
-  const handleSave = async () => {
-    try {
-      // Basic validations
-      if (formData.categories.length === 0) {
-        throw new Error("Please select a category.");
-      }
-      if (!formData.cardName || !formData.sku || !formData.stock) {
-        throw new Error("Card name, SKU, and stock are required.");
-      }
-
-      // Create FormData payload for multipart/form-data
-      const payload = new FormData();
-      payload.append("characterName", formData.cardName);
-      payload.append("sku", formData.sku);
-      payload.append("price", formData.price);
-      payload.append("discountedPrice", formData.discountedPrice); // NEW FIELD
-      payload.append("stock", formData.stock);
-      payload.append("cardDetail", formData.cardDetails);
-      payload.append("categoryId", formData.categories[0]);
-      payload.append(
-        "tagIds",
-        JSON.stringify(formData.tags.map((tag) => Number(tag)))
-      );
-      payload.append(
-        "creatorIds",
-        JSON.stringify([Number(formData.selectedCreator)])
-      );
-      payload.append("ownerId", "");
-      payload.append("cardType", "SPECIAL");
-
-      if (formData.source) {
-        payload.append(
-          "sourceImage",
-          JSON.stringify({
-            website: formData.sourceImageWebsite,
-            alt: formData.sourceImageAlt,
-          })
-        );
-      }
-
-      if (cardFile) {
-        payload.append("image", cardFile);
-      }
-
-      // Post to the API endpoint
-      const response = await axios.post(
-        `${SERVER_URL}/api/cards/create`,
-        payload,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-
-      // Set a success message and navigate away
-      setMessage({ type: "success", text: "Card created successfully!" });
-      setTimeout(() => {
-        navigate("/admin/card");
-      }, 1500);
-    } catch (error: any) {
-      console.error(
-        "Error creating card:",
-        error.response?.data || error.message
-      );
-      setMessage({
-        type: "error",
-        text:
-          error.response?.data?.message ||
-          error.message ||
-          "Failed to create card.",
-      });
+// Save handler (create new card)
+const handleSave = async () => {
+  try {
+    // Basic validations
+    if (formData.categories.length === 0) {
+      throw new Error("Please select a category.");
     }
-  };
+    if (!formData.cardName || !formData.sku || !formData.stock) {
+      throw new Error("Card name, SKU, and stock are required.");
+    }
+
+    // Create FormData payload for multipart/form-data
+    const payload = new FormData();
+    payload.append("characterName", formData.cardName);
+    payload.append("sku", formData.sku);
+    payload.append("price", formData.price);
+    payload.append("discountedPrice", formData.discountedPrice); // NEW FIELD
+    payload.append("stock", formData.stock);
+    payload.append("cardDetail", formData.cardDetails);
+    payload.append("categoryId", formData.categories[0]);
+    payload.append(
+      "tagIds",
+      JSON.stringify(formData.tags.map((tag) => Number(tag)))
+    );
+    payload.append(
+      "creatorIds",
+      JSON.stringify([Number(formData.selectedCreator)])
+    );
+    payload.append("ownerId", "");
+    payload.append("cardType", "SPECIAL");
+
+    if (formData.source) {
+      payload.append(
+        "sourceImage",
+        JSON.stringify({
+          website: formData.sourceImageWebsite,
+          alt: formData.sourceImageAlt,
+        })
+      );
+    }
+
+    if (cardFile) {
+      payload.append("image", cardFile);
+    }
+
+    // Post to the API endpoint
+    const response = await axios.post(
+      `${SERVER_URL}/api/cards/create`,
+      payload,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+
+    // Set a success message and navigate away
+    setMessage({ type: "success", text: "Card created successfully!" });
+    setTimeout(() => {
+      navigate("/admin/card");
+    }, 1500);
+  } catch (error: any) {
+    console.error("Error creating card:", error.response?.data || error.message);
+    
+    // Default error message
+    let errorMessage = "Failed to create card. Please try again later.";
+
+    // Create a mapping for known unique constraint errors
+    const uniqueConstraintErrors = [
+      {
+        key: "Card_uniqueCode_key",
+        message:
+          "A card with this unique code already exists. Please try again with a different card.",
+      },
+      {
+        key: "Card_qrCode_key",
+        message:
+          "A card with this QR code already exists. Please try again with a different QR code.",
+      },
+    ];
+
+    // Determine the error message source
+    const errorString =
+      error.response?.data?.error ||
+      error.response?.data?.message ||
+      error.message ||
+      "";
+
+    // Check for known unique constraint errors
+    for (const { key, message } of uniqueConstraintErrors) {
+      if (errorString.includes(key)) {
+        errorMessage = message;
+        break;
+      }
+    }
+
+    // Optionally, you can handle other HTTP status-specific cases here
+    if (error.response?.status === 400 && !errorMessage) {
+      errorMessage = error.response.data.error || "Bad request. Please check your input.";
+    }
+
+    setMessage({
+      type: "error",
+      text: errorMessage,
+    });
+  }
+};
+
 
   return (
     <div className="max-w-7xl mx-auto p-6">

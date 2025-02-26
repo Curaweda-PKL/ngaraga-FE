@@ -1,35 +1,95 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 import { CiShoppingCart } from "react-icons/ci";
+import { useParams } from "react-router-dom";
+import { SERVER_URL } from "@/middleware/utils";
 
 export const DetailCards: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
+  const [card, setCard] = useState<any>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string>("");
+
+  useEffect(() => {
+    const fetchCardDetail = async () => {
+      try {
+        const response = await axios.get(`${SERVER_URL}/api/detail-cards/cards/${id}`);
+        setCard(response.data.card);
+      } catch (err: any) {
+        console.error("Error fetching card detail:", err);
+        setError(
+          err.response?.data?.error ||
+          "Failed to fetch card detail. Please try again later."
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (id) {
+      fetchCardDetail();
+    } else {
+      setError("No card ID provided in the URL.");
+      setLoading(false);
+    }
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <p className="text-lg">Loading...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <p className="text-lg text-red-500">{error}</p>
+      </div>
+    );
+  }
+
+  const { product, characterName, createdAt, sourceImage, creators, tags } = card;
+  const bannerImage =
+    sourceImage || product?.cardImage || "https://i.ibb.co/f8ZDQzh/DAENDELS-LEGEND.jpg";
+  const title = product?.name || characterName || "Product Name";
+
+  // Get the raw cardDetail value.
+  const rawCardDetail = product?.cardDetail || "<p>The Orbitians is a collection of 10,000 unique NFTs on the Ethereum blockchain.</p>";
+
+  // Check if it's an object or a string.
+  let description = "";
+  if (typeof rawCardDetail === "string") {
+    description = rawCardDetail;
+  } else if (typeof rawCardDetail === "object" && rawCardDetail !== null) {
+    // If it's an object, try to extract the HTML string (adjust the key if needed).
+    description = rawCardDetail.__html || JSON.stringify(rawCardDetail);
+  }
+
+  const creator = creators && creators.length > 0 ? creators[0] : null;
+
   return (
     <div className="flex flex-col">
-      {/* Banner Section: Occupies 40% of the viewport height with margin top and border bottom */}
       <section
         className="relative w-full h-[40vh] mt-4 border-b border-gray-300"
         aria-label="Product Banner"
       >
-        {/* Center the image without stretching */}
         <img
-          src="https://i.ibb.co.com/f8ZDQzh/DAENDELS-LEGEND.jpg"
+          src={bannerImage}
           alt="Product Banner"
           className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 object-contain max-w-full max-h-full pb-4"
         />
       </section>
 
-      {/* Product Details Section */}
       <div className="relative bg-white p-4 m-4 rounded-lg sm:p-10 sm:m-8">
-        {/* Wrapper for Product Name & Minted Date */}
         <div className="px-4">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2 sm:text-3xl">
-            Product Name
-          </h1>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2 sm:text-3xl">{title}</h1>
           <h2 className="text-lg text-gray-700 sm:text-xl">
-            Minted on: December 25, 2024
+            Minted on: {createdAt ? new Date(createdAt).toLocaleDateString() : "N/A"}
           </h2>
         </div>
 
-        {/* Action Buttons (Desktop View) */}
         <div className="hidden sm:flex absolute top-4 right-4 space-x-2">
           <button
             className="flex items-center bg-call-to-action text-white px-4 py-2 rounded-full hover:bg-call-to-actions-800 transition text-base"
@@ -46,42 +106,36 @@ export const DetailCards: React.FC = () => {
           </button>
         </div>
 
-        {/* Detail Content */}
         <div className="mt-6 px-4">
-          {/* Header */}
           <div className="flex items-center space-x-4 mb-6">
-            <img
-              src="https://picsum.photos/id/237/200/300"
-              alt="Orbitian Logo"
-              className="w-12 h-12 rounded-full object-cover sm:w-10 sm:h-10"
-            />
-            <div>
-              <h2 className="text-lg font-semibold text-gray-800 sm:text-xl">
-                Created By
-              </h2>
-              <p className="text-gray-600 sm:text-base">Orbitian</p>
-            </div>
+            {creator ? (
+              <>
+                <img
+                  src={creator.image || "https://via.placeholder.com/150"}
+                  alt={creator.name}
+                  className="w-12 h-12 rounded-full object-cover sm:w-10 sm:h-10"
+                />
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-800 sm:text-xl">Created By</h2>
+                  <p className="text-gray-600 sm:text-base">{creator.name}</p>
+                </div>
+              </>
+            ) : (
+              <div>
+                <h2 className="text-lg font-semibold text-gray-800 sm:text-xl">Created By</h2>
+                <p className="text-gray-600 sm:text-base">Unknown</p>
+              </div>
+            )}
           </div>
 
-          {/* Description */}
-          <h3 className="text-xl text-gray-900 mb-4 sm:text-2xl">
-            Description
-          </h3>
-          <p className="text-gray-700 text-sm leading-relaxed mb-4 sm:text-base">
-            The Orbitians is a collection of 10,000 unique NFTs on the Ethereum blockchain.
-          </p>
-          <p className="text-gray-700 text-sm leading-relaxed mb-4 sm:text-base">
-            There are all sorts of beings in the NFT Universe. The most advanced and friendly of the bunch are Orbitians.
-          </p>
-          <p className="text-gray-700 text-sm leading-relaxed mb-4 sm:text-base">
-            They live in metal space machines, high up in the sky and only have one foot on Earth. These Orbitians are a peaceful race, but they have been at war with a group of invaders for many generations. The invaders are called Upside-Downs, because of their inverted bodies that live on the ground, yet do not know any other way to be. Upside-Downs believe that they will be able to win this war if they could only get an eye into Orbitian territory, so they've taken to make human beings their target.
-          </p>
+          <h3 className="text-xl text-gray-900 mb-4 sm:text-2xl">Description</h3>
+          <div
+            className="text-gray-700 text-sm leading-relaxed mb-4 sm:text-base"
+            dangerouslySetInnerHTML={{ __html: description }}
+          />
 
-          {/* Details */}
           <div className="mt-6">
-            <h4 className="text-gray-800 font-semibold mb-2 text-sm sm:text-base">
-              Details
-            </h4>
+            <h4 className="text-gray-800 font-semibold mb-2 text-sm sm:text-base">Details</h4>
             <ul className="list-none space-y-2">
               <li>
                 <a
@@ -106,25 +160,26 @@ export const DetailCards: React.FC = () => {
             </ul>
           </div>
 
-          {/* Tags - Improved mobile spacing */}
           <div className="mt-6">
-            <h4 className="text-gray-800 font-semibold mb-3 text-sm sm:text-base">
-              Tags
-            </h4>
+            <h4 className="text-gray-800 font-semibold mb-3 text-sm sm:text-base">Tags</h4>
             <div className="flex flex-wrap gap-2">
-              <span className="text-xs text-call-to-action border border-call-to-action px-3 py-1.5 rounded-full sm:text-base">
-                Animation
-              </span>
-              <span className="text-xs text-call-to-action border border-call-to-action px-3 py-1.5 rounded-full sm:text-base">
-                Illustration
-              </span>
-              <span className="text-xs text-call-to-action border border-call-to-action px-3 py-1.5 rounded-full sm:text-base">
-                Moon
-              </span>
+              {tags && tags.length > 0 ? (
+                tags.map((tag: any) => (
+                  <span
+                    key={tag.id}
+                    className="text-xs text-call-to-action border border-call-to-action px-3 py-1.5 rounded-full sm:text-base"
+                  >
+                    {tag.name}
+                  </span>
+                ))
+              ) : (
+                <span className="text-xs text-call-to-action border border-call-to-action px-3 py-1.5 rounded-full sm:text-base">
+                  No Tags
+                </span>
+              )}
             </div>
           </div>
 
-          {/* Action Buttons (Mobile View) - Improved positioning and sizing */}
           <div className="flex justify-between sm:hidden mt-4 mb-2">
             <button
               className="flex items-center justify-center bg-call-to-action text-white px-3 py-2 rounded-full hover:bg-call-to-actions-800 transition text-xs font-medium flex-1 mr-2"
@@ -137,7 +192,9 @@ export const DetailCards: React.FC = () => {
               className="border border-call-to-actions-900 text-call-to-action px-3 py-2 rounded-full transition text-xs font-medium flex-1"
               aria-label="Checkout"
             >
-              <a href="/checkout" className="block text-center">Checkout</a>
+              <a href="/checkout" className="block text-center">
+                Checkout
+              </a>
             </button>
           </div>
         </div>

@@ -69,14 +69,14 @@ export const MarketplaceCardSection: React.FC<MarketplaceCardSectionProps> = ({ 
       {/* Cards Grid */}
       <div className="grid gap-6 px-6 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4">
         {cards.map((card) => (
-          <Link key={card.id} to="/detail-cards">
-            <div className="w-full flex flex-col items-start gap-4 bg-[#F2F2F2] rounded-2xl shadow-xl transition-transform hover:scale-[1.02]">
+          <Link key={card.id} to={`/detail-cards/${card.id}`}>
+          <div className="w-full flex flex-col items-start gap-4 bg-[#F2F2F2] rounded-2xl shadow-xl transition-transform hover:scale-[1.02]">
               <figure className="w-full aspect-video rounded-t-2xl overflow-hidden">
                 {card.image ? (
                   <img
                     src={`${SERVER_URL}/${card.image.replace(/\\/g, "/")}`}
                     alt={card.name}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-contain pt-2 mt-2"
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center bg-[#3B3B3B] text-gray-400" />

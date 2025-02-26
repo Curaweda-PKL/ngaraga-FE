@@ -101,7 +101,7 @@ export const routes: Array<PathRouteProps> = [
   {path: "/", element: <Home />},
   {path: "/account/:name", element: <Artists />},
   {path: "/marketplace", element: <Marketplace />},
-  {path: "/detail-cards", element: <DetailCards />},
+  {path: "/detail-cards/:id", element: <DetailCards />},
   {path: "/detail-special-card", element: <DetailSpecial />},
   {path: "/special-card-detail", element: <SpecialCardDetail />},
   {path: "/view-detail", element: <ViewDetail />},
