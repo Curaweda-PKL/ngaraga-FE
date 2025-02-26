@@ -3,7 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { SERVER_URL } from "@/middleware/utils";
 
-export const AddCoupon = () => {
+export const AddCard = () => {
   const navigate = useNavigate();
 
   const [message, setMessage] = useState<{
