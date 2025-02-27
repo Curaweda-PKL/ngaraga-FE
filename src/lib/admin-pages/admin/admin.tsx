@@ -320,7 +320,7 @@ export const Admin = () => {
           <button
             key={i}
             className={`px-3 py-1 rounded ${
-              currentPage === i + 1 ? "bg-yellow-500 text-white" : "text-gray-600"
+              currentPage === i + 1 ? "bg-call-to-action text-white" : "text-gray-600"
             }`}
             onClick={() => handlePageChange(i + 1)}
           >

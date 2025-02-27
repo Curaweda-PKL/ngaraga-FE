@@ -164,7 +164,7 @@ export const Shipping: React.FC<ShippingProps> = ({onStatusChange}) => {
               {/* Toggle Switch */}
               <div
                 className={`w-12 h-6 rounded-full p-1 cursor-pointer transition-colors duration-200 ease-in-out ${
-                  carrier.isActive ? "bg-yellow-500" : "bg-gray-200"
+                  carrier.isActive ? "bg-call-to-action" : "bg-gray-200"
                 }`}
                 onClick={() => handleToggle(carrier.id)}
                 role="switch"

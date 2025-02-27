@@ -88,7 +88,7 @@ export default function TopTables() {
       <div className="bg-white rounded-lg p-6 border">
         <h2 className="text-lg font-semibold mb-4">Top Product</h2>
         <div className="flex items-center gap-4 mb-4">
-          <button className="px-3 py-1 text-white bg-yellow-500 rounded-md">
+          <button className="px-3 py-1 text-white bg-call-to-action rounded-md">
             7D
           </button>
           <button className="px-3 py-1 text-gray-500 bg-gray-200 rounded-md">
@@ -146,7 +146,7 @@ export default function TopTables() {
       <div className="bg-white rounded-lg p-6 border">
         <h2 className="text-lg font-semibold mb-4">Top Member</h2>
         <div className="flex items-center gap-4 mb-4">
-          <button className="px-3 py-1 text-white bg-yellow-500 rounded-md">
+          <button className="px-3 py-1 text-white bg-call-to-action rounded-md">
             7D
           </button>
           <button className="px-3 py-1 text-gray-500 bg-gray-200 rounded-md">

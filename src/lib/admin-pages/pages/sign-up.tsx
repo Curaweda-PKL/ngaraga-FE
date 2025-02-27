@@ -65,7 +65,7 @@ export const SignUpPage = () => {
             Sign Up Image <span className="text-red-500">*</span>
           </label>
           <div
-            className="border-dashed border-2 border-yellow-500 rounded-lg p-4 text-center bg-yellow-50 cursor-pointer"
+            className="border-dashed border-2 border-call-to-action rounded-lg p-4 text-center bg-yellow-50 cursor-pointer"
             onClick={() => fileInputRef.current?.click()}
             onDragOver={(e) => e.preventDefault()}
             onDrop={(e) => {
@@ -106,7 +106,7 @@ export const SignUpPage = () => {
                 />
                 <label
                   htmlFor="image-upload"
-                  className="cursor-pointer px-4 py-2 bg-yellow-500 text-white rounded"
+                  className="cursor-pointer px-4 py-2 bg-call-to-action text-white rounded"
                 >
                   Browse
                 </label>
@@ -176,7 +176,7 @@ export const SignUpPage = () => {
           Cancel
         </button>
         <button
-          className="px-4 py-2 bg-yellow-500 text-white rounded"
+          className="px-4 py-2 bg-call-to-action text-white rounded"
           onClick={handleUpdate}
         >
           Update
