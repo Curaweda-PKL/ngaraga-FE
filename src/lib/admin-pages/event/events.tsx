@@ -77,7 +77,7 @@ export const Events = () => {
         const cardsData = response.data.cards;
         const mappedCards = cardsData.map((card: any) => ({
           id: card.id,
-          name: card.characterName,
+          name: card.name,
         }));
         setCardRewards(mappedCards);
         if (mappedCards.length > 0) {

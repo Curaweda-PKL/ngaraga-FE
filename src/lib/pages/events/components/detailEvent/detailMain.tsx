@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
 import axios from "axios";
 import { SERVER_URL } from "@/middleware/utils";
 import { ClockIcon } from "../svgsIcon/clockIcon";
@@ -37,9 +37,13 @@ interface MainContentProps {
 }
 
 const MainContent: React.FC<MainContentProps> = ({ eventData }) => {
+  const location = useLocation();
   const [activeTab, setActiveTab] = useState<"description" | "benefit">("description");
   const [isShareModalOpen, setShareModalOpen] = useState(false);
-  const [claimedRewards, setClaimedRewards] = useState<{ [key: number]: string | null }>({});
+  const [pendingClaimId, setPendingClaimId] = useState<number | null>(null);
+  const [pendingClaimAttempted, setPendingClaimAttempted] = useState(false);
+  const [isConfirming, setIsConfirming] = useState(false);
+  const [claimConfirmed, setClaimConfirmed] = useState(false);
 
   const title = eventData?.eventName || "A Special Evening Celebration";
   const eventTime = eventData
@@ -72,26 +76,50 @@ const MainContent: React.FC<MainContentProps> = ({ eventData }) => {
   const description =
     eventData?.eventDescription || "Step into a world of elegance and charm...";
 
-  const handleClaimReward = async (cardId: number) => {
+  // --- useEffect to check if a token is present in the URL ---
+  useEffect(() => {
+    const queryParams = new URLSearchParams(location.search);
+    const token = queryParams.get("token");
+    if (token && !pendingClaimAttempted) {
+      setPendingClaimAttempted(true);
+      // Call the claimReward endpoint to create a pending claim.
+      axios
+        .get(`${SERVER_URL}/api/cardRewards/claim?token=${token}`, { withCredentials: true })
+        .then((response) => {
+          // Expecting the response to include pendingClaimId (e.g., { pendingClaimId: number })
+          if (response.data.pendingClaimId) {
+            setPendingClaimId(response.data.pendingClaimId);
+          } else {
+            console.error("Failed to create pending claim.");
+          }
+        })
+        .catch((error) => {
+          console.error("Error creating pending claim:", error);
+        });
+    }
+  }, [location.search, pendingClaimAttempted]);
+
+  // --- Handler for Confirm Claim button ---
+  const handleConfirmClaim = async () => {
+    if (!pendingClaimId) return;
+    setIsConfirming(true);
     try {
-      const response = await axios.post(
-        `${SERVER_URL}/api/cardRewards/${cardId}/generateClaimLink`,
-        {},
+      await axios.post(
+        `${SERVER_URL}/api/cardRewards/confirmClaim`,
+        { claimId: pendingClaimId },
         { withCredentials: true }
       );
-      if (response.data.claimUrl) {
-        setClaimedRewards((prev) => ({
-          ...prev,
-          [cardId]: response.data.claimUrl,
-        }));
-      }
-    } catch (error) {
-      console.error("Error claiming reward", error);
+      setClaimConfirmed(true);
+      setPendingClaimId(null);
+    } catch (error: any) {
+      console.error("Error confirming claim:", error);
+    } finally {
+      setIsConfirming(false);
     }
   };
 
   return (
-    <div className="w-full px-4 sm:px-6 py-4 sm:py-8 ">
+    <div className="w-full px-4 sm:px-6 py-4 sm:py-8">
       <div className="flex flex-col md:flex-row mx-auto">
         {/* Left Column */}
         <div className="w-full md:w-1/2 md:pr-6 mb-8 md:mb-0">
@@ -141,6 +169,7 @@ const MainContent: React.FC<MainContentProps> = ({ eventData }) => {
               Register Now
             </button>
           </Link>
+
           <div>
             <h3 className="text-xl mb-4">Share Event</h3>
             <div className="flex gap-4">
@@ -205,21 +234,41 @@ const MainContent: React.FC<MainContentProps> = ({ eventData }) => {
                         </div>
                       </div>
                       <div className="w-full sm:w-auto mt-4 sm:mt-0">
-                        {claimedRewards[reward.id] ? (
-                          <a
-                            href={claimedRewards[reward.id]!}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="block w-full sm:w-auto text-center bg-green-600 text-white px-4 py-2 rounded-lg"
+                        {claimConfirmed ? (
+                          <button
+                            className="block w-full sm:w-auto bg-green-600 text-white px-4 py-2 rounded-lg flex items-center justify-center cursor-default"
+                            disabled
                           >
-                            Open Reward
-                          </a>
+                            <svg
+                              className="w-5 h-5 mr-2 text-white animate-bounce"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="M5 13l4 4L19 7"
+                              ></path>
+                            </svg>
+                            Claimed
+                          </button>
+                        ) : pendingClaimId ? (
+                          <button
+                            onClick={handleConfirmClaim}
+                            disabled={isConfirming}
+                            className="block w-full sm:w-auto bg-green-600 text-white px-4 py-2 rounded-lg"
+                          >
+                            {isConfirming ? "Confirming..." : "Confirm Claim"}
+                          </button>
                         ) : reward.isClaimable ? (
                           <button
-                            className="w-full sm:w-auto bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600"
-                            onClick={() => handleClaimReward(reward.id)}
+                            className="w-full sm:w-auto bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 cursor-not-allowed"
+                            disabled
                           >
-                            Claim
+                            Claim (use link)
                           </button>
                         ) : (
                           <button
@@ -241,9 +290,7 @@ const MainContent: React.FC<MainContentProps> = ({ eventData }) => {
         </div>
       </div>
 
-      {isShareModalOpen && (
-        <ShareModal onClose={() => setShareModalOpen(false)} isOpen={isShareModalOpen} />
-      )}
+      {isShareModalOpen && <ShareModal onClose={() => setShareModalOpen(false)} isOpen={isShareModalOpen} />}
     </div>
   );
 };
