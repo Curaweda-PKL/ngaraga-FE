@@ -346,7 +346,7 @@ const DeliveryTab: React.FC = () => {
               gone for good. Don't worry you can always add it again later if
               needed.
             </p>
-            <div className="flex justify-end mt-4 space-x-2">
+            <div className="flex justify-end w-full space-x-2 mt-12">
               <button
                 className="px-4 py-2 text-gray-600 border rounded-lg hover:bg-gray-100"
                 onClick={closeModal}

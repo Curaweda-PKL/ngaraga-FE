@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from "react";
-import { IoRadioButtonOn } from "react-icons/io5";
-import { TbTruckDelivery } from "react-icons/tb";
-import { PiPackageLight } from "react-icons/pi";
+import React, {useState, useEffect} from "react";
+import {IoRadioButtonOn} from "react-icons/io5";
+import {TbTruckDelivery} from "react-icons/tb";
+import {PiPackageLight} from "react-icons/pi";
 import axios from "axios";
-import DeliveryForm from "./DeliveryForm";
-import PickupForm from "./PickupForm";
+import DeliveryForm from "./newCust/DeliveryForm";
+import PickupForm from "./newCust/PickupForm";
 
 export interface FormData {
   fullName: string;
@@ -120,12 +120,12 @@ const CheckoutForm: React.FC = () => {
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
     >
   ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    const {name, value} = e.target;
+    setFormData((prev) => ({...prev, [name]: value}));
   };
 
   const handlePickUpTimeChange = (time: string) => {
-    setFormData((prev) => ({ ...prev, pickUpTime: time }));
+    setFormData((prev) => ({...prev, pickUpTime: time}));
   };
 
   return (

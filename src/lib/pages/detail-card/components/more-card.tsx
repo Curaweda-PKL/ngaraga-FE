@@ -111,6 +111,7 @@ export const MoreCardSection: React.FC = () => {
               className="flex items-center px-4 py-2 bg-call-to-action text-white rounded-lg shadow-md hover:bg-call-to-actions-800 transition"
             >
               <FaRocket className="mr-2 text-xl sm:text-lg" />
+
               <span>More Cards</span>
             </button>
           </div>

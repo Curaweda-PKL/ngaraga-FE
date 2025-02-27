@@ -7,9 +7,27 @@ import {SectionSixForm} from "./components/section-6";
 import {SectionSevenForm} from "./components/section-7";
 import {SectionEightForm} from "./components/section-8";
 
+// Breadcrumb Component
+const Breadcrumb = () => {
+  return (
+    <div className="p-6 bg-white">
+      <div className="mb-4">
+        <div className="flex items-center gap-2 text-sm text-neutral-700">
+          <span>Pages</span>
+          <span>/</span>
+          <span className="font-bold">Home</span>
+        </div>
+        <h1 className="text-2xl font-semibold mt-2">Home</h1>
+      </div>
+    </div>
+  );
+};
+
+// Modified Home Section Component
 export const HomeSection = () => {
   return (
     <div className="text-[#262626]">
+      <Breadcrumb />
       <HeroBanner />
       <SectionTwoForm />
       <SectionThreeFrom />
@@ -18,6 +36,21 @@ export const HomeSection = () => {
       <SectionSixForm />
       <SectionSevenForm />
       <SectionEightForm />
+      <ActionButtons />
+    </div>
+  );
+};
+
+// Action Buttons Component
+const ActionButtons = () => {
+  return (
+    <div className="flex justify-end gap-4 py-6">
+      <button className="px-4 py-2 border border-gray-300 rounded-md text-gray-600 hover:bg-gray-50">
+        Cancel
+      </button>
+      <button className="px-4 py-2 bg-[#E9B824] text-white rounded-md hover:bg-[#d6a820]">
+        Update
+      </button>
     </div>
   );
 };
