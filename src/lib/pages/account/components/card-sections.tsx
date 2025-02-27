@@ -1,5 +1,3 @@
-"use client";
-
 import {useState, useRef, useEffect} from "react";
 
 type Card = {
@@ -50,7 +48,7 @@ const specialCardData: Card[] = [
     image: "/src/assets/img/Distant-Galaxy.png",
     index: "04",
     total: "04",
-    achieved: true
+    achieved: true,
   },
   {
     id: 2,
@@ -58,7 +56,7 @@ const specialCardData: Card[] = [
     creator: "NebulaKid",
     image: "/src/assets/img/Life-On-Edena.png",
     index: "02",
-    total: "02"
+    total: "02",
   },
   {
     id: 3,
@@ -66,7 +64,7 @@ const specialCardData: Card[] = [
     creator: "Spaceone",
     image: "/src/assets/img/AstroFiction.png",
     index: "06",
-    total: "05"
+    total: "05",
   },
   {
     id: 4,
@@ -74,7 +72,7 @@ const specialCardData: Card[] = [
     creator: "NebulaKid",
     image: "/src/assets/img/Life-On-Edena.png",
     index: "05",
-    total: "05"
+    total: "05",
   },
   {
     id: 5,
@@ -82,7 +80,7 @@ const specialCardData: Card[] = [
     creator: "MoonDancer",
     image: "/src/assets/img/Distant-Galaxy.png",
     index: "00",
-    total: "03"
+    total: "03",
   },
   {
     id: 6,
@@ -90,8 +88,8 @@ const specialCardData: Card[] = [
     creator: "Spaceone",
     image: "/src/assets/img/AstroFiction.png",
     index: "00",
-    total: "01"
-  }
+    total: "01",
+  },
 ];
 
 const purchaseData: Purchase[] = [
