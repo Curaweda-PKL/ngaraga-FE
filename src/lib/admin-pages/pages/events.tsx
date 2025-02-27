@@ -23,8 +23,8 @@ export const EventsForm: React.FC = () => {
     setSuccess("");
     try {
       const response = await axios.post(
-        `${SERVER_URL}/api/page-content/browsevent`,
-        { title, description }
+        `${SERVER_URL}/api/page-content/tradingDescription`,
+        { title, description, tradingDescription: "default dd" }
       );
       if (response.status === 200) {
         setSuccess("Events content updated successfully!");
