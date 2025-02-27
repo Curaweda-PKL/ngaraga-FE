@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, {useState, useEffect} from "react";
 import axios from "axios";
-import { useParams, useNavigate } from "react-router-dom";
+import {useParams, useNavigate} from "react-router-dom";
 import PhoneInput from "../checkout/components/PhoneInput";
-import { SERVER_URL } from "@/middleware/utils";
+import {SERVER_URL} from "@/middleware/utils";
 
 interface UserProfile {
   id: string;
@@ -26,8 +26,8 @@ interface EventData {
   eventDate: string;
   eventImage: string;
   eventDescription: string;
-  onlineZoomLink: string | null;
-  offlineLocation: string | null;
+  onlineZoomLink?: string | null;
+  offlineLocation?: string | null;
   eventSpecialGuestName: string;
   eventSpecialGuestOccupation: string;
   eventSpecialGuestImage: string;
@@ -39,7 +39,7 @@ interface RouteParams extends Record<string, string | undefined> {
 }
 
 const EventRegistration: React.FC = () => {
-  const { eventId } = useParams<RouteParams>();
+  const {eventId} = useParams<RouteParams>();
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -57,15 +57,14 @@ const EventRegistration: React.FC = () => {
     loading: boolean;
     success: boolean;
     error: string | null;
-  }>({ loading: false, success: false, error: null });
+  }>({loading: false, success: false, error: null});
 
-  // Fetch user profile
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
         const response = await axios.get<UserProfile>(
           `${SERVER_URL}/api/account/profile`,
-          { withCredentials: true }
+          {withCredentials: true}
         );
         const user = response.data;
         setFormData({
@@ -82,7 +81,6 @@ const EventRegistration: React.FC = () => {
     fetchUserProfile();
   }, []);
 
-  // Fetch event data
   useEffect(() => {
     if (!eventId) return;
 
@@ -113,18 +111,16 @@ const EventRegistration: React.FC = () => {
       return;
     }
 
-    setRegistrationStatus({ loading: true, success: false, error: null });
+    setRegistrationStatus({loading: true, success: false, error: null});
 
     try {
-      const response = await axios.post(
-
+      await axios.post(
         `${SERVER_URL}/api/event/${eventId}`,
-        
         {},
-        { withCredentials: true }
+        {withCredentials: true}
       );
 
-      setRegistrationStatus({ loading: false, success: true, error: null });
+      setRegistrationStatus({loading: false, success: true, error: null});
       navigate("/success/registered/event");
     } catch (error: any) {
       let errorMessage = "Registration failed. Please try again.";
@@ -137,33 +133,98 @@ const EventRegistration: React.FC = () => {
       } else {
         errorMessage = error.message;
       }
-      setRegistrationStatus({ loading: false, success: false, error: errorMessage });
+      setRegistrationStatus({
+        loading: false,
+        success: false,
+        error: errorMessage,
+      });
     }
   };
 
-  return (
-    <div className="min-h-screen p-4 md:p-8">
-      <h1 className="text-4xl text-[#171717] font-bold mb-8 ml-8">Register</h1>
+  const formatEventTime = (time: string) => {
+    const date = new Date(time);
+    return date.toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    });
+  };
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 -mt-4">
-          <form className="space-y-6 bg-white p-6 rounded-lg">
-            <input
-              type="text"
-              name="fullName"
-              placeholder="Full Name"
-              value={formData.fullName}
-              readOnly
-              className="w-full px-4 py-3 border rounded-lg text-gray-700 bg-gray-100 cursor-not-allowed"
-            />
-            <input
-              type="email"
-              name="email"
-              placeholder="Email"
-              value={formData.email}
-              readOnly
-              className="w-full px-4 py-3 border rounded-lg text-gray-700 bg-gray-100 cursor-not-allowed"
-            />
+  const formatEventDate = (date: string) => {
+    return new Date(date).toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+  };
+
+  return (
+    <div className="min-h-screen bg-white">
+      {/* Mobile Header - Only visible on mobile */}
+      <div className="md:hidden px-6 pt-6 pb-4">
+        <h1 className="text-2xl font-bold text-[#171717]">Register</h1>
+      </div>
+
+      {/* Desktop Header - Only visible on tablet and desktop */}
+      <div className="hidden md:block p-8">
+        <h1 className="text-4xl text-[#171717] font-bold mb-8">Register</h1>
+      </div>
+
+      <div className="md:grid md:grid-cols-1 lg:grid-cols-3 md:gap-8 md:p-8">
+        <div className="lg:col-span-2">
+          <div className="bg-white p-6 rounded-lg space-y-4">
+            <div className="relative">
+              <span className="absolute inset-y-0 left-4 flex items-center">
+                <svg
+                  className="h-5 w-5 text-gray-400"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                  />
+                </svg>
+              </span>
+              <input
+                type="text"
+                name="fullName"
+                placeholder="Full Name"
+                value={formData.fullName}
+                readOnly
+                className="w-full pl-12 pr-4 py-3 border rounded-lg text-gray-700 bg-gray-50"
+              />
+            </div>
+
+            <div className="relative">
+              <span className="absolute inset-y-0 left-4 flex items-center">
+                <svg
+                  className="h-5 w-5 text-gray-400"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                  />
+                </svg>
+              </span>
+              <input
+                type="email"
+                name="email"
+                placeholder="Email"
+                value={formData.email}
+                readOnly
+                className="w-full pl-12 pr-4 py-3 border rounded-lg text-gray-700 bg-gray-50"
+              />
+            </div>
+
             <PhoneInput
               countryCode={formData.countryCode}
               phoneNumber={formData.phoneNumber}
@@ -171,66 +232,130 @@ const EventRegistration: React.FC = () => {
               className="mt-6"
               disabled
             />
-          </form>
+          </div>
         </div>
 
-        <div className="bg-gray-50 border p-6 rounded-lg shadow-md lg:mt-0 lg:ml-8">
-          <h2 className="text-lg font-bold text-gray-800 mb-4">Event Summary</h2>
+        <div className="mt-6 md:mt-0 px-4 md:px-0">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100">
+            <h2 className="text-lg font-medium p-4 border-b">Summary Event</h2>
 
-          {loadingEvent ? (
-            <p className="text-gray-500">Loading event details...</p>
-          ) : errorEvent ? (
-            <p className="text-red-500">{errorEvent}</p>
-          ) : eventData ? (
-            <div className="bg-gray-100 border-t rounded-lg flex items-center p-4 mb-4">
-              <img
-                src={`${SERVER_URL}/uploads/event/${eventData.eventImage}`}
-                alt="Event Thumbnail"
-                className="w-32 h-24 object-cover rounded-lg mr-4"
-              />
-              <div className="flex-col">
-                <h3 className="text-gray-800 text-left font-semibold mb-2">
-                  {eventData.eventName}
-                </h3>
-                <p className="text-gray-500 text-left text-sm mb-2">
-                  <span>{new Date(eventData.eventTime).toLocaleTimeString()}</span> |{" "}
-                  <span>{new Date(eventData.eventDate).toLocaleDateString()}</span>
-                </p>
-                <p className="text-gray-500 text-left text-sm">
-                  {eventData.eventType === "ONLINE" ? (
-                    <>
-                      Zoom Link: <br />
-                      <a
-                        href={eventData.onlineZoomLink}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-500 underline hover:text-blue-700"
-                      >
-                        {eventData.onlineZoomLink}
-                      </a>
-                    </>
-                  ) : (
-                    <>
-                      Location: <br />
-                      <span className="font-semibold">{eventData.offlineLocation}</span>
-                    </>
-                  )}
-                </p>
+            {loadingEvent ? (
+              <p className="p-4 text-gray-500">Loading event details...</p>
+            ) : errorEvent ? (
+              <p className="p-4 text-red-500">{errorEvent}</p>
+            ) : eventData ? (
+              <div className="p-4">
+                <div className="bg-gray-50 rounded-xl p-4">
+                  <div className="flex gap-4">
+                    <img
+                      src={`${SERVER_URL}/uploads/event/${eventData.eventImage}`}
+                      alt="Event"
+                      className="w-20 h-20 rounded-lg object-cover flex-shrink-0"
+                    />
+                    <div>
+                      <h3 className="font-medium text-gray-900 mb-3">
+                        {eventData.eventName}
+                      </h3>
+                      <div className="space-y-2 text-sm text-gray-600">
+                        <div className="flex items-center gap-2">
+                          <svg
+                            className="w-4 h-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                            />
+                          </svg>
+                          {formatEventTime(eventData.eventTime)} -{" "}
+                          {formatEventTime(eventData.eventTime)}
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <svg
+                            className="w-4 h-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                            />
+                          </svg>
+                          {formatEventDate(eventData.eventDate)}
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {eventData.eventType === "ONLINE" ? (
+                            <>
+                              <svg
+                                className="w-4 h-4"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth="2"
+                                  d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
+                                />
+                              </svg>
+                              Zoom Meeting
+                            </>
+                          ) : (
+                            <>
+                              <svg
+                                className="w-4 h-4"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth="2"
+                                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                                />
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth="2"
+                                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                                />
+                              </svg>
+                              {eventData.offlineLocation}
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
+            ) : null}
+
+            <div className="p-4">
+              <button
+                onClick={handleRegistration}
+                disabled={registrationStatus.loading}
+                className="w-full py-3 px-4 bg-call-to-action text-white font-medium rounded-xl hover:bg-yellow-600 transition-colors"
+              >
+                {registrationStatus.loading ? "Registering..." : "Register"}
+              </button>
+
+              {registrationStatus.error && (
+                <p className="mt-3 text-sm text-red-500 text-center">
+                  {registrationStatus.error}
+                </p>
+              )}
             </div>
-          ) : null}
-
-          <button
-            type="button"
-            onClick={handleRegistration}
-            className="w-full py-3 bg-yellow-500 text-white font-semibold rounded-lg hover:bg-yellow-600 transition"
-            disabled={registrationStatus.loading}
-          >
-            {registrationStatus.loading ? "Registering..." : "Register"}
-          </button>
-
-          {registrationStatus.error && <p className="text-red-500 mt-2">{registrationStatus.error}</p>}
-          {registrationStatus.success && <p className="text-green-500 mt-2">Registration successful! Redirecting...</p>}
+          </div>
         </div>
       </div>
     </div>

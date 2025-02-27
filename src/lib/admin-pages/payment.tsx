@@ -112,7 +112,7 @@ export const Payment = () => {
               {/* Toggle Button */}
               <div
                 className={`w-12 h-6 rounded-full p-1 cursor-pointer transition-colors duration-200 ease-in-out ${
-                  payment.isActive ? "bg-yellow-500" : "bg-gray-200"
+                  payment.isActive ? "bg-call-to-action" : "bg-gray-200"
                 }`}
                 onClick={() => handleToggle(payment.id)}
                 role="switch"

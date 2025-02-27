@@ -92,7 +92,9 @@ export const AddSpecialCard = () => {
           id: creator.id,
           name: creator.name,
           image: creator.image
-            ? `${SERVER_URL}/uploads/creator/${encodeURIComponent(creator.image)}`
+            ? `${SERVER_URL}/uploads/creator/${encodeURIComponent(
+                creator.image
+              )}`
             : null,
         }));
         setApiCreators(creatorsData);
@@ -145,7 +147,8 @@ export const AddSpecialCard = () => {
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value, type } = e.target;
-    const newValue = type === "checkbox" ? (e.target as HTMLInputElement).checked : value;
+    const newValue =
+      type === "checkbox" ? (e.target as HTMLInputElement).checked : value;
     setFormData((prev) => ({
       ...prev,
       [name]: newValue,
@@ -195,114 +198,148 @@ export const AddSpecialCard = () => {
   };
 
   // Save handler (create new card)
-// Save handler (create new card)
-const handleSave = async () => {
-  try {
-    // Basic validations
-    if (formData.categories.length === 0) {
-      throw new Error("Please select a category.");
-    }
-    if (!formData.cardName || !formData.sku || !formData.stock) {
-      throw new Error("Card name, SKU, and stock are required.");
-    }
+  const handleSave = async () => {
+    try {
+      // Required field validations
+      if (!formData.cardImage) {
+        throw new Error("Card image is required.");
+      }
+      if (!formData.cardName.trim()) {
+        throw new Error("Card name is required.");
+      }
+      if (!formData.sku.trim()) {
+        throw new Error("SKU is required.");
+      }
+      if (!formData.price.trim()) {
+        throw new Error("Price is required.");
+      }
+      if (!formData.stock.trim()) {
+        throw new Error("Stock is required.");
+      }
+      if (!formData.cardDetails.trim()) {
+        throw new Error("Card details are required.");
+      }
+      if (formData.categories.length === 0) {
+        throw new Error("Please select at least one category.");
+      }
+      if (!formData.tag || formData.tags.length === 0) {
+        throw new Error("Please select at least one tag.");
+      }
 
-    // Create FormData payload for multipart/form-data
-    const payload = new FormData();
-    payload.append("characterName", formData.cardName);
-    payload.append("sku", formData.sku);
-    payload.append("price", formData.price);
-    payload.append("discountedPrice", formData.discountedPrice); // NEW FIELD
-    payload.append("stock", formData.stock);
-    payload.append("cardDetail", formData.cardDetails);
-    payload.append("categoryId", formData.categories[0]);
-    payload.append(
-      "tagIds",
-      JSON.stringify(formData.tags.map((tag) => Number(tag)))
-    );
-    payload.append(
-      "creatorIds",
-      JSON.stringify([Number(formData.selectedCreator)])
-    );
-    payload.append("ownerId", "");
-    payload.append("cardType", "SPECIAL");
-
-    if (formData.source) {
+      // Create FormData payload for multipart/form-data
+      const payload = new FormData();
+      payload.append("characterName", formData.cardName);
+      payload.append("sku", formData.sku);
+      payload.append("price", formData.price);
+      // Only append discountedPrice if salePrice is true, otherwise set to "0"
+      if (formData.salePrice) {
+        payload.append("discountedPrice", formData.discountedPrice);
+      } else {
+        payload.append("discountedPrice", "0");
+      }
+      payload.append("stock", formData.stock);
+      payload.append("cardDetail", formData.cardDetails);
+      payload.append("categoryId", formData.categories[0]);
       payload.append(
-        "sourceImage",
-        JSON.stringify({
-          website: formData.sourceImageWebsite,
-          alt: formData.sourceImageAlt,
-        })
+        "tagIds",
+        JSON.stringify(formData.tags.map((tag) => Number(tag)))
       );
-    }
+      payload.append(
+        "creatorIds",
+        JSON.stringify([Number(formData.selectedCreator)])
+      );
+      payload.append("ownerId", "");
+      payload.append("cardType", "SPECIAL");
 
-    if (cardFile) {
-      payload.append("image", cardFile);
-    }
+      if (formData.source) {
+        payload.append(
+          "sourceImage",
+          JSON.stringify({
+            website: formData.sourceImageWebsite,
+            alt: formData.sourceImageAlt,
+          })
+        );
+      }
 
-    // Post to the API endpoint
-    const response = await axios.post(
-      `${SERVER_URL}/api/cards/create`,
-      payload,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
+      if (cardFile) {
+        payload.append("image", cardFile);
+      }
+
+      // Post to the API endpoint
+      const response = await axios.post(
+        `${SERVER_URL}/api/cards/create`,
+        payload,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      // Set a success message and navigate away
+      setMessage({ type: "success", text: "Card created successfully!" });
+      setTimeout(() => {
+        navigate("/admin/special-card");
+      }, 1500);
+    } catch (error: any) {
+      console.error(
+        "Error creating card:",
+        error.response?.data || error.message
+      );
+
+      // Default error message
+      let errorMessage = "Failed to create card. Please try again later.";
+
+      // Mapping for known unique constraint errors
+      const uniqueConstraintErrors = [
+        {
+          key: "Card_uniqueCode_key",
+          message:
+            "A card with this unique code already exists. Generate a new SKU or character name",
         },
+        {
+          key: "Card_qrCode_key",
+          message:
+            "A card with this QR code already exists. Please try again with a different QR code.",
+        },
+      ];
+
+      const errorString =
+        error.response?.data?.error ||
+        error.response?.data?.message ||
+        error.message ||
+        "";
+
+      for (const { key, message } of uniqueConstraintErrors) {
+        if (errorString.includes(key)) {
+          errorMessage = message;
+          break;
+        }
       }
-    );
 
-    // Set a success message and navigate away
-    setMessage({ type: "success", text: "Card created successfully!" });
-    setTimeout(() => {
-      navigate("/admin/card");
-    }, 1500);
-  } catch (error: any) {
-    console.error("Error creating card:", error.response?.data || error.message);
-    
-    // Default error message
-    let errorMessage = "Failed to create card. Please try again later.";
-
-    // Create a mapping for known unique constraint errors
-    const uniqueConstraintErrors = [
-      {
-        key: "Card_uniqueCode_key",
-        message:
-          "A card with this unique code already exists. Please try again with a different card.",
-      },
-      {
-        key: "Card_qrCode_key",
-        message:
-          "A card with this QR code already exists. Please try again with a different QR code.",
-      },
-    ];
-
-    // Determine the error message source
-    const errorString =
-      error.response?.data?.error ||
-      error.response?.data?.message ||
-      error.message ||
-      "";
-
-    // Check for known unique constraint errors
-    for (const { key, message } of uniqueConstraintErrors) {
-      if (errorString.includes(key)) {
-        errorMessage = message;
-        break;
+      if (error.response?.status === 400 && !errorMessage) {
+        errorMessage =
+          error.response.data.error || "Bad request. Please check your input.";
       }
+
+      setMessage({
+        type: "error",
+        text: errorMessage,
+      });
     }
+  };
 
-    // Optionally, you can handle other HTTP status-specific cases here
-    if (error.response?.status === 400 && !errorMessage) {
-      errorMessage = error.response.data.error || "Bad request. Please check your input.";
-    }
-
-    setMessage({
-      type: "error",
-      text: errorMessage,
-    });
-  }
-};
-
+  // Determine if the Save button should be disabled
+  const isSaveDisabled =
+    !formData.cardImage ||
+    !formData.cardName.trim() ||
+    !formData.sku.trim() ||
+    !formData.price.trim() ||
+    !formData.stock.trim() ||
+    !formData.cardDetails.trim() ||
+    formData.categories.length === 0 ||
+    !formData.tag ||
+    formData.tags.length === 0;
 
   return (
     <div className="max-w-7xl mx-auto p-6">
@@ -359,7 +396,12 @@ const handleSave = async () => {
         </button>
         <button
           onClick={handleSave}
-          className="px-6 py-2 bg-call-to-actions-900 text-white rounded-lg hover:bg-call-to-actions-800"
+          disabled={isSaveDisabled}
+          className={`px-6 py-2 rounded-lg text-white ${
+            isSaveDisabled
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-call-to-actions-900 hover:bg-call-to-actions-800"
+          }`}
         >
           Save
         </button>

@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import QRCode from "react-qr-code";
 import { Plus, Search, Edit, Eye, EyeOff, Trash2, Link2 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { SERVER_URL } from "@/middleware/utils"; // Imported centralized server URL
 
 export const Events = () => {
@@ -39,9 +39,7 @@ export const Events = () => {
   const [isGenerating, setIsGenerating] = useState(false);
 
   // --- New state for Cards (for the select option) ---
-  const [cardRewards, setCardRewards] = useState<
-    { id: string | number; name: string }[]
-  >([]);
+  const [cardRewards, setCardRewards] = useState<{ id: string | number; name: string }[]>([]);
   const [selectedCardId, setSelectedCardId] = useState<string | number>("");
 
   // --- Ref for QR Code element (for downloading) ---
@@ -61,7 +59,8 @@ export const Events = () => {
           })} on ${new Date(event.eventDate).toLocaleDateString()}`,
           type: event.eventType || "Unknown",
           image: event.eventImage,
-          isSuspended: event.isSuspensed === true,
+          // Fix potential typo: use "isSuspended" if available or fallback to the original field
+          isSuspended: event.isSuspended === true || event.isSuspensed === true,
         }));
         setEvents(fetchedEvents);
       })
@@ -75,11 +74,10 @@ export const Events = () => {
     axios
       .get(`${SERVER_URL}/api/cards/all`)
       .then((response) => {
-        // Response is expected to be { cards: [...] }
         const cardsData = response.data.cards;
         const mappedCards = cardsData.map((card: any) => ({
           id: card.id,
-          name: card.characterName, // using characterName as the display name
+          name: card.characterName,
         }));
         setCardRewards(mappedCards);
         if (mappedCards.length > 0) {
@@ -112,6 +110,7 @@ export const Events = () => {
   // --- Handlers for Event selection, deletion, etc. ---
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
+      // Add all current page event ids (if not already selected)
       const newSelected = [...selectedEvents];
       currentEvents.forEach((event) => {
         if (!newSelected.includes(event.id)) {
@@ -120,6 +119,7 @@ export const Events = () => {
       });
       setSelectedEvents(newSelected);
     } else {
+      // Remove current page event ids from selectedEvents
       const newSelected = selectedEvents.filter(
         (id) => !currentEvents.some((event) => event.id === id)
       );
@@ -142,9 +142,7 @@ export const Events = () => {
     axios
       .delete(`${SERVER_URL}/api/events/${id}`)
       .then(() => {
-        setEvents((prevEvents) =>
-          prevEvents.filter((event) => event.id !== id)
-        );
+        setEvents((prevEvents) => prevEvents.filter((event) => event.id !== id));
         setSelectedEvents((prevSelected) =>
           prevSelected.filter((eventId) => eventId !== id)
         );
@@ -159,11 +157,7 @@ export const Events = () => {
     if (!window.confirm("Are you sure you want to delete selected events?")) {
       return;
     }
-    Promise.all(
-      selectedEvents.map((id) =>
-        axios.delete(`${SERVER_URL}/api/events/${id}`)
-      )
-    )
+    Promise.all(selectedEvents.map((id) => axios.delete(`${SERVER_URL}/api/events/${id}`)))
       .then(() => {
         setEvents((prevEvents) =>
           prevEvents.filter((event) => !selectedEvents.includes(event.id))
@@ -235,11 +229,10 @@ export const Events = () => {
     axios
       .post(
         `${SERVER_URL}/api/cardRewards/${selectedCardId}/generateClaimLink`,
-        {}, // No data payload.
-        { withCredentials: true } // Include credentials.
+        {},
+        { withCredentials: true }
       )
       .then((response) => {
-        // Assuming the API returns { claimUrl: "..." }
         setGeneratedLink(response.data.claimUrl);
       })
       .catch((error) => {
@@ -261,7 +254,6 @@ export const Events = () => {
         { withCredentials: true }
       )
       .then((response) => {
-        // Use the returned claimUrl to generate a QR code
         setGeneratedQRCode(response.data.claimUrl);
       })
       .catch((error) => {
@@ -288,40 +280,29 @@ export const Events = () => {
   // --- New Handler: Download the generated QR Code as PNG, JPG, or WEBP ---
   const downloadQRAs = (mimeType: string, extension: string) => {
     if (!qrRef.current) return;
-    // Get the SVG element rendered by the QRCode component.
     const svg = qrRef.current.querySelector("svg");
     if (!svg) return;
     const serializer = new XMLSerializer();
     let svgString = serializer.serializeToString(svg);
-
-    // Ensure the SVG has proper namespace declarations.
     if (!svgString.match(/^<svg[^>]+xmlns="http:\/\/www\.w3\.org\/2000\/svg"/))
       svgString = svgString.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
     if (!svgString.match(/^<svg[^>]+"http:\/\/www\.w3\.org\/1999\/xlink"/))
       svgString = svgString.replace(/^<svg/, '<svg xmlns:xlink="http://www.w3.org/1999/xlink"');
-
-    // Create a Blob from the SVG string.
     const svgBlob = new Blob([svgString], { type: "image/svg+xml;charset=utf-8" });
     const url = URL.createObjectURL(svgBlob);
-
-    // Create an image element and load the SVG data URL.
     const img = new Image();
     img.crossOrigin = "anonymous";
     img.onload = () => {
-      // Create a canvas element with the same dimensions as the image.
       const canvas = document.createElement("canvas");
       canvas.width = img.width;
       canvas.height = img.height;
       const ctx = canvas.getContext("2d");
-      // For non-PNG formats, fill the background with white.
       if (mimeType !== "image/png") {
         ctx.fillStyle = "#ffffff";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
       }
       ctx.drawImage(img, 0, 0);
-      // Convert the canvas content to a data URL in the desired format.
       const imgData = canvas.toDataURL(mimeType);
-      // Create and trigger a download.
       const downloadLink = document.createElement("a");
       downloadLink.href = imgData;
       downloadLink.download = `qr-code.${extension}`;
@@ -354,20 +335,20 @@ export const Events = () => {
             <Plus className="w-4 h-4" />
             <span>Add Events</span>
           </button>
-          <button
-            className="bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded-lg flex items-center gap-2"
-            onClick={handleDeleteSelected}
-            disabled={selectedEvents.length === 0}
-          >
-            <Trash2 className="w-4 h-4" />
-            <span>Delete Selected</span>
-          </button>
-          {/* Button to open the Generate Claim Link / QR modal */}
+          {/* Render Delete Selected only when all events on the current page are selected */}
+          {allSelected && (
+            <button
+              className="bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+              onClick={handleDeleteSelected}
+            >
+              <Trash2 className="w-4 h-4" />
+              <span>Delete Selected</span>
+            </button>
+          )}
           <button
             className="bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded-lg flex items-center gap-2"
             onClick={() => {
               setClaimLinkModalOpen(true);
-              // Reset previously generated values when opening the modal.
               setGeneratedLink("");
               setGeneratedQRCode("");
             }}
@@ -434,12 +415,11 @@ export const Events = () => {
                 <td className="p-4">{event.type}</td>
                 <td className="p-4">
                   <div className="flex gap-2">
-                    <button
+                    <Link to={`/admin/registered-user-event/${event.id}`}
                       className="p-2 hover:bg-gray-100 rounded-lg text-gray-600"
-                      onClick={() => navigate("/admin/add-event")}
                     >
                       <Plus className="w-4 h-4" />
-                    </button>
+                    </Link>
                     <button
                       className="p-2 hover:bg-gray-100 rounded-lg text-gray-600"
                       onClick={() => navigate(`/admin/edit-event/${event.id}`)}
