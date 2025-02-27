@@ -74,6 +74,7 @@ export const MoreCardSection: React.FC = () => {
             {cards.map((card) => (
               <div
                 key={card.id}
+                onClick={() => navigate(`/detail-cards/${card.id}`)}
                 className="w-full h-[400px] flex flex-col items-start gap-4 bg-[#F2F2F2] rounded-2xl shadow-xl transition-transform hover:scale-[1.02] sm:w-full"
               >
                 <figure className="w-full h-[260px] rounded-t-2xl overflow-hidden">
@@ -96,7 +97,7 @@ export const MoreCardSection: React.FC = () => {
                   </span>
                   {card.price && (
                     <span className="text-base text-[#404040] font-[Nunito] sm:text-sm">
-                      {card.price}
+                     Rp. {card.price}
                     </span>
                   )}
                 </div>

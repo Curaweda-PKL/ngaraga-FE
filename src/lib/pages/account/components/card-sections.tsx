@@ -1,4 +1,4 @@
-import {useState, useRef, useEffect} from "react";
+import {useState, useRef} from "react";
 
 type Card = {
   id: number;
@@ -146,7 +146,6 @@ export const CardSection = () => {
   const [activeFilter, setActiveFilter] = useState<
     "All" | "Payment" | "Packaging" | "Shipping" | "Delivered"
   >("All");
-  const [underlineStyle, setUnderlineStyle] = useState({width: 0, left: 0});
   const tabsRef = useRef<HTMLDivElement>(null);
 
   const filteredPurchaseData =
@@ -160,23 +159,6 @@ export const CardSection = () => {
       : activeTab === "specialCards"
       ? specialCardData
       : filteredPurchaseData;
-
-  useEffect(() => {
-    const activeButton = tabsRef.current?.querySelector(
-      activeTab === "cards"
-        ? ".tab-cards"
-        : activeTab === "specialCards"
-        ? ".tab-specialCards"
-        : ".tab-purchases"
-    ) as HTMLButtonElement;
-
-    if (activeButton) {
-      setUnderlineStyle({
-        width: activeButton.offsetWidth,
-        left: activeButton.offsetLeft,
-      });
-    }
-  }, [activeTab]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -237,45 +219,54 @@ export const CardSection = () => {
   };
 
   return (
-    <div className="w-full mb-10 px-4 sm:px-6">
+    <div className="w-full mb-10 px-4 sm:px-6 ">
       {/* Tabs */}
       <div
-        className="relative flex items-center justify-start space-x-4 sm:space-x-8 border-b border-gray-700 pb-4 mb-8 overflow-x-auto"
+        className="flex items-center justify-start space-x-4 sm:space-x-8 border-b border-gray-700 pb-4 mb-8 overflow-x-auto"
         ref={tabsRef}
       >
-        {/* Tab Buttons */}
-        <button
-          className={`tab-cards text-sm sm:text-lg font-semibold whitespace-nowrap ${
-            activeTab === "cards" ? "text-[#2B2B2B]" : "text-gray-400"
-          }`}
-          onClick={() => setActiveTab("cards")}
-        >
-          Card ({cardData.length})
-        </button>
+        {/* Tab Buttons dengan underline statis */}
+        <div className="relative">
+          <button
+            className={`tab-cards text-sm sm:text-lg font-semibold whitespace-nowrap ${
+              activeTab === "cards" ? "text-[#2B2B2B]" : "text-gray-400"
+            }`}
+            onClick={() => setActiveTab("cards")}
+          >
+            Card ({cardData.length})
+          </button>
+          {activeTab === "cards" && (
+            <div className="absolute bottom-[-16px] left-0 right-0 h-[2px] bg-[#2B2B2B]" />
+          )}
+        </div>
 
-        <button
-          className={`tab-specialCards text-sm sm:text-lg font-semibold whitespace-nowrap ${
-            activeTab === "specialCards" ? "text-[#2B2B2B]" : "text-gray-400"
-          }`}
-          onClick={() => setActiveTab("specialCards")}
-        >
-          Special Card ({specialCardData.length})
-        </button>
+        <div className="relative">
+          <button
+            className={`tab-specialCards text-sm sm:text-lg font-semibold whitespace-nowrap ${
+              activeTab === "specialCards" ? "text-[#2B2B2B]" : "text-gray-400"
+            }`}
+            onClick={() => setActiveTab("specialCards")}
+          >
+            Special Card ({specialCardData.length})
+          </button>
+          {activeTab === "specialCards" && (
+            <div className="absolute bottom-[-16px] left-0 right-0 h-[2px] bg-[#2B2B2B]" />
+          )}
+        </div>
 
-        <button
-          className={`tab-purchases text-sm sm:text-lg font-semibold whitespace-nowrap ${
-            activeTab === "purchases" ? "text-[#2B2B2B]" : "text-gray-400"
-          }`}
-          onClick={() => setActiveTab("purchases")}
-        >
-          Purchase ({purchaseData.length})
-        </button>
-
-        {/* Dynamic Underline */}
-        <div
-          className="absolute bottom-0 h-[2px] bg-[#2B2B2B] transition-all duration-300"
-          style={{width: underlineStyle.width, left: underlineStyle.left}}
-        />
+        <div className="relative">
+          <button
+            className={`tab-purchases text-sm sm:text-lg font-semibold whitespace-nowrap ${
+              activeTab === "purchases" ? "text-[#2B2B2B]" : "text-gray-400"
+            }`}
+            onClick={() => setActiveTab("purchases")}
+          >
+            Purchase ({purchaseData.length})
+          </button>
+          {activeTab === "purchases" && (
+            <div className="absolute bottom-[-16px] left-0 right-0 h-[2px] bg-[#2B2B2B]" />
+          )}
+        </div>
       </div>
 
       {/* Filter Buttons */}

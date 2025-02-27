@@ -1,21 +1,26 @@
-import React, { ChangeEvent, useState } from "react";
+import React, { ChangeEvent, useState, useEffect } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { SERVER_URL } from "@/middleware/utils";
 
 export const EditCouponForm = () => {
+  // Get coupon id from the URL
+  const { id: couponId } = useParams();
   const navigate = useNavigate();
 
+  // Local state for messages and loading
   const [message, setMessage] = useState<{
     type: "error" | "success";
     text: string;
   } | null>(null);
+  const [loading, setLoading] = useState(true);
 
+  // Form state with initial values
   const [formData, setFormData] = useState({
     couponName: "",
     couponCode: "",
-    userType: "", // "guest", "member", "newMember"
-    applyTo: "ALL_PRODUCTS", // ALL_PRODUCTS, PRODUCT_CATEGORIES, PRODUCT_LIST
+    userType: "", // e.g., "guest", "member", "newMember"
+    applyTo: "ALL_PRODUCTS",
     dateType: "unlimited", // "range" or "unlimited"
     startDate: "",
     endDate: "",
@@ -26,6 +31,65 @@ export const EditCouponForm = () => {
     totalQuantity: "",
   });
 
+  // Autofill the form by fetching coupon data
+  useEffect(() => {
+    const fetchCoupon = async () => {
+      try {
+        const response = await axios.get(
+          `${SERVER_URL}/api/coupons/${couponId}`,
+          { withCredentials: true }
+        );
+        // Check for coupon data either directly or in an array.
+        let couponData;
+        if (response.data.coupon) {
+          couponData = response.data.coupon;
+        } else if (response.data.coupons && response.data.coupons.length > 0) {
+          couponData = response.data.coupons[0];
+        } else {
+          throw new Error("Coupon data not found");
+        }
+        setFormData({
+          couponName: couponData.name || "",
+          couponCode: couponData.couponCode || "",
+          userType: couponData.userType || "",
+          applyTo: couponData.applyTo || "ALL_PRODUCTS",
+          dateType:
+            couponData.startDate && couponData.endDate ? "range" : "unlimited",
+          startDate: couponData.startDate || "",
+          endDate: couponData.endDate || "",
+          condition:
+            couponData.minimumSpent != null
+              ? couponData.discountType === "FIXED"
+                ? "MIN_SPENT_FIXED"
+                : "MIN_SPENT_PERCENT"
+              : couponData.discountType || "FIXED",
+          discountValue: couponData.discountValue
+            ? couponData.discountValue.toString()
+            : "",
+          minimumSpent: couponData.minimumSpent
+            ? couponData.minimumSpent.toString()
+            : "",
+          couponTotal: couponData.unlimitedUsage ? "unlimited" : "setQuantity",
+          totalQuantity:
+            couponData.unlimitedUsage || !couponData.totalQuantity
+              ? ""
+              : couponData.totalQuantity.toString(),
+        });
+      } catch (err: any) {
+        console.error("Error fetching coupon:", err);
+        setMessage({ type: "error", text: "Failed to load coupon data." });
+      } finally {
+        setLoading(false);
+      }
+    };
+  
+    if (couponId) {
+      fetchCoupon();
+    }
+  }, [couponId]);
+  
+
+  // Function to generate a random coupon code
   const generateCode = () => {
     const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     let code = "";
@@ -35,15 +99,17 @@ export const EditCouponForm = () => {
     setFormData((prev) => ({ ...prev, couponCode: code }));
   };
 
+  // Handle input changes for all form fields
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value, type } = e.target;
-    const newValue = type === "checkbox" ? (e.target as HTMLInputElement).checked : value;
+    const newValue =
+      type === "checkbox" ? (e.target as HTMLInputElement).checked : value;
     setFormData((prev) => ({ ...prev, [name]: newValue }));
   };
 
-  // Determine if the Save button should be enabled.
+  // Disable Save if required fields are missing
   const isSaveDisabled =
     !formData.couponName.trim() ||
     !formData.couponCode.trim() ||
@@ -54,12 +120,25 @@ export const EditCouponForm = () => {
     (formData.dateType === "range" && (!formData.startDate || !formData.endDate)) ||
     (formData.couponTotal === "setQuantity" && !formData.totalQuantity);
 
+  // Handle form submission to update coupon
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setMessage(null);
 
-    // Additional validations already done via isSaveDisabled.
+    // Validate date range
+    if (formData.dateType === "range") {
+      const start = new Date(formData.startDate);
+      const end = new Date(formData.endDate);
+      if (start > end) {
+        setMessage({
+          type: "error",
+          text: "Start date cannot be later than end date.",
+        });
+        return;
+      }
+    }
 
+    // Prepare payload to match backend expectations
     const payload = {
       couponCode: formData.couponCode,
       name: formData.couponName,
@@ -73,45 +152,39 @@ export const EditCouponForm = () => {
       endDate: formData.dateType === "range" ? formData.endDate : null,
       unlimitedUsage: formData.couponTotal === "unlimited",
       totalQuantity:
-        formData.couponTotal === "setQuantity" ? parseInt(formData.totalQuantity, 10) : null,
+        formData.couponTotal === "setQuantity"
+          ? parseInt(formData.totalQuantity, 10)
+          : null,
       minimumSpent:
-        formData.condition === "MIN_SPENT_FIXED" || formData.condition === "MIN_SPENT_PERCENT"
+        formData.condition === "MIN_SPENT_FIXED" ||
+        formData.condition === "MIN_SPENT_PERCENT"
           ? parseFloat(formData.minimumSpent)
           : null,
     };
 
     try {
-      const response = await axios.post(`${SERVER_URL}/api/coupons`, payload, {
-        withCredentials: true,
-      });
-      setMessage({ type: "success", text: "Coupon created successfully." });
-      console.log("Coupon response:", response.data);
-      // Optionally reset the form.
-      setFormData({
-        couponName: "",
-        couponCode: "",
-        userType: "",
-        applyTo: "ALL_PRODUCTS",
-        dateType: "unlimited",
-        startDate: "",
-        endDate: "",
-        condition: "FIXED",
-        discountValue: "",
-        minimumSpent: "",
-        couponTotal: "unlimited",
-        totalQuantity: "",
-      });
+      const response = await axios.patch(
+        `${SERVER_URL}/api/coupons/${couponId}`,
+        payload,
+        { withCredentials: true }
+      );
+      setMessage({ type: "success", text: "Coupon updated successfully." });
+      console.log("Coupon update response:", response.data);
       setTimeout(() => {
         navigate("/admin/coupon");
       }, 1500);
     } catch (err: any) {
-      console.error("Error creating coupon:", err);
+      console.error("Error updating coupon:", err);
       setMessage({
         type: "error",
-        text: err.response?.data?.error || "Failed to create coupon. Please try again.",
+        text: err.response?.data?.error || "Failed to update coupon. Please try again.",
       });
     }
   };
+
+  if (loading) {
+    return <div>Loading coupon data...</div>;
+  }
 
   return (
     <div className="max-w-7xl mx-auto p-6">
@@ -343,6 +416,7 @@ export const EditCouponForm = () => {
                 />
                 <span className="ml-2">User</span>
               </label>
+              {/* Additional user types can be added here */}
             </div>
           </div>
 
@@ -388,29 +462,27 @@ export const EditCouponForm = () => {
             )}
           </div>
         </div>
+                {/* Place the action buttons inside the form */}
+                <div className="col-span-1 md:col-span-2 flex justify-end gap-4 mt-6">
+          <button
+            type="button"
+            onClick={() => navigate("/admin/coupon")}
+            className="px-6 py-2 border rounded-lg hover:bg-gray-50"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            disabled={isSaveDisabled}
+            className={`px-6 py-2 rounded-lg text-white ${
+              !isSaveDisabled ? "bg-call-to-actions-900 hover:bg-call-to-actions-800" : "bg-gray-400 cursor-not-allowed"
+            }`}
+          >
+            Save
+          </button>
+        </div>
       </form>
 
-      <div className="flex justify-end gap-4 mt-6">
-        <button
-          type="button"
-          onClick={() => navigate("/admin/coupon")}
-          className="px-6 py-2 border rounded-lg hover:bg-gray-50"
-        >
-          Cancel
-        </button>
-        <button
-          type="submit"
-          onClick={handleSubmit}
-          disabled={isSaveDisabled}
-          className={`px-6 py-2 rounded-lg text-white ${
-            !isSaveDisabled
-              ? "bg-call-to-actions-900 hover:bg-call-to-actions-800"
-              : "bg-gray-400 cursor-not-allowed"
-          }`}
-        >
-          Save
-        </button>
-      </div>
     </div>
   );
 };

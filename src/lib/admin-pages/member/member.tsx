@@ -20,6 +20,7 @@ interface Member {
   card: string;
   specialCard: string;
   checked: boolean;
+  isSuspended: boolean;
   image?: string;
 }
 
@@ -32,6 +33,7 @@ export const Member = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   // Fetch accounts with role "USER" when the component mounts
   useEffect(() => {
@@ -58,7 +60,10 @@ export const Member = () => {
           card: "N/A",
           specialCard: "N/A",
           checked: false,
-          image: account.image ? account.image : `${SERVER_URL}/api/placeholder/40/40`,
+          isSuspended: account.isSuspended || false,
+          image: account.image
+            ? account.image
+            : `${SERVER_URL}/api/placeholder/40/40`,
         }));
         setMemberData(members);
         setError(null);
@@ -113,8 +118,163 @@ export const Member = () => {
     );
   };
 
-  const handleDelete = () => {
-    setMemberData((prev) => prev.filter((member) => !member.checked));
+  const handleDelete = async (userId?: string) => {
+    const selectedUsers = userId
+      ? [{ id: userId }]
+      : memberData.filter((user) => user.checked);
+
+    if (selectedUsers.length === 0) return;
+
+    const confirmDelete = window.confirm(
+      `Are you sure you want to delete ${selectedUsers.length} user(s)?`
+    );
+
+    if (!confirmDelete) return;
+
+    setLoading(true);
+    try {
+      for (const user of selectedUsers) {
+        const response = await fetch(
+          `${SERVER_URL}/api/accounts/delete/${user.id}`,
+          {
+            method: "DELETE",
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(`Failed to delete user: ${user.id}`);
+        }
+      }
+
+      setMemberData((prev) =>
+        prev.filter((user) => !selectedUsers.some((u) => u.id === user.id))
+      );
+
+      setSuccessMessage("User successfully deleted!"); // Tambah pesan sukses
+      setError(null);
+
+      // Hapus pesan sukses setelah 3 detik
+      setTimeout(() => setSuccessMessage(null), 3000);
+    } catch (err: any) {
+      setError(err.message || "Failed to delete users");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSuspend = async (userId: string) => {
+    if (!userId) return;
+
+    const confirmSuspend = window.confirm(
+      "Are you sure you want to suspend this user?"
+    );
+    if (!confirmSuspend) return;
+
+    setLoading(true);
+    try {
+      const response = await fetch(
+        `${SERVER_URL}/api/account/suspend/${userId}`,
+        {
+          method: "PUT",
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to suspend user");
+      }
+
+      setMemberData((prev) =>
+        prev.map((user) =>
+          user.id === userId ? { ...user, isSuspended: true } : user
+        )
+      );
+    } catch (err: any) {
+      setError(err.message || "Failed to suspend user");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUnsuspend = async (userId: string) => {
+    if (!userId) return;
+
+    const confirmUnsuspend = window.confirm(
+      "Are you sure you want to unsuspend this user?"
+    );
+    if (!confirmUnsuspend) return;
+
+    setLoading(true);
+    try {
+      const response = await fetch(
+        `${SERVER_URL}/api/account/unsuspend/${userId}`,
+        {
+          method: "PUT",
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to unsuspend user");
+      }
+
+      setMemberData((prev) =>
+        prev.map((user) =>
+          user.id === userId ? { ...user, isSuspended: false } : user
+        )
+      );
+    } catch (err: any) {
+      setError(err.message || "Failed to unsuspend user");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleBulkSuspendUnsuspend = async () => {
+    const selectedUsers = memberData.filter((user) => user.checked);
+
+    if (selectedUsers.length === 0) {
+      alert("Please select at least one user to suspend/unsuspend");
+      return;
+    }
+
+    const isSuspending = selectedUsers.some((user) => !user.isSuspended);
+    const action = isSuspending ? "suspend" : "unsuspend";
+
+    const confirmAction = window.confirm(
+      `Are you sure you want to ${action} these users?\n\n${selectedUsers
+        .map((user) => user.name)
+        .join(", ")}`
+    );
+
+    if (!confirmAction) return;
+
+    setLoading(true);
+    try {
+      await Promise.all(
+        selectedUsers.map((user) =>
+          fetch(`${SERVER_URL}/api/account/${action}/${user.id}`, {
+            method: "PUT",
+          })
+        )
+      );
+
+      // Update state setelah berhasil
+      setMemberData((prev) =>
+        prev.map((user) =>
+          selectedUsers.some((u) => u.id === user.id)
+            ? { ...user, isSuspended: isSuspending }
+            : user
+        )
+      );
+
+      setSuccessMessage(
+        `${selectedUsers.length} user(s) successfully ${action}ed!`
+      );
+      setTimeout(() => setSuccessMessage(null), 3000);
+    } catch (err: any) {
+      setError(err.message || `Failed to ${action} users`);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleDateChange = (date: Date | null, dateType: "start" | "end") => {
@@ -139,6 +299,11 @@ export const Member = () => {
       {loading && <div>Loading...</div>}
       {error && <div className="text-red-500 mb-4">Error: {error}</div>}
 
+      {successMessage && (
+        <div className="bg-green-100 text-green-700 border border-green-400 p-3 rounded-md mb-4">
+          {successMessage}
+        </div>
+      )}
       <div className="flex justify-evenly items-center mb-6">
         <div className="flex items-center">
           <button className="bg-call-to-actions-900 hover:bg-call-to-actions-800 text-white px-4 py-2 rounded-lg flex items-center gap-2">
@@ -147,14 +312,15 @@ export const Member = () => {
               <a href="/admin/add-member">Add Member</a>
             </span>
           </button>
-
-          <button className="border ml-2 border-call-to-actions-900 hover:bg-call-to-actions-200 text-call-to-actions-900 px-4 py-2 rounded-lg flex items-center gap-2">
+          <button
+            onClick={handleBulkSuspendUnsuspend}
+            className="border ml-2 border-call-to-actions-900 hover:bg-call-to-actions-200 text-call-to-actions-900 px-4 py-2 rounded-lg flex items-center gap-2"
+          >
             <FaEyeSlash />
             <span>Hide</span>
           </button>
-
           <button
-            onClick={handleDelete}
+            onClick={() => handleDelete()}
             className="border border-danger-colors-700 text-danger-colors-700 rounded-lg flex items-center ml-2 px-4 py-2 hover:bg-danger-colors-200 gap-2"
           >
             <FaTrash className="w-4 h-4" />
@@ -199,7 +365,7 @@ export const Member = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-lg border border-neutral-colors-500 overflow-hidden">
+      <div className="bg-white rounded-lg  overflow-hidden">
         <table className="w-full">
           <thead>
             <tr className="text-neutral-colors-700 font-[200]">
@@ -255,7 +421,11 @@ export const Member = () => {
                     <div className="flex items-center gap-3 truncate">
                       <div className="w-8 h-8 bg-gray-200 rounded-lg overflow-hidden shrink-0">
                         <img
-                          src={member.image ? member.image : `${SERVER_URL}/api/placeholder/40/40`}
+                          src={
+                            member.image
+                              ? member.image
+                              : `${SERVER_URL}/api/placeholder/40/40`
+                          }
                           alt="User avatar"
                           className="w-full h-full object-cover"
                         />
@@ -296,10 +466,24 @@ export const Member = () => {
                           <LensIcon />
                         </a>
                       </button>
-                      <button className="p-1.5 hover:bg-gray-100 text-neutral-colors-700 rounded-full">
-                        <EyeIcon />
+                      <button
+                        onClick={() =>
+                          member.isSuspended
+                            ? handleUnsuspend(member.id)
+                            : handleSuspend(member.id)
+                        }
+                        className={`p-1.5 rounded-full ${
+                          member.isSuspended
+                            ? "text-green-500 hover:bg-green-100"
+                            : "text-gray-500 hover:bg-gray-100"
+                        }`}
+                      >
+                        {member.isSuspended ? <FaEyeSlash /> : <EyeIcon />}
                       </button>
-                      <button className="p-1.5 hover:bg-gray-100 rounded-full text-red-500">
+                      <button
+                        onClick={() => handleDelete(member.id)}
+                        className="p-1.5 hover:bg-gray-100 rounded-full text-red-500"
+                      >
                         <TrashIcon />
                       </button>
                     </div>

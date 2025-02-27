@@ -37,9 +37,17 @@ export const AddMember = () => {
     confirmPassword: "",
   };
 
+  const [errors, setErrors] = useState({
+    name: "",
+    username: "",
+    email: "",
+    phoneNumber: "",
+    password: "",
+    confirmPassword: "",
+  });
+
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
-  // Load data from localStorage if available
   useEffect(() => {
     const savedData = localStorage.getItem("AddMemberForm");
     if (savedData) {
@@ -47,11 +55,10 @@ export const AddMember = () => {
     }
   }, []);
 
-  // Save data to localStorage whenever form data changes
   useEffect(() => {
     localStorage.setItem("AddMemberForm", JSON.stringify(formData));
   }, [formData]);
-
+  
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -82,68 +89,67 @@ export const AddMember = () => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({ ...prevData, [name]: value }));
+    setErrors((prevErrors) => ({ ...prevErrors, [name]: "" }));
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
 
-    // Prepare the form data for submission
-    const MemberData = {
-      name: formData.name,
-      phoneNumber: formData.phoneNumber,
-      email: formData.email,
-      password: formData.password,
-      confirmPassword: formData.confirmPassword,
-      socialLinks: {
-        website: formData.website,
-        discord: formData.discord,
-        youtube: formData.youtube,
-        twitter: formData.twitter,
-        instagram: formData.instagram,
+const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
+
+  let newErrors = {
+    name: formData.name ? "" : "Full Name is required",
+    username: formData.username ? "" : "Username is required",
+    email: formData.email ? "" : "Email is required",
+    phoneNumber: formData.phoneNumber ? "" : "Phone Number is required",
+    password: formData.password ? "" : "Password is required",
+    confirmPassword: formData.confirmPassword
+      ? formData.confirmPassword === formData.password
+        ? ""
+        : "Passwords do not match"
+      : "Confirm Password is required",
+  };
+
+  setErrors(newErrors);
+
+  if (Object.values(newErrors).some((error) => error !== "")) {
+    return;
+  }
+
+  const MemberData = {
+    name: formData.name,
+    phoneNumber: formData.phoneNumber,
+    email: formData.email,
+    password: formData.password,
+    confirmPassword: formData.confirmPassword,
+    socialLinks: {
+      website: formData.website,
+      discord: formData.discord,
+      youtube: formData.youtube,
+      twitter: formData.twitter,
+      instagram: formData.instagram,
+    },
+  };
+
+  try {
+    const response = await fetch(`${SERVER_URL}/api/register-user`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
       },
-    };
-
-    try {
-      const response = await fetch(`${SERVER_URL}/api/register-user`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(MemberData),
-      });
-    
-      if (response.ok) {
-        alert("Member created successfully!");
-      } else {
-        // Handle server-side error response
-        try {
-          // Attempt to parse JSON error response
-          const errorData = await response.json();
-          alert(`Failed to create Member: ${errorData.message || JSON.stringify(errorData)}`);
-        } catch (parseError) {
-          // Fallback to text if JSON parsing fails
-          const errorText = await response.text();
-          console.log(`Failed to create Member. Status: ${response.status} - ${errorText}`);
-        }
-      }
-    } catch (error) {
-      console.error("Error creating Member:", error);
-      
-      // Prepare error message
-      let errorMessage = "An error occurred while creating the Member.";
-      
-      // Add error details if available
-      if (error instanceof Error) {
-        errorMessage += `\nError: ${error.message}`;
-        // Include stack trace if needed (might be long)
-        errorMessage += `\nStack Trace: ${error.stack}`;
-      } else {
-        errorMessage += `\nError: ${String(error)}`;
-      }
-      
-      alert(errorMessage);
+      body: JSON.stringify(MemberData),
+    });
+    if (response.ok) {
+      alert("Member created successfully!");
+      navigate("/admin/member");
+    } else {
+      const errorData = await response.json();
+      alert(`Failed to create Member: ${errorData.message || JSON.stringify(errorData)}`);
     }
-  };
+  } catch (error) {
+    console.error("Error creating Member:", error);
+    alert("An error occurred while creating the Member.");
+  }
+};
 
   return (
     <div className="p-6">
@@ -203,12 +209,15 @@ export const AddMember = () => {
             </label>
             <input
               type="text"
-              className="w-full p-2 border rounded-lg"
+              className={`w-full p-2 border rounded-lg ${errors.name ? "border-red-500" : ""}`}
               name="name"
               value={formData.name}
               onChange={handleInputChange}
               placeholder="Full Name"
             />
+            {errors.name && (
+              <p className="text-red-500 text-sm mt-1">{errors.name}</p>
+            )}
           </div>
 
           <div>
@@ -217,12 +226,15 @@ export const AddMember = () => {
             </label>
             <input
               type="text"
-              className="w-full p-2 border rounded-lg"
+              className={`w-full p-2 border rounded-lg ${errors.username ? "border-red-500" : ""}`}
               name="username"
               value={formData.username}
               onChange={handleInputChange}
               placeholder="Username"
             />
+            {errors.username && (
+              <p className="text-red-500 text-sm mt-1">{errors.username}</p>
+            )}
           </div>
 
           <div>
@@ -231,12 +243,15 @@ export const AddMember = () => {
             </label>
             <input
               type="email"
-              className="w-full p-2 border rounded-lg"
+              className={`w-full p-2 border rounded-lg ${errors.email ? "border-red-500" : ""}`}
               name="email"
               value={formData.email}
               onChange={handleInputChange}
               placeholder="Email"
             />
+            {errors.email && (
+              <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+            )}
           </div>
 
           <div>
@@ -250,12 +265,17 @@ export const AddMember = () => {
               </select>
               <input
                 type="tel"
-                className="flex-1 p-2 border border-l-0 rounded-r-lg"
+                className={`w-full p-2 border rounded-lg ${errors.phoneNumber ? "border-red-500" : ""}`}
                 name="phoneNumber"
                 value={formData.phoneNumber}
                 onChange={handleInputChange}
                 placeholder="Enter Phone Number"
               />
+              {errors.phoneNumber && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.phoneNumber}
+                </p>
+              )}
             </div>
           </div>
 
@@ -337,12 +357,15 @@ export const AddMember = () => {
             </label>
             <input
               type="password"
-              className="w-full p-2 border rounded-lg"
+              className={`w-full p-2 border rounded-lg ${errors.password ? "border-red-500" : ""}`}
               name="password"
               value={formData.password}
               onChange={handleInputChange}
               placeholder="New Password"
             />
+            {errors.password && (
+              <p className="text-red-500 text-sm mt-1">{errors.password}</p>
+            )}
           </div>
 
           <div>
@@ -351,12 +374,17 @@ export const AddMember = () => {
             </label>
             <input
               type="password"
-              className="w-full p-2 border rounded-lg"
+              className={`w-full p-2 border rounded-lg ${errors.confirmPassword ? "border-red-500" : ""}`}
               name="confirmPassword"
               value={formData.confirmPassword}
               onChange={handleInputChange}
               placeholder="Confirm Password"
             />
+            {errors.confirmPassword && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.confirmPassword}
+              </p>
+            )}
           </div>
         </div>
 
