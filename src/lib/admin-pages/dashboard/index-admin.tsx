@@ -2,7 +2,7 @@ import Dashboard from "./dashboard";
 import Sales from "./sales";
 import TopTables from "./top-tables";
 import Visitors from "./visitors";
-import PageTraffic from "./page-traffic";
+import PageTraffic from "./page-visitors";
 
 const Admin = () => {
   return (
