@@ -5,6 +5,7 @@ import { SERVER_URL } from "@/middleware/utils";
 import BasicInformation from "./components/BasicInformation";
 import type { FormData, Column } from "./components/BasicInformation";
 import AddressSection from "./components/AddressSection";
+import { useNavigate } from "react-router-dom";
 
 // Define a type for social links.
 type SocialLinks = {
@@ -48,13 +49,17 @@ const EditProfilePage: React.FC = () => {
   const [bannerFile, setBannerFile] = useState<File | null>(null);
 
   // Flags for removal actions
-  const [profileImageRemoved, setProfileImageRemoved] = useState<boolean>(false);
+  const [profileImageRemoved, setProfileImageRemoved] =
+    useState<boolean>(false);
   const [bannerImageRemoved, setBannerImageRemoved] = useState<boolean>(false);
 
   // Helper to normalize image URLs
   const normalizeImageUrl = (rawPath: string): string => {
     let normalizedPath = rawPath.replace(/\\/g, "/").replace(/^src\//, "");
-    normalizedPath = normalizedPath.replace("uploadsprofile", "uploads/profile");
+    normalizedPath = normalizedPath.replace(
+      "uploadsprofile",
+      "uploads/profile"
+    );
     return `${SERVER_URL}/${normalizedPath}`;
   };
 
@@ -62,6 +67,8 @@ const EditProfilePage: React.FC = () => {
   const [selectedAddress, setSelectedAddress] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
+  const navigate = useNavigate();
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   // Fallback images
   const fallbackProfileImage =
@@ -70,7 +77,8 @@ const EditProfilePage: React.FC = () => {
     "https://images.unsplash.com/photo-1499336315816-097655dcfbda?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2710&q=80";
 
   // Profile & Banner image states with fallback values
-  const [profileImage, setProfileImage] = useState<string>(fallbackProfileImage);
+  const [profileImage, setProfileImage] =
+    useState<string>(fallbackProfileImage);
   const [bannerImage, setBannerImage] = useState<string>(fallbackBannerImage);
 
   // Refs for hidden file inputs
@@ -230,13 +238,24 @@ const EditProfilePage: React.FC = () => {
     try {
       setLoading(true);
       setError(null);
+      setSuccessMessage(null); // Reset pesan sukses sebelum request
 
       const socialLinksPayload = {
-        website: columns[0].enabled ? columns[0].value : originalSocialLinks.website,
-        discord: columns[1].enabled ? columns[1].value : originalSocialLinks.discord,
-        youtube: columns[2].enabled ? columns[2].value : originalSocialLinks.youtube,
-        twitter: columns[3].enabled ? columns[3].value : originalSocialLinks.twitter,
-        instagram: columns[4].enabled ? columns[4].value : originalSocialLinks.instagram,
+        website: columns[0].enabled
+          ? columns[0].value
+          : originalSocialLinks.website,
+        discord: columns[1].enabled
+          ? columns[1].value
+          : originalSocialLinks.discord,
+        youtube: columns[2].enabled
+          ? columns[2].value
+          : originalSocialLinks.youtube,
+        twitter: columns[3].enabled
+          ? columns[3].value
+          : originalSocialLinks.twitter,
+        instagram: columns[4].enabled
+          ? columns[4].value
+          : originalSocialLinks.instagram,
       };
 
       const formPayload = new FormData();
@@ -248,8 +267,14 @@ const EditProfilePage: React.FC = () => {
       formPayload.append("bio", formData.bio);
       formPayload.append("socialLinks", JSON.stringify(socialLinksPayload));
 
-      formPayload.append("removeProfileImage", profileImageRemoved ? "true" : "false");
-      formPayload.append("removeBannerImage", bannerImageRemoved ? "true" : "false");
+      formPayload.append(
+        "removeProfileImage",
+        profileImageRemoved ? "true" : "false"
+      );
+      formPayload.append(
+        "removeBannerImage",
+        bannerImageRemoved ? "true" : "false"
+      );
 
       if (profileFile) {
         formPayload.append("profileImage", profileFile);
@@ -258,21 +283,25 @@ const EditProfilePage: React.FC = () => {
         formPayload.append("bannerImage", bannerFile);
       }
 
-      const response = await axios.put(
-        `${SERVER_URL}/api/account/profile`,
-        formPayload,
-        {
-          withCredentials: true,
-          headers: { "Content-Type": "multipart/form-data" },
-        }
-      );
-      // Optionally, display a success message.
+      await axios.put(`${SERVER_URL}/api/account/profile`, formPayload, {
+        withCredentials: true,
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      // Tampilkan pesan sukses
+      setSuccessMessage("Profil berhasil diperbarui!");
+
+      // Hapus pesan sukses setelah 3 detik
+      setTimeout(() => {
+        setSuccessMessage(null);
+        navigate("/account"); // Redirect setelah update sukses
+      }, 3000);
     } catch (err: any) {
       console.error("Error updating profile", err);
       if (err.response && err.response.data && err.response.data.message) {
         setError(err.response.data.message);
       } else {
-        setError("Failed to update profile. Please try again.");
+        setError("Gagal memperbarui profil. Silakan coba lagi.");
       }
     } finally {
       setLoading(false);
@@ -282,6 +311,11 @@ const EditProfilePage: React.FC = () => {
   return (
     <div className="flex flex-col">
       {/* Background Banner */}
+      {successMessage && (
+        <div className="mt-4 p-3 bg-green-500 text-white rounded-lg">
+          {successMessage}
+        </div>
+      )}
       <section className="relative h-64">
         <div
           className="absolute top-0 w-full h-full bg-center bg-cover"
