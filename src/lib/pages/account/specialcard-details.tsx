@@ -1,32 +1,37 @@
+import {useState} from "react";
+import FusionModal from "./components/fusionModal";
+
 const SpecialCardDetail = () => {
+  const [showFusionModal, setShowFusionModal] = useState(false);
+
   const products = [
     {
       id: 1,
       name: "Magic Mushroom 0324",
       creator: "Shroomie",
       price: "Rp 200.000",
-      image: "/api/placeholder/400/400",
+      image: "/placeholder.svg?height=400&width=400",
     },
     {
       id: 2,
       name: "Happy Robot 032",
       creator: "BeKind2Robots",
       price: "Rp 200.000",
-      image: "/api/placeholder/400/400",
+      image: "/placeholder.svg?height=400&width=400",
     },
     {
       id: 3,
       name: "Happy Robot 024",
       creator: "BeKind2Robots",
       price: "Rp 200.000",
-      image: "/api/placeholder/400/400",
+      image: "/placeholder.svg?height=400&width=400",
     },
     {
       id: 4,
       name: "AstroFiction",
       creator: "Spaceone",
       price: "Rp 200.000",
-      image: "/api/placeholder/400/400",
+      image: "/placeholder.svg?height=400&width=400",
     },
   ];
 
@@ -62,7 +67,7 @@ const SpecialCardDetail = () => {
             >
               <div className="w-full sm:w-40 h-48 sm:h-40">
                 <img
-                  src={product.image}
+                  src={product.image || "/placeholder.svg"}
                   alt={product.name}
                   className="w-full h-full object-cover"
                 />
@@ -86,13 +91,30 @@ const SpecialCardDetail = () => {
         </div>
       </div>
 
+      {/* Fusion Button */}
+      <div className="flex justify-center mb-10">
+        <button
+          onClick={() => setShowFusionModal(true)}
+          className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-8 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105"
+        >
+          Fuse Cards to Create Special Card
+        </button>
+      </div>
+
+      {/* Fusion Modal */}
+      <FusionModal
+        isOpen={showFusionModal}
+        onClose={() => setShowFusionModal(false)}
+        products={products}
+      />
+
       {/* Created By Section */}
       <div className="mb-6 sm:mb-8">
         <h2 className="text-lg sm:text-xl font-bold mb-4">Created By</h2>
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 rounded-full bg-gray-200">
             <img
-              src="/api/placeholder/48/48"
+              src="/placeholder.svg?height=48&width=48"
               alt="Orbitian"
               className="w-full h-full rounded-full object-cover"
             />
@@ -142,7 +164,7 @@ const SpecialCardDetail = () => {
       </div>
 
       {/* Tags Section */}
-      <div>
+      <div className="mb-10">
         <h2 className="text-lg sm:text-xl font-bold mb-4">Tags</h2>
         <div className="flex flex-wrap gap-3">
           <span className="px-4 py-2 border border-call-to-action rounded-full text-call-to-action">

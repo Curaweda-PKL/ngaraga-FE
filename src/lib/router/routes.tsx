@@ -36,9 +36,11 @@ import {Payment} from "../admin-pages/payment";
 import {Admin} from "../admin-pages/admin/admin";
 import {AddAdmin} from "../admin-pages/admin/add-admin";
 import {ProfileSettings} from "../admin-pages/admin-profile";
+
 import AdminLogin from "../pages/auth/login/admin-login";
 import SentEmail from "../pages/auth/login/sentEmail";
 import SuccesRegist from "../pages/events/success-regist";
+
 import {EditProfileAdmin} from "../admin-pages/admin/edit-admin";
 import {EditCouponForm} from "../admin-pages/coupon/edit-coupon";
 import {RegisteredUsers} from "../admin-pages/event/registered-user";
@@ -106,7 +108,7 @@ export const routes: Array<PathRouteProps> = [
   {path: "/marketplace", element: <Marketplace />},
   {path: "/detail-cards/:id", element: <DetailCards />},
   {path: "/detail-special-card", element: <DetailSpecial />},
-  {path: "/special-card-detail/:id", element: <SpecialCardDetail />},
+  {path: "/special-card-detail", element: <SpecialCardDetail />},
   {path: "/view-detail", element: <ViewDetail />},
   {path: "/rankings", element: <TopCollectors />},
   {path: "/events", element: <BrowseEvents />},
