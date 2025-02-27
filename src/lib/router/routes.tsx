@@ -40,7 +40,10 @@ import {ProfileSettings} from "../admin-pages/admin-profile";
 import AdminLogin from "../pages/auth/login/admin-login";
 import SentEmail from "../pages/auth/login/sentEmail";
 import SuccesRegist from "../pages/events/success-regist";
-import {EditProfileAdmin} from "../admin-pages/admin/edit-admin";
+
+import { EditProfileAdmin } from "../admin-pages/admin/edit-admin";
+import { EditCouponForm } from "../admin-pages/coupon/edit-coupon";
+
 
 // Lazy-loaded Pages
 const Home = React.lazy(() => import("@/lib/pages/home/Home"));
@@ -103,7 +106,7 @@ export const routes: Array<PathRouteProps> = [
   {path: "/", element: <Home />},
   {path: "/account/:name", element: <Artists />},
   {path: "/marketplace", element: <Marketplace />},
-  {path: "/detail-cards", element: <DetailCards />},
+  {path: "/detail-cards/:id", element: <DetailCards />},
   {path: "/detail-special-card", element: <DetailSpecial />},
   {path: "/special-card-detail", element: <SpecialCardDetail />},
   {path: "/view-detail", element: <ViewDetail />},
@@ -153,6 +156,7 @@ export const adminRoutes: Array<PathRouteProps> = [
   { path: "add-event", element: <AddEvents /> },
   { path: "coupon", element: <Coupon /> },
   { path: "add-coupon", element: <AddCouponForm /> },
+  {path: "edit-coupon", element: <EditCouponForm />},
   { path: "creator", element: <Creator /> },
   { path: "member", element: <Member /> },
   { path: "add-member", element: <AddMember /> },

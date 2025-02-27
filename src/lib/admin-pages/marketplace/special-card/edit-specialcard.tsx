@@ -1,73 +1,197 @@
-import React, {useState, ChangeEvent} from "react";
-import {Upload} from "lucide-react";
-import {
-  Palette,
-  Shapes,
-  Music,
-  Camera,
-  Video,
-  Wrench,
-  Trophy,
-  Glasses,
-} from "lucide-react";
+import React, { ChangeEvent, useEffect, useState } from "react";
+import axios from "axios";
+import "react-quill/dist/quill.snow.css";
+import { useNavigate, useParams } from "react-router-dom";
+
+import CardForm from "../card/addcard/components/cardForm";
+import CardSettings from "../card/addcard/components/cardSetting";
+import { SERVER_URL } from "@/middleware/utils";
 
 export const EditSpecialCard = () => {
+  const navigate = useNavigate();
+  const { id } = useParams<{ id: string }>();
+
+  // States for API data
+  const [apiCategories, setApiCategories] = useState<
+    { id: number; name: string; image: string | null }[]
+  >([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
+  const [categoriesError, setCategoriesError] = useState<string | null>(null);
+
+  const [apiCreators, setApiCreators] = useState<
+    { id: number; name: string; image: string | null }[]
+  >([]);
+  const [creatorsLoading, setCreatorsLoading] = useState(true);
+  const [creatorsError, setCreatorsError] = useState<string | null>(null);
+
+  const [apiTags, setApiTags] = useState<{ id: number; name: string }[]>([]);
+  const [tagsLoading, setTagsLoading] = useState(true);
+  const [tagsError, setTagsError] = useState<string | null>(null);
+
+  // Message state to display success or error messages
+  const [message, setMessage] = useState<{
+    type: "error" | "success";
+    text: string;
+  } | null>(null);
+
+  // Form data state (now including discountedPrice)
   const [formData, setFormData] = useState({
     cardImage: null as string | ArrayBuffer | null,
     cardName: "",
     sku: "",
     price: "",
     salePrice: false,
+    discountedPrice: "", // NEW FIELD
     stock: "",
     cardDetails: "",
     categories: [] as string[],
     creator: false,
+    selectedCreator: "",
     tag: false,
+    tags: [] as string[],
     source: false,
+    sourceImageWebsite: "",
+    sourceImageAlt: "",
+    cardType: "SPECIAL",
   });
 
-  const categories = [
-    {name: "Art", icon: <Palette className="w-4 h-4" />},
-    {name: "Collectibles", icon: <Shapes className="w-4 h-4" />},
-    {name: "Music", icon: <Music className="w-4 h-4" />},
-    {name: "Photography", icon: <Camera className="w-4 h-4" />},
-    {name: "Video", icon: <Video className="w-4 h-4" />},
-    {name: "Utility", icon: <Wrench className="w-4 h-4" />},
-    {name: "Sport", icon: <Trophy className="w-4 h-4" />},
-    {name: "Virtual Worlds", icon: <Glasses className="w-4 h-4" />},
-  ];
+  // Store file for upload
+  const [cardFile, setCardFile] = useState<File | null>(null);
 
-  const creators = [
-    {name: "Astrovia", avatar: "/api/placeholder/32/32"},
-    {name: "Cosmara", avatar: "/api/placeholder/32/32"},
-    {name: "Stellaris", avatar: "/api/placeholder/32/32"},
-    {name: "Nebulion", avatar: "/api/placeholder/32/32"},
-    {name: "Galactica", avatar: "/api/placeholder/32/32"},
-  ];
+  // Fetch categories
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await axios.get(`${SERVER_URL}/api/categories/all`);
+        const categoriesData = response.data.categories.map((cat: any) => ({
+          id: cat.id,
+          name: cat.name,
+          image: cat.image
+            ? `${SERVER_URL}/${cat.image.replace(/\\/g, "/")}`
+            : null,
+        }));
+        setApiCategories(categoriesData);
+        setCategoriesError(null);
+      } catch (err) {
+        setCategoriesError("Failed to load categories");
+        setApiCategories([]);
+      } finally {
+        setCategoriesLoading(false);
+      }
+    };
 
-  const tags = [
-    "Animation Voyager",
-    "Illustration Culture",
-    "Moon Hopper",
-    "Animation Traveler",
-    "Comet Illustration",
-  ];
+    fetchCategories();
+  }, []);
 
+  // Fetch creators
+  useEffect(() => {
+    const fetchCreators = async () => {
+      try {
+        const response = await axios.get(`${SERVER_URL}/api/creator/all`);
+        const creatorsData = response.data.creators.map((creator: any) => ({
+          id: creator.id,
+          name: creator.name,
+          image: creator.image
+            ? `${SERVER_URL}/uploads/creator/${encodeURIComponent(creator.image)}`
+            : null,
+        }));
+        setApiCreators(creatorsData);
+        setCreatorsError(null);
+      } catch (error) {
+        console.error("Error fetching creators:", error);
+        setCreatorsError("Failed to load creators");
+        setApiCreators([]);
+      } finally {
+        setCreatorsLoading(false);
+      }
+    };
+
+    fetchCreators();
+  }, []);
+
+  // Preload creator images for smoother toggle experience.
+  useEffect(() => {
+    if (!creatorsLoading && !creatorsError) {
+      apiCreators.forEach((creator) => {
+        if (creator.image) {
+          const img = new Image();
+          img.src = creator.image;
+        }
+      });
+    }
+  }, [creatorsLoading, creatorsError, apiCreators]);
+
+  // Fetch tags
+  useEffect(() => {
+    const fetchTags = async () => {
+      try {
+        const response = await axios.get(`${SERVER_URL}/api/tags/all`);
+        setApiTags(response.data.tags);
+        setTagsError(null);
+      } catch (error) {
+        console.error("Error fetching tags:", error);
+        setTagsError("Failed to load tags");
+        setApiTags([]);
+      } finally {
+        setTagsLoading(false);
+      }
+    };
+
+    fetchTags();
+  }, []);
+
+  // Fetch existing card details using id from route.
+  useEffect(() => {
+    const fetchCardDetails = async () => {
+      try {
+        const response = await axios.get(`${SERVER_URL}/api/cards/${id}`);
+        const card = response.data.card;
+        setFormData({
+          cardImage: card.image || null,
+          cardName: card.characterName || card.name || "",
+          sku: card.sku || "",
+          price: card.price ? card.price.toString() : "",
+          salePrice: !!card.discountedPrice,
+          discountedPrice: card.discountedPrice ? card.discountedPrice.toString() : "",
+          stock: card.stock ? card.stock.toString() : "",
+          cardDetails: card.cardDetail || "",
+          categories: [card.categoryId.toString()],
+          creator: false,
+          selectedCreator: card.creatorIds ? card.creatorIds[0].toString() : "",
+          tag: false,
+          tags: card.tagIds ? card.tagIds.map((id: number) => id.toString()) : [],
+          source: false,
+          sourceImageWebsite: "",
+          sourceImageAlt: "",
+          cardType: card.cardType || "SPECIAL",
+        });
+      } catch (error: any) {
+        setMessage({ type: "error", text: error.response?.data?.message || error.message });
+      }
+    };
+
+    if (id) {
+      fetchCardDetails();
+    }
+  }, [id]);
+
+  // Input change handler
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    const {name, value, type} = e.target;
-    const newValue =
-      type === "checkbox" ? (e.target as HTMLInputElement).checked : value;
+    const { name, value, type } = e.target;
+    const newValue = type === "checkbox" ? (e.target as HTMLInputElement).checked : value;
     setFormData((prev) => ({
       ...prev,
       [name]: newValue,
     }));
   };
 
+  // Image upload handler
   const handleImageUpload = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
+      setCardFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
         setFormData((prev) => ({
@@ -79,6 +203,7 @@ export const EditSpecialCard = () => {
     }
   };
 
+  // Drag and drop handlers for image upload
   const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
   };
@@ -87,6 +212,7 @@ export const EditSpecialCard = () => {
     event.preventDefault();
     const file = event.dataTransfer.files?.[0];
     if (file) {
+      setCardFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
         setFormData((prev) => ({
@@ -98,279 +224,130 @@ export const EditSpecialCard = () => {
     }
   };
 
+  // Cancel handler
+  const handleCancel = () => {
+    navigate("/admin/card");
+  };
+
+  // Save handler (edit existing card)
+  const handleSave = async () => {
+    try {
+      // Basic validations.
+      if (formData.categories.length === 0) {
+        throw new Error("Please select a category.");
+      }
+      if (!formData.cardName || !formData.sku || !formData.stock) {
+        throw new Error("Card name, SKU, and stock are required.");
+      }
+
+      // Create FormData payload for multipart/form-data.
+      const payload = new FormData();
+      payload.append("characterName", formData.cardName);
+      payload.append("sku", formData.sku);
+      payload.append("price", formData.price);
+      payload.append("discountedPrice", formData.discountedPrice);
+      payload.append("stock", formData.stock);
+      payload.append("cardDetail", formData.cardDetails);
+      payload.append("categoryId", formData.categories[0]);
+      payload.append("tagIds", JSON.stringify(formData.tags.map((tag) => Number(tag))));
+      payload.append("creatorIds", JSON.stringify([Number(formData.selectedCreator)]));
+      payload.append("ownerId", "");
+      payload.append("cardType", "SPECIAL");
+
+      if (formData.source) {
+        payload.append(
+          "sourceImage",
+          JSON.stringify({
+            website: formData.sourceImageWebsite,
+            alt: formData.sourceImageAlt,
+          })
+        );
+      }
+
+      if (cardFile) {
+        payload.append("image", cardFile);
+      }
+
+      // Send PUT request to update the card.
+      const response = await axios.put(`${SERVER_URL}/api/cards/edit/${id}`, payload, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      setMessage({ type: "success", text: "Card updated successfully!" });
+      setTimeout(() => {
+        navigate("/admin/card");
+      }, 1500);
+    } catch (error: any) {
+      console.error("Error updating card:", error.response?.data || error.message);
+      setMessage({
+        type: "error",
+        text:
+          error.response?.data?.message ||
+          error.message ||
+          "Failed to update card.",
+      });
+    }
+  };
+
   return (
     <div className="max-w-7xl mx-auto p-6">
-      <h1 className="text-2xl font-semibold mb-6">Add Special Card</h1>
+      <h1 className="text-2xl font-semibold mb-6">Edit Card</h1>
+
+      {/* Message display */}
+      {message && (
+        <div
+          className={`p-4 rounded-lg mb-4 ${
+            message.type === "error"
+              ? "bg-red-100 text-red-700"
+              : "bg-green-100 text-green-700"
+          }`}
+        >
+          {message.text}
+        </div>
+      )}
 
       <div className="grid grid-cols-2 gap-6">
         {/* Left Column - Form Fields */}
-        <div className="space-y-6">
-          <div>
-            <label className="block mb-2 text-sm">Card Image *</label>
-            <div
-              className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center bg-gray-50"
-              onDragOver={handleDragOver}
-              onDrop={handleDrop}
-            >
-              {formData.cardImage ? (
-                <img
-                  src={formData.cardImage.toString()}
-                  alt="Card"
-                  className="w-full h-48 object-cover rounded-lg"
-                />
-              ) : (
-                <div className="space-y-4">
-                  <div className="flex justify-center">
-                    <button className="px-4 py-2 bg-yellow-500 text-white rounded-lg flex items-center gap-2">
-                      <Upload size={20} />
-                      Browse
-                    </button>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={handleImageUpload}
-                    />
-                  </div>
-                  <p className="text-sm text-gray-500">
-                    Click to Upload or Drag & Drop
-                  </p>
-                  <p className="text-xs text-gray-400">
-                    jpeg, jpg, png, max 4mb
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
-
-          <div>
-            <label className="block mb-2 text-sm">Card Name *</label>
-            <input
-              type="text"
-              name="cardName"
-              value={formData.cardName}
-              onChange={handleInputChange}
-              className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
-            />
-          </div>
-
-          <div>
-            <label className="block mb-2 text-sm">SKU *</label>
-            <input
-              type="text"
-              name="sku"
-              value={formData.sku}
-              onChange={handleInputChange}
-              className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
-            />
-          </div>
-
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <label className="text-sm">Price *</label>
-              <div className="relative inline-block w-10 mr-2 align-middle select-none">
-                <input
-                  type="checkbox"
-                  name="salePrice"
-                  checked={formData.salePrice}
-                  onChange={handleInputChange}
-                  className="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer"
-                />
-                <label className="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"></label>
-              </div>
-            </div>
-            <input
-              type="text"
-              name="price"
-              value={formData.price}
-              onChange={handleInputChange}
-              className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
-            />
-          </div>
-
-          <div>
-            <label className="block mb-2 text-sm">Stock *</label>
-            <input
-              type="text"
-              name="stock"
-              value={formData.stock}
-              onChange={handleInputChange}
-              className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
-            />
-          </div>
-
-          <div>
-            <label className="block mb-2 text-sm">Card Details</label>
-            <div className="border rounded-lg">
-              <div className="flex gap-2 p-2 border-b">
-                {/* Rich Text Editor Controls */}
-                <button className="p-1 hover:bg-gray-100 rounded">
-                  <svg
-                    className="w-4 h-4"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      fill="currentColor"
-                      d="M13 5h-2v6H5v2h6v6h2v-6h6v-2h-6z"
-                    />
-                  </svg>
-                </button>
-                {/* Add more editor controls as needed */}
-              </div>
-              <textarea
-                name="cardDetails"
-                value={formData.cardDetails}
-                onChange={handleInputChange}
-                className="w-full p-4 min-h-[200px] focus:outline-none"
-                placeholder="Write your card details..."
-              />
-            </div>
-          </div>
-        </div>
+        <CardForm
+          formData={formData}
+          handleInputChange={handleInputChange}
+          handleImageUpload={handleImageUpload}
+          handleDragOver={handleDragOver}
+          handleDrop={handleDrop}
+          setFormData={setFormData}
+        />
 
         {/* Right Column - Categories and Settings */}
-        <div className="space-y-6">
-          <div>
-            <label className="block mb-2 text-sm">Categories *</label>
-            <div className="space-y-2 bg-white p-4 rounded-lg border">
-              {categories.map((category) => (
-                <label
-                  key={category.name}
-                  className="flex items-center gap-2 p-2 hover:bg-gray-50 rounded-lg cursor-pointer"
-                >
-                  <input
-                    type="checkbox"
-                    className="form-checkbox"
-                    checked={formData.categories.includes(category.name)}
-                    onChange={(e) => {
-                      const newCategories = e.target.checked
-                        ? [...formData.categories, category.name]
-                        : formData.categories.filter(
-                            (c) => c !== category.name
-                          );
-                      setFormData((prev) => ({
-                        ...prev,
-                        categories: newCategories,
-                      }));
-                    }}
-                  />
-                  <span className="flex items-center gap-2">
-                    {category.icon}
-                    {category.name}
-                  </span>
-                </label>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <label className="text-sm">Creator</label>
-              <div className="relative inline-block w-10 mr-2 align-middle select-none">
-                <input
-                  type="checkbox"
-                  name="creator"
-                  checked={formData.creator}
-                  onChange={handleInputChange}
-                  className="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer"
-                />
-                <label className="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"></label>
-              </div>
-            </div>
-            {formData.creator && (
-              <div className="space-y-2 bg-white p-4 rounded-lg border">
-                {creators.map((creator) => (
-                  <label
-                    key={creator.name}
-                    className="flex items-center gap-2 p-2 hover:bg-gray-50 rounded-lg cursor-pointer"
-                  >
-                    <input
-                      type="radio"
-                      name="creator"
-                      className="form-radio"
-                    />
-                    <img
-                      src={creator.avatar}
-                      alt={creator.name}
-                      className="w-8 h-8 rounded-full"
-                    />
-                    <span>{creator.name}</span>
-                  </label>
-                ))}
-              </div>
-            )}
-          </div>
-
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <label className="text-sm">Tag</label>
-              <div className="relative inline-block w-10 mr-2 align-middle select-none">
-                <input
-                  type="checkbox"
-                  name="tag"
-                  checked={formData.tag}
-                  onChange={handleInputChange}
-                  className="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer"
-                />
-                <label className="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"></label>
-              </div>
-            </div>
-            {formData.tag && (
-              <div className="space-y-2 bg-white p-4 rounded-lg border">
-                {tags.map((tag) => (
-                  <label
-                    key={tag}
-                    className="flex items-center gap-2 p-2 hover:bg-gray-50 rounded-lg cursor-pointer"
-                  >
-                    <input
-                      type="checkbox"
-                      className="form-checkbox"
-                    />
-                    <span>{tag}</span>
-                  </label>
-                ))}
-              </div>
-            )}
-          </div>
-
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <label className="text-sm">Source</label>
-              <div className="relative inline-block w-10 mr-2 align-middle select-none">
-                <input
-                  type="checkbox"
-                  name="source"
-                  checked={formData.source}
-                  onChange={handleInputChange}
-                  className="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer"
-                />
-                <label className="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"></label>
-              </div>
-            </div>
-            {formData.source && (
-              <div className="space-y-2">
-                <input
-                  type="text"
-                  placeholder="View on Etherscan"
-                  className="w-full p-2 border rounded-lg"
-                />
-                <input
-                  type="text"
-                  placeholder="View Original"
-                  className="w-full p-2 border rounded-lg"
-                />
-              </div>
-            )}
-          </div>
-        </div>
+        <CardSettings
+          formData={formData}
+          handleInputChange={handleInputChange}
+          setFormData={setFormData}
+          apiCategories={apiCategories}
+          categoriesLoading={categoriesLoading}
+          categoriesError={categoriesError}
+          apiCreators={apiCreators}
+          creatorsLoading={creatorsLoading}
+          creatorsError={creatorsError}
+          apiTags={apiTags}
+          tagsLoading={tagsLoading}
+          tagsError={tagsError}
+        />
       </div>
 
       {/* Action Buttons */}
       <div className="flex justify-end gap-4 mt-6">
-        <button className="px-6 py-2 border rounded-lg hover:bg-gray-50">
+        <button
+          onClick={handleCancel}
+          className="px-6 py-2 border rounded-lg hover:bg-gray-50"
+        >
           Cancel
         </button>
-        <button className="px-6 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600">
+        <button
+          onClick={handleSave}
+          className="px-6 py-2 bg-call-to-actions-900 text-white rounded-lg hover:bg-call-to-actions-800"
+        >
           Save
         </button>
       </div>

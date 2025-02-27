@@ -7,7 +7,7 @@ import FilterModal from "./modal-sm";
 import { SERVER_URL } from "@/middleware/utils";
 
 interface MarketHeaderProps {
-  onFilteredCards: (cards: any[]) => void;
+  onFilteredCards: (cards: any[] | null) => void; // Updated to accept null
 }
 
 export const MarketHeader: React.FC<MarketHeaderProps> = ({ onFilteredCards }) => {
@@ -38,28 +38,43 @@ export const MarketHeader: React.FC<MarketHeaderProps> = ({ onFilteredCards }) =
     fetchPageContent();
   }, []);
 
-  // Fetch filtered cards and pass them up via onFilteredCards prop
   useEffect(() => {
+    const fetchFilteredCards = async () => {
+      try {
+        const response = await fetch(`${SERVER_URL}/api/filter/cards?type=${selectedFilter}`);
+        if (!response.ok) throw new Error("Failed to fetch filtered cards");
+
+        const data = await response.json();
+        if (!data.cards || !Array.isArray(data.cards)) throw new Error("Invalid data format");
+
+        // Update this transformation as needed based on your API response
+        const transformedCards = data.cards.map((card: any) => ({
+          id: card?.id ?? "Unknown",
+          name: card?.product?.name ?? "Unnamed Card",
+          category: card?.product?.category?.name ?? "Unknown Category",
+          image: card?.product?.image ?? "",
+          price: card?.product?.price ?? 0,
+          discountedPrice: card?.product?.discountedPrice ?? 0
+        }));
+
+        onFilteredCards(transformedCards);
+      } catch (error) {
+        console.error("Error fetching filtered cards:", error);
+        onFilteredCards([]);
+      }
+    };
+
     if (selectedFilter === "NORMAL" || selectedFilter === "SPECIAL") {
-      const fetchFilteredCards = async () => {
-        try {
-          const response = await fetch(`${SERVER_URL}/api/filter/cards?type=${selectedFilter}`);
-          if (!response.ok) throw new Error("Failed to fetch filtered cards");
-          const data = await response.json();
-          onFilteredCards(data.cards); // Pass the cards up to the parent
-        } catch (error) {
-          console.error("Error fetching filtered cards:", error);
-          onFilteredCards([]); // Clear cards on error
-        }
-      };
       fetchFilteredCards();
     } else {
-      onFilteredCards([]); // No valid filter selected
+      onFilteredCards(null);
     }
   }, [selectedFilter, onFilteredCards]);
 
   const handleSelectFilter = (filter: string) => {
-    setSelectedFilter(filter);
+    if (filter !== selectedFilter) {
+      setSelectedFilter(filter);
+    }
   };
 
   return (
@@ -98,10 +113,22 @@ export const MarketHeader: React.FC<MarketHeaderProps> = ({ onFilteredCards }) =
               onApply={() => setIsModalOpen(false)}
             >
               <ul>
-                <li className="py-2" onClick={() => handleSelectFilter("NORMAL")}>
+                <li
+                  className="py-2"
+                  onClick={() => {
+                    handleSelectFilter("NORMAL");
+                    setIsModalOpen(false);
+                  }}
+                >
                   NORMAL
                 </li>
-                <li className="py-2" onClick={() => handleSelectFilter("SPECIAL")}>
+                <li
+                  className="py-2"
+                  onClick={() => {
+                    handleSelectFilter("SPECIAL");
+                    setIsModalOpen(false);
+                  }}
+                >
                   SPECIAL
                 </li>
               </ul>
