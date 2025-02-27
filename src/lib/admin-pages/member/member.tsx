@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState } from "react";
-import DatePicker from "react-datepicker";
+import { useEffect, useState } from "react";
+// Removed: import DatePicker from "react-datepicker";
+// Removed: import "react-datepicker/dist/react-datepicker.css";
 import { FaPlus, FaEyeSlash, FaSearch, FaTrash } from "react-icons/fa";
-import "react-datepicker/dist/react-datepicker.css";
 import { PaginationMember } from "./components/paginationMember";
 import { LensIcon } from "./components/svgsIconMember/lensIcon";
 import { EyeIcon } from "./components/svgsIconMember/eyeIcon";
@@ -125,12 +125,7 @@ export const Member = () => {
 
     if (selectedUsers.length === 0) return;
 
-    const confirmDelete = window.confirm(
-      `Are you sure you want to delete ${selectedUsers.length} user(s)?`
-    );
-
-    if (!confirmDelete) return;
-
+    // Remove confirmation prompt and delete directly
     setLoading(true);
     try {
       for (const user of selectedUsers) {
@@ -150,10 +145,8 @@ export const Member = () => {
         prev.filter((user) => !selectedUsers.some((u) => u.id === user.id))
       );
 
-      setSuccessMessage("User successfully deleted!"); // Tambah pesan sukses
+      setSuccessMessage("User successfully deleted!");
       setError(null);
-
-      // Hapus pesan sukses setelah 3 detik
       setTimeout(() => setSuccessMessage(null), 3000);
     } catch (err: any) {
       setError(err.message || "Failed to delete users");
@@ -162,14 +155,9 @@ export const Member = () => {
     }
   };
 
+  // Suspend action now occurs directly without confirmation
   const handleSuspend = async (userId: string) => {
     if (!userId) return;
-
-    const confirmSuspend = window.confirm(
-      "Are you sure you want to suspend this user?"
-    );
-    if (!confirmSuspend) return;
-
     setLoading(true);
     try {
       const response = await fetch(
@@ -188,6 +176,8 @@ export const Member = () => {
           user.id === userId ? { ...user, isSuspended: true } : user
         )
       );
+      setSuccessMessage("User successfully suspended!");
+      setTimeout(() => setSuccessMessage(null), 3000);
     } catch (err: any) {
       setError(err.message || "Failed to suspend user");
     } finally {
@@ -195,14 +185,9 @@ export const Member = () => {
     }
   };
 
+  // Unsuspend action now occurs directly without confirmation
   const handleUnsuspend = async (userId: string) => {
     if (!userId) return;
-
-    const confirmUnsuspend = window.confirm(
-      "Are you sure you want to unsuspend this user?"
-    );
-    if (!confirmUnsuspend) return;
-
     setLoading(true);
     try {
       const response = await fetch(
@@ -221,6 +206,8 @@ export const Member = () => {
           user.id === userId ? { ...user, isSuspended: false } : user
         )
       );
+      setSuccessMessage("User successfully unsuspended!");
+      setTimeout(() => setSuccessMessage(null), 3000);
     } catch (err: any) {
       setError(err.message || "Failed to unsuspend user");
     } finally {
@@ -228,24 +215,18 @@ export const Member = () => {
     }
   };
 
+  // Bulk suspend/unsuspend without alerts; sets an error message if no user is selected
   const handleBulkSuspendUnsuspend = async () => {
     const selectedUsers = memberData.filter((user) => user.checked);
 
     if (selectedUsers.length === 0) {
-      alert("Please select at least one user to suspend/unsuspend");
+      setError("Please select at least one user to suspend/unsuspend");
+      setTimeout(() => setError(null), 3000);
       return;
     }
 
     const isSuspending = selectedUsers.some((user) => !user.isSuspended);
     const action = isSuspending ? "suspend" : "unsuspend";
-
-    const confirmAction = window.confirm(
-      `Are you sure you want to ${action} these users?\n\n${selectedUsers
-        .map((user) => user.name)
-        .join(", ")}`
-    );
-
-    if (!confirmAction) return;
 
     setLoading(true);
     try {
@@ -257,7 +238,6 @@ export const Member = () => {
         )
       );
 
-      // Update state setelah berhasil
       setMemberData((prev) =>
         prev.map((user) =>
           selectedUsers.some((u) => u.id === user.id)
@@ -298,12 +278,12 @@ export const Member = () => {
 
       {loading && <div>Loading...</div>}
       {error && <div className="text-red-500 mb-4">Error: {error}</div>}
-
       {successMessage && (
         <div className="bg-green-100 text-green-700 border border-green-400 p-3 rounded-md mb-4">
           {successMessage}
         </div>
       )}
+
       <div className="flex justify-evenly items-center mb-6">
         <div className="flex items-center">
           <button className="bg-call-to-actions-900 hover:bg-call-to-actions-800 text-white px-4 py-2 rounded-lg flex items-center gap-2">
@@ -312,20 +292,25 @@ export const Member = () => {
               <a href="/admin/add-member">Add Member</a>
             </span>
           </button>
-          <button
-            onClick={handleBulkSuspendUnsuspend}
-            className="border ml-2 border-call-to-actions-900 hover:bg-call-to-actions-200 text-call-to-actions-900 px-4 py-2 rounded-lg flex items-center gap-2"
-          >
-            <FaEyeSlash />
-            <span>Hide</span>
-          </button>
-          <button
-            onClick={() => handleDelete()}
-            className="border border-danger-colors-700 text-danger-colors-700 rounded-lg flex items-center ml-2 px-4 py-2 hover:bg-danger-colors-200 gap-2"
-          >
-            <FaTrash className="w-4 h-4" />
-            <span>Delete</span>
-          </button>
+          {filteredMembers.length > 0 &&
+            filteredMembers.every((member) => member.checked) && (
+              <>
+                <button
+                  onClick={handleBulkSuspendUnsuspend}
+                  className="border ml-2 border-call-to-actions-900 hover:bg-call-to-actions-200 text-call-to-actions-900 px-4 py-2 rounded-lg flex items-center gap-2"
+                >
+                  <FaEyeSlash />
+                  <span>Hide</span>
+                </button>
+                <button
+                  onClick={() => handleDelete()}
+                  className="border border-danger-colors-700 text-danger-colors-700 rounded-lg flex items-center ml-2 px-4 py-2 hover:bg-danger-colors-200 gap-2"
+                >
+                  <FaTrash className="w-4 h-4" />
+                  <span>Delete</span>
+                </button>
+              </>
+            )}
         </div>
 
         <div className="flex gap-4 flex-grow justify-end">
@@ -341,31 +326,34 @@ export const Member = () => {
           </div>
 
           <div className="flex gap-2">
-            <DatePicker
-              selected={startDate}
-              onChange={(date: Date | null) => handleDateChange(date, "start")}
-              selectsStart
-              startDate={startDate}
-              endDate={endDate}
-              placeholderText="From"
+            {/* Native HTML Date Picker for Start Date */}
+            <input
+              type="date"
+              value={startDate ? startDate.toISOString().slice(0, 10) : ""}
+              onChange={(e) => {
+                const date = e.target.value ? new Date(e.target.value) : null;
+                handleDateChange(date, "start");
+              }}
+              max={endDate ? endDate.toISOString().slice(0, 10) : undefined}
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-36 p-2.5"
             />
             <span className="text-gray-500">-</span>
-            <DatePicker
-              selected={endDate}
-              onChange={(date: Date | null) => handleDateChange(date, "end")}
-              selectsEnd
-              startDate={startDate}
-              endDate={endDate}
-              minDate={startDate}
-              placeholderText="To"
+            {/* Native HTML Date Picker for End Date */}
+            <input
+              type="date"
+              value={endDate ? endDate.toISOString().slice(0, 10) : ""}
+              onChange={(e) => {
+                const date = e.target.value ? new Date(e.target.value) : null;
+                handleDateChange(date, "end");
+              }}
+              min={startDate ? startDate.toISOString().slice(0, 10) : undefined}
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-36 p-2.5"
             />
           </div>
         </div>
       </div>
 
-      <div className="bg-white rounded-lg  overflow-hidden">
+      <div className="bg-white rounded-lg overflow-hidden">
         <table className="w-full">
           <thead>
             <tr className="text-neutral-colors-700 font-[200]">
