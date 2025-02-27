@@ -55,13 +55,20 @@ export const EditEvents = () => {
   const [cardsLoading, setCardsLoading] = useState<boolean>(false);
   const [cardsError, setCardsError] = useState<string>("");
 
+  // Temporary state to store the selected card id from event details
+  const [initialSelectedCardId, setInitialSelectedCardId] = useState<number | null>(null);
+
   // Fetch cards on mount
   useEffect(() => {
     const fetchCards = async () => {
       setCardsLoading(true);
       try {
         const response = await axios.get(`${SERVER_URL}/api/cards/all`);
-        setCards(response.data.cards);
+        if (response.data && response.data.cards) {
+          setCards(response.data.cards);
+        } else {
+          setCardsError("No cards data found.");
+        }
       } catch (error) {
         console.error("Error fetching cards:", error);
         setCardsError("Failed to fetch cards.");
@@ -104,45 +111,25 @@ export const EditEvents = () => {
             setFormData((prev) => ({ ...prev, eventTime: formattedTime }));
           }
           
-          // Set image previews if available - FIXED to handle non-string values
+          // Set image previews if available - handling possible non-string values
           if (event.eventImage) {
-            if (typeof event.eventImage === 'string') {
-              setEventImagePreview(
-                `${SERVER_URL}/src/uploads/event/${event.eventImage.replace(/\\/g, "/")}`
-              );
-            } else {
-              setEventImagePreview(
-                `${SERVER_URL}/src/uploads/event/${event.eventImage}`
-              );
-            }
+            const imagePath = typeof event.eventImage === "string"
+              ? event.eventImage.replace(/\\/g, "/")
+              : event.eventImage;
+            setEventImagePreview(`${SERVER_URL}/src/uploads/event/${imagePath}`);
           }
-          
           if (event.eventSpecialGuestImage) {
-            if (typeof event.eventSpecialGuestImage === 'string') {
-              setGuestAvatarPreview(
-                `${SERVER_URL}/src/uploads/event/${event.eventSpecialGuestImage.replace(/\\/g, "/")}`
-              );
-            } else {
-              setGuestAvatarPreview(
-                `${SERVER_URL}/src/uploads/event/${event.eventSpecialGuestImage}`
-              );
-            }
+            const guestPath = typeof event.eventSpecialGuestImage === "string"
+              ? event.eventSpecialGuestImage.replace(/\\/g, "/")
+              : event.eventSpecialGuestImage;
+            setGuestAvatarPreview(`${SERVER_URL}/src/uploads/event/${guestPath}`);
           }
           
-          // If cardRewards exist, assume the first card as selected
+          // If cardRewards exist, store the card id and enable event benefit
           if (event.cardRewards && event.cardRewards.length > 0) {
-            const card = event.cardRewards[0];
-            setFormData((prev) => ({
-              ...prev,
-              eventBenefit: true,
-              selectedCard: {
-                value: card.id,
-                label: card.name,
-                image: typeof card.image === 'string' 
-                  ? `${SERVER_URL}/${card.image.replace(/\\/g, "/")}` 
-                  : `${SERVER_URL}/${card.image}`,
-              },
-            }));
+            const cardReward = event.cardRewards[0];
+            setFormData((prev) => ({ ...prev, eventBenefit: true }));
+            setInitialSelectedCardId(cardReward.id);
           }
         } catch (error) {
           console.error("Error fetching event details:", error);
@@ -152,12 +139,31 @@ export const EditEvents = () => {
     }
   }, [id]);
 
-  // Create react-select options for cards - FIXED to handle non-string values
+  // Once cards and initialSelectedCardId are available, update selectedCard
+  useEffect(() => {
+    if (initialSelectedCardId && cards.length > 0) {
+      const selected = cards.find(card => card.id === initialSelectedCardId);
+      if (selected) {
+        setFormData(prev => ({
+          ...prev,
+          selectedCard: {
+            value: selected.id,
+            label: selected.name,
+            image: typeof selected.image === "string"
+              ? `${SERVER_URL}/${selected.image.replace(/\\/g, "/")}`
+              : `${SERVER_URL}/${selected.image}`,
+          }
+        }));
+      }
+    }
+  }, [cards, initialSelectedCardId]);
+
+  // Create react-select options for cards - handling possible non-string values
   const cardOptions: CardOption[] = cards.map((card) => ({
     value: card.id,
     label: card.name,
-    image: typeof card.image === 'string' 
-      ? `${SERVER_URL}/${card.image.replace(/\\/g, "/")}` 
+    image: typeof card.image === "string"
+      ? `${SERVER_URL}/${card.image.replace(/\\/g, "/")}`
       : `${SERVER_URL}/${card.image}`,
   }));
 
@@ -266,9 +272,9 @@ export const EditEvents = () => {
     if (formData.eventImage) {
       data.append("eventImage", formData.eventImage);
     }
-    // Send card reward info if applicable
+    // If event benefit is enabled, send cardRewards as a simple array of card IDs.
     if (formData.eventBenefit && formData.selectedCard) {
-      data.append("cardRewards", formData.selectedCard.value.toString());
+      data.append("cardRewards", JSON.stringify([formData.selectedCard.value]));
     }
     if (formData.eventType === "ONLINE") {
       data.append("onlineZoomLink", formData.linkZoom);
@@ -287,9 +293,10 @@ export const EditEvents = () => {
         headers: { "Content-Type": "multipart/form-data" },
       });
       console.log("Event updated successfully");
-      navigate("/admin/events");
+      navigate("/admin/event");
     } catch (error) {
       console.error("Error updating event:", error);
+      alert("There was an error updating the event. Please try again later.");
     }
   };
 
@@ -522,7 +529,7 @@ export const EditEvents = () => {
                   className="sr-only peer"
                 />
                 <div className="w-full h-full bg-gray-200 rounded-full peer peer-checked:bg-yellow-500 transition-colors"></div>
-                <div className="absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 peer-checked:translate-x-4" />
+                <div className="absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 peer peer-checked:translate-x-4" />
               </label>
             </div>
             {formData.specialGuest && (
