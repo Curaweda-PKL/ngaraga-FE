@@ -28,36 +28,25 @@ interface MainContentProps {
     eventType: string;
     onlineZoomLink: string;
     offlineLocation: string | null;
-    eventSpecialGuestName: string;
-    eventSpecialGuestOccupation: string;
-    eventSpecialGuestImage: string;
+    eventSpecialGuestName?: string;
+    eventSpecialGuestOccupation?: string;
+    eventSpecialGuestImage?: string;
     eventDescription: string;
     cardRewards?: Reward[];
   } | null;
 }
 
 const MainContent: React.FC<MainContentProps> = ({ eventData }) => {
-  const [activeTab, setActiveTab] = useState<"description" | "benefit">(
-    "description"
-  );
+  const [activeTab, setActiveTab] = useState<"description" | "benefit">("description");
   const [isShareModalOpen, setShareModalOpen] = useState(false);
-  const [claimedRewards, setClaimedRewards] = useState<{
-    [key: number]: string | null;
-  }>({});
+  const [claimedRewards, setClaimedRewards] = useState<{ [key: number]: string | null }>({});
 
   const title = eventData?.eventName || "A Special Evening Celebration";
   const eventTime = eventData
-    ? new Date(eventData.eventTime).toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      })
+    ? new Date(eventData.eventTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
     : "08:00 - 20:00";
   const eventDate = eventData
-    ? new Date(eventData.eventDate).toLocaleDateString([], {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-      })
+    ? new Date(eventData.eventDate).toLocaleDateString([], { day: "2-digit", month: "short", year: "numeric" })
     : "07 Dec 2024";
 
   const locationDisplay =
@@ -74,12 +63,12 @@ const MainContent: React.FC<MainContentProps> = ({ eventData }) => {
       eventData?.offlineLocation || "Jakarta"
     );
 
-  const guestName = eventData?.eventSpecialGuestName || "Allison Torff";
-  const guestOccupation =
-    eventData?.eventSpecialGuestOccupation || "Founder Ngaraga";
-  const guestImage = eventData?.eventSpecialGuestImage
-    ? `${SERVER_URL}/uploads/event/${eventData.eventSpecialGuestImage}`
-    : "/api/placeholder/48/48";
+  // Only render guest details if at least one guest detail is available.
+  const hasGuest =
+    eventData?.eventSpecialGuestName ||
+    eventData?.eventSpecialGuestOccupation ||
+    eventData?.eventSpecialGuestImage;
+
   const description =
     eventData?.eventDescription || "Step into a world of elegance and charm...";
 
@@ -102,9 +91,9 @@ const MainContent: React.FC<MainContentProps> = ({ eventData }) => {
   };
 
   return (
-    <div className="w-full px-4 sm:px-6 py-4 sm:py-8">
+    <div className="w-full px-4 sm:px-6 py-4 sm:py-8 ">
       <div className="flex flex-col md:flex-row mx-auto">
-        {/* Left Column - becomes top section on mobile */}
+        {/* Left Column */}
         <div className="w-full md:w-1/2 md:pr-6 mb-8 md:mb-0">
           <h1 className="text-2xl sm:text-4xl font-bold mb-6">{title}</h1>
 
@@ -126,20 +115,27 @@ const MainContent: React.FC<MainContentProps> = ({ eventData }) => {
             </ul>
           </div>
 
-          <div className="mb-8">
-            <h3 className="text-xl mb-4">Special Guest</h3>
-            <div className="flex items-center gap-4 mb-6">
-              <img
-                src={guestImage}
-                alt="Guest"
-                className="w-16 h-16 rounded-full object-cover"
-              />
-              <div>
-                <p className="font-medium text-lg">{guestName}</p>
-                <p className="text-gray-600">{guestOccupation}</p>
+          {hasGuest && (
+            <div className="mb-8">
+              <h3 className="text-xl mb-4">Special Guest</h3>
+              <div className="flex items-center gap-4 mb-6">
+                <img
+                  src={
+                    eventData?.eventSpecialGuestImage
+                      ? `${SERVER_URL}/uploads/event/${eventData.eventSpecialGuestImage}`
+                      : "/api/placeholder/48/48"
+                  }
+                  alt="Guest"
+                  className="w-16 h-16 rounded-full object-cover"
+                />
+                <div>
+                  <p className="font-medium text-lg">{eventData?.eventSpecialGuestName}</p>
+                  <p className="text-gray-600">{eventData?.eventSpecialGuestOccupation}</p>
+                </div>
               </div>
             </div>
-          </div>
+          )}
+
           <Link to={`/register-events/${eventData?.id}`} className="block mb-8">
             <button className="w-full sm:w-auto sm:min-w-[200px] bg-call-to-actions-900 text-white py-3 px-6 rounded-lg font-medium">
               Register Now
@@ -148,44 +144,30 @@ const MainContent: React.FC<MainContentProps> = ({ eventData }) => {
           <div>
             <h3 className="text-xl mb-4">Share Event</h3>
             <div className="flex gap-4">
-              <button
-                onClick={() => setShareModalOpen(true)}
-                className="text-gray-500 hover:text-black"
-              >
+              <button onClick={() => setShareModalOpen(true)} className="text-gray-500 hover:text-black">
                 <DiscordIcon />
               </button>
-              <button
-                onClick={() => setShareModalOpen(true)}
-                className="text-gray-500 hover:text-black"
-              >
+              <button onClick={() => setShareModalOpen(true)} className="text-gray-500 hover:text-black">
                 <IgIcon />
               </button>
-              <button
-                onClick={() => setShareModalOpen(true)}
-                className="text-gray-500 hover:text-black"
-              >
+              <button onClick={() => setShareModalOpen(true)} className="text-gray-500 hover:text-black">
                 <CopyIcon />
               </button>
-              <button
-                onClick={() => setShareModalOpen(true)}
-                className="text-gray-500 hover:text-black"
-              >
+              <button onClick={() => setShareModalOpen(true)} className="text-gray-500 hover:text-black">
                 <WaIcon />
               </button>
             </div>
           </div>
         </div>
 
-        {/* Right Column - becomes bottom section on mobile */}
+        {/* Right Column */}
         <div className="w-full md:w-1/2">
           <div className="flex border-b border-gray-200 mb-6 overflow-x-auto">
             <div className="flex w-full justify-center md:justify-start gap-8">
               <button
                 onClick={() => setActiveTab("description")}
                 className={`text-lg pb-2 whitespace-nowrap ${
-                  activeTab === "description"
-                    ? "border-b-2 border-yellow-500 text-black font-medium"
-                    : "text-gray-400"
+                  activeTab === "description" ? "border-b-2 border-yellow-500 text-black font-medium" : "text-gray-400"
                 }`}
               >
                 Description
@@ -193,9 +175,7 @@ const MainContent: React.FC<MainContentProps> = ({ eventData }) => {
               <button
                 onClick={() => setActiveTab("benefit")}
                 className={`text-lg pb-2 whitespace-nowrap ${
-                  activeTab === "benefit"
-                    ? "border-b-2 border-yellow-500 text-black font-medium"
-                    : "text-gray-400"
+                  activeTab === "benefit" ? "border-b-2 border-yellow-500 text-black font-medium" : "text-gray-400"
                 }`}
               >
                 Benefit
@@ -205,19 +185,13 @@ const MainContent: React.FC<MainContentProps> = ({ eventData }) => {
 
           {activeTab === "description" ? (
             <div className="text-gray-600">
-              <p
-                className="px-0 md:px-4"
-                dangerouslySetInnerHTML={{ __html: description }}
-              />
+              <p className="px-0 md:px-4" dangerouslySetInnerHTML={{ __html: description }} />
             </div>
           ) : (
             <div className="space-y-4">
               {eventData?.cardRewards?.length ? (
                 eventData.cardRewards.map((reward) => (
-                  <div
-                    key={reward.id}
-                    className="border border-gray-300 rounded-lg p-4 shadow-sm"
-                  >
+                  <div key={reward.id} className="border border-gray-300 rounded-lg p-4 shadow-sm">
                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                       <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full sm:w-auto">
                         <img
@@ -226,15 +200,8 @@ const MainContent: React.FC<MainContentProps> = ({ eventData }) => {
                           className="w-20 h-20 rounded-lg object-contain"
                         />
                         <div>
-                          <h4 className="text-lg font-semibold">
-                            {reward.characterName}
-                          </h4>
-                          <p
-                            className="text-gray-700"
-                            dangerouslySetInnerHTML={{
-                              __html: reward.cardDetail,
-                            }}
-                          />
+                          <h4 className="text-lg font-semibold">{reward.characterName}</h4>
+                          <p className="text-gray-700" dangerouslySetInnerHTML={{ __html: reward.cardDetail }} />
                         </div>
                       </div>
                       <div className="w-full sm:w-auto mt-4 sm:mt-0">
@@ -267,9 +234,7 @@ const MainContent: React.FC<MainContentProps> = ({ eventData }) => {
                   </div>
                 ))
               ) : (
-                <p className="text-gray-400 text-center md:text-left">
-                  No benefits available.
-                </p>
+                <p className="text-gray-400 text-center md:text-left">No benefits available.</p>
               )}
             </div>
           )}
@@ -277,7 +242,7 @@ const MainContent: React.FC<MainContentProps> = ({ eventData }) => {
       </div>
 
       {isShareModalOpen && (
-        <ShareModal onClose={() => setShareModalOpen(false)} isOpen={false} />
+        <ShareModal onClose={() => setShareModalOpen(false)} isOpen={isShareModalOpen} />
       )}
     </div>
   );
