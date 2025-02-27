@@ -1,1 +1,0 @@
-Password reset instructions have been sent to your email. Please check your inbox (or spam folder) and follow the link to reset your password. For security reasons, the link will expire in 24 hours.
