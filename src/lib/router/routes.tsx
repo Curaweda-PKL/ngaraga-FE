@@ -42,6 +42,7 @@ import SentEmail from "../pages/auth/login/sentEmail";
 import SuccesRegist from "../pages/events/success-regist";
 import { EditProfileAdmin } from "../admin-pages/admin/edit-admin";
 import { EditCouponForm } from "../admin-pages/coupon/edit-coupon";
+import { RegisteredUsers } from "../admin-pages/event/registered-user";
 
 // Lazy-loaded Pages
 const Home = React.lazy(() => import("@/lib/pages/home/Home"));
@@ -151,9 +152,10 @@ export const adminRoutes: Array<PathRouteProps> = [
   { path: "add-event", element: <AddEvents /> },
   { path: "coupon", element: <Coupon /> },
   { path: "add-coupon", element: <AddCouponForm /> },
-  {path: "edit-coupon", element: <EditCouponForm />},
+  {path: "edit-coupon/:id", element: <EditCouponForm />},
   { path: "creator", element: <Creator /> },
   { path: "member", element: <Member /> },
+  {path: "registered-user-event/:id", element: <RegisteredUsers />},
   { path: "add-member", element: <AddMember /> },
   { path: "detail-member", element: <MemberDetails /> },
   { path: "subscription", element: <Subscription /> },

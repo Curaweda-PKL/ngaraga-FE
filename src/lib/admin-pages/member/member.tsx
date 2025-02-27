@@ -199,7 +199,7 @@ export const Member = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-lg border border-neutral-colors-500 overflow-hidden">
+      <div className="bg-white rounded-lg  overflow-hidden">
         <table className="w-full">
           <thead>
             <tr className="text-neutral-colors-700 font-[200]">
