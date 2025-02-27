@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { FaEnvelope } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import ForgotPasswordImage from "@/assets/img/spacestarry.png";
 
 type ForgotPasswordFormData = {
@@ -14,7 +15,10 @@ const ForgotPassword: React.FC = () => {
   });
   const [error, setError] = useState<{ [key: string]: string }>({});
   const [loading, setLoading] = useState<boolean>(false);
+  const [message, setMessage] = useState<string | null>(null);
   const navigate = useNavigate();
+
+  const SERVER_URL = import.meta.env.VITE_SERVER_URL; // Pastikan ini ada di .env frontend
 
   // Handle form input changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -34,7 +38,6 @@ const ForgotPassword: React.FC = () => {
     let valid = true;
     const newError: { [key: string]: string } = {};
 
-    // Email validation
     if (!formData.email) {
       newError.email = "Email cannot be empty!";
       valid = false;
@@ -45,31 +48,36 @@ const ForgotPassword: React.FC = () => {
   };
 
   // Handle form submission
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setMessage(null);
 
     if (!validateForm()) {
       setLoading(false);
       return;
     }
 
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      const response = await axios.post(`${SERVER_URL}/api/email/forgot-password`, {
+        email: formData.email,
+      });
+
+      if (response.status === 200) {
+        setMessage("Password reset email has been sent! Check your inbox.");
+        setTimeout(() => navigate("/sentemail"), 3000);
+      }
+    } catch (err: any) {
+      setError({ email: err.response?.data?.error || "Something went wrong!" });
+    } finally {
       setLoading(false);
-      // Redirect to /sentemail after successful submission
-      navigate("/sentemail");
-    }, 1000);
+    }
   };
 
-  // Animation variants for arise effect
+  // Animation variants
   const ariseVariant = {
     hidden: { opacity: 0, y: 50 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.7, ease: "easeInOut" },
-    },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: "easeInOut" } },
   };
 
   return (
@@ -108,9 +116,8 @@ const ForgotPassword: React.FC = () => {
                 <h2 className="text-3xl font-bold text-gray-800 mb-4">
                   Forgot Password
                 </h2>
-                <p className="text-lg text-gray-500 ">
-                  Enter your email to receive instructions to reset your
-                  password.
+                <p className="text-lg text-gray-500">
+                  Enter your email to receive instructions to reset your password.
                 </p>
               </div>
 
@@ -118,9 +125,7 @@ const ForgotPassword: React.FC = () => {
               <div className="col-span-6 relative">
                 <div
                   className={`mt-1 flex items-center border rounded-md bg-white py-3 px-4 shadow-sm ${
-                    error.email
-                      ? "border-[#D22424]"
-                      : "focus-within:border-[var(--typing)]"
+                    error.email ? "border-[#D22424]" : "focus-within:border-[var(--typing)]"
                   }`}
                 >
                   <FaEnvelope className="text-gray-500 mr-2 text-sm" />
@@ -136,9 +141,7 @@ const ForgotPassword: React.FC = () => {
                     required
                   />
                 </div>
-                {error.email && (
-                  <p className="text-[#D22424] text-sm">{error.email}</p>
-                )}
+                {error.email && <p className="text-[#D22424] text-sm">{error.email}</p>}
               </div>
 
               {/* Submit Button */}
@@ -151,6 +154,13 @@ const ForgotPassword: React.FC = () => {
                   {loading ? "Sending..." : "Send Reset Instructions"}
                 </button>
               </div>
+
+              {/* Success Message */}
+              {message && (
+                <div className="col-span-6 text-center">
+                  <p className="text-green-500 font-semibold">{message}</p>
+                </div>
+              )}
             </motion.form>
           </motion.div>
         </main>
