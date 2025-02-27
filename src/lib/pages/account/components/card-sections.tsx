@@ -1,6 +1,6 @@
 "use client";
 
-import {useState, useRef, useEffect} from "react";
+import { useState, useRef } from "react";
 
 type Card = {
   id: number;
@@ -50,7 +50,7 @@ const specialCardData: Card[] = [
     image: "/src/assets/img/Distant-Galaxy.png",
     index: "04",
     total: "04",
-    achieved: true
+    achieved: true,
   },
   {
     id: 2,
@@ -58,7 +58,7 @@ const specialCardData: Card[] = [
     creator: "NebulaKid",
     image: "/src/assets/img/Life-On-Edena.png",
     index: "02",
-    total: "02"
+    total: "02",
   },
   {
     id: 3,
@@ -66,7 +66,7 @@ const specialCardData: Card[] = [
     creator: "Spaceone",
     image: "/src/assets/img/AstroFiction.png",
     index: "06",
-    total: "05"
+    total: "05",
   },
   {
     id: 4,
@@ -74,7 +74,7 @@ const specialCardData: Card[] = [
     creator: "NebulaKid",
     image: "/src/assets/img/Life-On-Edena.png",
     index: "05",
-    total: "05"
+    total: "05",
   },
   {
     id: 5,
@@ -82,7 +82,7 @@ const specialCardData: Card[] = [
     creator: "MoonDancer",
     image: "/src/assets/img/Distant-Galaxy.png",
     index: "00",
-    total: "03"
+    total: "03",
   },
   {
     id: 6,
@@ -90,8 +90,8 @@ const specialCardData: Card[] = [
     creator: "Spaceone",
     image: "/src/assets/img/AstroFiction.png",
     index: "00",
-    total: "01"
-  }
+    total: "01",
+  },
 ];
 
 const purchaseData: Purchase[] = [
@@ -148,10 +148,9 @@ export const CardSection = () => {
   const [activeFilter, setActiveFilter] = useState<
     "All" | "Payment" | "Packaging" | "Shipping" | "Delivered"
   >("All");
-  const [underlineStyle, setUnderlineStyle] = useState({width: 0, left: 0});
   const tabsRef = useRef<HTMLDivElement>(null);
 
-  const filteredPurchaseData =
+  const filteredPurchaseData =  
     activeFilter === "All"
       ? purchaseData
       : purchaseData.filter((purchase) => purchase.status === activeFilter);
@@ -162,23 +161,6 @@ export const CardSection = () => {
       : activeTab === "specialCards"
       ? specialCardData
       : filteredPurchaseData;
-
-  useEffect(() => {
-    const activeButton = tabsRef.current?.querySelector(
-      activeTab === "cards"
-        ? ".tab-cards"
-        : activeTab === "specialCards"
-        ? ".tab-specialCards"
-        : ".tab-purchases"
-    ) as HTMLButtonElement;
-
-    if (activeButton) {
-      setUnderlineStyle({
-        width: activeButton.offsetWidth,
-        left: activeButton.offsetLeft,
-      });
-    }
-  }, [activeTab]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -203,10 +185,7 @@ export const CardSection = () => {
             <button className="px-4 py-2 text-call-to-action border border-call-to-action rounded-lg hover:bg-yellow-50 text-sm">
               Change Payment
             </button>
-            <a
-              href="/payments"
-              className="w-full sm:w-auto"
-            >
+            <a href="/payments" className="w-full sm:w-auto">
               <button className="w-full px-4 py-2 text-white bg-call-to-action rounded-lg hover:bg-yellow-700 text-sm">
                 Payment
               </button>
@@ -219,10 +198,7 @@ export const CardSection = () => {
             <button className="px-4 py-2 text-call-to-action border border-call-to-action rounded-lg hover:bg-yellow-50 text-sm">
               Delivered
             </button>
-            <a
-              href="/view-detail"
-              className="w-full sm:w-auto"
-            >
+            <a href="/view-detail" className="w-full sm:w-auto">
               <button className="w-full px-4 py-2 text-white bg-call-to-action rounded-lg hover:bg-yellow-700 text-sm">
                 View Details
               </button>
@@ -239,45 +215,54 @@ export const CardSection = () => {
   };
 
   return (
-    <div className="w-full mb-10 px-4 sm:px-6">
+    <div className="w-full mb-10 px-4 sm:px-6 ">
       {/* Tabs */}
       <div
-        className="relative flex items-center justify-start space-x-4 sm:space-x-8 border-b border-gray-700 pb-4 mb-8 overflow-x-auto"
+        className="flex items-center justify-start space-x-4 sm:space-x-8 border-b border-gray-700 pb-4 mb-8 overflow-x-auto"
         ref={tabsRef}
       >
-        {/* Tab Buttons */}
-        <button
-          className={`tab-cards text-sm sm:text-lg font-semibold whitespace-nowrap ${
-            activeTab === "cards" ? "text-[#2B2B2B]" : "text-gray-400"
-          }`}
-          onClick={() => setActiveTab("cards")}
-        >
-          Card ({cardData.length})
-        </button>
+        {/* Tab Buttons dengan underline statis */}
+        <div className="relative">
+          <button
+            className={`tab-cards text-sm sm:text-lg font-semibold whitespace-nowrap ${
+              activeTab === "cards" ? "text-[#2B2B2B]" : "text-gray-400"
+            }`}
+            onClick={() => setActiveTab("cards")}
+          >
+            Card ({cardData.length})
+          </button>
+          {activeTab === "cards" && (
+            <div className="absolute bottom-[-16px] left-0 right-0 h-[2px] bg-[#2B2B2B]" />
+          )}
+        </div>
 
-        <button
-          className={`tab-specialCards text-sm sm:text-lg font-semibold whitespace-nowrap ${
-            activeTab === "specialCards" ? "text-[#2B2B2B]" : "text-gray-400"
-          }`}
-          onClick={() => setActiveTab("specialCards")}
-        >
-          Special Card ({specialCardData.length})
-        </button>
+        <div className="relative">
+          <button
+            className={`tab-specialCards text-sm sm:text-lg font-semibold whitespace-nowrap ${
+              activeTab === "specialCards" ? "text-[#2B2B2B]" : "text-gray-400"
+            }`}
+            onClick={() => setActiveTab("specialCards")}
+          >
+            Special Card ({specialCardData.length})
+          </button>
+          {activeTab === "specialCards" && (
+            <div className="absolute bottom-[-16px] left-0 right-0 h-[2px] bg-[#2B2B2B]" />
+          )}
+        </div>
 
-        <button
-          className={`tab-purchases text-sm sm:text-lg font-semibold whitespace-nowrap ${
-            activeTab === "purchases" ? "text-[#2B2B2B]" : "text-gray-400"
-          }`}
-          onClick={() => setActiveTab("purchases")}
-        >
-          Purchase ({purchaseData.length})
-        </button>
-
-        {/* Dynamic Underline */}
-        <div
-          className="absolute bottom-0 h-[2px] bg-[#2B2B2B] transition-all duration-300"
-          style={{width: underlineStyle.width, left: underlineStyle.left}}
-        />
+        <div className="relative">
+          <button
+            className={`tab-purchases text-sm sm:text-lg font-semibold whitespace-nowrap ${
+              activeTab === "purchases" ? "text-[#2B2B2B]" : "text-gray-400"
+            }`}
+            onClick={() => setActiveTab("purchases")}
+          >
+            Purchase ({purchaseData.length})
+          </button>
+          {activeTab === "purchases" && (
+            <div className="absolute bottom-[-16px] left-0 right-0 h-[2px] bg-[#2B2B2B]" />
+          )}
+        </div>
       </div>
 
       {/* Filter Buttons */}
@@ -314,11 +299,7 @@ export const CardSection = () => {
             if (activeTab === "specialCards") {
               // Render Special Card with new design
               return (
-                <a
-                  href="/special-card-detail"
-                  key={item.id}
-                  className="block"
-                >
+                <a href="/special-card-detail" key={item.id} className="block">
                   <div className="w-full flex flex-col rounded-lg overflow-hidden transition-transform hover:scale-[1.02]">
                     <figure className="w-full h-[240px] rounded-t-lg overflow-hidden relative">
                       <img
@@ -355,10 +336,7 @@ export const CardSection = () => {
             } else {
               // Render normal Card
               return (
-                <a
-                  href="/special-card-detail"
-                  key={item.id}
-                >
+                <a href="/special-card-detail" key={item.id}>
                   <div className="w-full h-[400px] flex flex-col items-start gap-4 bg-[#F2F2F2] rounded-2xl shadow-xl transition-transform hover:scale-[1.02]">
                     <figure className="w-full h-[260px] rounded-t-2xl overflow-hidden">
                       <img
