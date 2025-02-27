@@ -150,7 +150,7 @@ export const Member = () => {
         prev.filter((user) => !selectedUsers.some((u) => u.id === user.id))
       );
 
-      setSuccessMessage("User(s) successfully deleted!"); // Tambah pesan sukses
+      setSuccessMessage("User successfully deleted!"); // Tambah pesan sukses
       setError(null);
 
       // Hapus pesan sukses setelah 3 detik
@@ -228,6 +228,55 @@ export const Member = () => {
     }
   };
 
+  const handleBulkSuspendUnsuspend = async () => {
+    const selectedUsers = memberData.filter((user) => user.checked);
+
+    if (selectedUsers.length === 0) {
+      alert("Please select at least one user to suspend/unsuspend");
+      return;
+    }
+
+    const isSuspending = selectedUsers.some((user) => !user.isSuspended);
+    const action = isSuspending ? "suspend" : "unsuspend";
+
+    const confirmAction = window.confirm(
+      `Are you sure you want to ${action} these users?\n\n${selectedUsers
+        .map((user) => user.name)
+        .join(", ")}`
+    );
+
+    if (!confirmAction) return;
+
+    setLoading(true);
+    try {
+      await Promise.all(
+        selectedUsers.map((user) =>
+          fetch(`${SERVER_URL}/api/account/${action}/${user.id}`, {
+            method: "PUT",
+          })
+        )
+      );
+
+      // Update state setelah berhasil
+      setMemberData((prev) =>
+        prev.map((user) =>
+          selectedUsers.some((u) => u.id === user.id)
+            ? { ...user, isSuspended: isSuspending }
+            : user
+        )
+      );
+
+      setSuccessMessage(
+        `${selectedUsers.length} user(s) successfully ${action}ed!`
+      );
+      setTimeout(() => setSuccessMessage(null), 3000);
+    } catch (err: any) {
+      setError(err.message || `Failed to ${action} users`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleDateChange = (date: Date | null, dateType: "start" | "end") => {
     if (dateType === "start") {
       setStartDate(date || undefined);
@@ -263,12 +312,13 @@ export const Member = () => {
               <a href="/admin/add-member">Add Member</a>
             </span>
           </button>
-
-          <button className="border ml-2 border-call-to-actions-900 hover:bg-call-to-actions-200 text-call-to-actions-900 px-4 py-2 rounded-lg flex items-center gap-2">
+          <button
+            onClick={handleBulkSuspendUnsuspend}
+            className="border ml-2 border-call-to-actions-900 hover:bg-call-to-actions-200 text-call-to-actions-900 px-4 py-2 rounded-lg flex items-center gap-2"
+          >
             <FaEyeSlash />
             <span>Hide</span>
           </button>
-
           <button
             onClick={() => handleDelete()}
             className="border border-danger-colors-700 text-danger-colors-700 rounded-lg flex items-center ml-2 px-4 py-2 hover:bg-danger-colors-200 gap-2"
