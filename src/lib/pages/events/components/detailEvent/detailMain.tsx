@@ -17,6 +17,21 @@ interface Reward {
   characterName: string;
   cardDetail: string;
   isClaimable?: boolean;
+  // isClaimed will be computed based on eventData.CardClaim
+  isClaimed?: boolean;
+}
+
+interface CardClaim {
+  id: number;
+  userId: string;
+  eventId: string;
+  cardRewardId: number;
+  claimedCardId?: number;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+  claimedCard?: any;
+  cardReward?: Reward;
 }
 
 interface MainContentProps {
@@ -33,6 +48,8 @@ interface MainContentProps {
     eventSpecialGuestImage?: string;
     eventDescription: string;
     cardRewards?: Reward[];
+    // Include CardClaim from the API response
+    CardClaim?: CardClaim[];
   } | null;
 }
 
@@ -67,7 +84,6 @@ const MainContent: React.FC<MainContentProps> = ({ eventData }) => {
       eventData?.offlineLocation || "Jakarta"
     );
 
-  // Only render guest details if at least one guest detail is available.
   const hasGuest =
     eventData?.eventSpecialGuestName ||
     eventData?.eventSpecialGuestOccupation ||
@@ -76,17 +92,15 @@ const MainContent: React.FC<MainContentProps> = ({ eventData }) => {
   const description =
     eventData?.eventDescription || "Step into a world of elegance and charm...";
 
-  // --- useEffect to check if a token is present in the URL ---
+  // Check for token in URL to create a pending claim
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
     const token = queryParams.get("token");
     if (token && !pendingClaimAttempted) {
       setPendingClaimAttempted(true);
-      // Call the claimReward endpoint to create a pending claim.
       axios
         .get(`${SERVER_URL}/api/cardRewards/claim?token=${token}`, { withCredentials: true })
         .then((response) => {
-          // Expecting the response to include pendingClaimId (e.g., { pendingClaimId: number })
           if (response.data.pendingClaimId) {
             setPendingClaimId(response.data.pendingClaimId);
           } else {
@@ -99,7 +113,7 @@ const MainContent: React.FC<MainContentProps> = ({ eventData }) => {
     }
   }, [location.search, pendingClaimAttempted]);
 
-  // --- Handler for Confirm Claim button ---
+  // Handler for confirming claim
   const handleConfirmClaim = async () => {
     if (!pendingClaimId) return;
     setIsConfirming(true);
@@ -196,7 +210,9 @@ const MainContent: React.FC<MainContentProps> = ({ eventData }) => {
               <button
                 onClick={() => setActiveTab("description")}
                 className={`text-lg pb-2 whitespace-nowrap ${
-                  activeTab === "description" ? "border-b-2 border-yellow-500 text-black font-medium" : "text-gray-400"
+                  activeTab === "description"
+                    ? "border-b-2 border-yellow-500 text-black font-medium"
+                    : "text-gray-400"
                 }`}
               >
                 Description
@@ -204,7 +220,9 @@ const MainContent: React.FC<MainContentProps> = ({ eventData }) => {
               <button
                 onClick={() => setActiveTab("benefit")}
                 className={`text-lg pb-2 whitespace-nowrap ${
-                  activeTab === "benefit" ? "border-b-2 border-yellow-500 text-black font-medium" : "text-gray-400"
+                  activeTab === "benefit"
+                    ? "border-b-2 border-yellow-500 text-black font-medium"
+                    : "text-gray-400"
                 }`}
               >
                 Benefit
@@ -218,70 +236,76 @@ const MainContent: React.FC<MainContentProps> = ({ eventData }) => {
             </div>
           ) : (
             <div className="space-y-4">
-              {eventData?.cardRewards?.length ? (
-                eventData.cardRewards.map((reward) => (
-                  <div key={reward.id} className="border border-gray-300 rounded-lg p-4 shadow-sm">
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full sm:w-auto">
-                        <img
-                          src={`${SERVER_URL}/${reward.image}`}
-                          alt={reward.characterName}
-                          className="w-20 h-20 rounded-lg object-contain"
-                        />
-                        <div>
-                          <h4 className="text-lg font-semibold">{reward.characterName}</h4>
-                          <p className="text-gray-700" dangerouslySetInnerHTML={{ __html: reward.cardDetail }} />
+              {eventData?.cardRewards && eventData.cardRewards.length ? (
+                eventData.cardRewards.map((reward) => {
+                  // Determine if this reward has been claimed by checking CardClaim array
+                  const isRewardClaimed = eventData?.CardClaim?.some(
+                    (claim) => claim.cardRewardId === reward.id && claim.status === "confirmed"
+                  );
+                  return (
+                    <div key={reward.id} className="border border-gray-300 rounded-lg p-4 shadow-sm">
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full sm:w-auto">
+                          <img
+                            src={`${SERVER_URL}/${reward.image}`}
+                            alt={reward.characterName}
+                            className="w-20 h-20 rounded-lg object-contain"
+                          />
+                          <div>
+                            <h4 className="text-lg font-semibold">{reward.characterName}</h4>
+                            <p className="text-gray-700" dangerouslySetInnerHTML={{ __html: reward.cardDetail }} />
+                          </div>
+                        </div>
+                        <div className="w-full sm:w-auto mt-4 sm:mt-0">
+                          {isRewardClaimed || claimConfirmed ? (
+                            <button
+                              className="block w-full sm:w-auto bg-green-600 text-white px-4 py-2 rounded-lg flex items-center justify-center cursor-default"
+                              disabled
+                            >
+                              <svg
+                                className="w-5 h-5 mr-2 text-white animate-bounce"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth="2"
+                                  d="M5 13l4 4L19 7"
+                                ></path>
+                              </svg>
+                              Claimed
+                            </button>
+                          ) : pendingClaimId ? (
+                            <button
+                              onClick={handleConfirmClaim}
+                              disabled={isConfirming}
+                              className="block w-full sm:w-auto bg-green-600 text-white px-4 py-2 rounded-lg"
+                            >
+                              {isConfirming ? "Confirming..." : "Confirm Claim"}
+                            </button>
+                          ) : reward.isClaimable ? (
+                            <button
+                              className="w-full sm:w-auto bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 cursor-not-allowed"
+                              disabled
+                            >
+                              Claim (use link)
+                            </button>
+                          ) : (
+                            <button
+                              className="w-full sm:w-auto bg-gray-400 text-white px-4 py-2 rounded-lg cursor-not-allowed"
+                              disabled
+                            >
+                              Claim
+                            </button>
+                          )}
                         </div>
                       </div>
-                      <div className="w-full sm:w-auto mt-4 sm:mt-0">
-                        {claimConfirmed ? (
-                          <button
-                            className="block w-full sm:w-auto bg-green-600 text-white px-4 py-2 rounded-lg flex items-center justify-center cursor-default"
-                            disabled
-                          >
-                            <svg
-                              className="w-5 h-5 mr-2 text-white animate-bounce"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                              xmlns="http://www.w3.org/2000/svg"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="2"
-                                d="M5 13l4 4L19 7"
-                              ></path>
-                            </svg>
-                            Claimed
-                          </button>
-                        ) : pendingClaimId ? (
-                          <button
-                            onClick={handleConfirmClaim}
-                            disabled={isConfirming}
-                            className="block w-full sm:w-auto bg-green-600 text-white px-4 py-2 rounded-lg"
-                          >
-                            {isConfirming ? "Confirming..." : "Confirm Claim"}
-                          </button>
-                        ) : reward.isClaimable ? (
-                          <button
-                            className="w-full sm:w-auto bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 cursor-not-allowed"
-                            disabled
-                          >
-                            Claim (use link)
-                          </button>
-                        ) : (
-                          <button
-                            className="w-full sm:w-auto bg-gray-400 text-white px-4 py-2 rounded-lg cursor-not-allowed"
-                            disabled
-                          >
-                            Claim
-                          </button>
-                        )}
-                      </div>
                     </div>
-                  </div>
-                ))
+                  );
+                })
               ) : (
                 <p className="text-gray-400 text-center md:text-left">No benefits available.</p>
               )}

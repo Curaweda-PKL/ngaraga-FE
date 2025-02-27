@@ -110,29 +110,31 @@ const EventRegistration: React.FC = () => {
       });
       return;
     }
-
-    setRegistrationStatus({loading: true, success: false, error: null});
-
+  
+    setRegistrationStatus({ loading: true, success: false, error: null });
+  
     try {
       await axios.post(
         `${SERVER_URL}/api/event/${eventId}`,
         {},
-        {withCredentials: true}
+        { withCredentials: true }
       );
-
-      setRegistrationStatus({loading: false, success: true, error: null});
+  
+      setRegistrationStatus({ loading: false, success: true, error: null });
       navigate("/success/registered/event");
     } catch (error: any) {
-      let errorMessage = "Registration failed. Please try again.";
+      // Log the error details internally for debugging.
+      console.error("Registration error: ", error);
+  
+      // Set a generic error message for the user.
+      let errorMessage = "Oops, something went wrong. Please try again later.";
       if (error.response?.status === 409) {
         errorMessage = "You are already registered for this event.";
-      } else if (error.response?.data?.message) {
-        errorMessage = error.response.data.message;
       } else if (error.request) {
-        errorMessage = "No response from server. Check your connection.";
-      } else {
-        errorMessage = error.message;
+        errorMessage =
+          "We couldn't connect to our servers. try few minutes later.";
       }
+  
       setRegistrationStatus({
         loading: false,
         success: false,
@@ -140,7 +142,7 @@ const EventRegistration: React.FC = () => {
       });
     }
   };
-
+  
   const formatEventTime = (time: string) => {
     const date = new Date(time);
     return date.toLocaleTimeString([], {
