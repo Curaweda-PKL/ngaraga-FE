@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Pencil, Trash2, Search, Eye, EyeOff } from "lucide-react";
 import axios from "axios";
-import { CategoryModal } from "./CategoryModal"; // adjust the import path as needed
-import { SERVER_URL } from "@/middleware/utils"; // Import centralized server URL
+import {CategoryModal} from "./CategoryModal"; // adjust the import path as needed
+import {SERVER_URL} from "@/middleware/utils"; // Import centralized server URL
 
 export const Categories = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -13,6 +13,7 @@ export const Categories = () => {
     code?: string; // category code
     seriesId?: number;
     image?: string;
+
     isSuspended?: boolean;
     series?: { master?: { name: string; code?: string } };
   } | null>(null);
@@ -21,6 +22,7 @@ export const Categories = () => {
   const [series, setSeries] = useState<
     { id: number; name: string; code: string; isSuspended: boolean }[]
   >([]);
+
   const [categoriesList, setCategoriesList] = useState<any[]>([]);
   const [loadingSeries, setLoadingSeries] = useState(true);
   const [errorSeries, setErrorSeries] = useState<string | null>(null);
@@ -134,6 +136,7 @@ export const Categories = () => {
     }
 
     try {
+
       const response = await axios.put(
         `${SERVER_URL}/api/categories/edit/${id}`,
         formData
@@ -144,6 +147,7 @@ export const Categories = () => {
         setSuccessMessage("Category updated successfully!");
         setTimeout(() => setSuccessMessage(""), 3000);
       }
+
     } catch (error) {
       console.error("Error updating category:", error);
       setActionErrorMessage(
@@ -218,7 +222,10 @@ export const Categories = () => {
       {/* Breadcrumb */}
       <div className="mb-4">
         <nav className="text-sm text-gray-500">
-          <a href="/admin/marketplace" className="hover:text-yellow-500">
+          <a
+            href="/admin/marketplace"
+            className="hover:text-yellow-500"
+          >
             Marketplace
           </a>
           <span className="mx-2">/</span>
@@ -289,7 +296,9 @@ export const Categories = () => {
           <tbody className="divide-y divide-gray-200">
             {loadingCategories ? (
               <tr>
+
                 <td colSpan={7} className="px-6 py-4 text-center text-sm">
+
                   Loading categories...
                 </td>
               </tr>
@@ -300,6 +309,7 @@ export const Categories = () => {
                 </td>
               </tr>
             ) : (
+
               visibleCategories.map((category) => {
                 // Use the nested series data if available, otherwise fall back to lookup
                 const seriesObj = category.series || series.find((s) => s.id === category.seriesId);
@@ -321,6 +331,7 @@ export const Categories = () => {
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-600">
                       <div className="flex items-center gap-3">
+
                         {category.image ? (
                           <img
                             src={category.image}
