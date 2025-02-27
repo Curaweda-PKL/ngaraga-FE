@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import parse from "html-react-parser";
@@ -5,6 +6,8 @@ import { CiShoppingCart } from "react-icons/ci";
 import { useParams } from "react-router-dom";
 import { SERVER_URL } from "@/middleware/utils";
 import { motion, AnimatePresence } from "framer-motion";
+
+
 
 export const DetailCards: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -151,6 +154,7 @@ export const DetailCards: React.FC = () => {
           >
             <CiShoppingCart className="mr-2 text-2xl" />
             {cartLoading ? "Adding..." : "Add to Cart"}
+
           </button>
           <button className="border border-call-to-actions-900 text-call-to-action px-4 py-2 rounded-full transition text-base" aria-label="Checkout">
             <a href="/checkout">Checkout</a>

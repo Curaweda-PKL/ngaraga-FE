@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useEffect, useState } from "react";
+import React, {ChangeEvent, useEffect, useState} from "react";
 
 interface CardSettingsProps {
   formData: {
@@ -44,13 +44,13 @@ interface CardSettingsProps {
       cardType: string;
     }>
   >;
-  apiCategories: { id: number; name: string; image: string | null }[];
+  apiCategories: {id: number; name: string; image: string | null}[];
   categoriesLoading: boolean;
   categoriesError: string | null;
-  apiCreators: { id: number; name: string; image: string | null }[];
+  apiCreators: {id: number; name: string; image: string | null}[];
   creatorsLoading: boolean;
   creatorsError: string | null;
-  apiTags: { id: number; name: string }[];
+  apiTags: {id: number; name: string}[];
   tagsLoading: boolean;
   tagsError: string | null;
 }
@@ -120,7 +120,10 @@ const CardSettings: React.FC<CardSettingsProps> = ({
                       }));
                     }}
                   />
-                  <label htmlFor={id} className="flex items-center gap-2">
+                  <label
+                    htmlFor={id}
+                    className="flex items-center gap-2"
+                  >
                     {category.image && (
                       <img
                         src={category.image}
@@ -131,9 +134,7 @@ const CardSettings: React.FC<CardSettingsProps> = ({
                         }}
                       />
                     )}
-                    <span className="inline-block ml-2">
-                      {category.name}
-                    </span>
+                    <span className="inline-block ml-2">{category.name}</span>
                   </label>
                 </div>
               );
@@ -182,9 +183,7 @@ const CardSettings: React.FC<CardSettingsProps> = ({
                   type="radio"
                   name="selectedCreator"
                   value={creator.id.toString()}
-                  checked={
-                    formData.selectedCreator === creator.id.toString()
-                  }
+                  checked={formData.selectedCreator === creator.id.toString()}
                   onChange={handleInputChange}
                   className="form-radio"
                 />
@@ -227,7 +226,10 @@ const CardSettings: React.FC<CardSettingsProps> = ({
               apiTags.map((tag) => {
                 const id = `tag-${tag.id}`;
                 return (
-                  <div key={tag.id} className="tag-checkbox">
+                  <div
+                    key={tag.id}
+                    className="tag-checkbox"
+                  >
                     <input
                       type="checkbox"
                       id={id}
@@ -275,7 +277,10 @@ const CardSettings: React.FC<CardSettingsProps> = ({
           }`}
         >
           <div className="flex flex-col">
-            <label htmlFor="sourceImageWebsite" className="text-sm mb-1">
+            <label
+              htmlFor="sourceImageWebsite"
+              className="text-sm mb-1"
+            >
               Website
             </label>
             <input
@@ -289,7 +294,10 @@ const CardSettings: React.FC<CardSettingsProps> = ({
             />
           </div>
           <div className="flex flex-col">
-            <label htmlFor="sourceImageAlt" className="text-sm mb-1">
+            <label
+              htmlFor="sourceImageAlt"
+              className="text-sm mb-1"
+            >
               Alt Website
             </label>
             <input

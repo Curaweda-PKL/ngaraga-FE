@@ -49,7 +49,6 @@ export const Master = () => {
   };
 
   const handleAddMaster = async (name: string, code: string) => {
-    // If a code is provided, validate its format.
     if (code && !isValidCode(code)) {
       setErrorMessage("Input harus mengikuti format xxx");
       return;
@@ -57,20 +56,17 @@ export const Master = () => {
     try {
       const bodyData: any = { name };
       if (code) {
-        bodyData.code = code; // Hanya tambahkan jika code ada
+        bodyData.code = code;
       }
-
       const response = await fetch(`${SERVER_URL}/api/master/create`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(bodyData),
       });
-
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || "Failed to add master");
       }
-
       const newMaster = await response.json();
       setMasterList((prev) => [...prev, newMaster.master]);
       setSuccessMessage("Master successfully added.");
@@ -82,7 +78,6 @@ export const Master = () => {
   };
 
   const handleEditMaster = async (id: number, name: string, code: string) => {
-    // Validate code if provided
     if (code && !isValidCode(code)) {
       setErrorMessage("Input harus mengikuti format xxx");
       return;
@@ -90,20 +85,17 @@ export const Master = () => {
     try {
       const bodyData: any = { name };
       if (code) {
-        bodyData.code = code; // Hanya tambahkan jika ada
+        bodyData.code = code;
       }
-
       const response = await fetch(`${SERVER_URL}/api/master/edit/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(bodyData),
       });
-
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || "Failed to update master");
       }
-
       const updatedMaster = await response.json();
       setMasterList((prev) =>
         prev.map((master) =>
@@ -123,11 +115,9 @@ export const Master = () => {
       const response = await fetch(`${SERVER_URL}/api/master/delete/${id}`, {
         method: "DELETE",
       });
-
       if (!response.ok) {
         throw new Error("Failed to delete master");
       }
-
       setMasterList((prev) => prev.filter((master) => master.id !== id));
       setSuccessMessage("Master successfully deleted.");
       setTimeout(() => setSuccessMessage(""), 3000);
@@ -137,7 +127,7 @@ export const Master = () => {
     }
   };
 
-  // New: Toggle suspend/unsuspend for a master
+  // Toggle suspend/unsuspend for a master
   const handleToggleSuspend = async (id: number, currentStatus: boolean) => {
     try {
       const endpoint = currentStatus
@@ -154,7 +144,6 @@ export const Master = () => {
         );
       }
       const result = await response.json();
-      // Expecting result.master to contain the updated master
       setMasterList((prev) =>
         prev.map((master) =>
           master.id === result.master.id ? result.master : master
@@ -180,14 +169,14 @@ export const Master = () => {
     submitText,
     onSubmit,
     defaultValue = "",
-    defaultCode = "", // Tambahkan defaultCode
+    defaultCode = "",
   }) => {
     const [inputValue, setInputValue] = useState(defaultValue);
-    const [inputCode, setInputCode] = useState(defaultCode); // Untuk input code
+    const [inputCode, setInputCode] = useState(defaultCode);
 
     useEffect(() => {
       setInputValue(defaultValue);
-      setInputCode(defaultCode); // Set defaultCode
+      setInputCode(defaultCode);
     }, [defaultValue, defaultCode]);
 
     if (!isOpen) return null;
@@ -204,7 +193,6 @@ export const Master = () => {
               <X className="w-5 h-5" />
             </button>
           </div>
-
           <div className="p-4">
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Master Name*
@@ -231,7 +219,6 @@ export const Master = () => {
               </p>
             )}
           </div>
-
           <div className="flex justify-end gap-2 p-4 border-t">
             <button
               onClick={onClose}
@@ -241,7 +228,6 @@ export const Master = () => {
             </button>
             <button
               onClick={() => {
-                // Only submit if code is empty or valid
                 if (inputCode && !isValidCode(inputCode)) {
                   setErrorMessage("Input harus mengikuti format xxx");
                   return;
@@ -302,49 +288,77 @@ export const Master = () => {
         </div>
       </div>
 
-      {/* Master List */}
-      <div className="grid grid-cols-2 gap-4">
-        {masterList
-          .filter((master) =>
-            master.name.toLowerCase().includes(searchQuery.toLowerCase())
-          )
-          .map((master: { id: number; name: string; isSuspended: boolean; code: string }) => (
-            <div
-              key={master.id}
-              className="bg-white rounded-lg p-4 flex items-center justify-between border border-gray-100"
-            >
-              <span className="font-medium text-gray-700">{master.name}</span>
-              <div className="flex items-center gap-4">
-                <button
-                  onClick={() => {
-                    setSelectedMaster(master);
-                    setIsEditModalOpen(true);
-                  }}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  <Pencil className="w-5 h-5" />
-                </button>
-                <button
-                  onClick={() =>
-                    handleToggleSuspend(master.id, master.isSuspended)
-                  }
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  {master.isSuspended ? (
-                    <EyeOff className="w-5 h-5" />
-                  ) : (
-                    <Eye className="w-5 h-5" />
-                  )}
-                </button>
-                <button
-                  onClick={() => handleDeleteMaster(master.id)}
-                  className="text-red-400 hover:text-red-600"
-                >
-                  <Trash2 className="w-5 h-5" />
-                </button>
-              </div>
-            </div>
-          ))}
+      {/* Master List Table */}
+      <div className="overflow-x-auto">
+        <table className="min-w-full divide-y ">
+          <thead className="">
+            <tr>
+              <th className="px-6 py-3 text-left text-xs font-bold text-black uppercase tracking-wider">
+                Master Name
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-bold text-black uppercase tracking-wider">
+                Master Code
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-bold text-black uppercase tracking-wider">
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {masterList
+              .filter((master) =>
+                master.name.toLowerCase().includes(searchQuery.toLowerCase())
+              )
+              .map(
+                (master: {
+                  id: number;
+                  name: string;
+                  isSuspended: boolean;
+                  code: string;
+                }) => (
+                  <tr key={master.id}>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {master.name}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {master.code}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => {
+                            setSelectedMaster(master);
+                            setIsEditModalOpen(true);
+                          }}
+                          className="text-gray-400 hover:text-gray-600"
+                        >
+                          <Pencil className="w-5 h-5" />
+                        </button>
+                        <button
+                          onClick={() =>
+                            handleToggleSuspend(master.id, master.isSuspended)
+                          }
+                          className="text-gray-400 hover:text-gray-600"
+                        >
+                          {master.isSuspended ? (
+                            <EyeOff className="w-5 h-5" />
+                          ) : (
+                            <Eye className="w-5 h-5" />
+                          )}
+                        </button>
+                        <button
+                          onClick={() => handleDeleteMaster(master.id)}
+                          className="text-red-400 hover:text-red-600"
+                        >
+                          <Trash2 className="w-5 h-5" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                )
+              )}
+          </tbody>
+        </table>
       </div>
 
       {/* Modals */}

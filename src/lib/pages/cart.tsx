@@ -15,6 +15,8 @@ const Cart: React.FC = () => {
   const [cartItems, setCartItems] = useState<any[]>([]);
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
   const [selectAll, setSelectAll] = useState(false);
+  const [couponCode, setCouponCode] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState<any>(null);
 
   // Function to map backend cart items to local state format.
   const mapCartItems = (cart: any) => {
@@ -37,8 +39,9 @@ const Cart: React.FC = () => {
       const response = await axios.get(`${SERVER_URL}/api/cart`, {
         withCredentials: true,
       });
-      if (response.data.cart && response.data.cart.items) {
+      if (response.data.cart) {
         setCartItems(mapCartItems(response.data.cart));
+        setAppliedCoupon(response.data.cart.appliedCoupon || null);
       }
     } catch (err: any) {
       console.error("Error fetching cart items:", err);
@@ -49,13 +52,12 @@ const Cart: React.FC = () => {
     fetchCartItems();
   }, [fetchCartItems]);
 
-  // Delete a single cart item by calling the DELETE endpoint.
+  // Delete a single cart item.
   const handleDeleteItem = async (cartItemId: number) => {
     try {
       await axios.delete(`${SERVER_URL}/api/cart/item/${cartItemId}`, {
         withCredentials: true,
       });
-      // Refresh cart state after deletion.
       await fetchCartItems();
       setSelectedItems((prev) => prev.filter((id) => id !== cartItemId));
     } catch (err: any) {
@@ -63,7 +65,7 @@ const Cart: React.FC = () => {
     }
   };
 
-  // Decrement cart item quantity by calling the subtract endpoint.
+  // Decrement cart item quantity.
   const handleSubtractQuantity = async (cartItemId: number) => {
     try {
       await axios.patch(
@@ -77,7 +79,7 @@ const Cart: React.FC = () => {
     }
   };
 
-  // Increment cart item quantity by calling the add endpoint.
+  // Increment cart item quantity.
   const handleAddQuantity = async (cartItemId: number) => {
     try {
       await axios.patch(
@@ -122,10 +124,43 @@ const Cart: React.FC = () => {
     }
   };
 
+  // Handler to apply coupon by calling the backend endpoint.
+  const handleApplyCoupon = async () => {
+    try {
+      const response = await axios.post(
+        `${SERVER_URL}/api/cart/apply-coupon`,
+        { couponCode },
+        { withCredentials: true }
+      );
+      console.log("Coupon applied:", response.data);
+      // Refresh the cart to include applied coupon details.
+      await fetchCartItems();
+    } catch (err: any) {
+      console.error("Error applying coupon:", err);
+    }
+  };
+
+  // Calculate the subtotal.
   const subtotal = cartItems.reduce(
     (total, item) => total + item.price * item.quantity,
     0
   );
+
+  // Function to calculate final price based on coupon details.
+  const calculateFinalPrice = (subtotal: number, coupon: any) => {
+    if (!coupon) return subtotal;
+    let discountAmount = 0;
+    // Ensure case-insensitive comparison.
+    if (coupon.discountType.toLowerCase() === "percentage") {
+      discountAmount = subtotal * (coupon.discountValue / 100);
+    } else {
+      // Fixed discount.
+      discountAmount = Number(coupon.discountValue);
+    }
+    return subtotal - discountAmount;
+  };
+
+  const finalPrice = calculateFinalPrice(subtotal, appliedCoupon);
   const hasSelectedItems = selectedItems.length > 0;
 
   return (
@@ -239,20 +274,53 @@ const Cart: React.FC = () => {
                 Rp {subtotal.toLocaleString("id-ID")}
               </span>
             </div>
-          </div>
-          <div className="flex items-center space-x-2 mb-4">
-            <div className="relative flex-1">
-              <FaTag className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Add discount code"
-                className="pl-10 h-10 p-2 border bg-white border-gray-300 rounded-md"
-              />
+            {appliedCoupon && (
+              <div className="flex items-center justify-between mt-2">
+                <span className="text-[#262626]">Discount</span>
+                <span className="font-bold text-[#171717] text-lg">
+                  {appliedCoupon.discountType.toLowerCase() === "percentage"
+                    ? `- Rp ${(subtotal * appliedCoupon.discountValue / 100).toLocaleString("id-ID")}`
+                    : `- Rp ${Number(appliedCoupon.discountValue).toLocaleString("id-ID")}`}
+                </span>
+              </div>
+            )}
+            <div className="flex items-center justify-between mt-2">
+              <span className="text-[#262626]">Total</span>
+              <span className="font-bold text-[#171717] text-lg">
+                Rp {finalPrice.toLocaleString("id-ID")}
+              </span>
             </div>
-            <button className="h-10 px-4 text-gray-400 bg-gray-200 rounded-md text-sm">
-              Apply
-            </button>
           </div>
+          {/* Coupon Code Section */}
+          {appliedCoupon ? (
+            <div className="mb-4">
+              <p className="text-green-500 font-bold">
+                Coupon Applied: {appliedCoupon.couponCode} -{" "}
+                {appliedCoupon.discountType.toLowerCase() === "percentage"
+                  ? `${appliedCoupon.discountValue}% off`
+                  : `Rp ${appliedCoupon.discountValue} off`}
+              </p>
+            </div>
+          ) : (
+            <div className="flex items-center space-x-2 mb-4">
+              <div className="relative flex-1">
+                <FaTag className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Add discount code"
+                  className="pl-10 h-10 p-2 border bg-white border-gray-300 rounded-md"
+                  value={couponCode}
+                  onChange={(e) => setCouponCode(e.target.value)}
+                />
+              </div>
+              <button
+                className="h-10 px-4 text-call-to-actions-100 bg-call-to-actions-900 rounded-md text-sm"
+                onClick={handleApplyCoupon}
+              >
+                Apply
+              </button>
+            </div>
+          )}
           <button className="w-full py-2 text-white bg-call-to-action rounded-md flex items-center justify-center space-x-2">
             <FaTrash />
             <a href="/checkout">

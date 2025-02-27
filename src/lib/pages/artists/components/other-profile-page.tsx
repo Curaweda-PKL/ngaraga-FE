@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useState} from "react";
 import axios from "axios";
-import { CgProfile } from "react-icons/cg";
+import {CgProfile} from "react-icons/cg";
 import {
   FaDiscord,
   FaGlobe,
@@ -8,14 +8,13 @@ import {
   FaTwitter,
   FaYoutube,
 } from "react-icons/fa";
-import { Link, useParams } from "react-router-dom";
+import {useParams} from "react-router-dom";
 
 const ProfileSkeleton: React.FC = () => {
   return (
     <div className="flex flex-col">
       {/* Skeleton Banner */}
       <section className="relative h-48 bg-gray-300 animate-pulse"></section>
-
       <div className="container mx-auto px-6 py-10 animate-pulse">
         <div className="flex flex-col lg:flex-row items-center lg:items-start lg:justify-between">
           {/* Left Section: Profile Content Skeleton */}
@@ -37,7 +36,7 @@ const ProfileSkeleton: React.FC = () => {
             </div>
             {/* Skeleton Social Links */}
             <div className="flex justify-center lg:justify-start space-x-6">
-              {Array.from({ length: 5 }).map((_, idx) => (
+              {Array.from({length: 5}).map((_, idx) => (
                 <div
                   key={idx}
                   className="w-10 h-10 bg-gray-300 rounded-full"
@@ -56,9 +55,9 @@ const ProfileSkeleton: React.FC = () => {
   );
 };
 
-export const ArtistsPage: React.FC = () => {
+export const ProfilePage: React.FC = () => {
   // Retrieve the dynamic "$name" parameter from the URL.
-  const { name } = useParams<{ name: string }>();
+  const {name} = useParams<{name: string}>();
 
   // Local state for profile data, loading, and errors.
   const [profile, setProfile] = useState<any>(null);
@@ -71,7 +70,7 @@ export const ArtistsPage: React.FC = () => {
       try {
         const response = await axios.get(
           `http://localhost:3000/api/account/${name}`,
-          { withCredentials: true }
+          {withCredentials: true}
         );
         setProfile(response.data);
       } catch (err: any) {

@@ -4,10 +4,8 @@ import { SERVER_URL } from "@/middleware/utils"; // Import centralized server UR
 
 export const SignUpPage = () => {
   const [image, setImage] = useState<File | null>(null);
-  const [title, setTitle] = useState("Welcome back!");
-  const [description, setDescription] = useState(
-    "Enter your details to access your account and continue your journey of creating and collecting Cards."
-  );
+  const [title, setTitle] = useState(""); // Set initial state to empty string
+  const [description, setDescription] = useState(""); // Set initial state to empty string
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -67,7 +65,7 @@ export const SignUpPage = () => {
             Sign Up Image <span className="text-red-500">*</span>
           </label>
           <div
-            className="border-dashed border-2 border-yellow-500 rounded-lg p-4 text-center bg-yellow-50 cursor-pointer"
+            className="border-dashed border-2 border-call-to-action rounded-lg p-4 text-center bg-yellow-50 cursor-pointer"
             onClick={() => fileInputRef.current?.click()}
             onDragOver={(e) => e.preventDefault()}
             onDrop={(e) => {
@@ -108,7 +106,7 @@ export const SignUpPage = () => {
                 />
                 <label
                   htmlFor="image-upload"
-                  className="cursor-pointer px-4 py-2 bg-yellow-500 text-white rounded"
+                  className="cursor-pointer px-4 py-2 bg-call-to-action text-white rounded"
                 >
                   Browse
                 </label>
@@ -147,6 +145,7 @@ export const SignUpPage = () => {
           </label>
           <input
             type="text"
+            placeholder="Welcome back!"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             className="w-full border-gray-300 rounded-lg shadow-sm focus:border-yellow-500 focus:ring-yellow-500"
@@ -159,6 +158,7 @@ export const SignUpPage = () => {
             Sign Up Description <span className="text-red-500">*</span>
           </label>
           <textarea
+            placeholder="Enter your details to access your account and continue your journey of creating and collecting Cards."
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             rows={3}
@@ -176,7 +176,7 @@ export const SignUpPage = () => {
           Cancel
         </button>
         <button
-          className="px-4 py-2 bg-yellow-500 text-white rounded"
+          className="px-4 py-2 bg-call-to-action text-white rounded"
           onClick={handleUpdate}
         >
           Update
@@ -185,3 +185,4 @@ export const SignUpPage = () => {
     </div>
   );
 };
+  
