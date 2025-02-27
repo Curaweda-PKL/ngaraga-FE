@@ -23,14 +23,8 @@ export const Events = () => {
   const itemsPerPage = 5;
   const navigate = useNavigate();
 
-  // --- Modal state for Suspend/Unsuspend actions (existing) ---
-  const [modalOpen, setModalOpen] = useState(false);
-  const [modalEvent, setModalEvent] = useState<{
-    id: string;
-    name: string;
-    isSuspended: boolean;
-  } | null>(null);
-  const [modalAction, setModalAction] = useState<"suspend" | "unsuspend">("suspend");
+  // --- Notification state for success/error messages ---
+  const [notification, setNotification] = useState<{ type: "success" | "error", message: string } | null>(null);
 
   // --- New modal state for Generating a Claim Link / QR ---
   const [claimLinkModalOpen, setClaimLinkModalOpen] = useState(false);
@@ -59,7 +53,6 @@ export const Events = () => {
           })} on ${new Date(event.eventDate).toLocaleDateString()}`,
           type: event.eventType || "Unknown",
           image: event.eventImage,
-          // Fix potential typo: use "isSuspended" if available or fallback to the original field
           isSuspended: event.isSuspended === true || event.isSuspensed === true,
         }));
         setEvents(fetchedEvents);
@@ -94,6 +87,16 @@ export const Events = () => {
     setCurrentPage(1);
   }, [searchQuery]);
 
+  // --- Auto-clear notifications after 3 seconds ---
+  useEffect(() => {
+    if (notification) {
+      const timer = setTimeout(() => {
+        setNotification(null);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [notification]);
+
   // --- Pagination and Filtering ---
   const filteredEvents = events.filter((event) =>
     event.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -110,7 +113,6 @@ export const Events = () => {
   // --- Handlers for Event selection, deletion, etc. ---
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
-      // Add all current page event ids (if not already selected)
       const newSelected = [...selectedEvents];
       currentEvents.forEach((event) => {
         if (!newSelected.includes(event.id)) {
@@ -119,7 +121,6 @@ export const Events = () => {
       });
       setSelectedEvents(newSelected);
     } else {
-      // Remove current page event ids from selectedEvents
       const newSelected = selectedEvents.filter(
         (id) => !currentEvents.some((event) => event.id === id)
       );
@@ -189,37 +190,24 @@ export const Events = () => {
     return buttons;
   };
 
-  // --- Handlers for Suspend/Unsuspend Modal ---
-  const openSuspendModal = (event: { id: string; name: string; isSuspended: boolean }) => {
-    setModalEvent(event);
-    setModalAction(event.isSuspended ? "unsuspend" : "suspend");
-    setModalOpen(true);
-  };
-
-  const handleSuspendUnsuspend = () => {
-    if (!modalEvent) return;
-    const url = `${SERVER_URL}/api/events/${modalEvent.id}/${modalAction}`;
+  // --- New Handler: Directly toggle suspend/unsuspend without modal ---
+  const handleToggleSuspend = (event: { id: string; name: string; isSuspended: boolean }) => {
+    const action = event.isSuspended ? "unsuspend" : "suspend";
+    const url = `${SERVER_URL}/api/events/${event.id}/${action}`;
     axios
       .put(url)
       .then(() => {
         setEvents((prevEvents) =>
           prevEvents.map((ev) =>
-            ev.id === modalEvent.id ? { ...ev, isSuspended: modalAction === "suspend" } : ev
+            ev.id === event.id ? { ...ev, isSuspended: action === "suspend" } : ev
           )
         );
+        setNotification({ type: "success", message: `Event ${action === "suspend" ? "suspended" : "unsuspended"} successfully.` });
       })
       .catch((error) => {
         console.error("Error updating event suspension:", error);
-      })
-      .finally(() => {
-        setModalOpen(false);
-        setModalEvent(null);
+        setNotification({ type: "error", message: "Error updating event suspension." });
       });
-  };
-
-  const handleCloseModal = () => {
-    setModalOpen(false);
-    setModalEvent(null);
   };
 
   // --- New Handler: Generate Claim Link for the selected card ---
@@ -270,10 +258,11 @@ export const Events = () => {
     navigator.clipboard
       .writeText(generatedLink)
       .then(() => {
-        alert("Link copied to clipboard!");
+        setNotification({ type: "success", message: "Link copied to clipboard!" });
       })
       .catch((error) => {
         console.error("Copy failed:", error);
+        setNotification({ type: "error", message: "Failed to copy link." });
       });
   };
 
@@ -316,6 +305,13 @@ export const Events = () => {
 
   return (
     <div className="p-6">
+      {/* Notification Message */}
+      {notification && (
+        <div className={`p-4 mb-4 text-sm rounded ${notification.type === "success" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
+          {notification.message}
+        </div>
+      )}
+
       {/* Breadcrumb */}
       <div className="flex items-center text-sm text-gray-500 mb-4">
         <span>Events</span>
@@ -335,7 +331,6 @@ export const Events = () => {
             <Plus className="w-4 h-4" />
             <span>Add Events</span>
           </button>
-          {/* Render Delete Selected only when all events on the current page are selected */}
           {allSelected && (
             <button
               className="bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded-lg flex items-center gap-2"
@@ -428,7 +423,7 @@ export const Events = () => {
                     </button>
                     <button
                       className="p-2 hover:bg-gray-100 rounded-lg text-gray-600"
-                      onClick={() => openSuspendModal(event)}
+                      onClick={() => handleToggleSuspend(event)}
                     >
                       {event.isSuspended ? (
                         <EyeOff className="w-4 h-4" />
@@ -479,39 +474,6 @@ export const Events = () => {
           </>
         )}
       </div>
-
-      {/* --- Existing Modal for Suspend/Unsuspend Confirmation --- */}
-      {modalOpen && modalEvent && (
-        <div className="fixed inset-0 flex items-center justify-center z-50">
-          <div
-            className="absolute inset-0 bg-black opacity-50"
-            onClick={handleCloseModal}
-          ></div>
-          <div className="bg-white rounded-lg shadow-lg z-10 p-6 w-96">
-            <h2 className="text-xl font-semibold mb-4">
-              {modalAction === "suspend" ? "Suspend Event" : "Unsuspend Event"}
-            </h2>
-            <p className="mb-6">
-              Are you sure you want to {modalAction} the event{" "}
-              <span className="font-medium">{modalEvent.name}</span>?
-            </p>
-            <div className="flex justify-end gap-2">
-              <button
-                className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
-                onClick={handleCloseModal}
-              >
-                Cancel
-              </button>
-              <button
-                className="px-4 py-2 rounded bg-yellow-500 text-white hover:bg-yellow-600"
-                onClick={handleSuspendUnsuspend}
-              >
-                Confirm
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* --- New Modal for Generating Claim Link / QR --- */}
       {claimLinkModalOpen && (
@@ -602,18 +564,14 @@ export const Events = () => {
                 Cancel
               </button>
               <button
-                className={`px-4 py-2 rounded bg-green-500 text-white hover:bg-green-600 ${
-                  isGenerating ? "opacity-50 cursor-not-allowed" : ""
-                }`}
+                className={`px-4 py-2 rounded bg-green-500 text-white hover:bg-green-600 ${isGenerating ? "opacity-50 cursor-not-allowed" : ""}`}
                 onClick={handleGenerateClaimLink}
                 disabled={isGenerating || !selectedCardId}
               >
                 {isGenerating ? "Generating..." : "Generate Link"}
               </button>
               <button
-                className={`px-4 py-2 rounded bg-purple-500 text-white hover:bg-purple-600 ${
-                  isGenerating ? "opacity-50 cursor-not-allowed" : ""
-                }`}
+                className={`px-4 py-2 rounded bg-purple-500 text-white hover:bg-purple-600 ${isGenerating ? "opacity-50 cursor-not-allowed" : ""}`}
                 onClick={handleGenerateClaimQR}
                 disabled={isGenerating || !selectedCardId}
               >

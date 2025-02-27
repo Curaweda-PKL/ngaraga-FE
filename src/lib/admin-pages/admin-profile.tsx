@@ -1,19 +1,19 @@
 import React, { useState, ChangeEvent, useEffect } from "react";
 import { X } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+// Removed: import { useNavigate } from "react-router-dom";
 import PhoneInput from "@/lib/pages/checkout/components/PhoneInput";
 import axios from "axios";
 import { SERVER_URL } from "@/middleware/utils"; // Import your server URL
 
 export const ProfileSettings = () => {
-  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   const [initialLoad, setInitialLoad] = useState(true);
 
   const [existingImage, setExistingImage] = useState<string | null>(null);
   const [imagePreview, setImagePreview] = useState<string | ArrayBuffer | null>(null);
-  // New state to hold the file to send in FormData
+  // State to hold the file to send in FormData
   const [imageFile, setImageFile] = useState<File | null>(null);
 
   const [formData, setFormData] = useState({
@@ -23,6 +23,8 @@ export const ProfileSettings = () => {
     phoneNumber: "",
     countryCode: "",
   });
+  // To allow resetting changes on cancel, we store the initial data separately
+  const [initialData, setInitialData] = useState(formData);
 
   const [selectedPermissions, setSelectedPermissions] = useState<string[]>([]);
 
@@ -44,13 +46,16 @@ export const ProfileSettings = () => {
             : null
         );
 
-        setFormData({
+        const fetchedData = {
           fullName: userData.fullName,
           name: userData.name,
           email: userData.email,
           phoneNumber: userData.phoneNumber,
           countryCode: userData.countryCode,
-        });
+        };
+
+        setFormData(fetchedData);
+        setInitialData(fetchedData);
 
         const permissions =
           userData.permissions?.map((p: { permission: { key: string } }) => p.permission.key) || [];
@@ -82,7 +87,7 @@ export const ProfileSettings = () => {
     }));
   };
 
-  // Updated image upload handler to store the file as well as preview
+  // Image upload handler: store the file and show a preview
   const handleImageUpload = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -120,7 +125,7 @@ export const ProfileSettings = () => {
     }));
   };
 
-  // Function to update profile information (excluding password)
+  // Update profile information (excluding password)
   const handleUpdate = async () => {
     try {
       // Create a FormData object to send file and text data
@@ -151,17 +156,18 @@ export const ProfileSettings = () => {
 
       const data = await response.json();
       console.log("Admin updated successfully", data);
-      navigate("/admin/admin");
+      setSuccess("Profile updated successfully");
+      setError(null);
     } catch (error) {
       console.error("Error updating admin:", error);
       setError(error instanceof Error ? error.message : "An error occurred");
+      setSuccess(null);
     }
   };
 
-  // Function to handle password reset using Axios
+  // Handle password reset using Axios
   const handlePasswordUpdate = async () => {
     try {
-      // Send PATCH request to reset password endpoint
       const response = await axios.patch(
         `${SERVER_URL}/api/general/account/reset-password`,
         {
@@ -171,16 +177,27 @@ export const ProfileSettings = () => {
         { withCredentials: true }
       );
       console.log("Password reset successfully:", response.data);
-      // Optionally, you can show a success message or notification here
-
+      setSuccess("Password reset successfully");
+      setError(null);
       // Close the modal and clear the password fields
       setShowPasswordModal(false);
       setPasswordData({ newPassword: "", confirmPassword: "" });
     } catch (err: any) {
       console.error("Error resetting password:", err.response?.data || err.message);
-      // Optionally, display error message to the user (e.g., using setError or a toast notification)
       setError(err.response?.data?.message || "Error resetting password");
+      setSuccess(null);
     }
+  };
+
+  // Cancel action: reset the form to its initial values
+  const handleCancel = () => {
+    setFormData(initialData);
+    setImageFile(null);
+    setImagePreview(null);
+    // Optionally reset permissions as needed:
+    // setSelectedPermissions([]);
+    setSuccess("Changes cancelled");
+    setError(null);
   };
 
   // Loading Skeleton
@@ -188,14 +205,10 @@ export const ProfileSettings = () => {
     return (
       <div className="max-w-7xl mx-auto p-6">
         <div className="animate-pulse space-y-6">
-          {/* Skeleton for the header */}
           <div className="h-8 bg-gray-300 rounded w-1/2"></div>
-          {/* Skeleton card */}
           <div className="card shadow-lg bg-white border-2 p-6">
             <div className="flex space-x-4">
-              {/* Skeleton for image */}
               <div className="w-32 h-32 bg-gray-300 rounded-lg"></div>
-              {/* Skeleton for text fields */}
               <div className="flex-1 space-y-4">
                 <div className="h-4 bg-gray-300 rounded w-full"></div>
                 <div className="h-4 bg-gray-300 rounded w-5/6"></div>
@@ -213,16 +226,16 @@ export const ProfileSettings = () => {
     );
   }
 
-  if (error) {
-    return <div className="text-center p-8 text-red-500">Error: {error}</div>;
-  }
-
   if (initialLoad) {
     return null;
   }
 
   return (
     <div className="max-w-7xl mx-auto">
+      {/* Display messages */}
+      {error && <div className="mb-4 p-4 bg-red-100 text-red-700 rounded">{error}</div>}
+      {success && <div className="mb-4 p-4 bg-green-100 text-green-700 rounded">{success}</div>}
+      
       <h1 className="text-2xl font-bold mb-6">{formData.fullName}</h1>
       <div className="card shadow-lg bg-white border-2 p-6">
         <div className="space-y-6">
@@ -418,10 +431,7 @@ export const ProfileSettings = () => {
 
       {/* Cancel & Update Buttons for Profile Update */}
       <div className="flex justify-end mt-6 space-x-4">
-        <button
-          className="btn btn-outline"
-          onClick={() => navigate("/admin/admin")}
-        >
+        <button className="btn btn-outline" onClick={handleCancel}>
           Cancel
         </button>
         <button onClick={handleUpdate} className="btn btn-warning text-white">

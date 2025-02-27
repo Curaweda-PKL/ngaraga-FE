@@ -3,37 +3,60 @@ import axios from "axios";
 import { SERVER_URL } from "@/middleware/utils";
 
 const SuccessVerify: React.FC = () => {
-  const [email, setEmail] = useState<string>('');
-  const [name, setName] = useState<string>('');
+  const [email, setEmail] = useState<string>("");
+  const [name, setName] = useState<string>("");
 
+  // Use the verification endpoint if a token is provided in the URL
   useEffect(() => {
-    // Attempt to get the email and name from localStorage first.
-    const storedEmail = localStorage.getItem('userEmail');
-    const storedName = localStorage.getItem('userName');
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get("token");
 
-    if (storedEmail) {
-      setEmail(storedEmail);
-    }
-    if (storedName) {
-      setName(storedName);
-    }
-
-    // If data isn't available in localStorage, fetch from the user profile API.
-    if (!storedEmail || !storedName) {
+    if (token) {
       axios
-        .get(`${SERVER_URL}/api/account/profile`, { withCredentials: true })
+        .get(`${SERVER_URL}/api/registrations/verify?token=${token}`)
         .then((response) => {
           if (response.data) {
+            // Assume the endpoint returns the user's email and fullName (or name)
             setEmail(response.data.email);
-            // Prefer fullName if available; otherwise, fall back to name.
-            setName(response.data.fullName || response.data.name || '');
+            setName(response.data.fullName || response.data.name || "");
           }
         })
         .catch((error) => {
-          console.error('Error fetching profile:', error);
+          console.error("Verification failed:", error);
         });
     }
   }, []);
+
+  // Fallback to localStorage and profile API if token is not present or data is missing
+  useEffect(() => {
+    if (!email || !name) {
+      // Attempt to get the email and name from localStorage
+      const storedEmail = localStorage.getItem("userEmail");
+      const storedName = localStorage.getItem("userName");
+
+      if (storedEmail) {
+        setEmail(storedEmail);
+      }
+      if (storedName) {
+        setName(storedName);
+      }
+
+      // If data isn't available in localStorage, fetch from the user profile API
+      if (!storedEmail || !storedName) {
+        axios
+          .get(`${SERVER_URL}/api/account/profile`, { withCredentials: true })
+          .then((response) => {
+            if (response.data) {
+              setEmail(response.data.email);
+              setName(response.data.fullName || response.data.name || "");
+            }
+          })
+          .catch((error) => {
+            console.error("Error fetching profile:", error);
+          });
+      }
+    }
+  }, [email, name]);
 
   return (
     <div className="flex justify-center items-center min-h-screen break-words">
@@ -76,11 +99,10 @@ const SuccessVerify: React.FC = () => {
           />
         </svg>
         <h1 className="text-2xl font-semibold mt-4">
-          Thank You{ name ? `, ${name}` : '' }!
+          Thank You{ name ? `, ${name}` : "" }!
         </h1>
         <p className="mt-2 text-lg">
-            Your email is verified successfully. 
-          <strong> {email}</strong>
+          Your email is verified successfully. <strong>{email}</strong>
         </p>
         <p className="mt-2 text-lg">See you there!</p>
       </div>
