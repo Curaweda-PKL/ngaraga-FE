@@ -344,7 +344,7 @@ const EventRegistration: React.FC = () => {
               <button
                 onClick={handleRegistration}
                 disabled={registrationStatus.loading}
-                className="w-full py-3 px-4 bg-yellow-500 text-white font-medium rounded-xl hover:bg-yellow-600 transition-colors"
+                className="w-full py-3 px-4 bg-call-to-action text-white font-medium rounded-xl hover:bg-yellow-600 transition-colors"
               >
                 {registrationStatus.loading ? "Registering..." : "Register"}
               </button>

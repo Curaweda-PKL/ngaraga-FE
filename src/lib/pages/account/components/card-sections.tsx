@@ -8,6 +8,9 @@ type Card = {
   creator: string;
   image: string;
   price?: string;
+  index?: string;
+  total?: string;
+  achieved?: boolean;
 };
 
 type Purchase = {
@@ -41,11 +44,54 @@ const cardData: Card[] = [
 
 const specialCardData: Card[] = [
   {
-    id: 3,
-    title: "Cosmic Symphony",
-    creator: "NebulaKid",
-    image: "/src/assets/img/Cosmic-Symphony.png",
+    id: 1,
+    title: "Distant Galaxy",
+    creator: "MoonDancer",
+    image: "/src/assets/img/Distant-Galaxy.png",
+    index: "04",
+    total: "04",
+    achieved: true
   },
+  {
+    id: 2,
+    title: "Life On Edena",
+    creator: "NebulaKid",
+    image: "/src/assets/img/Life-On-Edena.png",
+    index: "02",
+    total: "02"
+  },
+  {
+    id: 3,
+    title: "AstroFiction",
+    creator: "Spaceone",
+    image: "/src/assets/img/AstroFiction.png",
+    index: "06",
+    total: "05"
+  },
+  {
+    id: 4,
+    title: "Life On Edena",
+    creator: "NebulaKid",
+    image: "/src/assets/img/Life-On-Edena.png",
+    index: "05",
+    total: "05"
+  },
+  {
+    id: 5,
+    title: "Distant Galaxy",
+    creator: "MoonDancer",
+    image: "/src/assets/img/Distant-Galaxy.png",
+    index: "00",
+    total: "03"
+  },
+  {
+    id: 6,
+    title: "AstroFiction",
+    creator: "Spaceone",
+    image: "/src/assets/img/AstroFiction.png",
+    index: "00",
+    total: "01"
+  }
 ];
 
 const purchaseData: Purchase[] = [
@@ -154,14 +200,14 @@ export const CardSection = () => {
       case "Payment":
         return (
           <div className="flex flex-col sm:flex-row gap-3">
-            <button className="px-4 py-2 text-yellow-600 border border-yellow-600 rounded-lg hover:bg-yellow-50 text-sm">
+            <button className="px-4 py-2 text-call-to-action border border-call-to-action rounded-lg hover:bg-yellow-50 text-sm">
               Change Payment
             </button>
             <a
               href="/payments"
               className="w-full sm:w-auto"
             >
-              <button className="w-full px-4 py-2 text-white bg-yellow-600 rounded-lg hover:bg-yellow-700 text-sm">
+              <button className="w-full px-4 py-2 text-white bg-call-to-action rounded-lg hover:bg-yellow-700 text-sm">
                 Payment
               </button>
             </a>
@@ -170,14 +216,14 @@ export const CardSection = () => {
       case "Delivered":
         return (
           <div className="flex flex-col sm:flex-row gap-3">
-            <button className="px-4 py-2 text-yellow-600 border border-yellow-600 rounded-lg hover:bg-yellow-50 text-sm">
+            <button className="px-4 py-2 text-call-to-action border border-call-to-action rounded-lg hover:bg-yellow-50 text-sm">
               Delivered
             </button>
             <a
               href="/view-detail"
               className="w-full sm:w-auto"
             >
-              <button className="w-full px-4 py-2 text-white bg-yellow-600 rounded-lg hover:bg-yellow-700 text-sm">
+              <button className="w-full px-4 py-2 text-white bg-call-to-action rounded-lg hover:bg-yellow-700 text-sm">
                 View Details
               </button>
             </a>
@@ -185,7 +231,7 @@ export const CardSection = () => {
         );
       default:
         return (
-          <button className="w-full sm:w-auto px-4 py-2 text-white bg-yellow-600 rounded-lg hover:bg-yellow-700 text-sm">
+          <button className="w-full sm:w-auto px-4 py-2 text-white bg-call-to-action rounded-lg hover:bg-yellow-700 text-sm">
             View Details
           </button>
         );
@@ -244,7 +290,7 @@ export const CardSection = () => {
                 onClick={() => setActiveFilter(filter as any)}
                 className={`px-3 py-1 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-medium ${
                   activeFilter === filter
-                    ? "bg-yellow-100 text-yellow-600 border-2 border-yellow-600"
+                    ? "bg-call-to-action-100 text-call-to-action border-2 border-call-to-action"
                     : "bg-gray-50 text-gray-600 border border-gray-200"
                 }`}
               >
@@ -265,36 +311,79 @@ export const CardSection = () => {
       >
         {currentData.map((item) => {
           if ("image" in item && "title" in item && "creator" in item) {
-            // Render Card/Special Card
-            return (
-              <a
-                href="/special-card-detail"
-                key={item.id}
-              >
-                <div className="w-full h-[400px] flex flex-col items-start gap-4 bg-[#F2F2F2] rounded-2xl shadow-xl transition-transform hover:scale-[1.02]">
-                  <figure className="w-full h-[260px] rounded-t-2xl overflow-hidden">
-                    <img
-                      src={item.image || "/placeholder.svg"}
-                      alt={item.title}
-                      className="w-full h-full object-cover"
-                    />
-                  </figure>
-                  <div className="p-4 sm:p-6 flex flex-col items-start gap-2 w-full flex-grow">
-                    <h3 className="text-xl sm:text-2xl font-bold text-[#171717]">
-                      {item.title}
-                    </h3>
-                    <span className="text-sm sm:text-base text-[#404040]">
-                      {item.creator}
-                    </span>
-                    {activeTab === "cards" && (
-                      <span className="text-sm sm:text-base text-[#404040]">
-                        {item.price}
-                      </span>
-                    )}
+            if (activeTab === "specialCards") {
+              // Render Special Card with new design
+              return (
+                <a
+                  href="/special-card-detail"
+                  key={item.id}
+                  className="block"
+                >
+                  <div className="w-full flex flex-col rounded-lg overflow-hidden transition-transform hover:scale-[1.02]">
+                    <figure className="w-full h-[240px] rounded-t-lg overflow-hidden relative">
+                      <img
+                        src={item.image || "/placeholder.svg"}
+                        alt={item.title}
+                        className="w-full h-full object-cover"
+                      />
+                    </figure>
+                    <div className="bg-gray-100 p-4 rounded-b-lg">
+                      <h3 className="text-lg font-bold text-gray-800 mb-1">
+                        {item.title}
+                      </h3>
+                      <p className="text-sm text-gray-600 mb-2">
+                        {item.creator}
+                      </p>
+                      <div className="flex justify-between items-center">
+                        <div className="text-xs text-gray-500">
+                          {item.index} / {item.total}
+                        </div>
+                        {item.achieved ? (
+                          <div className="bg-call-to-action-600 text-call-to-action border border-call-to-action px-3 py-1 rounded-full text-xs font-medium flex items-center">
+                            <span className="mr-1">✓</span> Achieved
+                          </div>
+                        ) : (
+                          <button className="bg-call-to-action hover:bg-yellow-600 text-white px-4 py-1 rounded-full text-xs font-medium">
+                            Klaim
+                          </button>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </a>
-            );
+                </a>
+              );
+            } else {
+              // Render normal Card
+              return (
+                <a
+                  href="/special-card-detail"
+                  key={item.id}
+                >
+                  <div className="w-full h-[400px] flex flex-col items-start gap-4 bg-[#F2F2F2] rounded-2xl shadow-xl transition-transform hover:scale-[1.02]">
+                    <figure className="w-full h-[260px] rounded-t-2xl overflow-hidden">
+                      <img
+                        src={item.image || "/placeholder.svg"}
+                        alt={item.title}
+                        className="w-full h-full object-cover"
+                      />
+                    </figure>
+                    <div className="p-4 sm:p-6 flex flex-col items-start gap-2 w-full flex-grow">
+                      <h3 className="text-xl sm:text-2xl font-bold text-[#171717]">
+                        {item.title}
+                      </h3>
+                      <span className="text-sm sm:text-base text-[#404040]">
+                        {item.creator}
+                      </span>
+                      {activeTab === "cards" && item.price && (
+                        <span className="text-sm sm:text-base text-[#404040]">
+                          {item.price}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </a>
+              );
+            }
           } else if ("orderId" in item && "status" in item) {
             // Render Purchase
             return (

@@ -73,10 +73,10 @@ const SpecialCardDetail = () => {
                 <p className="text-gray-600 mb-1">Price</p>
                 <p className="font-bold mb-4">{product.price}</p>
                 <div className="flex gap-3">
-                  <button className="flex-1 sm:flex-none bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600">
+                  <button className="flex-1 sm:flex-none bg-call-to-action text-white px-4 py-2 rounded-lg hover:bg-yellow-600">
                     Add to Cart
                   </button>
-                  <button className="flex-1 sm:flex-none border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50">
+                  <button className="flex-1 sm:flex-none border border-call-to-action text-call-to-action px-4 py-2 rounded-lg">
                     Checkout
                   </button>
                 </div>
@@ -145,13 +145,13 @@ const SpecialCardDetail = () => {
       <div>
         <h2 className="text-lg sm:text-xl font-bold mb-4">Tags</h2>
         <div className="flex flex-wrap gap-3">
-          <span className="px-4 py-2 border border-gray-300 rounded-full text-gray-600">
+          <span className="px-4 py-2 border border-call-to-action rounded-full text-call-to-action">
             Animation
           </span>
-          <span className="px-4 py-2 border border-gray-300 rounded-full text-gray-600">
+          <span className="px-4 py-2 border border-call-to-action rounded-full text-call-to-action">
             illustration
           </span>
-          <span className="px-4 py-2 border border-gray-300 rounded-full text-gray-600">
+          <span className="px-4 py-2 border border-call-to-action rounded-full text-call-to-action">
             moon
           </span>
         </div>
