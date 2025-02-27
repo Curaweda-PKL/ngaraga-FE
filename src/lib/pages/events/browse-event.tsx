@@ -24,9 +24,9 @@ const EventCard: React.FC<EventCardProps> = ({
   
   const handleClick = () => {
     if (id) {
-      navigate(`/detail-events/id`);
+      navigate(`/detail-events/${id}`);
     } else {
-      navigate("/detail-events/id");
+      navigate("/");
     }
   };
   

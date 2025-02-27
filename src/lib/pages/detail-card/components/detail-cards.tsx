@@ -7,8 +7,6 @@ import { useParams } from "react-router-dom";
 import { SERVER_URL } from "@/middleware/utils";
 import { motion, AnimatePresence } from "framer-motion";
 
-import React from "react";
-import {CiShoppingCart} from "react-icons/ci";
 
 
 export const DetailCards: React.FC = () => {
