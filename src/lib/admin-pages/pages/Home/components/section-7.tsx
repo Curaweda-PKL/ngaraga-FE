@@ -94,7 +94,7 @@ export const SectionSevenForm = () => {
               />
               <label
                 htmlFor={`file-${imageKey}`}
-                className="bg-yellow-500 text-white px-4 py-1 rounded-md text-sm cursor-pointer inline-block"
+                className="bg-call-to-action text-white px-4 py-1 rounded-md text-sm cursor-pointer inline-block"
               >
                 Browse
               </label>

@@ -79,7 +79,7 @@ export default function PageTraffic() {
                 onClick={() => section.setFilter(btn)}
                 className={`px-4 py-2 rounded-md text-sm font-medium ${
                   section.filter === btn
-                    ? "bg-yellow-500 text-white"
+                    ? "bg-call-to-action text-white"
                     : "bg-gray-200 text-gray-700"
                 }`}
               >
