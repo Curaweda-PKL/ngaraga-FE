@@ -1,5 +1,4 @@
 import {useState} from "react";
-import FusionModal from "./components/fusionModal";
 
 const SpecialCardDetail = () => {
   const [showFusionModal, setShowFusionModal] = useState(false);
@@ -90,23 +89,6 @@ const SpecialCardDetail = () => {
           ))}
         </div>
       </div>
-
-      {/* Fusion Button */}
-      <div className="flex justify-center mb-10">
-        <button
-          onClick={() => setShowFusionModal(true)}
-          className="bg-[#DDB11F] hover:from-orange-600 hover:to-yellow-600 text-white font-bold py-3 px-8 rounded-lg shadow-lg transition-all duration-300"
-        >
-          FUSION CHARACTER
-        </button>
-      </div>
-
-      {/* Fusion Modal */}
-      <FusionModal
-        isOpen={showFusionModal}
-        onClose={() => setShowFusionModal(false)}
-        products={products}
-      />
 
       {/* Created By Section */}
       <div className="mb-6 sm:mb-8">
