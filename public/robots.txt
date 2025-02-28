@@ -3,4 +3,4 @@ User-agent: *
 Allow: /
 
 # Host
-Host: republic.indonesia.travel
+Host: curaweda.com

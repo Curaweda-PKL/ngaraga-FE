@@ -1,15 +1,152 @@
-/* eslint-disable import/no-extraneous-dependencies */
-import tailwindTypography from '@tailwindcss/typography';
-import type { Config } from 'tailwindcss';
-import { fontFamily } from 'tailwindcss/defaultTheme';
+import tailwindTypography from "@tailwindcss/typography";
+import daisyui from "daisyui";
+import type { Config } from "tailwindcss";
+import { fontFamily } from "tailwindcss/defaultTheme";
 
 export default {
-  darkMode: ['class'],
-  content: ['./src/**/*.{js,jsx,ts,tsx}'],
+  darkMode: ["class"],
+  content: ["./src/**/*.{js,jsx,ts,tsx}"],
   theme: {
-    fontFamily: {
-      sans: ['"Plus Jakarta Sans"', ...fontFamily.sans],
+    extend: {
+      colors: {
+        "background-primary": "#FFFFFF",
+        "background-secondary": "var(--background-secondary)",
+        "call-to-action": "var(--call-to-action)",
+        "call-to-actions": {
+          100: "var(--call-to-actions-100)",
+          200: "var(--call-to-actions-200)",
+          300: "var(--call-to-actions-300)",
+          400: "var(--call-to-actions-400)",
+          500: "var(--call-to-actions-500)",
+          600: "var(--call-to-actions-600)",
+          700: "var(--call-to-actions-700)",
+          800: "var(--call-to-actions-800)",
+          900: "var(--call-to-actions-900)",
+        },
+        "neutral-colors": {
+          100: "var(--neutral-colors-100)",
+          200: "var(--neutral-colors-200)",
+          300: "var(--neutral-colors-300)",
+          400: "var(--neutral-colors-400)",
+          500: "var(--neutral-colors-500)",
+          600: "var(--neutral-colors-600)",
+          700: "var(--neutral-colors-700)",
+          800: "var(--neutral-colors-800)",
+          900: "var(--neutral-colors-900)",
+        },
+        "success-colors": {
+          100: "var(--success-colors-100)",
+          200: "var(--success-colors-200)",
+          300: "var(--success-colors-300)",
+          400: "var(--success-colors-400)",
+          500: "var(--success-colors-500)",
+          600: "var(--success-colors-600)",
+          700: "var(--success-colors-700)",
+          800: "var(--success-colors-800)",
+          900: "var(--success-colors-900)",
+        },
+        "info-colors": {
+          100: "var(--info-colors-100)",
+          200: "var(--info-colors-200)",
+          300: "var(--info-colors-300)",
+          400: "var(--info-colors-400)",
+          500: "var(--info-colors-500)",
+          600: "var(--info-colors-600)",
+          700: "var(--info-colors-700)",
+          800: "var(--info-colors-800)",
+          900: "var(--info-colors-900)",
+        },
+        "warning-colors": {
+          100: "var(--warning-colors-100)",
+          200: "var(--warning-colors-200)",
+          300: "var(--warning-colors-300)",
+          400: "var(--warning-colors-400)",
+          500: "var(--warning-colors-500)",
+          600: "var(--warning-colors-600)",
+          700: "var(--warning-colors-700)",
+          800: "var(--warning-colors-800)",
+          900: "var(--warning-colors-900)",
+        },
+        "danger-colors": {
+          100: "var(--danger-colors-100)",
+          200: "var(--danger-colors-200)",
+          300: "var(--danger-colors-300)",
+          400: "var(--danger-colors-400)",
+          500: "var(--danger-colors-500)",
+          600: "var(--danger-colors-600)",
+          700: "var(--danger-colors-700)",
+          800: "var(--danger-colors-800)",
+          900: "var(--danger-colors-900)",
+        },
+        "call-to-shadow": "var(--call-to-shadow)",
+        "light-cream": "var(--light-cream)",
+
+        background: "hsl(var(--background))",
+        foreground: "hsl(var(--foreground))",
+        card: {
+          DEFAULT: "hsl(var(--card))",
+          foreground: "hsl(var(--card-foreground))",
+        },
+        popover: {
+          DEFAULT: "hsl(var(--popover))",
+          foreground: "hsl(var(--popover-foreground))",
+        },
+        primary: {
+          DEFAULT: "hsl(var(--primary))",
+          foreground: "hsl(var(--primary-foreground))",
+        },
+        secondary: {
+          DEFAULT: "hsl(var(--secondary))",
+          foreground: "hsl(var(--secondary-foreground))",
+        },
+        muted: {
+          DEFAULT: "hsl(var(--muted))",
+          foreground: "hsl(var(--muted-foreground))",
+        },
+        accent: {
+          DEFAULT: "hsl(var(--accent))",
+          foreground: "hsl(var(--accent-foreground))",
+        },
+        destructive: {
+          DEFAULT: "hsl(var(--destructive))",
+          foreground: "hsl(var(--destructive-foreground))",
+        },
+        border: "hsl(var(--border))",
+        input: "hsl(var(--input))",
+        ring: "hsl(var(--ring))",
+        chart: {
+          "1": "hsl(var(--chart-1))",
+          "2": "hsl(var(--chart-2))",
+          "3": "hsl(var(--chart-3))",
+          "4": "hsl(var(--chart-4))",
+          "5": "hsl(var(--chart-5))",
+        },
+        sidebar: {
+          DEFAULT: "hsl(var(--sidebar-background))",
+          foreground: "hsl(var(--sidebar-foreground))",
+          primary: "hsl(var(--sidebar-primary))",
+          "primary-foreground": "hsl(var(--sidebar-primary-foreground))",
+          accent: "hsl(var(--sidebar-accent))",
+          "accent-foreground": "hsl(var(--sidebar-accent-foreground))",
+          border: "hsl(var(--sidebar-border))",
+          ring: "hsl(var(--sidebar-ring))",
+        },
+      },
+      fontFamily: {
+        sans: ['"Nunito Sans"', ...fontFamily.sans],
+        mono: ['"Mono"', "monospace"],
+      },
+      borderRadius: {
+        lg: "var(--radius)",
+        md: "calc(var(--radius) - 2px)",
+        sm: "calc(var(--radius) - 4px)",
+      },
     },
   },
-  plugins: [tailwindTypography],
+  plugins: [
+    tailwindTypography,
+    daisyui,
+    require("tailwindcss-animate"),
+    require("flowbite/plugin"),
+  ],
 } satisfies Config;
