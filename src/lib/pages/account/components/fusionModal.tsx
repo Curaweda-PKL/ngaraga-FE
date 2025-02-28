@@ -1,5 +1,5 @@
 import {useState} from "react";
-import {X, Square, Diamond} from "lucide-react";
+import {X} from "lucide-react";
 
 interface Product {
   id: number;
@@ -16,172 +16,333 @@ interface FusionModalProps {
 }
 
 const FusionModal = ({isOpen, onClose, products}: FusionModalProps) => {
-  const [selectedCards, setSelectedCards] = useState<number[]>([]);
+  const [modalState, setModalState] = useState<
+    "initial" | "confirm" | "processing"
+  >("initial");
+  const [transactionId, setTransactionId] = useState<string>("");
 
   if (!isOpen) return null;
 
-  const toggleCardSelection = (id: number) => {
-    if (selectedCards.includes(id)) {
-      setSelectedCards(selectedCards.filter((cardId) => cardId !== id));
-    } else if (selectedCards.length < 4) {
-      setSelectedCards([...selectedCards, id]);
-    }
+  // Materials required for evolution
+  const materials = [
+    {
+      name: "Golden Sword",
+      color: "bg-red-600",
+      border: "border-yellow-500",
+      quantity: "10/10",
+      collected: true,
+    },
+    {
+      name: "Magic Essence",
+      color: "bg-purple-600",
+      border: "border-pink-500",
+      quantity: "10/10",
+      collected: true,
+    },
+    {
+      name: "Blue Essence",
+      color: "bg-blue-500",
+      border: "border-blue-300",
+      quantity: "10/10",
+      collected: true,
+    },
+    {
+      name: "Yellow Essence",
+      color: "bg-yellow-500",
+      border: "border-yellow-300",
+      quantity: "10/10",
+      collected: true,
+    },
+    {
+      name: "Pink Essence",
+      color: "bg-pink-500",
+      border: "border-pink-300",
+      quantity: "10/10",
+      collected: true,
+    },
+    {
+      name: "Red Essence",
+      color: "bg-red-500",
+      border: "border-red-300",
+      quantity: "10/10",
+      collected: true,
+    },
+    {
+      name: "Rainbow Essence",
+      color: "bg-purple-600",
+      border: "border-pink-400",
+      quantity: "10/10",
+      collected: true,
+    },
+  ];
+
+  const handleEvolve = () => {
+    setModalState("confirm");
   };
 
-  const isCardSelected = (id: number) => selectedCards.includes(id);
-
-  const getCardTypeIcon = (index: number) => {
-    // Different icons for different card positions
-    switch (index % 4) {
-      case 0:
-        return <Diamond className="w-8 h-8 text-blue-400 fill-blue-200" />;
-      case 1:
-        return <Diamond className="w-8 h-8 text-blue-500 fill-blue-300" />;
-      case 2:
-        return <Square className="w-8 h-8 text-blue-600 fill-blue-400" />;
-      case 3:
-        return <Diamond className="w-8 h-8 text-pink-400 fill-pink-200" />;
-      default:
-        return <Diamond className="w-8 h-8 text-blue-400 fill-blue-200" />;
-    }
+  const handleConfirm = () => {
+    setModalState("processing");
+    setTransactionId("0x380C8D...601D");
+    // Simulate processing time
+    setTimeout(() => {
+      onClose();
+      setModalState("initial");
+    }, 3000);
   };
+
+  const handleReject = () => {
+    setModalState("initial");
+  };
+
+  if (modalState === "confirm") {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-80">
+        <div className="relative w-full max-w-2xl bg-white rounded-lg overflow-hidden shadow-2xl">
+          <div className="p-6">
+            <h2 className="text-xl font-bold mb-4">
+              Confirm Fusion of selected heroes
+            </h2>
+
+            {/* Character Cards */}
+            <div className="flex items-center justify-center gap-2 mb-6">
+              {products.slice(0, 4).map((product, index) => (
+                <div
+                  key={index}
+                  className="w-24 h-24 rounded-lg overflow-hidden border-2 border-gray-200"
+                >
+                  <img
+                    src={product.image || "/placeholder.svg"}
+                    alt={product.name}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="text-xs text-center text-gray-600 mt-1">
+                    #{1670 + index}
+                  </div>
+                </div>
+              ))}
+              <div className="text-2xl text-blue-500 mx-2">&gt;</div>
+              <div className="w-24 h-24 bg-gradient-to-br from-orange-400 to-red-500 rounded-lg"></div>
+            </div>
+
+            <div className="border-t border-gray-200 pt-4">
+              <h3 className="font-bold mb-2">Proceed to your wallet</h3>
+              <p className="text-gray-600 text-sm mb-4">
+                You will need to confirm the transaction within your wallet.
+              </p>
+
+              {/* Transaction Details */}
+              <div className="bg-gray-50 rounded-lg p-4 mb-4">
+                <div className="flex justify-between mb-2">
+                  <span className="text-gray-600">Estimated fee</span>
+                  <span className="font-medium">0.00233778 BNB</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Total</span>
+                  <span className="font-medium">0.00233778 BNB</span>
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-3">
+                <button
+                  onClick={handleReject}
+                  className="px-6 py-2 border border-gray-300 rounded-full text-gray-700 hover:bg-gray-50"
+                >
+                  Reject
+                </button>
+                <button
+                  onClick={handleConfirm}
+                  className="px-6 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600"
+                >
+                  Confirm
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (modalState === "processing") {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-80">
+        <div className="relative w-full max-w-2xl bg-white rounded-lg overflow-hidden shadow-2xl">
+          <div className="p-6">
+            <h2 className="text-xl font-bold mb-4">Creating a Mystery Box</h2>
+
+            {/* Character Cards */}
+            <div className="flex items-center justify-center gap-2 mb-6">
+              {products.slice(0, 4).map((product, index) => (
+                <div
+                  key={index}
+                  className="w-24 h-24 rounded-lg overflow-hidden border-2 border-gray-200"
+                >
+                  <img
+                    src={product.image || "/placeholder.svg"}
+                    alt={product.name}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="text-xs text-center text-gray-600 mt-1">
+                    #{1670 + index}
+                  </div>
+                </div>
+              ))}
+              <div className="text-2xl text-blue-500 mx-2">&gt;</div>
+              <div className="w-24 h-24 bg-gradient-to-br from-orange-400 to-red-500 rounded-lg"></div>
+            </div>
+
+            <div className="text-center text-gray-600 mb-4">
+              <p>Your Fusion is currently in progress.</p>
+              <p>Confirmation on the blockchain will follow shortly.</p>
+            </div>
+
+            <div className="text-center text-sm text-gray-500 mb-4">
+              Transaction
+              <br />
+              <span className="font-mono">{transactionId}</span>
+            </div>
+
+            <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
+              <div
+                className="bg-blue-500 h-2 rounded-full animate-[progress_2s_ease-in-out_infinite]"
+                style={{width: "70%"}}
+              ></div>
+            </div>
+
+            <div className="text-center">
+              <div className="inline-flex items-center px-4 py-2 bg-blue-100 text-blue-800 rounded-full">
+                <svg
+                  className="animate-spin -ml-1 mr-3 h-5 w-5 text-blue-600"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+                Processing...
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-70">
-      <div className="relative w-full max-w-4xl bg-gradient-to-b from-blue-50 to-gray-100 rounded-3xl shadow-2xl overflow-hidden">
-        {/* Header with title */}
-        <div className="text-center py-4 border-b border-gray-200">
-          <h2 className="text-2xl font-bold text-blue-900">FUSION</h2>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-80">
+      <div className="relative w-full max-w-3xl bg-gray-900 rounded-lg overflow-hidden shadow-2xl">
+        {/* Header with gradient */}
+        <div className="relative bg-gradient-to-r from-orange-500 via-yellow-500 to-yellow-400 py-3 px-4 flex justify-between items-center">
+          <h2 className="text-2xl font-bold text-white tracking-wider drop-shadow-md">
+            EVOLVE
+          </h2>
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+            className="bg-red-600 rounded-full w-10 h-10 flex items-center justify-center text-white hover:bg-red-700 transition-colors"
           >
             <X className="w-6 h-6" />
           </button>
         </div>
 
-        {/* Subtitle */}
-        <div className="text-center py-3 px-6">
-          <h3 className="text-lg text-blue-800">
-            Simple & clean digit card game US
-            <br />
-            no excessive card preview
-          </h3>
+        {/* Description */}
+        <div className="px-4 py-2 text-gray-300 text-sm">
+          <p>Evolving a unit will consume materials in requirements.</p>
         </div>
 
-        {/* Card Selection Area */}
-        <div className="grid grid-cols-4 gap-4 p-6">
-          {products.map((product, index) => (
-            <div
-              key={product.id}
-              onClick={() => toggleCardSelection(product.id)}
-              className={`relative cursor-pointer transition-all duration-300 transform ${
-                isCardSelected(product.id)
-                  ? "scale-105 ring-4 ring-blue-400"
-                  : "hover:scale-105"
-              }`}
-            >
-              <div className="bg-gradient-to-b from-blue-100 to-gray-100 rounded-xl overflow-hidden border-2 border-gray-200">
-                {/* Card Number and Type */}
-                <div className="flex justify-between items-center p-2 bg-gradient-to-r from-blue-200 to-blue-300 text-white">
-                  <div className="flex items-center">
-                    <div className="w-6 h-6 rounded-full bg-white text-blue-500 flex items-center justify-center font-bold">
-                      {index + 1}
-                    </div>
-                  </div>
-                  <div className="text-xs font-bold">
-                    {index % 2 === 0 ? "NORMAL CARD" : "SPECIAL CARD"}
+        {/* Main Content */}
+        <div className="flex flex-col md:flex-row p-4 gap-4">
+          {/* Left Side - Character Evolution */}
+          <div className="flex-1 flex flex-col items-center">
+            <div className="flex items-center justify-center gap-4">
+              {/* Before Character */}
+              <div className="relative">
+                <div className="w-32 h-32 bg-gradient-to-b from-red-600 to-purple-700 rounded-lg overflow-hidden border-2 border-red-400">
+                  <img
+                    src={
+                      products[0]?.image ||
+                      "/placeholder.svg?height=128&width=128"
+                    }
+                    alt="Character Before"
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-r from-red-600 to-purple-700 py-1 px-2 text-white text-center text-sm font-bold">
+                    {products[0]?.name.split(" ")[0] || "Hunter"}
                   </div>
                 </div>
+              </div>
 
-                {/* Card Image */}
-                <div className="p-4 bg-gradient-to-br from-blue-900 to-blue-700 flex items-center justify-center h-32">
-                  {getCardTypeIcon(index)}
-                </div>
+              {/* Arrow */}
+              <div className="text-white text-3xl font-bold">&gt;</div>
 
-                {/* Card Name */}
-                <div className="p-2 text-center bg-gray-50">
-                  <p className="text-sm font-medium text-gray-700">
-                    {product.name.split(" ")[0]}
-                  </p>
-                  <p className="text-xs text-gray-500">•</p>
-                </div>
-
-                {/* Card Button */}
-                <div className="p-1">
-                  <button className="w-full py-1 bg-blue-400 hover:bg-blue-500 text-white rounded-md text-sm">
-                    {isCardSelected(product.id) ? "Selected" : "Select"}
-                  </button>
+              {/* After Character */}
+              <div className="relative">
+                <div className="w-32 h-32 bg-gradient-to-b from-blue-600 to-purple-700 rounded-lg overflow-hidden border-2 border-blue-400">
+                  <img
+                    src={
+                      products[0]?.image ||
+                      "/placeholder.svg?height=128&width=128"
+                    }
+                    alt="Character After"
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-r from-blue-600 to-purple-700 py-1 px-2 text-white text-center text-sm font-bold">
+                    {products[0]?.name.split(" ")[0] || "Hunter"} (Divinity)
+                  </div>
                 </div>
               </div>
             </div>
-          ))}
-        </div>
 
-        {/* Selected Cards Indicators */}
-        <div className="px-6 pb-4">
-          <p className="text-blue-800 font-medium mb-2">
-            Resulting special product
-          </p>
-          <div className="flex space-x-4 mb-6">
-            {[0, 1, 2, 3].map((index) => {
-              const selectedProduct = products.find(
-                (p) => p.id === selectedCards[index]
-              );
-              return (
-                <div
-                  key={index}
-                  className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                    selectedProduct
-                      ? "bg-gradient-to-br from-blue-400 to-blue-600 shadow-lg"
-                      : "bg-gray-200"
-                  }`}
-                >
-                  {selectedProduct && getCardTypeIcon(index)}
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Confirm Button */}
-          <div className="flex justify-center">
-            <button
-              className={`py-3 px-16 rounded-full text-white text-lg font-bold shadow-lg ${
-                selectedCards.length === 4
-                  ? "bg-gradient-to-r from-blue-400 to-blue-600 hover:from-blue-500 hover:to-blue-700"
-                  : "bg-gray-400 cursor-not-allowed"
-              }`}
-              disabled={selectedCards.length !== 4}
-            >
-              CONFIRM
-            </button>
-          </div>
-        </div>
-
-        {/* Result Preview */}
-        <div className="p-6 border-t border-gray-200">
-          <div className="flex justify-between">
-            <div className="w-1/2 pr-4">
-              {/* Left side is empty in the image */}
-            </div>
-            <div className="w-1/2 pl-4 flex flex-col items-center">
-              {selectedCards.length === 4 ? (
-                <div className="w-24 h-24 rounded-lg bg-gradient-to-br from-pink-200 to-pink-400 flex items-center justify-center mb-4">
-                  <Diamond className="w-12 h-12 text-white fill-pink-100" />
-                </div>
-              ) : (
-                <div className="w-24 h-24 rounded-lg bg-gray-200 mb-4"></div>
-              )}
+            {/* Buttons */}
+            <div className="mt-6 flex flex-col gap-2 w-full max-w-xs">
               <button
-                className={`py-2 px-8 rounded-md text-white ${
-                  selectedCards.length === 4
-                    ? "bg-blue-500 hover:bg-blue-600"
-                    : "bg-gray-400 cursor-not-allowed"
-                }`}
-                disabled={selectedCards.length !== 4}
+                onClick={handleEvolve}
+                className="py-2 px-4 bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white font-bold rounded-md shadow-md"
               >
-                CONFIRM
+                Evolve
               </button>
+              <button className="py-2 px-4 bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white font-bold rounded-md shadow-md">
+                Preview
+              </button>
+            </div>
+          </div>
+
+          {/* Right Side - Requirements */}
+          <div className="flex-1">
+            <div className="bg-gray-800 rounded-lg p-3 border border-gray-700">
+              <h3 className="text-white font-bold mb-2">Requirements:</h3>
+
+              {/* Materials Grid */}
+              <div className="grid grid-cols-3 gap-2">
+                {materials.map((material, index) => (
+                  <div
+                    key={index}
+                    className="relative"
+                  >
+                    <div
+                      className={`aspect-square ${material.color} rounded-md border-2 ${material.border} flex items-center justify-center p-1`}
+                    >
+                      <div className="w-full h-full bg-black bg-opacity-20 rounded flex items-center justify-center">
+                        <div className="w-8 h-8 transform rotate-45 bg-gradient-to-br from-white to-transparent opacity-50"></div>
+                      </div>
+                    </div>
+                    <div className="absolute bottom-1 right-1 text-xs font-bold text-white bg-black bg-opacity-50 px-1 rounded">
+                      {material.quantity}
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>

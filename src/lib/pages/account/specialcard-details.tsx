@@ -95,9 +95,9 @@ const SpecialCardDetail = () => {
       <div className="flex justify-center mb-10">
         <button
           onClick={() => setShowFusionModal(true)}
-          className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-8 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105"
+          className="bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600 text-white font-bold py-3 px-8 rounded-lg shadow-lg transition-all duration-300"
         >
-          Fuse Cards to Create Special Card
+          FUSION CHARACTER
         </button>
       </div>
 

@@ -253,57 +253,52 @@ export const EditEvents = () => {
   };
 
   // Submit handler for updating the event
-const handleSubmit = async () => {
-  if (!formData.eventName || !formData.eventTime || !formData.eventDate) {
-    alert("Please fill in all required fields.");
-    return;
-  }
-  // Allow existing image (preview) if no new file is chosen.
-  if (!formData.eventImage && !eventImagePreview) {
-    alert("Please upload an event image.");
-    return;
-  }
-  const data = new FormData();
-  data.append("eventName", formData.eventName);
-  data.append("eventTime", formData.eventTime);
-  data.append("eventDate", formData.eventDate);
-  data.append("eventDescription", formData.eventDetails);
-  data.append("eventType", formData.eventType);
-  if (formData.eventImage) {
-    data.append("eventImage", formData.eventImage);
-  }
-  // Send card reward info as an array if applicable.
-  if (formData.eventBenefit && formData.selectedCard) {
-    // Option 1: Using JSON.stringify to send an array.
-    data.append("cardRewards", JSON.stringify([formData.selectedCard.value]));
-    
-    // Option 2: Using array notation (uncomment if your backend supports it):
-    // data.append("cardRewards[]", formData.selectedCard.value.toString());
-  }
-  if (formData.eventType === "ONLINE") {
-    data.append("onlineZoomLink", formData.linkZoom);
-  } else if (formData.eventType === "OFFLINE") {
-    data.append("offlineLocation", formData.offlineLocation);
-  }
-  if (formData.specialGuest) {
-    data.append("eventSpecialGuestName", formData.guestName);
-    data.append("eventSpecialGuestOccupation", formData.guestOccupation);
-    if (formData.guestAvatar) {
-      data.append("eventSpecialGuestImage", formData.guestAvatar);
+  const handleSubmit = async () => {
+    if (!formData.eventName || !formData.eventTime || !formData.eventDate) {
+      alert("Please fill in all required fields.");
+      return;
     }
-  }
-  try {
-    await axios.put(`${SERVER_URL}/api/events/${id}`, data, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
-    console.log("Event updated successfully");
-    navigate("/admin/event");
-  } catch (error) {
-    console.error("Error updating event:", error);
-    alert("There was an error updating the event. Please try again later.");
-  }
-};
-
+    // Allow existing image (preview) if no new file is chosen.
+    if (!formData.eventImage && !eventImagePreview) {
+      alert("Please upload an event image.");
+      return;
+    }
+    const data = new FormData();
+    data.append("eventName", formData.eventName);
+    data.append("eventTime", formData.eventTime);
+    data.append("eventDate", formData.eventDate);
+    data.append("eventDescription", formData.eventDetails);
+    data.append("eventType", formData.eventType);
+    if (formData.eventImage) {
+      data.append("eventImage", formData.eventImage);
+    }
+    // If event benefit is enabled, send cardRewards as a simple array of card IDs.
+    if (formData.eventBenefit && formData.selectedCard) {
+      data.append("cardRewards", JSON.stringify([formData.selectedCard.value]));
+    }
+    if (formData.eventType === "ONLINE") {
+      data.append("onlineZoomLink", formData.linkZoom);
+    } else if (formData.eventType === "OFFLINE") {
+      data.append("offlineLocation", formData.offlineLocation);
+    }
+    if (formData.specialGuest) {
+      data.append("eventSpecialGuestName", formData.guestName);
+      data.append("eventSpecialGuestOccupation", formData.guestOccupation);
+      if (formData.guestAvatar) {
+        data.append("eventSpecialGuestImage", formData.guestAvatar);
+      }
+    }
+    try {
+      await axios.put(`${SERVER_URL}/api/events/${id}`, data, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      console.log("Event updated successfully");
+      navigate("/admin/event");
+    } catch (error) {
+      console.error("Error updating event:", error);
+      alert("There was an error updating the event. Please try again later.");
+    }
+  };
 
   return (
     <div className="max-w-7xl mx-auto p-6">
@@ -534,7 +529,7 @@ const handleSubmit = async () => {
                   className="sr-only peer"
                 />
                 <div className="w-full h-full bg-gray-200 rounded-full peer peer-checked:bg-yellow-500 transition-colors"></div>
-                <div className="absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 peer-checked:translate-x-4" />
+                <div className="absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 peer peer-checked:translate-x-4" />
               </label>
             </div>
             {formData.specialGuest && (
