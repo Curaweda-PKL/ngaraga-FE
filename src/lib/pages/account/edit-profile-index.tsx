@@ -5,7 +5,6 @@ import { SERVER_URL } from "@/middleware/utils";
 import BasicInformation from "./components/BasicInformation";
 import type { FormData, Column } from "./components/BasicInformation";
 import AddressSection from "./components/AddressSection";
-import { useNavigate } from "react-router-dom";
 
 // Define a type for social links.
 type SocialLinks = {
@@ -31,17 +30,17 @@ const EditProfilePage: React.FC = () => {
   const [columns, setColumns] = useState<Column[]>(
     [...Array(5)].map(() => ({
       enabled: true,
-      value: "https://www.example.com/",
+      value: "",
     }))
   );
 
   // State to store the original social links fetched from the API.
   const [originalSocialLinks, setOriginalSocialLinks] = useState<SocialLinks>({
-    website: "https://www.example.com/",
-    discord: "https://www.example.com/",
-    youtube: "https://www.example.com/",
-    twitter: "https://www.example.com/",
-    instagram: "https://www.example.com/",
+    website: "",
+    discord: "",
+    youtube: "",
+    twitter: "",
+    instagram: "",
   });
 
   // States to hold file objects (if user selects a new image)
@@ -67,7 +66,6 @@ const EditProfilePage: React.FC = () => {
   const [selectedAddress, setSelectedAddress] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const navigate = useNavigate();
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   // Fallback images
@@ -195,38 +193,25 @@ const EditProfilePage: React.FC = () => {
           setBannerImage(normalizedBannerUrl);
         }
 
-        let socialLinksData: any = {};
-        if (data.socialLinks) {
-          if (typeof data.socialLinks === "string") {
-            try {
-              socialLinksData = JSON.parse(data.socialLinks);
-            } catch (err) {
-              console.error("Error parsing socialLinks:", err);
-            }
-          } else {
-            socialLinksData = data.socialLinks;
-          }
-        }
+        let socialLinksData = typeof data.socialLinks === "string"
+        ? JSON.parse(data.socialLinks)
+        : data.socialLinks || {};
 
-        const fetchedSocialLinks: SocialLinks = {
-          website: socialLinksData.website || "https://www.example.com/",
-          discord: socialLinksData.discord || "https://www.example.com/",
-          youtube: socialLinksData.youtube || "https://www.example.com/",
-          twitter: socialLinksData.twitter || "https://www.example.com/",
-          instagram: socialLinksData.instagram || "https://www.example.com/",
-        };
-
-        setColumns([
-          { enabled: true, value: fetchedSocialLinks.website },
-          { enabled: true, value: fetchedSocialLinks.discord },
-          { enabled: true, value: fetchedSocialLinks.youtube },
-          { enabled: true, value: fetchedSocialLinks.twitter },
-          { enabled: true, value: fetchedSocialLinks.instagram },
-        ]);
-        setOriginalSocialLinks(fetchedSocialLinks);
-      } catch (err) {
-        console.error("Error fetching profile", err);
+      setColumns([
+        { enabled: true, value: socialLinksData.website || "" },
+        { enabled: true, value: socialLinksData.discord || "" },
+        { enabled: true, value: socialLinksData.youtube || "" },
+        { enabled: true, value: socialLinksData.twitter || "" },
+        { enabled: true, value: socialLinksData.instagram || "" },
+      ]);
+      setOriginalSocialLinks(socialLinksData);
+    } catch (err) {
+      if (axios.isCancel(err)) {
+        console.log("Request dibatalkan:", err.message);
+      } else {
+        console.error("Error fetching profile:", err);
       }
+    }
     };
 
     fetchProfile();
@@ -294,7 +279,6 @@ const EditProfilePage: React.FC = () => {
       // Hapus pesan sukses setelah 3 detik
       setTimeout(() => {
         setSuccessMessage(null);
-        navigate("/account"); // Redirect setelah update sukses
       }, 3000);
     } catch (err: any) {
       console.error("Error updating profile", err);

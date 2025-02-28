@@ -23,7 +23,9 @@ export interface Column {
 interface BasicInformationProps {
   formData: FormData;
   handleFormChange: (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
   ) => void;
   columns: Column[];
   handleInputChange: (index: number, value: string) => void;
@@ -103,7 +105,7 @@ const BasicInformation: React.FC<BasicInformationProps> = ({
         value={formData.bio}
         onChange={handleFormChange}
         className="mt-4 w-full border border-gray-300 rounded-lg p-4 shadow-sm focus:ring-yellow-500 focus:border-yellow-500"
-        placeholder="The internet's friendliest designer kid."
+        placeholder="Bio"
       ></textarea>
 
       {/* Website Links */}
@@ -112,42 +114,51 @@ const BasicInformation: React.FC<BasicInformationProps> = ({
           <label className="inline-flex items-center cursor-pointer">
             <input
               type="checkbox"
-              checked={column.enabled}
+              checked={column.enabled ?? false} // Default ke false jika undefined
               onChange={() => toggleColumn(index)}
               className="sr-only peer"
             />
-            <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600 dark:peer-checked:bg-blue-600"
-            ></div>
+            <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600 dark:peer-checked:bg-blue-600"></div>
           </label>
           <div className="relative flex items-center w-full mt-2">
             {index === 0 && (
               <CiGlobe
                 size={24}
-                className={`absolute left-3 ${!column.enabled ? "text-gray-400" : "text-black"}`}
+                className={`absolute left-3 ${
+                  !column.enabled ? "text-gray-400" : "text-black"
+                }`}
               />
             )}
             {index === 1 && (
               <AiOutlineDiscord
                 size={24}
-                className={`absolute left-3 ${!column.enabled ? "text-gray-400" : "text-black"}`}
+                className={`absolute left-3 ${
+                  !column.enabled ? "text-gray-400" : "text-black"
+                }`}
               />
             )}
             {index === 2 && (
               <AiOutlineYoutube
                 size={24}
-                className={`absolute left-3 ${!column.enabled ? "text-gray-400" : "text-black"}`}
+                className={`absolute left-3 ${
+                  !column.enabled ? "text-gray-400" : "text-black"
+                }`}
               />
             )}
             {index === 3 && (
               <CiTwitter
                 size={24}
-                className={`absolute left-3 ${!column.enabled ? "text-gray-400" : "text-black"}`}
+                className={`absolute left-3 ${
+                  !column.enabled ? "text-gray-400" : "text-black"
+                }`}
               />
             )}
             {index === 4 && (
               <IoLogoInstagram
                 size={24}
-                className={`absolute left-3 ${!column.enabled ? "text-gray-400" : "text-black"}`}
+                className={`absolute left-3 ${
+                  !column.enabled ? "text-gray-400" : "text-black"
+                }`}
               />
             )}
             <input
@@ -160,7 +171,6 @@ const BasicInformation: React.FC<BasicInformationProps> = ({
                   ? "border-gray-300 focus:ring-yellow-500 focus:border-yellow-500"
                   : "bg-gray-100 border-gray-200 text-gray-400"
               }`}
-              placeholder="https://www.example.com/"
             />
           </div>
         </div>
