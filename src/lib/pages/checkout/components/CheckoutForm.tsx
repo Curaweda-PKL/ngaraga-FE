@@ -38,11 +38,20 @@ export interface Subdistrict {
   name: string;
 }
 
+export interface DeliveryOption {
+  id: string;
+  name: string;
+  logo: string;
+  estimatedDelivery: string;
+  price: number;
+}
+
 const CheckoutForm: React.FC = () => {
   const [selectedTab, setSelectedTab] = useState<"delivery" | "pickup">(
     "delivery"
   );
   const [paymentMethod, setPaymentMethod] = useState<string>("Bank BCA");
+  const [selectedDelivery, setSelectedDelivery] = useState<string>("Anter Aja");
   const [formData, setFormData] = useState<FormData>({
     fullName: "",
     email: "",
@@ -65,6 +74,37 @@ const CheckoutForm: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   const availablePickUpTimes = ["08:00", "10:00", "13:00", "14:00", "15:00"];
+
+  const deliveryOptions: DeliveryOption[] = [
+    {
+      id: "anteraja",
+      name: "Anter Aja",
+      logo: "https://anteraja.id/assets/images/logo-aj.svg",
+      estimatedDelivery: "3-4 Days",
+      price: 15000,
+    },
+    {
+      id: "idexpress",
+      name: "ID Express",
+      logo: "https://idexpress.com/assets/img/logo.png",
+      estimatedDelivery: "3-4 Days",
+      price: 15000,
+    },
+    {
+      id: "jne",
+      name: "JNE",
+      logo: "https://www.jne.co.id/frontend/images/logo.png",
+      estimatedDelivery: "3-4 Days",
+      price: 15000,
+    },
+  ];
+
+  const paymentOptions = [
+    {id: 1, name: "Bank BCA", logo: "/bca-logo.png"},
+    {id: 2, name: "Bank BNI", logo: "/bni-logo.png"},
+    {id: 3, name: "Bank BRI", logo: "/bri-logo.png"},
+    {id: 4, name: "Qris", logo: "/qris-logo.png"},
+  ];
 
   useEffect(() => {
     const fetchProvinces = async () => {
@@ -128,39 +168,92 @@ const CheckoutForm: React.FC = () => {
     setFormData((prev) => ({...prev, pickUpTime: time}));
   };
 
+  const formatCurrency = (amount: number) => {
+    return `Rp ${amount.toLocaleString("id-ID")}`;
+  };
+
   return (
-    <div className="col-span-2">
-      <div className="checkout-header">
-        <h1 className="font-bold text-2xl mb-2">Checkout</h1>
-        {/* Progress indicator remains same */}
+    <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="checkout-header py-4">
+        <h1 className="font-bold text-xl sm:text-2xl mb-2">Checkout</h1>
+        {/* Progress indicator can be added here */}
       </div>
 
-      <div className="mt-10 space-y-4">
-        <div className="flex gap-5 items-center mb-8">
+      <div className="mt-4 sm:mt-6 space-y-4">
+        {/* Delivery/Pickup Tab */}
+        <div className="flex gap-3 sm:gap-5 items-center mb-4 sm:mb-8">
           <button
-            className={`btn ${
+            className={`flex items-center gap-2 py-2 px-3 sm:py-3 sm:px-4 text-sm sm:text-base ${
               selectedTab === "delivery"
-                ? "bg-call-to-actions-100"
+                ? "bg-call-to-actions-100 text-call-to-actions-900"
                 : "bg-neutral-colors-200"
-            } border rounded-lg`}
+            } border rounded-lg transition-colors`}
             onClick={() => setSelectedTab("delivery")}
           >
-            <TbTruckDelivery size={18} />
-            Delivery
+            <TbTruckDelivery className="text-lg sm:text-xl" />
+            <span>Delivery</span>
           </button>
           <button
-            className={`btn ${
+            className={`flex items-center gap-2 py-2 px-3 sm:py-3 sm:px-4 text-sm sm:text-base ${
               selectedTab === "pickup"
-                ? "bg-call-to-actions-100"
+                ? "bg-call-to-actions-100 text-call-to-actions-900"
                 : "bg-neutral-colors-200"
-            } border rounded-lg`}
+            } border rounded-lg transition-colors`}
             onClick={() => setSelectedTab("pickup")}
           >
-            <PiPackageLight size={18} />
-            Pick up
+            <PiPackageLight className="text-lg sm:text-xl" />
+            <span>Pick up</span>
           </button>
         </div>
 
+        {/* Delivery Options Section */}
+        {selectedTab === "delivery" && (
+          <div className="mb-6">
+            <h2 className="font-bold text-base sm:text-lg mb-3">
+              Delivery Options
+            </h2>
+            <div className="space-y-3">
+              {deliveryOptions.map((option) => (
+                <div
+                  key={option.id}
+                  className={`flex items-center p-3 sm:p-4 border rounded-lg cursor-pointer
+                    ${
+                      selectedDelivery === option.name
+                        ? "border-call-to-actions-900 bg-call-to-actions-50"
+                        : "border-gray-200"
+                    }`}
+                  onClick={() => setSelectedDelivery(option.name)}
+                >
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center bg-gray-100 rounded-md overflow-hidden mr-3">
+                    <img
+                      src={option.logo}
+                      alt={option.name}
+                      className="w-8 h-8 object-contain"
+                    />
+                  </div>
+                  <div className="flex-grow">
+                    <div className="font-medium">{option.name}</div>
+                    <div className="text-sm text-gray-500">
+                      Estimated Delivery: {option.estimatedDelivery}
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="font-medium">
+                      {formatCurrency(option.price)}
+                    </div>
+                    {selectedDelivery === option.name && (
+                      <div className="text-call-to-actions-900 ml-auto">
+                        <IoRadioButtonOn size={18} />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Form Sections */}
         {selectedTab === "delivery" ? (
           <DeliveryForm
             formData={formData}
@@ -181,38 +274,78 @@ const CheckoutForm: React.FC = () => {
         )}
 
         {/* Payment Method Section */}
-        <div className="mt-8 mb-8">
-          <h2 className="font-bold text-lg mb-4">Payment Method</h2>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {["Bank BCA", "Bank BNI", "Bank BRI", "Qris"].map((method) => (
-              <label
-                key={method}
-                className={`flex justify-center items-center border rounded-lg p-3 cursor-pointer mb-4 ${
-                  paymentMethod === method ? "border-call-to-actions-900" : ""
-                }`}
+        <div className="w-full max-w-4xl mx-auto">
+          <h2 className="font-medium text-gray-700 mb-3">Payment Method</h2>
+          {/* Desktop/Tablet View - 2x2 Grid */}
+          <div className="hidden sm:grid grid-cols-2 gap-4">
+            {paymentOptions.map((method) => (
+              <div
+                key={method.id}
+                className={`flex items-center p-4 border rounded-lg cursor-pointer
+              ${
+                paymentMethod === method.name
+                  ? "border-yellow-400 bg-yellow-50"
+                  : "border-gray-200"
+              }`}
+                onClick={() => setPaymentMethod(method.name)}
               >
-                <img
-                  src="https://png.pngtree.com/png-vector/20221121/ourmid/pngtree-bca-bank-logo-png-image_6472275.png"
-                  alt={method}
-                  className="w-16 h-16 mr-4 object-cover p-3"
-                />
-                <span className="flex-grow">{method}</span>
-                <div className="relative flex flex-col items-end mb-10">
-                  {paymentMethod === method && (
-                    <IoRadioButtonOn className="text-xl" />
-                  )}
+                <div className="w-12 h-12 flex items-center justify-center bg-gray-100 rounded-md overflow-hidden mr-3">
+                  <img
+                    src={method.logo}
+                    alt={method.name}
+                    className="w-8 h-8 object-contain"
+                  />
                 </div>
-                <input
-                  type="radio"
-                  name="payment"
-                  value={method}
-                  checked={paymentMethod === method}
-                  onChange={() => setPaymentMethod(method)}
-                  className="hidden"
-                />
-              </label>
+                <div className="flex-grow">
+                  <div className="font-medium">{method.name}</div>
+                </div>
+                {paymentMethod === method.name && (
+                  <div className="text-yellow-500 ml-auto">
+                    <IoRadioButtonOn size={18} />
+                  </div>
+                )}
+              </div>
             ))}
           </div>
+
+          {/* Mobile View - Stacked List */}
+          <div className="sm:hidden space-y-3">
+            {paymentOptions.map((method) => (
+              <div
+                key={method.id}
+                className={`flex items-center p-3 border rounded-lg cursor-pointer
+              ${
+                paymentMethod === method.name
+                  ? "border-yellow-400 bg-yellow-50"
+                  : "border-gray-200"
+              }`}
+                onClick={() => setPaymentMethod(method.name)}
+              >
+                <div className="w-10 h-10 flex items-center justify-center bg-gray-100 rounded-md overflow-hidden mr-3">
+                  <img
+                    src={method.logo}
+                    alt={method.name}
+                    className="w-8 h-8 object-contain"
+                  />
+                </div>
+                <div className="flex-grow">
+                  <div className="font-medium">{method.name}</div>
+                </div>
+                {paymentMethod === method.name && (
+                  <div className="text-yellow-500 ml-auto">
+                    <IoRadioButtonOn size={18} />
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Continue Button */}
+        <div className="mt-8">
+          <button className="w-full bg-call-to-actions-900 text-white py-3 rounded-lg font-medium hover:bg-call-to-actions-800 transition-colors">
+            Continue to Payment
+          </button>
         </div>
       </div>
     </div>

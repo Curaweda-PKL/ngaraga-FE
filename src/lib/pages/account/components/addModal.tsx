@@ -1,7 +1,7 @@
 import axios from "axios";
-import React, { useState, useEffect } from "react";
+import React, {useState, useEffect} from "react";
 import PhoneInput from "../../checkout/components/PhoneInput";
-import { SERVER_URL } from "@/middleware/utils";
+import {SERVER_URL} from "@/middleware/utils";
 
 interface AddAddressModalProps {
   isOpen: boolean;
@@ -25,12 +25,12 @@ interface Subdistrict {
   name: string;
 }
 
-const AddAddressModal: React.FC<AddAddressModalProps> = ({ isOpen, onClose }) => {
+const AddAddressModal: React.FC<AddAddressModalProps> = ({isOpen, onClose}) => {
   const [fullName, setFullName] = useState("");
   const [phoneCountryCode, setPhoneCountryCode] = useState("+62");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [country, setCountry] = useState("");
-  
+
   // For province, city, and subdistrict we now store both the ID and the name.
   const [province, setProvince] = useState(""); // holds province id
   const [provinceName, setProvinceName] = useState(""); // holds province name
@@ -56,7 +56,6 @@ const AddAddressModal: React.FC<AddAddressModalProps> = ({ isOpen, onClose }) =>
     cities: "",
     subdistricts: "",
   });
-
   // New state for saving the address
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState("");
@@ -66,17 +65,20 @@ const AddAddressModal: React.FC<AddAddressModalProps> = ({ isOpen, onClose }) =>
   useEffect(() => {
     const fetchProvinces = async () => {
       if (country === "Indonesia") {
-        setLoading((prev) => ({ ...prev, provinces: true }));
-        setError((prev) => ({ ...prev, provinces: "" }));
+        setLoading((prev) => ({...prev, provinces: true}));
+        setError((prev) => ({...prev, provinces: ""}));
         try {
           const response = await axios.get<Province[]>(
             "https://curaweda-pkl.github.io/api-wilayah-indonesia/api/provinces.json"
           );
           setProvinces(response.data);
         } catch (err) {
-          setError((prev) => ({ ...prev, provinces: "Failed to load provinces" }));
+          setError((prev) => ({
+            ...prev,
+            provinces: "Failed to load provinces",
+          }));
         } finally {
-          setLoading((prev) => ({ ...prev, provinces: false }));
+          setLoading((prev) => ({...prev, provinces: false}));
         }
       }
     };
@@ -87,17 +89,17 @@ const AddAddressModal: React.FC<AddAddressModalProps> = ({ isOpen, onClose }) =>
   useEffect(() => {
     const fetchCities = async () => {
       if (country === "Indonesia" && province) {
-        setLoading((prev) => ({ ...prev, cities: true }));
-        setError((prev) => ({ ...prev, cities: "" }));
+        setLoading((prev) => ({...prev, cities: true}));
+        setError((prev) => ({...prev, cities: ""}));
         try {
           const response = await axios.get<City[]>(
             `https://curaweda-pkl.github.io/api-wilayah-indonesia/api/regencies/${province}.json`
           );
           setCities(response.data);
         } catch (err) {
-          setError((prev) => ({ ...prev, cities: "Failed to load cities" }));
+          setError((prev) => ({...prev, cities: "Failed to load cities"}));
         } finally {
-          setLoading((prev) => ({ ...prev, cities: false }));
+          setLoading((prev) => ({...prev, cities: false}));
         }
       }
     };
@@ -108,30 +110,38 @@ const AddAddressModal: React.FC<AddAddressModalProps> = ({ isOpen, onClose }) =>
   useEffect(() => {
     const fetchSubdistricts = async () => {
       if (country === "Indonesia" && city) {
-        setLoading((prev) => ({ ...prev, subdistricts: true }));
-        setError((prev) => ({ ...prev, subdistricts: "" }));
+        setLoading((prev) => ({...prev, subdistricts: true}));
+        setError((prev) => ({...prev, subdistricts: ""}));
         try {
           const response = await axios.get<Subdistrict[]>(
             `https://curaweda-pkl.github.io/api-wilayah-indonesia/api/districts/${city}.json`
           );
           setSubdistricts(response.data);
         } catch (err) {
-          setError((prev) => ({ ...prev, subdistricts: "Failed to load subdistricts" }));
+          setError((prev) => ({
+            ...prev,
+            subdistricts: "Failed to load subdistricts",
+          }));
         } finally {
-          setLoading((prev) => ({ ...prev, subdistricts: false }));
+          setLoading((prev) => ({...prev, subdistricts: false}));
         }
       }
     };
 
     fetchSubdistricts();
   }, [city, country]);
-
   // Return null if modal is not open
   if (!isOpen) return null;
-
   const handleSaveAddress = async () => {
     // Basic validation for required fields (adjust as needed)
-    if (!country || !province || !city || !subdistrict || !postalCode || !addressDetails) {
+    if (
+      !country ||
+      !province ||
+      !city ||
+      !subdistrict ||
+      !postalCode ||
+      !addressDetails
+    ) {
       setSaveError("Please fill out all required fields.");
       return;
     }
@@ -142,20 +152,20 @@ const AddAddressModal: React.FC<AddAddressModalProps> = ({ isOpen, onClose }) =>
       const payload = {
         fullName,
         country,
-        province: provinceName,     // the name of the province
-        provinceId: province,       // the id of the province
-        city: cityName,             // the name of the city
-        cityId: city,               // the id of the city
+        province: provinceName, // the name of the province
+        provinceId: province, // the id of the province
+        city: cityName, // the name of the city
+        cityId: city, // the id of the city
         subdistrict: subdistrictName, // the name of the subdistrict
-        subdistrictId: subdistrict,   // the id of the subdistrict
+        subdistrictId: subdistrict, // the id of the subdistrict
         postalCode,
-        addressDetails,             // Will be mapped to 'details' in the backend if needed
+        addressDetails, // Will be mapped to 'details' in the backend if needed
       };
 
       const response = await axios.post(
         `${SERVER_URL}/api/account/addresses`,
         payload,
-        { withCredentials: true }
+        {withCredentials: true}
       );
       console.log("Address created:", response.data);
       // Optionally refresh addresses list here
@@ -259,7 +269,9 @@ const AddAddressModal: React.FC<AddAddressModalProps> = ({ isOpen, onClose }) =>
                   onChange={(e) => {
                     const selectedId = e.target.value;
                     setProvince(selectedId);
-                    const selected = provinces.find((prov) => prov.id === selectedId);
+                    const selected = provinces.find(
+                      (prov) => prov.id === selectedId
+                    );
                     setProvinceName(selected ? selected.name : "");
                     // Reset dependent fields
                     setCity("");
@@ -271,7 +283,10 @@ const AddAddressModal: React.FC<AddAddressModalProps> = ({ isOpen, onClose }) =>
                 >
                   <option value="">Select Province</option>
                   {provinces.map((prov) => (
-                    <option key={prov.id} value={prov.id}>
+                    <option
+                      key={prov.id}
+                      value={prov.id}
+                    >
                       {prov.name}
                     </option>
                   ))}
@@ -280,7 +295,9 @@ const AddAddressModal: React.FC<AddAddressModalProps> = ({ isOpen, onClose }) =>
                   <span className="text-sm mt-1">Loading provinces...</span>
                 )}
                 {error.provinces && (
-                  <span className="text-red-500 text-sm mt-1">{error.provinces}</span>
+                  <span className="text-red-500 text-sm mt-1">
+                    {error.provinces}
+                  </span>
                 )}
               </>
             ) : (
@@ -306,7 +323,9 @@ const AddAddressModal: React.FC<AddAddressModalProps> = ({ isOpen, onClose }) =>
                   onChange={(e) => {
                     const selectedId = e.target.value;
                     setCity(selectedId);
-                    const selected = cities.find((cty) => cty.id === selectedId);
+                    const selected = cities.find(
+                      (cty) => cty.id === selectedId
+                    );
                     setCityName(selected ? selected.name : "");
                     // Reset subdistrict fields
                     setSubdistrict("");
@@ -316,7 +335,10 @@ const AddAddressModal: React.FC<AddAddressModalProps> = ({ isOpen, onClose }) =>
                 >
                   <option value="">Select City</option>
                   {cities.map((cty) => (
-                    <option key={cty.id} value={cty.id}>
+                    <option
+                      key={cty.id}
+                      value={cty.id}
+                    >
                       {cty.name}
                     </option>
                   ))}
@@ -325,7 +347,9 @@ const AddAddressModal: React.FC<AddAddressModalProps> = ({ isOpen, onClose }) =>
                   <span className="text-sm mt-1">Loading cities...</span>
                 )}
                 {error.cities && (
-                  <span className="text-red-500 text-sm mt-1">{error.cities}</span>
+                  <span className="text-red-500 text-sm mt-1">
+                    {error.cities}
+                  </span>
                 )}
               </>
             ) : (
@@ -354,14 +378,21 @@ const AddAddressModal: React.FC<AddAddressModalProps> = ({ isOpen, onClose }) =>
                   onChange={(e) => {
                     const selectedId = e.target.value;
                     setSubdistrict(selectedId);
-                    const selected = subdistricts.find((sub) => sub.id === selectedId);
+                    const selected = subdistricts.find(
+                      (sub) => sub.id === selectedId
+                    );
                     setSubdistrictName(selected ? selected.name : "");
                   }}
-                  disabled={!city || loading.subdistricts || !!error.subdistricts}
+                  disabled={
+                    !city || loading.subdistricts || !!error.subdistricts
+                  }
                 >
                   <option value="">Select Subdistrict</option>
                   {subdistricts.map((sub) => (
-                    <option key={sub.id} value={sub.id}>
+                    <option
+                      key={sub.id}
+                      value={sub.id}
+                    >
                       {sub.name}
                     </option>
                   ))}
@@ -370,7 +401,9 @@ const AddAddressModal: React.FC<AddAddressModalProps> = ({ isOpen, onClose }) =>
                   <span className="text-sm mt-1">Loading subdistricts...</span>
                 )}
                 {error.subdistricts && (
-                  <span className="text-red-500 text-sm mt-1">{error.subdistricts}</span>
+                  <span className="text-red-500 text-sm mt-1">
+                    {error.subdistricts}
+                  </span>
                 )}
               </>
             ) : (

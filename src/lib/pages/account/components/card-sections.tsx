@@ -1,6 +1,4 @@
-"use client";
-
-import { useState, useRef } from "react";
+import {useState, useRef} from "react";
 
 type Card = {
   id: number;
@@ -150,7 +148,7 @@ export const CardSection = () => {
   >("All");
   const tabsRef = useRef<HTMLDivElement>(null);
 
-  const filteredPurchaseData =  
+  const filteredPurchaseData =
     activeFilter === "All"
       ? purchaseData
       : purchaseData.filter((purchase) => purchase.status === activeFilter);
@@ -185,7 +183,10 @@ export const CardSection = () => {
             <button className="px-4 py-2 text-call-to-action border border-call-to-action rounded-lg hover:bg-yellow-50 text-sm">
               Change Payment
             </button>
-            <a href="/payments" className="w-full sm:w-auto">
+            <a
+              href="/payments"
+              className="w-full sm:w-auto"
+            >
               <button className="w-full px-4 py-2 text-white bg-call-to-action rounded-lg hover:bg-yellow-700 text-sm">
                 Payment
               </button>
@@ -198,7 +199,10 @@ export const CardSection = () => {
             <button className="px-4 py-2 text-call-to-action border border-call-to-action rounded-lg hover:bg-yellow-50 text-sm">
               Delivered
             </button>
-            <a href="/view-detail" className="w-full sm:w-auto">
+            <a
+              href="/view-detail"
+              className="w-full sm:w-auto"
+            >
               <button className="w-full px-4 py-2 text-white bg-call-to-action rounded-lg hover:bg-yellow-700 text-sm">
                 View Details
               </button>
@@ -299,7 +303,11 @@ export const CardSection = () => {
             if (activeTab === "specialCards") {
               // Render Special Card with new design
               return (
-                <a href="/special-card-detail" key={item.id} className="block">
+                <a
+                  href="/special-card-detail"
+                  key={item.id}
+                  className="block"
+                >
                   <div className="w-full flex flex-col rounded-lg overflow-hidden transition-transform hover:scale-[1.02]">
                     <figure className="w-full h-[240px] rounded-t-lg overflow-hidden relative">
                       <img
@@ -336,7 +344,10 @@ export const CardSection = () => {
             } else {
               // Render normal Card
               return (
-                <a href="/special-card-detail" key={item.id}>
+                <a
+                  href="/special-card-detail"
+                  key={item.id}
+                >
                   <div className="w-full h-[400px] flex flex-col items-start gap-4 bg-[#F2F2F2] rounded-2xl shadow-xl transition-transform hover:scale-[1.02]">
                     <figure className="w-full h-[260px] rounded-t-2xl overflow-hidden">
                       <img
