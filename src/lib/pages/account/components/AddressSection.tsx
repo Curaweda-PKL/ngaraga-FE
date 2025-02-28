@@ -1,14 +1,13 @@
 // src/components/AddressSection.tsx
-import React, { useState, useEffect } from "react";
+import React, {useState, useEffect} from "react";
 import axios from "axios";
-import { IoRadioButtonOn } from "react-icons/io5";
-import { FaSadTear } from "react-icons/fa"; // Imported sad icon
-import { HomeIcon } from "./homeIcon";
+import {IoRadioButtonOn} from "react-icons/io5";
+import {FaSadTear} from "react-icons/fa"; // Imported sad icon
+import {HomeIcon} from "./homeIcon";
 import AddAddressModal from "./addModal";
 import EditAddressModal from "./editModal";
 import DeleteAddressModal from "./deleteModal";
-import { SERVER_URL } from "@/middleware/utils";
-
+import {SERVER_URL} from "@/middleware/utils";
 // Define the Address interface (adjust fields as needed)
 interface Address {
   id: string;
@@ -30,13 +29,20 @@ interface AddressSectionProps {
   handleAddressClick: (index: number) => void;
 }
 
-const AddressSection: React.FC<AddressSectionProps> = ({ selectedAddress, handleAddressClick }) => {
+const AddressSection: React.FC<AddressSectionProps> = ({
+  selectedAddress,
+  handleAddressClick,
+}) => {
   // States for controlling modals
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [editingAddressIndex, setEditingAddressIndex] = useState<number | null>(null);
-  const [deletingAddressIndex, setDeletingAddressIndex] = useState<number | null>(null);
+  const [editingAddressIndex, setEditingAddressIndex] = useState<number | null>(
+    null
+  );
+  const [deletingAddressIndex, setDeletingAddressIndex] = useState<
+    number | null
+  >(null);
 
   // State for storing fetched addresses
   const [addresses, setAddresses] = useState<Address[]>([]);
@@ -49,12 +55,17 @@ const AddressSection: React.FC<AddressSectionProps> = ({ selectedAddress, handle
       setLoadingAddresses(true);
       setErrorAddresses("");
       try {
-        const response = await axios.get(`${SERVER_URL}/api/account/addresses`, {
-          withCredentials: true,
-        });
+        const response = await axios.get(
+          `${SERVER_URL}/api/account/addresses`,
+          {
+            withCredentials: true,
+          }
+        );
         setAddresses(response.data);
       } catch (error: any) {
-        setErrorAddresses(error.response?.data?.message || "Failed to load addresses.");
+        setErrorAddresses(
+          error.response?.data?.message || "Failed to load addresses."
+        );
       } finally {
         setLoadingAddresses(false);
       }
@@ -67,12 +78,17 @@ const AddressSection: React.FC<AddressSectionProps> = ({ selectedAddress, handle
   useEffect(() => {
     const fetchActiveAddress = async () => {
       try {
-        const response = await axios.get(`${SERVER_URL}/api/account/list/addresses/active`, {
-          withCredentials: true,
-        });
+        const response = await axios.get(
+          `${SERVER_URL}/api/account/list/addresses/active`,
+          {
+            withCredentials: true,
+          }
+        );
         const activeAddress = response.data;
         if (activeAddress) {
-          const activeIndex = addresses.findIndex((addr) => addr.id === activeAddress.id);
+          const activeIndex = addresses.findIndex(
+            (addr) => addr.id === activeAddress.id
+          );
           if (activeIndex !== -1 && activeIndex !== selectedAddress) {
             handleAddressClick(activeIndex);
           }
@@ -99,7 +115,7 @@ const AddressSection: React.FC<AddressSectionProps> = ({ selectedAddress, handle
       await axios.put(
         `${SERVER_URL}/api/account/addresses/active/${addressId}`,
         {},
-        { withCredentials: true }
+        {withCredentials: true}
       );
       console.log("Active address saved successfully");
     } catch (error) {
@@ -115,7 +131,9 @@ const AddressSection: React.FC<AddressSectionProps> = ({ selectedAddress, handle
         await axios.delete(`${SERVER_URL}/api/account/addresses/${addressId}`, {
           withCredentials: true,
         });
-        setAddresses(prev => prev.filter((_, index) => index !== deletingAddressIndex));
+        setAddresses((prev) =>
+          prev.filter((_, index) => index !== deletingAddressIndex)
+        );
       } catch (error) {
         console.error("Error deleting address", error);
       }
@@ -136,7 +154,10 @@ const AddressSection: React.FC<AddressSectionProps> = ({ selectedAddress, handle
         <p className="text-red-500">{errorAddresses}</p>
       ) : addresses.length > 0 ? (
         addresses.map((address, index) => (
-          <div key={address.id} className="grid grid-cols-1 gap-4">
+          <div
+            key={address.id}
+            className="grid grid-cols-1 gap-4"
+          >
             <div
               className={`p-4 border rounded-lg shadow-md mt-4 ${
                 selectedAddress === index
@@ -223,7 +244,9 @@ const AddressSection: React.FC<AddressSectionProps> = ({ selectedAddress, handle
           onAddressUpdated={(updatedAddress: Address) => {
             // Update the corresponding address in the state
             setAddresses((prev) =>
-              prev.map((addr, idx) => (idx === editingAddressIndex ? updatedAddress : addr))
+              prev.map((addr, idx) =>
+                idx === editingAddressIndex ? updatedAddress : addr
+              )
             );
           }}
         />

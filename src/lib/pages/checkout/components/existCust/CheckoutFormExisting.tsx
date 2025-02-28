@@ -1,5 +1,6 @@
 import axios from "axios";
-import React, {useEffect, useState} from "react";
+import type React from "react";
+import {useEffect, useState} from "react";
 import {IoRadioButtonOn} from "react-icons/io5";
 import DeliveryTab from "./DeliveryForm";
 import PickupTab from "./PickupTab";
@@ -56,11 +57,11 @@ const CheckoutExisting: React.FC = () => {
     pickUpTime: "",
   });
 
-  const [provinces, setProvinces] = useState<Province[]>([]);
-  const [cities, setCities] = useState<City[]>([]);
-  const [subdistricts, setSubdistricts] = useState<Subdistrict[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const [, setProvinces] = useState<Province[]>([]);
+  const [, setCities] = useState<City[]>([]);
+  const [, setSubdistricts] = useState<Subdistrict[]>([]);
+  const [, setLoading] = useState<boolean>(true);
+  const [, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchProvinces = async () => {
@@ -118,11 +119,34 @@ const CheckoutExisting: React.FC = () => {
     setFormData((prev) => ({...prev, pickUpTime: time}));
   };
 
+  const paymentOptions = [
+    {
+      method: "Bank BCA",
+      image:
+        "https://png.pngtree.com/png-vector/20221121/ourmid/pngtree-bca-bank-logo-png-image_6472275.png",
+    },
+    {
+      method: "Bank BNI",
+      image:
+        "https://png.pngtree.com/png-vector/20221121/ourmid/pngtree-bca-bank-logo-png-image_6472275.png",
+    },
+    {
+      method: "Bank BRI",
+      image:
+        "https://png.pngtree.com/png-vector/20221121/ourmid/pngtree-bca-bank-logo-png-image_6472275.png",
+    },
+    {
+      method: "Qris",
+      image:
+        "https://png.pngtree.com/png-vector/20221121/ourmid/pngtree-bca-bank-logo-png-image_6472275.png",
+    },
+  ];
+
   return (
     <div className="col-span-2">
       <div className="checkout-header">
         <h1 className="font-bold text-2xl mb-2">Checkout</h1>
-        <div className="flex items-center">
+        <div className="flex items-center overflow-x-auto md:overflow-visible">
           <div className="w-8 h-8 bg-call-to-actions-900 rounded-lg text-white flex items-center justify-center mt-2">
             <span className="text-white font-bold">1</span>
           </div>
@@ -181,44 +205,61 @@ const CheckoutExisting: React.FC = () => {
 
         <div className="mt-8 mb-8">
           <h2 className="font-bold text-lg mb-4">Payment Method</h2>
-          <div className="grid grid-cols-4 gap-4">
-            {[
-              {
-                method: "Bank BCA",
-                image:
-                  "https://png.pngtree.com/png-vector/20221121/ourmid/pngtree-bca-bank-logo-png-image_6472275.png",
-              },
-              {
-                method: "Bank BNI",
-                image:
-                  "https://png.pngtree.com/png-vector/20221121/ourmid/pngtree-bca-bank-logo-png-image_6472275.png",
-              },
-              {
-                method: "Bank BRI",
-                image:
-                  "https://png.pngtree.com/png-vector/20221121/ourmid/pngtree-bca-bank-logo-png-image_6472275.png",
-              },
-              {
-                method: "Qris",
-                image:
-                  "https://png.pngtree.com/png-vector/20221121/ourmid/pngtree-bca-bank-logo-png-image_6472275.png",
-              },
-            ].map(({method, image}) => (
+
+          {/* Mobile view (vertical stack) */}
+          <div className="md:hidden space-y-3">
+            {paymentOptions.map(({method, image}) => (
               <label
                 key={method}
-                className={`flex justify-center items-center border rounded-lg p-3 cursor-pointer mb-16 ${
+                className={`flex items-center justify-between w-full border rounded-lg p-4 cursor-pointer ${
+                  paymentMethod === method
+                    ? "bg-call-to-actions-100 border-call-to-actions-900"
+                    : "bg-neutral-colors-200"
+                }`}
+              >
+                <div className="flex items-center">
+                  <img
+                    src={image || "/placeholder.svg"}
+                    alt={method}
+                    className="w-10 h-10 object-contain mr-3"
+                  />
+                  <span className="font-medium">{method}</span>
+                </div>
+                {paymentMethod === method && (
+                  <IoRadioButtonOn className="text-call-to-actions-900 text-xl" />
+                )}
+                <input
+                  type="radio"
+                  name="payment"
+                  value={method}
+                  checked={paymentMethod === method}
+                  onChange={() => setPaymentMethod(method)}
+                  className="hidden"
+                />
+              </label>
+            ))}
+          </div>
+
+          {/* Tablet/Desktop view (vertical list) */}
+          <div className="hidden md:block space-y-3">
+            {paymentOptions.map(({method, image}) => (
+              <label
+                key={method}
+                className={`flex items-center border rounded-lg p-4 cursor-pointer ${
                   paymentMethod === method ? "border-call-to-actions-900" : ""
                 }`}
               >
-                <img
-                  src={image}
-                  alt={method}
-                  className="w-16 h-16 mr-4 object-cover p-3"
-                />
-                <span className="flex-grow">{method}</span>
-                <div className="relative flex flex-col items-end mb-10">
-                  {paymentMethod === method && <IoRadioButtonOn />}
+                <div className="bg-gray-100 p-3 rounded-lg mr-4">
+                  <img
+                    src={image || "/placeholder.svg"}
+                    alt={method}
+                    className="w-12 h-12 object-contain"
+                  />
                 </div>
+                <span className="flex-grow font-medium">{method}</span>
+                {paymentMethod === method && (
+                  <IoRadioButtonOn className="text-yellow-400 text-xl" />
+                )}
                 <input
                   type="radio"
                   name="payment"
