@@ -59,6 +59,7 @@ export const ProfilePage: React.FC = () => {
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  
 
   // Fetch the user profile when the component mounts.
   useEffect(() => {
