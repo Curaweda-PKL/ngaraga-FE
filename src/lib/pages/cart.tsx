@@ -30,6 +30,11 @@ const Cart: React.FC = () => {
         getImageUrl(item.card.product.image) ||
         getImageUrl(item.card.product.cardImage) ||
         "https://via.placeholder.com/100",
+      // Extracting the first creator's name
+      creatorName:
+        item.card.creators && item.card.creators.length > 0
+          ? item.card.creators[0].name
+          : "Unknown",
     }));
   };
 
@@ -169,7 +174,8 @@ const Cart: React.FC = () => {
         My Cart
       </h1>
       <p className="text-[#404040] mb-6 text-center md:text-left">
-        Review your selected items, adjust quantities, and proceed to checkout seamlessly.
+        Review your selected items, adjust quantities, and proceed to checkout
+        seamlessly.
       </p>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
@@ -216,7 +222,7 @@ const Cart: React.FC = () => {
                 />
                 <div>
                   <h2 className="font-semibold text-gray-800">{item.name}</h2>
-                  <p className="text-gray-500 text-sm">Orbitian</p>
+                  <p className="text-gray-500 text-sm">{item.creatorName}</p>
                 </div>
               </div>
               <div className="flex flex-col items-end space-y-2 w-full sm:w-auto">
@@ -279,11 +285,18 @@ const Cart: React.FC = () => {
                 <span className="text-[#262626]">Discount</span>
                 <span className="font-bold text-[#171717] text-lg">
                   {appliedCoupon.discountType.toLowerCase() === "percentage"
-                    ? `- Rp ${(subtotal * appliedCoupon.discountValue / 100).toLocaleString("id-ID")}`
-                    : `- Rp ${Number(appliedCoupon.discountValue).toLocaleString("id-ID")}`}
+                    ? `- Rp ${(
+                        (subtotal * appliedCoupon.discountValue) /
+                        100
+                      ).toLocaleString("id-ID")}`
+                    : `- Rp ${Number(
+                        appliedCoupon.discountValue
+                      ).toLocaleString("id-ID")}`}
                 </span>
               </div>
             )}
+            {/* Horizontal line above Total */}
+            <hr className="my-2 border-gray-300" />
             <div className="flex items-center justify-between mt-2">
               <span className="text-[#262626]">Total</span>
               <span className="font-bold text-[#171717] text-lg">
@@ -291,6 +304,7 @@ const Cart: React.FC = () => {
               </span>
             </div>
           </div>
+
           {/* Coupon Code Section */}
           {appliedCoupon ? (
             <div className="mb-4">

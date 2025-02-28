@@ -21,17 +21,20 @@ export const MoreCardSection: React.FC = () => {
   useEffect(() => {
     const fetchCards = async () => {
       try {
+        // Using the endpoint to fetch cards data
         const response = await axios.get(`${SERVER_URL}/api/available/marketplace/cards`);
-        if (response.data?.cards) {
+        if (response.data?.cards && response.data.cards.length > 0) {
           const transformedCards: Card[] = response.data.cards.map((card: any) => ({
             id: card.id,
             title: card.name,
-            // Mapping category to creator for display purposes; adjust as needed.
             creator: card.category,
             image: card.image,
             price: card.price,
           }));
           setCards(transformedCards);
+        } else {
+          // No cards returned; trigger fallback UI
+          setCards([]);
         }
       } catch (err) {
         console.error("Error fetching cards:", err);
@@ -65,8 +68,47 @@ export const MoreCardSection: React.FC = () => {
 
       {loading ? (
         <p className="px-6">Loading...</p>
-      ) : error ? (
-        <p className="px-6 text-red-500">{error}</p>
+      ) : error || cards.length === 0 ? (
+        <div className="flex flex-col items-center justify-center w-full h-[400px]">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="w-12 h-12 text-gray-400"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+          >
+            <circle cx="12" cy="12" r="10" strokeWidth="2" stroke="currentColor" fill="none" />
+            <path
+              d="M8 14s1.5 2 4 2 4-2 4-2"
+              strokeWidth="2"
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              fill="none"
+            />
+            <line
+              x1="9"
+              y1="9"
+              x2="9.01"
+              y2="9"
+              strokeWidth="2"
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <line
+              x1="15"
+              y1="9"
+              x2="15.01"
+              y2="9"
+              strokeWidth="2"
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+          <p className="mt-4 text-gray-400">{error || "No cards available"}</p>
+        </div>
       ) : (
         <div className="flex flex-col sm:flex-row justify-between items-center sm:items-start">
           {/* Cards Grid */}
@@ -85,7 +127,45 @@ export const MoreCardSection: React.FC = () => {
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-[#3B3B3B] text-gray-400 rounded-t-2xl" />
+                    <div className="w-full h-full flex items-center justify-center bg-[#3B3B3B] text-gray-400 rounded-t-2xl">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="w-12 h-12"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <circle cx="12" cy="12" r="10" strokeWidth="2" stroke="currentColor" fill="none" />
+                        <path
+                          d="M8 14s1.5 2 4 2 4-2 4-2"
+                          strokeWidth="2"
+                          stroke="currentColor"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          fill="none"
+                        />
+                        <line
+                          x1="9"
+                          y1="9"
+                          x2="9.01"
+                          y2="9"
+                          strokeWidth="2"
+                          stroke="currentColor"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                        <line
+                          x1="15"
+                          y1="9"
+                          x2="15.01"
+                          y2="9"
+                          strokeWidth="2"
+                          stroke="currentColor"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </div>
                   )}
                 </figure>
                 <div className="p-6 flex flex-col items-start gap-2 w-full flex-grow">
@@ -97,7 +177,7 @@ export const MoreCardSection: React.FC = () => {
                   </span>
                   {card.price && (
                     <span className="text-base text-[#404040] font-[Nunito] sm:text-sm">
-                     Rp. {card.price}
+                      Rp. {card.price}
                     </span>
                   )}
                 </div>
@@ -112,7 +192,6 @@ export const MoreCardSection: React.FC = () => {
               className="flex items-center px-4 py-2 bg-call-to-action text-white rounded-lg shadow-md hover:bg-call-to-actions-800 transition"
             >
               <FaRocket className="mr-2 text-xl sm:text-lg" />
-
               <span>More Cards</span>
             </button>
           </div>

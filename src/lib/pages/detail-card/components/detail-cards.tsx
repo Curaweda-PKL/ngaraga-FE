@@ -1,16 +1,14 @@
-
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import parse from "html-react-parser";
 import { CiShoppingCart } from "react-icons/ci";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { SERVER_URL } from "@/middleware/utils";
 import { motion, AnimatePresence } from "framer-motion";
 
-
-
 export const DetailCards: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate(); // Initialize navigate
   const [card, setCard] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
@@ -22,7 +20,6 @@ export const DetailCards: React.FC = () => {
   const [showSidebar, setShowSidebar] = useState<boolean>(false);
 
   // Helper function: returns a full URL for an image.
-  // Optionally accepts a directory (e.g., "src/uploads/creator").
   const getImageUrl = (img?: string, directory?: string): string => {
     if (!img) return "";
     if (img.startsWith("http://") || img.startsWith("https://")) return img;
@@ -80,6 +77,11 @@ export const DetailCards: React.FC = () => {
       console.log("Cart response:", response.data);
     } catch (err: any) {
       console.error("Error adding card to cart:", err);
+      // If the error indicates the user is not logged in (e.g., 401 Unauthorized),
+      // redirect to the login page.
+      if (err.response && err.response.status === 401) {
+        return navigate("/login");
+      }
       setCartError(
         err.response?.data?.error ||
           "Failed to add card to cart. Please try again."
@@ -107,8 +109,6 @@ export const DetailCards: React.FC = () => {
   }
 
   const { product, characterName, createdAt, sourceImage, creators, tags } = card;
-
-  // Determine banner image.
   const bannerImage =
     getImageUrl(sourceImage) ||
     getImageUrl(product?.cardImage) ||
@@ -117,8 +117,6 @@ export const DetailCards: React.FC = () => {
   const description =
     product?.cardDetail ||
     "<p>The Orbitians is a collection of 10,000 unique NFTs on the Ethereum blockchain.</p>";
-
-  // Use first creator if available.
   const creator = creators && creators.length > 0 ? creators[0] : null;
 
   return (
@@ -154,7 +152,6 @@ export const DetailCards: React.FC = () => {
           >
             <CiShoppingCart className="mr-2 text-2xl" />
             {cartLoading ? "Adding..." : "Add to Cart"}
-
           </button>
           <button className="border border-call-to-actions-900 text-call-to-action px-4 py-2 rounded-full transition text-base" aria-label="Checkout">
             <a href="/checkout">Checkout</a>
