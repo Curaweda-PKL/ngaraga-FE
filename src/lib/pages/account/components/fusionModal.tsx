@@ -139,11 +139,13 @@ const FusionModal = ({isOpen, onClose, products}: FusionModalProps) => {
           <h2 className="text-xl font-bold mb-4">
             Confirm Fusion of selected heroes
           </h2>
-          <div className="flex items-center justify-center gap-4 mb-6">
+
+          {/* Hero cards section - maintains desktop layout but adjusts for mobile */}
+          <div className="flex flex-wrap md:flex-nowrap items-center justify-center gap-2 md:gap-4 mb-6">
             {products.slice(0, 4).map((product, index) => (
               <div
                 key={index}
-                className="w-20 h-20 relative"
+                className="w-16 md:w-20 h-16 md:h-20 relative"
               >
                 <img
                   src={product.image || "/placeholder.svg"}
@@ -155,15 +157,19 @@ const FusionModal = ({isOpen, onClose, products}: FusionModalProps) => {
                 </div>
               </div>
             ))}
+
             <div className="text-2xl font-bold">&gt;</div>
-            <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg"></div>
+            <div className="w-16 md:w-20 h-16 md:h-20 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg"></div>
           </div>
+
           <div className="border-t border-gray-200 pt-4">
             <h3 className="font-medium mb-2">Proceed to your wallet</h3>
             <p className="text-sm text-gray-600 mb-4">
               You will need to confirm the transaction within your wallet.
             </p>
-            <div className="flex justify-end gap-3">
+
+            {/* Buttons - keeps desktop layout but stacks on mobile */}
+            <div className="flex flex-col md:flex-row justify-end gap-3">
               <button
                 onClick={() => setModalState("initial")}
                 className="px-4 py-2 border border-gray-300 rounded-md hover:bg-red-600"
@@ -186,13 +192,17 @@ const FusionModal = ({isOpen, onClose, products}: FusionModalProps) => {
   if (modalState === "processing") {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-80">
-        <div className="bg-white rounded-lg p-6 max-w-lg w-full">
-          <h2 className="text-xl font-bold mb-4">Creating a Mystery Box</h2>
-          <div className="flex items-center justify-center gap-4 mb-6">
+        <div className="bg-white rounded-lg p-4 sm:p-6 max-w-lg w-full">
+          <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4 text-center sm:text-left">
+            Creating a Mystery Box
+          </h2>
+
+          {/* Product display - responsive grid/flex layout */}
+          <div className="flex flex-wrap sm:flex-nowrap items-center justify-center gap-2 sm:gap-4 mb-4 sm:mb-6">
             {products.slice(0, 4).map((product, index) => (
               <div
                 key={index}
-                className="w-20 h-20 relative"
+                className="w-16 h-16 sm:w-20 sm:h-20 relative"
               >
                 <img
                   src={product.image || "/placeholder.svg"}
@@ -204,27 +214,37 @@ const FusionModal = ({isOpen, onClose, products}: FusionModalProps) => {
                 </div>
               </div>
             ))}
-            <div className="text-2xl font-bold">&gt;</div>
-            <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg"></div>
+            <div className="text-xl sm:text-2xl font-bold">&#62;</div>
+            <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg"></div>
           </div>
-          <p className="text-sm text-gray-600 mb-2">
+
+          {/* Status text */}
+          <p className="text-xs sm:text-sm text-gray-600 mb-1 sm:mb-2 text-center sm:text-left">
             Your Fusion is currently in progress.
           </p>
-          <p className="text-sm text-gray-600 mb-4">
+          <p className="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4 text-center sm:text-left">
             Confirmation on the blockchain will follow shortly.
           </p>
-          <div className="text-xs text-gray-500 mb-4">
+
+          {/* Transaction info */}
+          <div className="text-xs text-gray-500 mb-3 sm:mb-4 text-center sm:text-left">
             Transaction
             <br />
             0x890CD30...601D
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
+
+          {/* Progress bar */}
+          <div className="w-full bg-gray-200 rounded-full h-2 mb-3 sm:mb-4">
             <div
               className="bg-blue-500 h-2 rounded-full transition-all duration-500"
               style={{width: `${progress}%`}}
             ></div>
           </div>
-          <div className="text-center text-sm text-gray-600">Processing...</div>
+
+          {/* Status message */}
+          <div className="text-center text-xs sm:text-sm text-gray-600">
+            Processing...
+          </div>
         </div>
       </div>
     );
@@ -274,7 +294,7 @@ const FusionModal = ({isOpen, onClose, products}: FusionModalProps) => {
               </div>
 
               {/* Arrow */}
-              <div className="text-white text-3xl font-bold">&gt;</div>
+              <div className="text-black text-3xl font-bold">&gt;</div>
 
               {/* After Character */}
               <div className="relative">
@@ -311,7 +331,7 @@ const FusionModal = ({isOpen, onClose, products}: FusionModalProps) => {
           {/* Right Side - Requirements */}
           <div className="flex-1">
             <div className="bg-neutral-200 rounded-lg p-3 border border-gray-200">
-              <h3 className="text-white font-bold mb-2">Requirements:</h3>
+              <h3 className="text-[#171717] font-bold mb-2">Requirements:</h3>
 
               {/* Materials Grid */}
               <div className="grid grid-cols-3 gap-2">
