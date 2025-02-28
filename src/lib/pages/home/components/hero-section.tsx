@@ -67,6 +67,28 @@ interface ApiResponse {
   stats: Stats;
 }
 
+// Fallback component for network errors with animated SVG
+const ErrorFallback = () => {
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen">
+      <motion.svg
+        className="w-20 h-20"
+        viewBox="0 0 50 50"
+        fill="none"
+        stroke="#e53e3e"
+        strokeWidth="5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        animate={{ rotate: 360 }}
+        transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+      >
+        <circle cx="25" cy="25" r="20" />
+      </motion.svg>
+      <p className="text-xl mt-4">Something went wrong with this component</p>
+    </div>
+  );
+};
+
 export const HeroFrame = () => {
   const navigate = useNavigate();
   const xRef = useRef<NodeJS.Timeout | null>(null);
@@ -210,7 +232,7 @@ export const HeroFrame = () => {
   };
 
   if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
+  if (error) return <ErrorFallback />;
 
   return (
     <div className="flex items-center justify-center min-h-screen p-4 sm:p-6 md:p-8">
