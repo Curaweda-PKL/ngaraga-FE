@@ -1,10 +1,10 @@
-// src/EditProfilePage.tsx
-import React, { useState, useEffect, useRef } from "react";
+import React, {useState, useEffect, useRef} from "react";
 import axios from "axios";
-import { SERVER_URL } from "@/middleware/utils";
+import {SERVER_URL} from "@/middleware/utils";
 import BasicInformation from "./components/BasicInformation";
-import type { FormData, Column } from "./components/BasicInformation";
+import type {FormData, Column} from "./components/BasicInformation";
 import AddressSection from "./components/AddressSection";
+import {FaTrash, FaPen} from "react-icons/fa";
 
 // Define a type for social links.
 type SocialLinks = {
@@ -94,14 +94,14 @@ const EditProfilePage: React.FC = () => {
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
     >
   ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    const {name, value} = e.target;
+    setFormData((prev) => ({...prev, [name]: value}));
   };
 
   // Update individual social link value
   const handleInputChange = (index: number, value: string) => {
     setColumns((prev) =>
-      prev.map((col, idx) => (idx === index ? { ...col, value } : col))
+      prev.map((col, idx) => (idx === index ? {...col, value} : col))
     );
   };
 
@@ -109,7 +109,7 @@ const EditProfilePage: React.FC = () => {
   const toggleColumn = (index: number) => {
     setColumns((prev) =>
       prev.map((col, idx) =>
-        idx === index ? { ...col, enabled: !col.enabled } : col
+        idx === index ? {...col, enabled: !col.enabled} : col
       )
     );
   };
@@ -193,25 +193,26 @@ const EditProfilePage: React.FC = () => {
           setBannerImage(normalizedBannerUrl);
         }
 
-        let socialLinksData = typeof data.socialLinks === "string"
-        ? JSON.parse(data.socialLinks)
-        : data.socialLinks || {};
+        let socialLinksData =
+          typeof data.socialLinks === "string"
+            ? JSON.parse(data.socialLinks)
+            : data.socialLinks || {};
 
-      setColumns([
-        { enabled: true, value: socialLinksData.website || "" },
-        { enabled: true, value: socialLinksData.discord || "" },
-        { enabled: true, value: socialLinksData.youtube || "" },
-        { enabled: true, value: socialLinksData.twitter || "" },
-        { enabled: true, value: socialLinksData.instagram || "" },
-      ]);
-      setOriginalSocialLinks(socialLinksData);
-    } catch (err) {
-      if (axios.isCancel(err)) {
-        console.log("Request dibatalkan:", err.message);
-      } else {
-        console.error("Error fetching profile:", err);
+        setColumns([
+          {enabled: true, value: socialLinksData.website || ""},
+          {enabled: true, value: socialLinksData.discord || ""},
+          {enabled: true, value: socialLinksData.youtube || ""},
+          {enabled: true, value: socialLinksData.twitter || ""},
+          {enabled: true, value: socialLinksData.instagram || ""},
+        ]);
+        setOriginalSocialLinks(socialLinksData);
+      } catch (err) {
+        if (axios.isCancel(err)) {
+          console.log("Request dibatalkan:", err.message);
+        } else {
+          console.error("Error fetching profile:", err);
+        }
       }
-    }
     };
 
     fetchProfile();
@@ -270,7 +271,7 @@ const EditProfilePage: React.FC = () => {
 
       await axios.put(`${SERVER_URL}/api/account/profile`, formPayload, {
         withCredentials: true,
-        headers: { "Content-Type": "multipart/form-data" },
+        headers: {"Content-Type": "multipart/form-data"},
       });
 
       // Tampilkan pesan sukses
@@ -312,24 +313,24 @@ const EditProfilePage: React.FC = () => {
           <input
             type="file"
             accept="image/*"
-            style={{ display: "none" }}
+            style={{display: "none"}}
             ref={bannerInputRef}
             onChange={handleBannerFileChange}
           />
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex space-x-4">
+          <div className="absolute bottom-4 left-4 flex space-x-4">
             <button
               type="button"
               onClick={() => bannerInputRef.current?.click()}
-              className="bg-call-to-actions-900 text-white py-2 px-6 rounded-lg hover:bg-opacity-80"
+              className="bg-white text-gray-800 p-2 rounded-full hover:bg-gray-200"
             >
-              Replace
+              <FaPen size={20} />
             </button>
             <button
               type="button"
               onClick={handleBannerRemove}
-              className="bg-neutral-colors-100 text-call-to-actions-900 py-2 px-6 rounded-lg hover:bg-opacity-80"
+              className="bg-white text-red-500 p-2 rounded-full hover:bg-gray-200"
             >
-              Remove
+              <FaTrash size={20} />
             </button>
           </div>
         </div>
@@ -371,33 +372,35 @@ const EditProfilePage: React.FC = () => {
               <input
                 type="file"
                 accept="image/*"
-                style={{ display: "none" }}
+                style={{display: "none"}}
                 ref={profileInputRef}
                 onChange={handleProfileFileChange}
               />
               <div className="relative w-32 h-32 mt-4 mb-6">
                 <img
-                  src={profileImage}
+                  src={profileImage || "/placeholder.svg"}
                   alt="Profile"
                   className="w-full h-full rounded-lg object-cover shadow-lg"
                 />
-                {profileImage !== fallbackProfileImage && (
+                <div className="absolute bottom-2 left-2 flex space-x-2">
                   <button
                     type="button"
-                    onClick={handleProfileRemove}
-                    className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1 text-xs"
+                    onClick={() => profileInputRef.current?.click()}
+                    className="bg-white text-gray-800 p-2 rounded-full hover:bg-gray-200"
                   >
-                    &times;
+                    <FaPen size={16} />
                   </button>
-                )}
+                  {profileImage !== fallbackProfileImage && (
+                    <button
+                      type="button"
+                      onClick={handleProfileRemove}
+                      className="bg-white text-red-500 p-2 rounded-full hover:bg-gray-200"
+                    >
+                      <FaTrash size={16} />
+                    </button>
+                  )}
+                </div>
               </div>
-              <button
-                type="button"
-                onClick={() => profileInputRef.current?.click()}
-                className="bg-call-to-actions-900 text-white px-8 py-2 rounded-lg flex items-center space-x-3 text-lg font-medium hover:bg-yellow-600"
-              >
-                Replace
-              </button>
             </div>
           </div>
 
