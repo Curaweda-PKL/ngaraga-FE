@@ -42,30 +42,6 @@ export const CollectorCards = () => {
       totalCards: 25,
       rank: 1,
     },
-    {
-      id: 3,
-      username: "Kakarotto",
-      avatar:
-        "https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg",
-      totalCards: 25,
-      rank: 1,
-    },
-    {
-      id: 1,
-      username: "Kakarotto",
-      avatar:
-        "https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg",
-      totalCards: 25,
-      rank: 1,
-    },
-    {
-      id: 2,
-      username: "Kakarotto",
-      avatar:
-        "https://www.shutterstock.com/image-photo/cartoon-artistic-image-goku-dragonball-260nw-2540516459.jpg",
-      totalCards: 25,
-      rank: 1,
-    },
   ];
 
   // Fetch top collectors section header data on mount
@@ -123,6 +99,9 @@ export const CollectorCards = () => {
     collectorImage = normalizedImage.startsWith("http")
       ? normalizedImage
       : `${SERVER_URL}/${normalizedImage}`;
+
+      console.log("Normalized Collector Image URL:", collectorImage);
+
   }
 
   return (

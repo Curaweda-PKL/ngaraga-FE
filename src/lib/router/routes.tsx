@@ -45,6 +45,7 @@ import {EditProfileAdmin} from "../admin-pages/admin/edit-admin";
 import {EditCouponForm} from "../admin-pages/coupon/edit-coupon";
 import {RegisteredUsers} from "../admin-pages/event/registered-user";
 import SuccessVerify from "../pages/events/success-verify";
+import QrCodeComponent from "../pages/scan-qr/scan-qr";
 
 // Lazy-loaded Pages
 const Home = React.lazy(() => import("@/lib/pages/home/Home"));
@@ -118,6 +119,8 @@ export const routes: Array<PathRouteProps> = [
   {path: "/sentEmail", element: <SentEmail />},
   {path: "/success/registered/event", element: <SuccesRegist />},
   {path: "/success/emailverified", element: <SuccessVerify />},
+  {path: "/scan-qr", element: <QrCodeComponent />},
+
 ];
 
 export const privateRoutes: Array<PathRouteProps> = [

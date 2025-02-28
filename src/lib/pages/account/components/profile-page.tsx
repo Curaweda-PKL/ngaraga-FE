@@ -7,6 +7,7 @@ import {
   FaInstagram,
   FaTwitter,
   FaYoutube,
+  FaQrcode, // imported QR code icon
 } from "react-icons/fa";
 import { SERVER_URL } from "@/middleware/utils";
 import { Link } from "react-router-dom";
@@ -39,7 +40,10 @@ const ProfileSkeleton: React.FC = () => {
             {/* Skeleton Social Links */}
             <div className="flex justify-center lg:justify-start space-x-6">
               {Array.from({ length: 5 }).map((_, idx) => (
-                <div key={idx} className="w-10 h-10 bg-gray-300 rounded-full"></div>
+                <div
+                  key={idx}
+                  className="w-10 h-10 bg-gray-300 rounded-full"
+                ></div>
               ))}
             </div>
           </div>
@@ -59,16 +63,14 @@ export const ProfilePage: React.FC = () => {
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  
 
   // Fetch the user profile when the component mounts.
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const response = await axios.get(
-          `${SERVER_URL}/api/account/profile`,
-          { withCredentials: true }
-        );
+        const response = await axios.get(`${SERVER_URL}/api/account/profile`, {
+          withCredentials: true,
+        });
         setProfile(response.data);
       } catch (err: any) {
         console.error("Error fetching profile:", err);
@@ -87,9 +89,7 @@ export const ProfilePage: React.FC = () => {
   }
   if (error) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        {error}
-      </div>
+      <div className="flex justify-center items-center h-screen">{error}</div>
     );
   }
 
@@ -100,7 +100,10 @@ export const ProfilePage: React.FC = () => {
     let normalizedPath = profile.image
       .replace(/\\/g, "/")
       .replace(/^src\//, "");
-    normalizedPath = normalizedPath.replace("uploadsprofile", "uploads/profile");
+    normalizedPath = normalizedPath.replace(
+      "uploadsprofile",
+      "uploads/profile"
+    );
     avatarUrl = `${SERVER_URL}/${normalizedPath}`;
   }
 
@@ -111,7 +114,10 @@ export const ProfilePage: React.FC = () => {
     let normalizedBannerPath = profile.imageBanner
       .replace(/\\/g, "/")
       .replace(/^src\//, "");
-    normalizedBannerPath = normalizedBannerPath.replace("uploadsprofile", "uploads/profile");
+    normalizedBannerPath = normalizedBannerPath.replace(
+      "uploadsprofile",
+      "uploads/profile"
+    );
     bannerUrl = `${SERVER_URL}/${normalizedBannerPath}`;
   }
 
@@ -145,28 +151,23 @@ export const ProfilePage: React.FC = () => {
 
   // Extract individual social links, using defaults if empty.
   const website =
-    parsedSocialLinks.website &&
-    parsedSocialLinks.website.trim().length > 0
+    parsedSocialLinks.website && parsedSocialLinks.website.trim().length > 0
       ? parsedSocialLinks.website
       : "https://ncase.me/trust/";
   const discord =
-    parsedSocialLinks.discord &&
-    parsedSocialLinks.discord.trim().length > 0
+    parsedSocialLinks.discord && parsedSocialLinks.discord.trim().length > 0
       ? parsedSocialLinks.discord
       : "https://discord.com";
   const youtube =
-    parsedSocialLinks.youtube &&
-    parsedSocialLinks.youtube.trim().length > 0
+    parsedSocialLinks.youtube && parsedSocialLinks.youtube.trim().length > 0
       ? parsedSocialLinks.youtube
       : "https://youtube.com";
   const twitter =
-    parsedSocialLinks.twitter &&
-    parsedSocialLinks.twitter.trim().length > 0
+    parsedSocialLinks.twitter && parsedSocialLinks.twitter.trim().length > 0
       ? parsedSocialLinks.twitter
       : "https://twitter.com";
   const instagram =
-    parsedSocialLinks.instagram &&
-    parsedSocialLinks.instagram.trim().length > 0
+    parsedSocialLinks.instagram && parsedSocialLinks.instagram.trim().length > 0
       ? parsedSocialLinks.instagram
       : "https://instagram.com";
 
@@ -203,9 +204,13 @@ export const ProfilePage: React.FC = () => {
             </div>
 
             {/* Buttons (for smaller screens) */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 lg:hidden">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6 lg:hidden">
               <button className="transition duration-300 text-white bg-call-to-actions-900 transform border-2 border-call-to-action font-bold py-2 px-6 rounded-lg flex items-center justify-center space-x-2 hover:bg-call-to-actions-800 hover:text-white">
                 <span>Edit Profile</span>
+              </button>
+              <button className="transition duration-300 text-white bg-call-to-actions-900 transform border-2 border-call-to-action font-bold py-2 px-6 rounded-lg flex items-center justify-center space-x-2 hover:bg-call-to-actions-800 hover:text-white">
+                <FaQrcode />
+                <span>Scan QR</span>
               </button>
             </div>
 
@@ -291,12 +296,20 @@ export const ProfilePage: React.FC = () => {
           </div>
 
           {/* Buttons for larger screens */}
-          <div className="hidden lg:flex mt-6 lg:mt-0 justify-end space-x-4 order-2 lg:order-none">
+          <div className="hidden lg:flex mt-6 lg:mt-0 justify-end space-x-6 order-2 gap-4 lg:order-none">
             <Link
               to={"edit-profile"}
               className="transition duration-300 bg-call-to-actions-900 text-white transform border-2 border-call-to-action font-bold py-2 px-6 rounded-lg flex items-center justify-center space-x-2 hover:bg-call-to-actions-800 hover:text-white shadow-md"
             >
               <span>Edit Profile</span>
+            </Link>
+
+            <Link
+              to={"/scan-qr"}
+              className="transition duration-300 bg-call-to-actions-900 text-white transform border-2 border-call-to-action font-bold py-2 px-6 rounded-lg flex items-center justify-center space-x-2 hover:bg-call-to-actions-800 hover:text-white shadow-md"
+            >
+              <FaQrcode />
+              <span>Scan QR</span>
             </Link>
           </div>
         </div>
