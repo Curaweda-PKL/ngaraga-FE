@@ -35,8 +35,8 @@ const OrderSummary: React.FC = () => {
   const total = subtotal + shippingCost + vat;
 
   return (
-    <div className="flex flex-col p-6 rounded-lg max-h-fit border border-neutral-colors-400 bg-neutral-colors-200 lg:mt-20">
-      <h2 className="font-bold text-lg mb-2">Summary Order</h2>
+    <div className="flex flex-col p-6 rounded-lg max-h-fit border border-neutral-colors-400 bg-neutral-colors-200 lg:mt-20 mx-auto sm:max-w-md">
+      <h2 className="font-bold text-lg mb-2 text-center">Summary Order</h2>
       <div className="border-b border-neutral-colors-400 mb-5"></div>
       {/* Product List */}
       {items.map((item, index) => (
@@ -66,23 +66,23 @@ const OrderSummary: React.FC = () => {
         </div>
       ))}
       <div className="mt-6 space-y-2">
-        <div className="flex justify-between">
+        <div className="flex flex-col lg:flex-row justify-between lg:items-center">
           <span>Subtotal</span>
           <span>{formatCurrency(subtotal)}</span>
         </div>
-        <div className="flex justify-between">
+        <div className="flex flex-col lg:flex-row justify-between lg:items-center">
           <span>Shipping</span>
           <span>{formatCurrency(shippingCost)}</span>
         </div>
-        <div className="flex justify-between">
+        <div className="flex flex-col lg:flex-row justify-between lg:items-center">
           <span>Discount</span>
           <span>Rp 0</span>
         </div>
-        <div className="flex justify-between border-b border-neutral-colors-400 pb-2">
+        <div className="flex flex-col lg:flex-row justify-between lg:items-center border-b border-neutral-colors-400 pb-2">
           <span>VAT 11%</span>
           <span>{formatCurrency(vat)}</span>
         </div>
-        <div className="flex justify-between font-bold text-lg mt-2">
+        <div className="flex flex-col lg:flex-row justify-between lg:items-center font-bold text-lg mt-2">
           <span>Total</span>
           <span>{formatCurrency(total)}</span>
         </div>
@@ -95,4 +95,5 @@ const OrderSummary: React.FC = () => {
     </div>
   );
 };
+
 export default OrderSummary;

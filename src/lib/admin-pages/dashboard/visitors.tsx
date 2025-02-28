@@ -145,7 +145,7 @@ export default function Visitors() {
                 <button
                   className={`px-4 py-2 rounded-lg transition-colors ${
                     timeRange === "7 Days"
-                      ? "bg-blue-500 text-white"
+                      ? "bg-call-to-action text-white"
                       : "bg-gray-100 hover:bg-gray-200"
                   }`}
                   onClick={() => handleTimeRangeChange("7 Days")}
@@ -155,7 +155,7 @@ export default function Visitors() {
                 <button
                   className={`px-4 py-2 rounded-lg transition-colors ${
                     timeRange === "30 Days"
-                      ? "bg-blue-500 text-white"
+                      ? "bg-call-to-action text-white"
                       : "bg-gray-100 hover:bg-gray-200"
                   }`}
                   onClick={() => handleTimeRangeChange("30 Days")}
@@ -165,7 +165,7 @@ export default function Visitors() {
                 <button
                   className={`px-4 py-2 rounded-lg transition-colors ${
                     timeRange === "1 Year"
-                      ? "bg-blue-500 text-white"
+                      ? "bg-call-to-action text-white"
                       : "bg-gray-100 hover:bg-gray-200"
                   }`}
                   onClick={() => handleTimeRangeChange("1 Year")}

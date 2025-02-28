@@ -6,11 +6,13 @@ interface CategoryModalProps {
   onClose: () => void;
   title: string;
   submitText: string;
-  onSubmit: (name: string, seriesId: number, image: File) => void;
+  onSubmit: (name: string, seriesId: number, image: File, code?: string) => void;
   defaultValue?: string;
+  defaultCode?: string;
   loadingSeries: boolean;
   errorSeries: string | null;
-  series: { id: number; name: string }[];
+  // Updated type to include isSuspended so we can filter out suspended series.
+  series: { id: number; name: string; isSuspended: boolean }[];
   selectedSeries: number | null;
   setSelectedSeries: (value: number | null) => void;
   selectedImage: File | null;
@@ -24,6 +26,7 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
   submitText,
   onSubmit,
   defaultValue = "",
+  defaultCode = "",
   loadingSeries,
   errorSeries,
   series,
@@ -33,9 +36,28 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
   setSelectedImage,
 }) => {
   const [inputValue, setInputValue] = useState(defaultValue);
+  const [code, setCode] = useState(defaultCode);
   const [error, setError] = useState("");
+  const [codeError, setCodeError] = useState<string | null>(null);
 
   useEffect(() => setInputValue(defaultValue), [defaultValue]);
+  useEffect(() => setCode(defaultCode), [defaultCode]);
+
+  // Function to validate the code input
+  const validateCode = (value: string) => {
+    // If field is not empty, then enforce the pattern: exactly three digits.
+    if (value && !/^\d{3}$/.test(value)) {
+      return "Input harus mengikuti format xxx (number) contoh: 123";
+    }
+    return null;
+  };
+
+  const handleCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newCode = e.target.value;
+    setCode(newCode);
+    const validationError = validateCode(newCode);
+    setCodeError(validationError);
+  };
 
   if (!isOpen) return null;
 
@@ -52,8 +74,13 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
       setError("Please upload an SVG image.");
       return;
     }
+    // If code is non-empty and invalid, do not submit
+    if (code && validateCode(code)) {
+      setCodeError(validateCode(code));
+      return;
+    }
 
-    onSubmit(inputValue, selectedSeries, selectedImage);
+    onSubmit(inputValue, selectedSeries, selectedImage, code);
     onClose();
   };
 
@@ -81,15 +108,19 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
           ) : (
             <select
               value={selectedSeries || ""}
-              onChange={(e) => setSelectedSeries(e.target.value ? Number(e.target.value) : null)}
+              onChange={(e) =>
+                setSelectedSeries(e.target.value ? Number(e.target.value) : null)
+              }
               className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500"
             >
               <option value="">Select Series</option>
-              {series.map((serie) => (
-                <option key={serie.id} value={serie.id}>
-                  {serie.name}
-                </option>
-              ))}
+              {series
+                .filter((serie) => !serie.isSuspended)
+                .map((serie) => (
+                  <option key={serie.id} value={serie.id}>
+                    {serie.name}
+                  </option>
+                ))}
             </select>
           )}
 
@@ -101,8 +132,12 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
             htmlFor="imageUpload"
             className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500 cursor-pointer flex justify-between items-center"
           >
-            <span className="text-gray-500">{selectedImage ? selectedImage.name : "No file chosen"}</span>
-            <span className="bg-gray-100 hover:bg-gray-200 px-4 py-1 rounded-md text-sm">Browse</span>
+            <span className="text-gray-500">
+              {selectedImage ? selectedImage.name : "No file chosen"}
+            </span>
+            <span className="bg-gray-100 hover:bg-gray-200 px-4 py-1 rounded-md text-sm">
+              Browse
+            </span>
           </label>
           <input
             type="file"
@@ -144,20 +179,46 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
             className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500"
           />
 
-          {/* Error Message */}
+          {/* Code Input (Optional) with Regex validation */}
+          <label className="block text-sm font-medium text-gray-700 mb-1 mt-4">
+            Category Code (format xxx)
+          </label>
+          <input
+            type="text"
+            value={code}
+            onChange={handleCodeChange}
+            placeholder="Enter category code e.g. 123"
+            className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+          />
+          {codeError && (
+            <p className="text-red-500 text-sm mt-1">{codeError}</p>
+          )}
+
+          {/* General Error Message */}
           {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
         </div>
 
         {/* Footer Buttons */}
         <div className="flex justify-end gap-2 p-4 border-t">
-          <button onClick={onClose} className="px-4 py-2 border rounded-lg text-gray-600 hover:bg-gray-50">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 border rounded-lg text-gray-600 hover:bg-gray-50"
+          >
             Cancel
           </button>
           <button
             onClick={handleSubmit}
-            disabled={!inputValue.trim() || selectedSeries === null || !selectedImage}
+            disabled={
+              !inputValue.trim() ||
+              selectedSeries === null ||
+              !selectedImage ||
+              (!!code && !!codeError)
+            }
             className={`px-4 py-2 rounded-lg text-white ${
-              !inputValue.trim() || selectedSeries === null || !selectedImage
+              !inputValue.trim() ||
+              selectedSeries === null ||
+              !selectedImage ||
+              (!!code && !!codeError)
                 ? "bg-gray-300 cursor-not-allowed"
                 : "bg-call-to-actions-900 hover:bg-call-to-actions-800"
             }`}

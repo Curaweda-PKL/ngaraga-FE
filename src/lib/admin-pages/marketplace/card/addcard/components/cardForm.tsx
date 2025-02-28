@@ -1,8 +1,7 @@
-// CardForm.tsx
 import React, { ChangeEvent, useRef } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
-import { Upload } from "lucide-react";
+import {Upload} from "lucide-react";
 
 interface CardFormProps {
   formData: {
@@ -11,9 +10,9 @@ interface CardFormProps {
     sku: string;
     price: string;
     salePrice: boolean;
+    discountedPrice: string; // NEW FIELD
     stock: string;
     cardDetails: string;
-    // Added new fields to match the AddCard state
     categories: string[];
     creator: boolean;
     selectedCreator: string;
@@ -22,6 +21,7 @@ interface CardFormProps {
     source: boolean;
     sourceImageWebsite: string;
     sourceImageAlt: string;
+    cardType: string;
   };
   handleInputChange: (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -36,6 +36,7 @@ interface CardFormProps {
       sku: string;
       price: string;
       salePrice: boolean;
+      discountedPrice: string;
       stock: string;
       cardDetails: string;
       categories: string[];
@@ -46,6 +47,7 @@ interface CardFormProps {
       source: boolean;
       sourceImageWebsite: string;
       sourceImageAlt: string;
+      cardType: string;
     }>
   >;
 }
@@ -149,6 +151,20 @@ const CardForm: React.FC<CardFormProps> = ({
         />
       </div>
 
+      {/* Conditionally render discounted price field if salePrice is true */}
+      {formData.salePrice && (
+        <div>
+          <label className="block mb-2 text-sm mt-2">Discounted Price</label>
+          <input
+            type="text"
+            name="discountedPrice"
+            value={formData.discountedPrice}
+            onChange={handleInputChange}
+            className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
+          />
+        </div>
+      )}
+
       <div>
         <label className="block mb-2 text-sm">Stock *</label>
         <input
@@ -166,7 +182,7 @@ const CardForm: React.FC<CardFormProps> = ({
           <ReactQuill
             value={formData.cardDetails}
             onChange={(value) =>
-              setFormData((prev) => ({ ...prev, cardDetails: value }))
+              setFormData((prev) => ({...prev, cardDetails: value}))
             }
             placeholder="Write your card details..."
           />

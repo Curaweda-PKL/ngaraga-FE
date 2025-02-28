@@ -3,15 +3,16 @@ import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { Upload } from "lucide-react";
 import axios from "axios";
-import Select, { components, OptionProps } from "react-select";
+import Select, { components, OptionProps, SingleValueProps } from "react-select";
 import { useNavigate } from "react-router-dom";
-import { SERVER_URL } from "@/middleware/utils"; // Import the centralized server URL
+import { SERVER_URL } from "@/middleware/utils";
 
 // Define a type for your card data
 interface Card {
-  id: number; // now using card id
+  id: number;
   image: string;
-  sku: string; // still available if needed elsewhere
+  sku: string;
+  name: string;
   characterName: string;
   categoryName: string;
   price: string;
@@ -19,16 +20,14 @@ interface Card {
 }
 
 interface CardOption {
-  value: number; // now using card id instead of sku
-  label: string; // card name
-  image: string; // image URL
+  value: number;
+  label: string;
+  image: string;
 }
 
 export const AddEvents = () => {
-  // Initialize useNavigate
   const navigate = useNavigate();
 
-  // Existing form state, now with selectedCard as a CardOption or null
   const [formData, setFormData] = useState({
     eventImage: null as File | null,
     eventName: "",
@@ -50,18 +49,18 @@ export const AddEvents = () => {
   const [eventImagePreview, setEventImagePreview] = useState<string | null>(null);
   const [guestAvatarPreview, setGuestAvatarPreview] = useState<string | null>(null);
 
-  // New states for fetching cards
+  // States for fetching cards
   const [cards, setCards] = useState<Card[]>([]);
   const [cardsLoading, setCardsLoading] = useState<boolean>(false);
   const [cardsError, setCardsError] = useState<string>("");
 
-  // Fetch cards on component mount
+  // Fetch cards on mount
   useEffect(() => {
     const fetchCards = async () => {
       setCardsLoading(true);
       try {
         const response = await axios.get(`${SERVER_URL}/api/cards/all`);
-        // Assumes API returns { cards: [ ... ] }
+        // Assumes API returns { cards: [...] }
         setCards(response.data.cards);
       } catch (error) {
         console.error("Error fetching cards:", error);
@@ -74,10 +73,10 @@ export const AddEvents = () => {
     fetchCards();
   }, []);
 
-  // Create options for react-select from your cards using card id instead of sku
+  // Create options for react-select from your cards
   const cardOptions: CardOption[] = cards.map((card) => ({
     value: card.id,
-    label: card.characterName,
+    label: card.name,
     image: `${SERVER_URL}/${card.image.replace(/\\/g, "/")}`,
   }));
 
@@ -95,17 +94,36 @@ export const AddEvents = () => {
     </components.Option>
   );
 
-  // Handlers for form inputs and file uploads (existing code)
+  // Custom single value to display selected option with image and name
+// Custom single value component for react-select
+const CustomSingleValue = (props: SingleValueProps<CardOption, false>) => (
+  <components.SingleValue {...props}>
+    <div style={{ display: "flex", alignItems: "center" }}>
+      <img
+        src={props.data.image}
+        alt={props.data.label}
+        style={{
+          width: 30,
+          height: 30,
+          objectFit: "cover",
+          marginRight: 10,
+        }}
+      />
+      <span style={{ color: "#000", fontSize: "0.9rem" }}>
+        {props.data.label || "Unnamed Card"}
+      </span>
+    </div>
+  </components.SingleValue>
+);
+
+
+  // Handlers for form inputs and file uploads
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value, type } = e.target;
-    const newValue =
-      type === "checkbox" ? (e.target as HTMLInputElement).checked : value;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: newValue,
-    }));
+    const newValue = type === "checkbox" ? (e.target as HTMLInputElement).checked : value;
+    setFormData((prev) => ({ ...prev, [name]: newValue }));
   };
 
   const handleImageUpload = (e: ChangeEvent<HTMLInputElement>) => {
@@ -169,7 +187,7 @@ export const AddEvents = () => {
     if (formData.eventImage) {
       data.append("eventImage", formData.eventImage);
     }
-    // If event benefit is enabled and a card is selected, send its id instead of sku
+    // If event benefit is enabled and a card is selected, send its id
     if (formData.eventBenefit && formData.selectedCard) {
       data.append("cardRewards", formData.selectedCard.value.toString());
     }
@@ -186,15 +204,10 @@ export const AddEvents = () => {
       }
     }
     try {
-      const response = await axios.post(
-        `${SERVER_URL}/api/events`,
-        data,
-        {
-          headers: { "Content-Type": "multipart/form-data" },
-        }
-      );
+      const response = await axios.post(`${SERVER_URL}/api/events`, data, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
       console.log("Event created:", response.data);
-      // Navigate to /admin/event on successful save
       navigate("/admin/event");
     } catch (error) {
       console.error("Error creating event:", error);
@@ -250,9 +263,7 @@ export const AddEvents = () => {
                   <p className="text-sm text-gray-500">
                     Click to Upload or Drag & Drop
                   </p>
-                  <p className="text-xs text-gray-400">
-                    jpeg, jpg, png, max 4mb
-                  </p>
+                  <p className="text-xs text-gray-400">jpeg, jpg, png, max 4mb</p>
                 </div>
               )}
             </div>
@@ -298,10 +309,7 @@ export const AddEvents = () => {
           <div>
             <div className="flex items-center justify-between mb-2">
               <label className="text-sm">Event Benefit *</label>
-              <label
-                htmlFor="eventBenefit"
-                className="relative inline-block w-10 h-6"
-              >
+              <label htmlFor="eventBenefit" className="relative inline-block w-10 h-6">
                 <input
                   type="checkbox"
                   id="eventBenefit"
@@ -318,26 +326,28 @@ export const AddEvents = () => {
               <p>Loading Cards...</p>
             ) : cardsError ? (
               <p style={{ color: "red" }}>{cardsError}</p>
+            ) : cardOptions.length === 0 ? (
+              <p>No cards available.</p>
             ) : (
               <Select
-                isDisabled={!formData.eventBenefit}
-                options={cardOptions}
-                value={formData.selectedCard}
-                onChange={(selectedOption) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    selectedCard: selectedOption,
-                  }))
-                }
-                placeholder="Choose a Card"
-                components={{ Option: CustomOption }}
-                styles={{
-                  control: (provided) => ({
-                    ...provided,
-                    borderRadius: "0.5rem",
-                  }),
-                }}
-              />
+              isDisabled={!formData.eventBenefit}
+              options={cardOptions}
+              value={formData.selectedCard}
+              onChange={(selectedOption) =>
+                setFormData((prev) => ({ ...prev, selectedCard: selectedOption }))
+              }
+              placeholder="Choose a Card"
+              components={{
+                Option: CustomOption,
+                SingleValue: CustomSingleValue,
+              }}
+              styles={{
+                control: (provided) => ({
+                  ...provided,
+                  borderRadius: "0.5rem",
+                }),
+              }}
+            />
             )}
           </div>
 
@@ -394,9 +404,7 @@ export const AddEvents = () => {
           {/* Online Event Link */}
           {formData.eventType === "ONLINE" && (
             <div>
-              <label className="block mb-2 text-sm">
-                Online Event Link
-              </label>
+              <label className="block mb-2 text-sm">Online Event Link</label>
               <input
                 type="text"
                 name="linkZoom"
@@ -411,9 +419,7 @@ export const AddEvents = () => {
           {/* Offline Location */}
           {formData.eventType === "OFFLINE" && (
             <div>
-              <label className="block mb-2 text-sm mt-2">
-                Event Location
-              </label>
+              <label className="block mb-2 text-sm mt-2">Event Location</label>
               <input
                 type="text"
                 name="offlineLocation"
@@ -429,10 +435,7 @@ export const AddEvents = () => {
           <div>
             <div className="flex items-center justify-between mb-2">
               <label className="text-sm">Special Guest</label>
-              <label
-                htmlFor="specialGuest"
-                className="relative inline-block w-10 h-6"
-              >
+              <label htmlFor="specialGuest" className="relative inline-block w-10 h-6">
                 <input
                   type="checkbox"
                   id="specialGuest"
@@ -459,9 +462,7 @@ export const AddEvents = () => {
                   />
                 </div>
                 <div>
-                  <label className="block mb-2 text-sm">
-                    Guest Occupation
-                  </label>
+                  <label className="block mb-2 text-sm">Guest Occupation</label>
                   <input
                     type="text"
                     name="guestOccupation"
@@ -500,12 +501,8 @@ export const AddEvents = () => {
                           className="hidden"
                           onChange={handleGuestAvatarUpload}
                         />
-                        <p className="text-sm text-gray-500">
-                          Click to Upload or Drag & Drop
-                        </p>
-                        <p className="text-xs text-gray-400">
-                          jpeg, jpg, png, max 4mb
-                        </p>
+                        <p className="text-sm text-gray-500">Click to Upload or Drag & Drop</p>
+                        <p className="text-xs text-gray-400">jpeg, jpg, png, max 4mb</p>
                       </div>
                     )}
                   </div>
@@ -518,9 +515,7 @@ export const AddEvents = () => {
 
       {/* Action Buttons */}
       <div className="flex justify-end gap-4 mt-6">
-        <button className="px-6 py-2 border rounded-lg hover:bg-gray-50">
-          Cancel
-        </button>
+        <button className="px-6 py-2 border rounded-lg hover:bg-gray-50">Cancel</button>
         <button
           onClick={handleSubmit}
           className="px-6 py-2 bg-call-to-actions-900 text-white rounded-lg hover:bg-yellow-600"

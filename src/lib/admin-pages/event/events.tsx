@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import QRCode from "react-qr-code";
 import { Plus, Search, Edit, Eye, EyeOff, Trash2, Link2 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { SERVER_URL } from "@/middleware/utils"; // Imported centralized server URL
 
 export const Events = () => {
@@ -23,14 +23,8 @@ export const Events = () => {
   const itemsPerPage = 5;
   const navigate = useNavigate();
 
-  // --- Modal state for Suspend/Unsuspend actions (existing) ---
-  const [modalOpen, setModalOpen] = useState(false);
-  const [modalEvent, setModalEvent] = useState<{
-    id: string;
-    name: string;
-    isSuspended: boolean;
-  } | null>(null);
-  const [modalAction, setModalAction] = useState<"suspend" | "unsuspend">("suspend");
+  // --- Notification state for success/error messages ---
+  const [notification, setNotification] = useState<{ type: "success" | "error", message: string } | null>(null);
 
   // --- New modal state for Generating a Claim Link / QR ---
   const [claimLinkModalOpen, setClaimLinkModalOpen] = useState(false);
@@ -39,9 +33,7 @@ export const Events = () => {
   const [isGenerating, setIsGenerating] = useState(false);
 
   // --- New state for Cards (for the select option) ---
-  const [cardRewards, setCardRewards] = useState<
-    { id: string | number; name: string }[]
-  >([]);
+  const [cardRewards, setCardRewards] = useState<{ id: string | number; name: string }[]>([]);
   const [selectedCardId, setSelectedCardId] = useState<string | number>("");
 
   // --- Ref for QR Code element (for downloading) ---
@@ -61,7 +53,7 @@ export const Events = () => {
           })} on ${new Date(event.eventDate).toLocaleDateString()}`,
           type: event.eventType || "Unknown",
           image: event.eventImage,
-          isSuspended: event.isSuspensed === true,
+          isSuspended: event.isSuspended === true || event.isSuspensed === true,
         }));
         setEvents(fetchedEvents);
       })
@@ -75,11 +67,10 @@ export const Events = () => {
     axios
       .get(`${SERVER_URL}/api/cards/all`)
       .then((response) => {
-        // Response is expected to be { cards: [...] }
         const cardsData = response.data.cards;
         const mappedCards = cardsData.map((card: any) => ({
           id: card.id,
-          name: card.characterName, // using characterName as the display name
+          name: card.name,
         }));
         setCardRewards(mappedCards);
         if (mappedCards.length > 0) {
@@ -95,6 +86,16 @@ export const Events = () => {
   useEffect(() => {
     setCurrentPage(1);
   }, [searchQuery]);
+
+  // --- Auto-clear notifications after 3 seconds ---
+  useEffect(() => {
+    if (notification) {
+      const timer = setTimeout(() => {
+        setNotification(null);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [notification]);
 
   // --- Pagination and Filtering ---
   const filteredEvents = events.filter((event) =>
@@ -142,9 +143,7 @@ export const Events = () => {
     axios
       .delete(`${SERVER_URL}/api/events/${id}`)
       .then(() => {
-        setEvents((prevEvents) =>
-          prevEvents.filter((event) => event.id !== id)
-        );
+        setEvents((prevEvents) => prevEvents.filter((event) => event.id !== id));
         setSelectedEvents((prevSelected) =>
           prevSelected.filter((eventId) => eventId !== id)
         );
@@ -159,11 +158,7 @@ export const Events = () => {
     if (!window.confirm("Are you sure you want to delete selected events?")) {
       return;
     }
-    Promise.all(
-      selectedEvents.map((id) =>
-        axios.delete(`${SERVER_URL}/api/events/${id}`)
-      )
-    )
+    Promise.all(selectedEvents.map((id) => axios.delete(`${SERVER_URL}/api/events/${id}`)))
       .then(() => {
         setEvents((prevEvents) =>
           prevEvents.filter((event) => !selectedEvents.includes(event.id))
@@ -195,37 +190,24 @@ export const Events = () => {
     return buttons;
   };
 
-  // --- Handlers for Suspend/Unsuspend Modal ---
-  const openSuspendModal = (event: { id: string; name: string; isSuspended: boolean }) => {
-    setModalEvent(event);
-    setModalAction(event.isSuspended ? "unsuspend" : "suspend");
-    setModalOpen(true);
-  };
-
-  const handleSuspendUnsuspend = () => {
-    if (!modalEvent) return;
-    const url = `${SERVER_URL}/api/events/${modalEvent.id}/${modalAction}`;
+  // --- New Handler: Directly toggle suspend/unsuspend without modal ---
+  const handleToggleSuspend = (event: { id: string; name: string; isSuspended: boolean }) => {
+    const action = event.isSuspended ? "unsuspend" : "suspend";
+    const url = `${SERVER_URL}/api/events/${event.id}/${action}`;
     axios
       .put(url)
       .then(() => {
         setEvents((prevEvents) =>
           prevEvents.map((ev) =>
-            ev.id === modalEvent.id ? { ...ev, isSuspended: modalAction === "suspend" } : ev
+            ev.id === event.id ? { ...ev, isSuspended: action === "suspend" } : ev
           )
         );
+        setNotification({ type: "success", message: `Event ${action === "suspend" ? "suspended" : "unsuspended"} successfully.` });
       })
       .catch((error) => {
         console.error("Error updating event suspension:", error);
-      })
-      .finally(() => {
-        setModalOpen(false);
-        setModalEvent(null);
+        setNotification({ type: "error", message: "Error updating event suspension." });
       });
-  };
-
-  const handleCloseModal = () => {
-    setModalOpen(false);
-    setModalEvent(null);
   };
 
   // --- New Handler: Generate Claim Link for the selected card ---
@@ -235,11 +217,10 @@ export const Events = () => {
     axios
       .post(
         `${SERVER_URL}/api/cardRewards/${selectedCardId}/generateClaimLink`,
-        {}, // No data payload.
-        { withCredentials: true } // Include credentials.
+        {},
+        { withCredentials: true }
       )
       .then((response) => {
-        // Assuming the API returns { claimUrl: "..." }
         setGeneratedLink(response.data.claimUrl);
       })
       .catch((error) => {
@@ -261,7 +242,6 @@ export const Events = () => {
         { withCredentials: true }
       )
       .then((response) => {
-        // Use the returned claimUrl to generate a QR code
         setGeneratedQRCode(response.data.claimUrl);
       })
       .catch((error) => {
@@ -278,50 +258,40 @@ export const Events = () => {
     navigator.clipboard
       .writeText(generatedLink)
       .then(() => {
-        alert("Link copied to clipboard!");
+        setNotification({ type: "success", message: "Link copied to clipboard!" });
       })
       .catch((error) => {
         console.error("Copy failed:", error);
+        setNotification({ type: "error", message: "Failed to copy link." });
       });
   };
 
   // --- New Handler: Download the generated QR Code as PNG, JPG, or WEBP ---
   const downloadQRAs = (mimeType: string, extension: string) => {
     if (!qrRef.current) return;
-    // Get the SVG element rendered by the QRCode component.
     const svg = qrRef.current.querySelector("svg");
     if (!svg) return;
     const serializer = new XMLSerializer();
     let svgString = serializer.serializeToString(svg);
-
-    // Ensure the SVG has proper namespace declarations.
     if (!svgString.match(/^<svg[^>]+xmlns="http:\/\/www\.w3\.org\/2000\/svg"/))
       svgString = svgString.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
     if (!svgString.match(/^<svg[^>]+"http:\/\/www\.w3\.org\/1999\/xlink"/))
       svgString = svgString.replace(/^<svg/, '<svg xmlns:xlink="http://www.w3.org/1999/xlink"');
-
-    // Create a Blob from the SVG string.
     const svgBlob = new Blob([svgString], { type: "image/svg+xml;charset=utf-8" });
     const url = URL.createObjectURL(svgBlob);
-
-    // Create an image element and load the SVG data URL.
     const img = new Image();
     img.crossOrigin = "anonymous";
     img.onload = () => {
-      // Create a canvas element with the same dimensions as the image.
       const canvas = document.createElement("canvas");
       canvas.width = img.width;
       canvas.height = img.height;
       const ctx = canvas.getContext("2d");
-      // For non-PNG formats, fill the background with white.
       if (mimeType !== "image/png") {
         ctx.fillStyle = "#ffffff";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
       }
       ctx.drawImage(img, 0, 0);
-      // Convert the canvas content to a data URL in the desired format.
       const imgData = canvas.toDataURL(mimeType);
-      // Create and trigger a download.
       const downloadLink = document.createElement("a");
       downloadLink.href = imgData;
       downloadLink.download = `qr-code.${extension}`;
@@ -335,6 +305,13 @@ export const Events = () => {
 
   return (
     <div className="p-6">
+      {/* Notification Message */}
+      {notification && (
+        <div className={`p-4 mb-4 text-sm rounded ${notification.type === "success" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
+          {notification.message}
+        </div>
+      )}
+
       {/* Breadcrumb */}
       <div className="flex items-center text-sm text-gray-500 mb-4">
         <span>Events</span>
@@ -354,20 +331,19 @@ export const Events = () => {
             <Plus className="w-4 h-4" />
             <span>Add Events</span>
           </button>
-          <button
-            className="bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded-lg flex items-center gap-2"
-            onClick={handleDeleteSelected}
-            disabled={selectedEvents.length === 0}
-          >
-            <Trash2 className="w-4 h-4" />
-            <span>Delete Selected</span>
-          </button>
-          {/* Button to open the Generate Claim Link / QR modal */}
+          {allSelected && (
+            <button
+              className="bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+              onClick={handleDeleteSelected}
+            >
+              <Trash2 className="w-4 h-4" />
+              <span>Delete Selected</span>
+            </button>
+          )}
           <button
             className="bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded-lg flex items-center gap-2"
             onClick={() => {
               setClaimLinkModalOpen(true);
-              // Reset previously generated values when opening the modal.
               setGeneratedLink("");
               setGeneratedQRCode("");
             }}
@@ -434,12 +410,11 @@ export const Events = () => {
                 <td className="p-4">{event.type}</td>
                 <td className="p-4">
                   <div className="flex gap-2">
-                    <button
+                    <Link to={`/admin/registered-user-event/${event.id}`}
                       className="p-2 hover:bg-gray-100 rounded-lg text-gray-600"
-                      onClick={() => navigate("/admin/add-event")}
                     >
                       <Plus className="w-4 h-4" />
-                    </button>
+                    </Link>
                     <button
                       className="p-2 hover:bg-gray-100 rounded-lg text-gray-600"
                       onClick={() => navigate(`/admin/edit-event/${event.id}`)}
@@ -448,7 +423,7 @@ export const Events = () => {
                     </button>
                     <button
                       className="p-2 hover:bg-gray-100 rounded-lg text-gray-600"
-                      onClick={() => openSuspendModal(event)}
+                      onClick={() => handleToggleSuspend(event)}
                     >
                       {event.isSuspended ? (
                         <EyeOff className="w-4 h-4" />
@@ -499,39 +474,6 @@ export const Events = () => {
           </>
         )}
       </div>
-
-      {/* --- Existing Modal for Suspend/Unsuspend Confirmation --- */}
-      {modalOpen && modalEvent && (
-        <div className="fixed inset-0 flex items-center justify-center z-50">
-          <div
-            className="absolute inset-0 bg-black opacity-50"
-            onClick={handleCloseModal}
-          ></div>
-          <div className="bg-white rounded-lg shadow-lg z-10 p-6 w-96">
-            <h2 className="text-xl font-semibold mb-4">
-              {modalAction === "suspend" ? "Suspend Event" : "Unsuspend Event"}
-            </h2>
-            <p className="mb-6">
-              Are you sure you want to {modalAction} the event{" "}
-              <span className="font-medium">{modalEvent.name}</span>?
-            </p>
-            <div className="flex justify-end gap-2">
-              <button
-                className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
-                onClick={handleCloseModal}
-              >
-                Cancel
-              </button>
-              <button
-                className="px-4 py-2 rounded bg-yellow-500 text-white hover:bg-yellow-600"
-                onClick={handleSuspendUnsuspend}
-              >
-                Confirm
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* --- New Modal for Generating Claim Link / QR --- */}
       {claimLinkModalOpen && (
@@ -622,18 +564,14 @@ export const Events = () => {
                 Cancel
               </button>
               <button
-                className={`px-4 py-2 rounded bg-green-500 text-white hover:bg-green-600 ${
-                  isGenerating ? "opacity-50 cursor-not-allowed" : ""
-                }`}
+                className={`px-4 py-2 rounded bg-green-500 text-white hover:bg-green-600 ${isGenerating ? "opacity-50 cursor-not-allowed" : ""}`}
                 onClick={handleGenerateClaimLink}
                 disabled={isGenerating || !selectedCardId}
               >
                 {isGenerating ? "Generating..." : "Generate Link"}
               </button>
               <button
-                className={`px-4 py-2 rounded bg-purple-500 text-white hover:bg-purple-600 ${
-                  isGenerating ? "opacity-50 cursor-not-allowed" : ""
-                }`}
+                className={`px-4 py-2 rounded bg-purple-500 text-white hover:bg-purple-600 ${isGenerating ? "opacity-50 cursor-not-allowed" : ""}`}
                 onClick={handleGenerateClaimQR}
                 disabled={isGenerating || !selectedCardId}
               >

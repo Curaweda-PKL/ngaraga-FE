@@ -1,57 +1,68 @@
-import React, { ChangeEvent, useEffect, useState } from "react";
+import React, {ChangeEvent, useEffect, useState} from "react";
 import axios from "axios";
 import "react-quill/dist/quill.snow.css";
-import { useNavigate } from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 
 import CardForm from "./components/cardForm";
 import CardSettings from "./components/cardSetting";
-import { SERVER_URL } from "@/middleware/utils"; 
+
+import { SERVER_URL } from "@/middleware/utils";
+
 
 export const AddCard = () => {
   const navigate = useNavigate();
 
-  // Categories state (now including id)
+  // States for API data
   const [apiCategories, setApiCategories] = useState<
-    { id: number; name: string; image: string | null }[]
+    {id: number; name: string; image: string | null}[]
   >([]);
   const [categoriesLoading, setCategoriesLoading] = useState(true);
   const [categoriesError, setCategoriesError] = useState<string | null>(null);
 
-  // Creators state (fetched from API, now including id)
   const [apiCreators, setApiCreators] = useState<
-    { id: number; name: string; image: string | null }[]
+    {id: number; name: string; image: string | null}[]
   >([]);
   const [creatorsLoading, setCreatorsLoading] = useState(true);
   const [creatorsError, setCreatorsError] = useState<string | null>(null);
 
-  // Tags state (fetched from API)
+
   const [apiTags, setApiTags] = useState<{ id: number; name: string }[]>([]);
+
+
   const [tagsLoading, setTagsLoading] = useState(true);
   const [tagsError, setTagsError] = useState<string | null>(null);
 
-  // Form data state including new fields for source image info
+  // Message state to display success or error messages
+  const [message, setMessage] = useState<{
+    type: "error" | "success";
+    text: string;
+  } | null>(null);
+
+  // Form data state (now including discountedPrice)
   const [formData, setFormData] = useState({
-    cardImage: null as string | ArrayBuffer | null, // For preview
+    cardImage: null as string | ArrayBuffer | null,
     cardName: "",
     sku: "",
     price: "",
     salePrice: false,
+    discountedPrice: "", // NEW FIELD
     stock: "",
     cardDetails: "",
-    categories: [] as string[], // stores selected category IDs as strings
+    categories: [] as string[],
     creator: false,
-    selectedCreator: "", // stores selected creator ID as string
+    selectedCreator: "",
     tag: false,
-    tags: [] as string[], // stores selected tag IDs as strings
+    tags: [] as string[],
     source: false,
     sourceImageWebsite: "",
     sourceImageAlt: "",
+    cardType: "NORMAL",
   });
 
-  // State to keep the actual file for upload
+  // Store file for upload
   const [cardFile, setCardFile] = useState<File | null>(null);
 
-  // Fetch categories (include id)
+  // Fetch categories
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -76,7 +87,7 @@ export const AddCard = () => {
     fetchCategories();
   }, []);
 
-  // Fetch creators (include id)
+  // Fetch creators
   useEffect(() => {
     const fetchCreators = async () => {
       try {
@@ -85,7 +96,9 @@ export const AddCard = () => {
           id: creator.id,
           name: creator.name,
           image: creator.image
-            ? `${SERVER_URL}/uploads/creator/${encodeURIComponent(creator.image)}`
+            ? `${SERVER_URL}/uploads/creator/${encodeURIComponent(
+                creator.image
+              )}`
             : null,
         }));
         setApiCreators(creatorsData);
@@ -102,7 +115,7 @@ export const AddCard = () => {
     fetchCreators();
   }, []);
 
-  // Preload creator images so they're cached on first toggle.
+  // Preload creator images for smoother toggle experience.
   useEffect(() => {
     if (!creatorsLoading && !creatorsError) {
       apiCreators.forEach((creator) => {
@@ -137,9 +150,12 @@ export const AddCard = () => {
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
+
     const { name, value, type } = e.target;
+
     const newValue =
       type === "checkbox" ? (e.target as HTMLInputElement).checked : value;
+
     setFormData((prev) => ({
       ...prev,
       [name]: newValue,
@@ -150,19 +166,19 @@ export const AddCard = () => {
   const handleImageUpload = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      setCardFile(file); // Store file for upload
+      setCardFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
         setFormData((prev) => ({
           ...prev,
-          cardImage: reader.result, // For preview
+          cardImage: reader.result,
         }));
       };
       reader.readAsDataURL(file);
     }
   };
 
-  // Drag over and drop handlers for image upload
+  // Drag and drop handlers for image upload
   const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
   };
@@ -171,7 +187,7 @@ export const AddCard = () => {
     event.preventDefault();
     const file = event.dataTransfer.files?.[0];
     if (file) {
-      setCardFile(file); // Store file for upload
+      setCardFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
         setFormData((prev) => ({
@@ -188,12 +204,33 @@ export const AddCard = () => {
     navigate("/admin/card");
   };
 
-  // Save handler (create new card(s))
+  // Save handler (create new card)
   const handleSave = async () => {
     try {
-      // Ensure a category is selected
+      // Required field validations
+      if (!formData.cardImage) {
+        throw new Error("Card image is required.");
+      }
+      if (!formData.cardName.trim()) {
+        throw new Error("Card name is required.");
+      }
+      if (!formData.sku.trim()) {
+        throw new Error("SKU is required.");
+      }
+      if (!formData.price.trim()) {
+        throw new Error("Price is required.");
+      }
+      if (!formData.stock.trim()) {
+        throw new Error("Stock is required.");
+      }
+      if (!formData.cardDetails.trim()) {
+        throw new Error("Card details are required.");
+      }
       if (formData.categories.length === 0) {
-        throw new Error("Please select a category.");
+        throw new Error("Please select at least one category.");
+      }
+      if (!formData.tag || formData.tags.length === 0) {
+        throw new Error("Please select at least one tag.");
       }
 
       // Create FormData payload for multipart/form-data
@@ -201,13 +238,15 @@ export const AddCard = () => {
       payload.append("characterName", formData.cardName);
       payload.append("sku", formData.sku);
       payload.append("price", formData.price);
+      // Only append discountedPrice if salePrice is true, otherwise set to "0"
+      if (formData.salePrice) {
+        payload.append("discountedPrice", formData.discountedPrice);
+      } else {
+        payload.append("discountedPrice", "0");
+      }
       payload.append("stock", formData.stock);
       payload.append("cardDetail", formData.cardDetails);
-
-      // Append the first selected category (as per your current logic)
       payload.append("categoryId", formData.categories[0]);
-
-      // Convert the selected tag IDs and creator ID into JSON strings
       payload.append(
         "tagIds",
         JSON.stringify(formData.tags.map((tag) => Number(tag)))
@@ -216,14 +255,9 @@ export const AddCard = () => {
         "creatorIds",
         JSON.stringify([Number(formData.selectedCreator)])
       );
-
-      // Owner ID is optional – here we leave it empty
       payload.append("ownerId", "");
+      payload.append("cardType", "NORMAL");
 
-      // Append cardType as DEFAULT (for a normal card)
-      payload.append("CardType", "DEFAULT");
-
-      // Append sourceImage if the source toggle is enabled
       if (formData.source) {
         payload.append(
           "sourceImage",
@@ -234,12 +268,11 @@ export const AddCard = () => {
         );
       }
 
-      // Append image file if available
       if (cardFile) {
         payload.append("image", cardFile);
       }
 
-      // Send POST request to the API endpoint
+      // Post to the API endpoint
       const response = await axios.post(
         `${SERVER_URL}/api/cards/create`,
         payload,
@@ -250,23 +283,87 @@ export const AddCard = () => {
         }
       );
 
-      console.log("Response:", response.data);
-      navigate("/admin/card");
+      // Set a success message and navigate away
+      setMessage({ type: "success", text: "Card created successfully!" });
+      setTimeout(() => {
+        navigate("/admin/card");
+      }, 1500);
     } catch (error: any) {
       console.error(
         "Error creating card:",
         error.response?.data || error.message
       );
-      alert(
-        "Error creating card: " +
-          (error.response?.data?.message || error.message)
-      );
+
+      // Default error message
+      let errorMessage = "Failed to create card. Please try again later.";
+
+      // Mapping for known unique constraint errors
+      const uniqueConstraintErrors = [
+        {
+          key: "Card_uniqueCode_key",
+          message:
+            "A card with this unique code already exists. Generate a new SKU or character name",
+        },
+        {
+          key: "Card_qrCode_key",
+          message:
+            "A card with this QR code already exists. Please try again with a different QR code.",
+        },
+      ];
+
+      const errorString =
+        error.response?.data?.error ||
+        error.response?.data?.message ||
+        error.message ||
+        "";
+
+      for (const { key, message } of uniqueConstraintErrors) {
+        if (errorString.includes(key)) {
+          errorMessage = message;
+          break;
+        }
+      }
+
+      if (error.response?.status === 400 && !errorMessage) {
+        errorMessage =
+          error.response.data.error || "Bad request. Please check your input.";
+      }
+
+      setMessage({
+        type: "error",
+        text: errorMessage,
+      });
     }
   };
+
+  // Determine if the Save button should be disabled
+  const isSaveDisabled =
+    !formData.cardImage ||
+    !formData.cardName.trim() ||
+    !formData.sku.trim() ||
+    !formData.price.trim() ||
+    !formData.stock.trim() ||
+    !formData.cardDetails.trim() ||
+    formData.categories.length === 0 ||
+    !formData.tag ||
+    formData.tags.length === 0;
 
   return (
     <div className="max-w-7xl mx-auto p-6">
       <h1 className="text-2xl font-semibold mb-6">Add Card</h1>
+
+      {/* Message display */}
+      {message && (
+        <div
+          className={`p-4 rounded-lg mb-4 ${
+            message.type === "error"
+              ? "bg-red-100 text-red-700"
+              : "bg-green-100 text-green-700"
+          }`}
+        >
+          {message.text}
+        </div>
+      )}
 
       <div className="grid grid-cols-2 gap-6">
         {/* Left Column - Form Fields */}
@@ -306,7 +403,12 @@ export const AddCard = () => {
         </button>
         <button
           onClick={handleSave}
-          className="px-6 py-2 bg-call-to-actions-900 text-white rounded-lg hover:bg-call-to-actions-800"
+          disabled={isSaveDisabled}
+          className={`px-6 py-2 rounded-lg text-white ${
+            isSaveDisabled
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-call-to-actions-900 hover:bg-call-to-actions-800"
+          }`}
         >
           Save
         </button>

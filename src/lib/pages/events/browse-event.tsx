@@ -26,7 +26,7 @@ const EventCard: React.FC<EventCardProps> = ({
     if (id) {
       navigate(`/detail-events/${id}`);
     } else {
-      navigate("/detail-events");
+      navigate("/");
     }
   };
   
@@ -115,7 +115,7 @@ const BrowseEvents: React.FC = () => {
   useEffect(() => {
     const fetchPageContent = async () => {
       try {
-        const response = await axios.get(`${SERVER_URL}/api/page-content/browsevent`);
+        const response = await axios.get(`${SERVER_URL}/api/page-content/tradingDescription`);
         if (response.data) {
           setPageContent({
             title: response.data.title || pageContent.title,

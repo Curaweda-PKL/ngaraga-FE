@@ -30,17 +30,17 @@ const EditProfilePage: React.FC = () => {
   const [columns, setColumns] = useState<Column[]>(
     [...Array(5)].map(() => ({
       enabled: true,
-      value: "https://www.example.com/",
+      value: "",
     }))
   );
 
   // State to store the original social links fetched from the API.
   const [originalSocialLinks, setOriginalSocialLinks] = useState<SocialLinks>({
-    website: "https://www.example.com/",
-    discord: "https://www.example.com/",
-    youtube: "https://www.example.com/",
-    twitter: "https://www.example.com/",
-    instagram: "https://www.example.com/",
+    website: "",
+    discord: "",
+    youtube: "",
+    twitter: "",
+    instagram: "",
   });
 
   // States to hold file objects (if user selects a new image)
@@ -48,13 +48,17 @@ const EditProfilePage: React.FC = () => {
   const [bannerFile, setBannerFile] = useState<File | null>(null);
 
   // Flags for removal actions
-  const [profileImageRemoved, setProfileImageRemoved] = useState<boolean>(false);
+  const [profileImageRemoved, setProfileImageRemoved] =
+    useState<boolean>(false);
   const [bannerImageRemoved, setBannerImageRemoved] = useState<boolean>(false);
 
   // Helper to normalize image URLs
   const normalizeImageUrl = (rawPath: string): string => {
     let normalizedPath = rawPath.replace(/\\/g, "/").replace(/^src\//, "");
-    normalizedPath = normalizedPath.replace("uploadsprofile", "uploads/profile");
+    normalizedPath = normalizedPath.replace(
+      "uploadsprofile",
+      "uploads/profile"
+    );
     return `${SERVER_URL}/${normalizedPath}`;
   };
 
@@ -62,6 +66,7 @@ const EditProfilePage: React.FC = () => {
   const [selectedAddress, setSelectedAddress] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   // Fallback images
   const fallbackProfileImage =
@@ -70,7 +75,8 @@ const EditProfilePage: React.FC = () => {
     "https://images.unsplash.com/photo-1499336315816-097655dcfbda?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2710&q=80";
 
   // Profile & Banner image states with fallback values
-  const [profileImage, setProfileImage] = useState<string>(fallbackProfileImage);
+  const [profileImage, setProfileImage] =
+    useState<string>(fallbackProfileImage);
   const [bannerImage, setBannerImage] = useState<string>(fallbackBannerImage);
 
   // Refs for hidden file inputs
@@ -187,38 +193,25 @@ const EditProfilePage: React.FC = () => {
           setBannerImage(normalizedBannerUrl);
         }
 
-        let socialLinksData: any = {};
-        if (data.socialLinks) {
-          if (typeof data.socialLinks === "string") {
-            try {
-              socialLinksData = JSON.parse(data.socialLinks);
-            } catch (err) {
-              console.error("Error parsing socialLinks:", err);
-            }
-          } else {
-            socialLinksData = data.socialLinks;
-          }
-        }
+        let socialLinksData = typeof data.socialLinks === "string"
+        ? JSON.parse(data.socialLinks)
+        : data.socialLinks || {};
 
-        const fetchedSocialLinks: SocialLinks = {
-          website: socialLinksData.website || "https://www.example.com/",
-          discord: socialLinksData.discord || "https://www.example.com/",
-          youtube: socialLinksData.youtube || "https://www.example.com/",
-          twitter: socialLinksData.twitter || "https://www.example.com/",
-          instagram: socialLinksData.instagram || "https://www.example.com/",
-        };
-
-        setColumns([
-          { enabled: true, value: fetchedSocialLinks.website },
-          { enabled: true, value: fetchedSocialLinks.discord },
-          { enabled: true, value: fetchedSocialLinks.youtube },
-          { enabled: true, value: fetchedSocialLinks.twitter },
-          { enabled: true, value: fetchedSocialLinks.instagram },
-        ]);
-        setOriginalSocialLinks(fetchedSocialLinks);
-      } catch (err) {
-        console.error("Error fetching profile", err);
+      setColumns([
+        { enabled: true, value: socialLinksData.website || "" },
+        { enabled: true, value: socialLinksData.discord || "" },
+        { enabled: true, value: socialLinksData.youtube || "" },
+        { enabled: true, value: socialLinksData.twitter || "" },
+        { enabled: true, value: socialLinksData.instagram || "" },
+      ]);
+      setOriginalSocialLinks(socialLinksData);
+    } catch (err) {
+      if (axios.isCancel(err)) {
+        console.log("Request dibatalkan:", err.message);
+      } else {
+        console.error("Error fetching profile:", err);
       }
+    }
     };
 
     fetchProfile();
@@ -230,13 +223,24 @@ const EditProfilePage: React.FC = () => {
     try {
       setLoading(true);
       setError(null);
+      setSuccessMessage(null); // Reset pesan sukses sebelum request
 
       const socialLinksPayload = {
-        website: columns[0].enabled ? columns[0].value : originalSocialLinks.website,
-        discord: columns[1].enabled ? columns[1].value : originalSocialLinks.discord,
-        youtube: columns[2].enabled ? columns[2].value : originalSocialLinks.youtube,
-        twitter: columns[3].enabled ? columns[3].value : originalSocialLinks.twitter,
-        instagram: columns[4].enabled ? columns[4].value : originalSocialLinks.instagram,
+        website: columns[0].enabled
+          ? columns[0].value
+          : originalSocialLinks.website,
+        discord: columns[1].enabled
+          ? columns[1].value
+          : originalSocialLinks.discord,
+        youtube: columns[2].enabled
+          ? columns[2].value
+          : originalSocialLinks.youtube,
+        twitter: columns[3].enabled
+          ? columns[3].value
+          : originalSocialLinks.twitter,
+        instagram: columns[4].enabled
+          ? columns[4].value
+          : originalSocialLinks.instagram,
       };
 
       const formPayload = new FormData();
@@ -248,8 +252,14 @@ const EditProfilePage: React.FC = () => {
       formPayload.append("bio", formData.bio);
       formPayload.append("socialLinks", JSON.stringify(socialLinksPayload));
 
-      formPayload.append("removeProfileImage", profileImageRemoved ? "true" : "false");
-      formPayload.append("removeBannerImage", bannerImageRemoved ? "true" : "false");
+      formPayload.append(
+        "removeProfileImage",
+        profileImageRemoved ? "true" : "false"
+      );
+      formPayload.append(
+        "removeBannerImage",
+        bannerImageRemoved ? "true" : "false"
+      );
 
       if (profileFile) {
         formPayload.append("profileImage", profileFile);
@@ -258,21 +268,24 @@ const EditProfilePage: React.FC = () => {
         formPayload.append("bannerImage", bannerFile);
       }
 
-      const response = await axios.put(
-        `${SERVER_URL}/api/account/profile`,
-        formPayload,
-        {
-          withCredentials: true,
-          headers: { "Content-Type": "multipart/form-data" },
-        }
-      );
-      // Optionally, display a success message.
+      await axios.put(`${SERVER_URL}/api/account/profile`, formPayload, {
+        withCredentials: true,
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      // Tampilkan pesan sukses
+      setSuccessMessage("Profil berhasil diperbarui!");
+
+      // Hapus pesan sukses setelah 3 detik
+      setTimeout(() => {
+        setSuccessMessage(null);
+      }, 3000);
     } catch (err: any) {
       console.error("Error updating profile", err);
       if (err.response && err.response.data && err.response.data.message) {
         setError(err.response.data.message);
       } else {
-        setError("Failed to update profile. Please try again.");
+        setError("Gagal memperbarui profil. Silakan coba lagi.");
       }
     } finally {
       setLoading(false);
@@ -282,6 +295,11 @@ const EditProfilePage: React.FC = () => {
   return (
     <div className="flex flex-col">
       {/* Background Banner */}
+      {successMessage && (
+        <div className="mt-4 p-3 bg-green-500 text-white rounded-lg">
+          {successMessage}
+        </div>
+      )}
       <section className="relative h-64">
         <div
           className="absolute top-0 w-full h-full bg-center bg-cover"

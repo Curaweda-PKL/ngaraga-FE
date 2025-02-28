@@ -3,16 +3,16 @@ import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { Upload } from "lucide-react";
 import axios from "axios";
-import Select, { components, OptionProps } from "react-select";
+import Select, { components, OptionProps, SingleValueProps } from "react-select";
 import { useParams, useNavigate } from "react-router-dom";
-import { SERVER_URL } from "@/middleware/utils"; // Imported centralized server URL
+import { SERVER_URL } from "@/middleware/utils";
 
 // Define a type for your card data
 interface Card {
   id: number;
   image: string;
   sku: string;
-  characterName: string;
+  name: string;
   categoryName: string;
   price: string;
   stock: number;
@@ -55,13 +55,20 @@ export const EditEvents = () => {
   const [cardsLoading, setCardsLoading] = useState<boolean>(false);
   const [cardsError, setCardsError] = useState<string>("");
 
+  // Temporary state to store the selected card id from event details
+  const [initialSelectedCardId, setInitialSelectedCardId] = useState<number | null>(null);
+
   // Fetch cards on mount
   useEffect(() => {
     const fetchCards = async () => {
       setCardsLoading(true);
       try {
         const response = await axios.get(`${SERVER_URL}/api/cards/all`);
-        setCards(response.data.cards);
+        if (response.data && response.data.cards) {
+          setCards(response.data.cards);
+        } else {
+          setCardsError("No cards data found.");
+        }
       } catch (error) {
         console.error("Error fetching cards:", error);
         setCardsError("Failed to fetch cards.");
@@ -103,29 +110,26 @@ export const EditEvents = () => {
             const formattedTime = time.toISOString().substring(11, 16);
             setFormData((prev) => ({ ...prev, eventTime: formattedTime }));
           }
-          // Set image previews if available
+          
+          // Set image previews if available - handling possible non-string values
           if (event.eventImage) {
-            setEventImagePreview(
-              `${SERVER_URL}/src/uploads/event/${event.eventImage.replace(/\\/g, "/")}`
-            );
+            const imagePath = typeof event.eventImage === "string"
+              ? event.eventImage.replace(/\\/g, "/")
+              : event.eventImage;
+            setEventImagePreview(`${SERVER_URL}/src/uploads/event/${imagePath}`);
           }
           if (event.eventSpecialGuestImage) {
-            setGuestAvatarPreview(
-              `${SERVER_URL}/src/uploads/event/${event.eventSpecialGuestImage.replace(/\\/g, "/")}`
-            );
+            const guestPath = typeof event.eventSpecialGuestImage === "string"
+              ? event.eventSpecialGuestImage.replace(/\\/g, "/")
+              : event.eventSpecialGuestImage;
+            setGuestAvatarPreview(`${SERVER_URL}/src/uploads/event/${guestPath}`);
           }
-          // If cardRewards exist, assume the first card as selected
+          
+          // If cardRewards exist, store the card id and enable event benefit
           if (event.cardRewards && event.cardRewards.length > 0) {
-            const card = event.cardRewards[0];
-            setFormData((prev) => ({
-              ...prev,
-              eventBenefit: true,
-              selectedCard: {
-                value: card.id,
-                label: card.characterName,
-                image: `${SERVER_URL}/${card.image.replace(/\\/g, "/")}`,
-              },
-            }));
+            const cardReward = event.cardRewards[0];
+            setFormData((prev) => ({ ...prev, eventBenefit: true }));
+            setInitialSelectedCardId(cardReward.id);
           }
         } catch (error) {
           console.error("Error fetching event details:", error);
@@ -135,11 +139,32 @@ export const EditEvents = () => {
     }
   }, [id]);
 
-  // Create react-select options for cards
+  // Once cards and initialSelectedCardId are available, update selectedCard
+  useEffect(() => {
+    if (initialSelectedCardId && cards.length > 0) {
+      const selected = cards.find(card => card.id === initialSelectedCardId);
+      if (selected) {
+        setFormData(prev => ({
+          ...prev,
+          selectedCard: {
+            value: selected.id,
+            label: selected.name,
+            image: typeof selected.image === "string"
+              ? `${SERVER_URL}/${selected.image.replace(/\\/g, "/")}`
+              : `${SERVER_URL}/${selected.image}`,
+          }
+        }));
+      }
+    }
+  }, [cards, initialSelectedCardId]);
+
+  // Create react-select options for cards - handling possible non-string values
   const cardOptions: CardOption[] = cards.map((card) => ({
     value: card.id,
-    label: card.characterName,
-    image: `${SERVER_URL}/${card.image.replace(/\\/g, "/")}`,
+    label: card.name,
+    image: typeof card.image === "string"
+      ? `${SERVER_URL}/${card.image.replace(/\\/g, "/")}`
+      : `${SERVER_URL}/${card.image}`,
   }));
 
   // Custom option to show card image & name
@@ -154,6 +179,27 @@ export const EditEvents = () => {
         <span>{props.data.label}</span>
       </div>
     </components.Option>
+  );
+
+  // Custom single value to display selected option with image and name
+  const CustomSingleValue = (props: SingleValueProps<CardOption, false>) => (
+    <components.SingleValue {...props}>
+      <div style={{ display: "flex", alignItems: "center" }}>
+        <img
+          src={props.data.image}
+          alt={props.data.label}
+          style={{
+            width: 30,
+            height: 30,
+            objectFit: "cover",
+            marginRight: 10,
+          }}
+        />
+        <span style={{ color: "#000", fontSize: "0.9rem" }}>
+          {props.data.label || "Unnamed Card"}
+        </span>
+      </div>
+    </components.SingleValue>
   );
 
   // Handlers for form inputs and file uploads
@@ -226,9 +272,9 @@ export const EditEvents = () => {
     if (formData.eventImage) {
       data.append("eventImage", formData.eventImage);
     }
-    // Send card reward info if applicable
+    // If event benefit is enabled, send cardRewards as a simple array of card IDs.
     if (formData.eventBenefit && formData.selectedCard) {
-      data.append("cardRewards", formData.selectedCard.value.toString());
+      data.append("cardRewards", JSON.stringify([formData.selectedCard.value]));
     }
     if (formData.eventType === "ONLINE") {
       data.append("onlineZoomLink", formData.linkZoom);
@@ -247,9 +293,10 @@ export const EditEvents = () => {
         headers: { "Content-Type": "multipart/form-data" },
       });
       console.log("Event updated successfully");
-      navigate("/admin/events");
+      navigate("/admin/event");
     } catch (error) {
       console.error("Error updating event:", error);
+      alert("There was an error updating the event. Please try again later.");
     }
   };
 
@@ -356,26 +403,28 @@ export const EditEvents = () => {
                   className="sr-only peer"
                 />
                 <div className="w-full h-full bg-gray-200 rounded-full peer peer-checked:bg-yellow-500 transition-colors"></div>
-                <div className="absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 peer-checked:translate-x-4" />
+                <div className="absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 peer peer-checked:translate-x-4" />
               </label>
             </div>
             {cardsLoading ? (
               <p>Loading Cards...</p>
             ) : cardsError ? (
               <p style={{ color: "red" }}>{cardsError}</p>
+            ) : cardOptions.length === 0 ? (
+              <p>No cards available.</p>
             ) : (
               <Select
                 isDisabled={!formData.eventBenefit}
                 options={cardOptions}
                 value={formData.selectedCard}
                 onChange={(selectedOption) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    selectedCard: selectedOption,
-                  }))
+                  setFormData((prev) => ({ ...prev, selectedCard: selectedOption }))
                 }
                 placeholder="Choose a Card"
-                components={{ Option: CustomOption }}
+                components={{
+                  Option: CustomOption,
+                  SingleValue: CustomSingleValue,
+                }}
                 styles={{
                   control: (provided) => ({
                     ...provided,
@@ -480,7 +529,7 @@ export const EditEvents = () => {
                   className="sr-only peer"
                 />
                 <div className="w-full h-full bg-gray-200 rounded-full peer peer-checked:bg-yellow-500 transition-colors"></div>
-                <div className="absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 peer-checked:translate-x-4" />
+                <div className="absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 peer peer-checked:translate-x-4" />
               </label>
             </div>
             {formData.specialGuest && (
@@ -552,7 +601,7 @@ export const EditEvents = () => {
       <div className="flex justify-end gap-4 mt-6">
         <button
           className="px-6 py-2 border rounded-lg hover:bg-gray-50"
-          onClick={() => navigate("/admin/events")}
+          onClick={() => navigate("/admin/event")}
         >
           Cancel
         </button>
