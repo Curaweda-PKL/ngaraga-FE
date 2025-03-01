@@ -84,7 +84,7 @@ const ErrorFallback = () => {
       >
         <circle cx="25" cy="25" r="20" />
       </motion.svg>
-      <p className="text-xl mt-4">Something went wrong with this component</p>
+      <p className="text-xl mt-4">Something went wrong with</p>
     </div>
   );
 };
@@ -137,7 +137,7 @@ export const HeroFrame = () => {
   const creatorImage = normalizedCreatorImage.startsWith("http")
     ? normalizedCreatorImage
     : normalizedCreatorImage.startsWith("src/uploads")
-    ? `${SERVER_URL}/${normalizedCreatorImage}`
+    ? `${SERVER_URL}/api/${normalizedCreatorImage}`
     : `${SERVER_URL}/src/uploads/creator/${normalizedCreatorImage}`;
 
   // jQuery animation effects (unchanged)

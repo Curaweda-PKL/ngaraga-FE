@@ -6,6 +6,7 @@ import {
   FaInstagram,
   FaTwitter,
   FaYoutube,
+  FaQrcode, // imported QR code icon
 } from "react-icons/fa";
 import {SERVER_URL} from "@/middleware/utils";
 import {Link} from "react-router-dom";
@@ -38,6 +39,7 @@ const ProfileSkeleton: React.FC = () => {
             {/* Skeleton Social Links */}
             <div className="flex justify-center lg:justify-start space-x-6">
               {Array.from({length: 5}).map((_, idx) => (
+
                 <div
                   key={idx}
                   className="w-10 h-10 bg-gray-300 rounded-full"
@@ -202,9 +204,13 @@ export const ProfilePage: React.FC = () => {
             </div>
 
             {/* Buttons (for smaller screens) */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 lg:hidden">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6 lg:hidden">
               <button className="transition duration-300 text-white bg-call-to-actions-900 transform border-2 border-call-to-action font-bold py-2 px-6 rounded-lg flex items-center justify-center space-x-2 hover:bg-call-to-actions-800 hover:text-white">
                 <span>Edit Profile</span>
+              </button>
+              <button className="transition duration-300 text-white bg-call-to-actions-900 transform border-2 border-call-to-action font-bold py-2 px-6 rounded-lg flex items-center justify-center space-x-2 hover:bg-call-to-actions-800 hover:text-white">
+                <FaQrcode />
+                <span>Scan QR</span>
               </button>
             </div>
 
@@ -290,12 +296,20 @@ export const ProfilePage: React.FC = () => {
           </div>
 
           {/* Buttons for larger screens */}
-          <div className="hidden lg:flex mt-6 lg:mt-0 justify-end space-x-4 order-2 lg:order-none">
+          <div className="hidden lg:flex mt-6 lg:mt-0 justify-end space-x-6 order-2 gap-4 lg:order-none">
             <Link
               to={"edit-profile"}
               className="transition duration-300 bg-call-to-actions-900 text-white transform border-2 border-call-to-action font-bold py-2 px-6 rounded-lg flex items-center justify-center space-x-2 hover:bg-call-to-actions-800 hover:text-white shadow-md"
             >
               <span>Edit Profile</span>
+            </Link>
+
+            <Link
+              to={"/scan-qr"}
+              className="transition duration-300 bg-call-to-actions-900 text-white transform border-2 border-call-to-action font-bold py-2 px-6 rounded-lg flex items-center justify-center space-x-2 hover:bg-call-to-actions-800 hover:text-white shadow-md"
+            >
+              <FaQrcode />
+              <span>Scan QR</span>
             </Link>
           </div>
         </div>
