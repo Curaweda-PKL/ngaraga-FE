@@ -1,9 +1,18 @@
-import { useState, useEffect, useRef } from "react";
+import {useState, useEffect, useRef} from "react";
 import axios from "axios";
 import QRCode from "react-qr-code";
-import { Plus, Search, Edit, Eye, EyeOff, Trash2, Link2 } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
-import { SERVER_URL } from "@/middleware/utils"; // Imported centralized server URL
+import {
+  Plus,
+  Search,
+  Edit,
+  Eye,
+  EyeOff,
+  Trash2,
+  Link2,
+  User,
+} from "lucide-react";
+import {Link, useNavigate} from "react-router-dom";
+import {SERVER_URL} from "@/middleware/utils";
 
 export const Events = () => {
   // --- States for Events List ---
@@ -24,7 +33,10 @@ export const Events = () => {
   const navigate = useNavigate();
 
   // --- Notification state for success/error messages ---
-  const [notification, setNotification] = useState<{ type: "success" | "error", message: string } | null>(null);
+  const [notification, setNotification] = useState<{
+    type: "success" | "error";
+    message: string;
+  } | null>(null);
 
   // --- New modal state for Generating a Claim Link / QR ---
   const [claimLinkModalOpen, setClaimLinkModalOpen] = useState(false);
@@ -33,7 +45,9 @@ export const Events = () => {
   const [isGenerating, setIsGenerating] = useState(false);
 
   // --- New state for Cards (for the select option) ---
-  const [cardRewards, setCardRewards] = useState<{ id: string | number; name: string }[]>([]);
+  const [cardRewards, setCardRewards] = useState<
+    {id: string | number; name: string}[]
+  >([]);
   const [selectedCardId, setSelectedCardId] = useState<string | number>("");
 
   // --- Ref for QR Code element (for downloading) ---
@@ -143,7 +157,9 @@ export const Events = () => {
     axios
       .delete(`${SERVER_URL}/api/events/${id}`)
       .then(() => {
-        setEvents((prevEvents) => prevEvents.filter((event) => event.id !== id));
+        setEvents((prevEvents) =>
+          prevEvents.filter((event) => event.id !== id)
+        );
         setSelectedEvents((prevSelected) =>
           prevSelected.filter((eventId) => eventId !== id)
         );
@@ -158,7 +174,9 @@ export const Events = () => {
     if (!window.confirm("Are you sure you want to delete selected events?")) {
       return;
     }
-    Promise.all(selectedEvents.map((id) => axios.delete(`${SERVER_URL}/api/events/${id}`)))
+    Promise.all(
+      selectedEvents.map((id) => axios.delete(`${SERVER_URL}/api/events/${id}`))
+    )
       .then(() => {
         setEvents((prevEvents) =>
           prevEvents.filter((event) => !selectedEvents.includes(event.id))
@@ -191,7 +209,11 @@ export const Events = () => {
   };
 
   // --- New Handler: Directly toggle suspend/unsuspend without modal ---
-  const handleToggleSuspend = (event: { id: string; name: string; isSuspended: boolean }) => {
+  const handleToggleSuspend = (event: {
+    id: string;
+    name: string;
+    isSuspended: boolean;
+  }) => {
     const action = event.isSuspended ? "unsuspend" : "suspend";
     const url = `${SERVER_URL}/api/events/${event.id}/${action}`;
     axios
@@ -199,14 +221,22 @@ export const Events = () => {
       .then(() => {
         setEvents((prevEvents) =>
           prevEvents.map((ev) =>
-            ev.id === event.id ? { ...ev, isSuspended: action === "suspend" } : ev
+            ev.id === event.id ? {...ev, isSuspended: action === "suspend"} : ev
           )
         );
-        setNotification({ type: "success", message: `Event ${action === "suspend" ? "suspended" : "unsuspended"} successfully.` });
+        setNotification({
+          type: "success",
+          message: `Event ${
+            action === "suspend" ? "suspended" : "unsuspended"
+          } successfully.`,
+        });
       })
       .catch((error) => {
         console.error("Error updating event suspension:", error);
-        setNotification({ type: "error", message: "Error updating event suspension." });
+        setNotification({
+          type: "error",
+          message: "Error updating event suspension.",
+        });
       });
   };
 
@@ -218,7 +248,7 @@ export const Events = () => {
       .post(
         `${SERVER_URL}/api/cardRewards/${selectedCardId}/generateClaimLink`,
         {},
-        { withCredentials: true }
+        {withCredentials: true}
       )
       .then((response) => {
         setGeneratedLink(response.data.claimUrl);
@@ -239,7 +269,7 @@ export const Events = () => {
       .post(
         `${SERVER_URL}/api/cardRewards/${selectedCardId}/generateClaimLink`,
         {},
-        { withCredentials: true }
+        {withCredentials: true}
       )
       .then((response) => {
         setGeneratedQRCode(response.data.claimUrl);
@@ -258,26 +288,41 @@ export const Events = () => {
     navigator.clipboard
       .writeText(generatedLink)
       .then(() => {
-        setNotification({ type: "success", message: "Link copied to clipboard!" });
+        setNotification({
+          type: "success",
+          message: "Link copied to clipboard!",
+        });
       })
       .catch((error) => {
         console.error("Copy failed:", error);
-        setNotification({ type: "error", message: "Failed to copy link." });
+        setNotification({type: "error", message: "Failed to copy link."});
       });
   };
 
   // --- New Handler: Download the generated QR Code as PNG, JPG, or WEBP ---
   const downloadQRAs = (mimeType: string, extension: string) => {
     if (!qrRef.current) return;
-    const svg = qrRef.current.querySelector("svg");
+
+    // Use type assertion to tell TypeScript what type qrRef.current is
+    const element = qrRef.current as HTMLElement;
+    const svg = element.querySelector("svg");
     if (!svg) return;
+
     const serializer = new XMLSerializer();
     let svgString = serializer.serializeToString(svg);
     if (!svgString.match(/^<svg[^>]+xmlns="http:\/\/www\.w3\.org\/2000\/svg"/))
-      svgString = svgString.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
+      svgString = svgString.replace(
+        /^<svg/,
+        '<svg xmlns="http://www.w3.org/2000/svg"'
+      );
     if (!svgString.match(/^<svg[^>]+"http:\/\/www\.w3\.org\/1999\/xlink"/))
-      svgString = svgString.replace(/^<svg/, '<svg xmlns:xlink="http://www.w3.org/1999/xlink"');
-    const svgBlob = new Blob([svgString], { type: "image/svg+xml;charset=utf-8" });
+      svgString = svgString.replace(
+        /^<svg/,
+        '<svg xmlns:xlink="http://www.w3.org/1999/xlink"'
+      );
+    const svgBlob = new Blob([svgString], {
+      type: "image/svg+xml;charset=utf-8",
+    });
     const url = URL.createObjectURL(svgBlob);
     const img = new Image();
     img.crossOrigin = "anonymous";
@@ -286,6 +331,9 @@ export const Events = () => {
       canvas.width = img.width;
       canvas.height = img.height;
       const ctx = canvas.getContext("2d");
+      // Add null check for ctx
+      if (!ctx) return;
+
       if (mimeType !== "image/png") {
         ctx.fillStyle = "#ffffff";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -307,7 +355,13 @@ export const Events = () => {
     <div className="p-6">
       {/* Notification Message */}
       {notification && (
-        <div className={`p-4 mb-4 text-sm rounded ${notification.type === "success" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
+        <div
+          className={`p-4 mb-4 text-sm rounded ${
+            notification.type === "success"
+              ? "bg-green-100 text-green-700"
+              : "bg-red-100 text-red-700"
+          }`}
+        >
           {notification.message}
         </div>
       )}
@@ -340,17 +394,6 @@ export const Events = () => {
               <span>Delete Selected</span>
             </button>
           )}
-          <button
-            className="bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded-lg flex items-center gap-2"
-            onClick={() => {
-              setClaimLinkModalOpen(true);
-              setGeneratedLink("");
-              setGeneratedQRCode("");
-            }}
-          >
-            <Link2 className="w-4 h-4" />
-            <span>Generate Claim Link</span>
-          </button>
         </div>
 
         {/* Search Input */}
@@ -387,13 +430,18 @@ export const Events = () => {
           </thead>
           <tbody>
             {currentEvents.map((event) => (
-              <tr key={event.id} className="border-b">
+              <tr
+                key={event.id}
+                className="border-b"
+              >
                 <td className="p-4">
                   <input
                     type="checkbox"
                     className="rounded border-gray-300"
                     checked={selectedEvents.includes(event.id)}
-                    onChange={(e) => handleSelectEvent(event.id, e.target.checked)}
+                    onChange={(e) =>
+                      handleSelectEvent(event.id, e.target.checked)
+                    }
                   />
                 </td>
                 <td className="p-4">
@@ -410,10 +458,11 @@ export const Events = () => {
                 <td className="p-4">{event.type}</td>
                 <td className="p-4">
                   <div className="flex gap-2">
-                    <Link to={`/admin/registered-user-event/${event.id}`}
+                    <Link
+                      to={`/admin/registered-user-event/${event.id}`}
                       className="p-2 hover:bg-gray-100 rounded-lg text-gray-600"
                     >
-                      <Plus className="w-4 h-4" />
+                      <User className="w-4 h-4" />
                     </Link>
                     <button
                       className="p-2 hover:bg-gray-100 rounded-lg text-gray-600"
@@ -433,6 +482,17 @@ export const Events = () => {
                     </button>
                     <button
                       className="p-2 hover:bg-gray-100 rounded-lg text-gray-600"
+                      onClick={() => {
+                        setSelectedCardId("");
+                        setClaimLinkModalOpen(true);
+                        setGeneratedLink("");
+                        setGeneratedQRCode("");
+                      }}
+                    >
+                      <Link2 className="w-4 h-4" />
+                    </button>
+                    <button
+                      className="p-2 hover:bg-gray-100 rounded-lg text-gray-600"
                       onClick={() => handleDeleteEvent(event.id)}
                     >
                       <Trash2 className="w-4 h-4" />
@@ -443,7 +503,10 @@ export const Events = () => {
             ))}
             {currentEvents.length === 0 && (
               <tr>
-                <td colSpan={5} className="p-4 text-center text-gray-500">
+                <td
+                  colSpan={5}
+                  className="p-4 text-center text-gray-500"
+                >
                   No events found.
                 </td>
               </tr>
@@ -459,14 +522,18 @@ export const Events = () => {
           <>
             <button
               className="px-3 py-1 rounded text-gray-600 hover:bg-gray-100"
-              onClick={() => currentPage > 1 && setCurrentPage((prev) => prev - 1)}
+              onClick={() =>
+                currentPage > 1 && setCurrentPage((prev) => prev - 1)
+              }
               disabled={currentPage === 1}
             >
               Prev
             </button>
             <button
               className="px-3 py-1 rounded text-gray-600 hover:bg-gray-100"
-              onClick={() => currentPage < totalPages && setCurrentPage((prev) => prev + 1)}
+              onClick={() =>
+                currentPage < totalPages && setCurrentPage((prev) => prev + 1)
+              }
               disabled={currentPage === totalPages}
             >
               Next
@@ -485,7 +552,10 @@ export const Events = () => {
           <div className="bg-white rounded-lg shadow-lg z-10 p-6 w-96">
             <h2 className="text-xl font-semibold mb-4">Generate Claim Link</h2>
             <p className="mb-4 text-sm text-gray-600">
-              Tutorial: Select the card from the dropdown below, then click "Generate Link" to create a secure claim link or "Generate QR" to create a QR code version of the claim link. Share the link or QR code with your users so they can claim the reward.
+              Tutorial: Select the card from the dropdown below, then click
+              "Generate Link" to create a secure claim link or "Generate QR" to
+              create a QR code version of the claim link. Share the link or QR
+              code with your users so they can claim the reward.
             </p>
             <div className="mb-4">
               <label className="block mb-1 font-medium">Select Card:</label>
@@ -496,7 +566,10 @@ export const Events = () => {
               >
                 {cardRewards.length > 0 ? (
                   cardRewards.map((reward) => (
-                    <option key={reward.id} value={reward.id}>
+                    <option
+                      key={reward.id}
+                      value={reward.id}
+                    >
                       {reward.name}
                     </option>
                   ))
@@ -530,7 +603,10 @@ export const Events = () => {
                 <div className="flex flex-col items-center">
                   <p className="mb-2 text-sm text-gray-600">QR Code:</p>
                   <div ref={qrRef}>
-                    <QRCode value={generatedQRCode} size={128} />
+                    <QRCode
+                      value={generatedQRCode}
+                      size={128}
+                    />
                   </div>
                   <div className="mt-2 flex gap-2">
                     <button
@@ -564,14 +640,18 @@ export const Events = () => {
                 Cancel
               </button>
               <button
-                className={`px-4 py-2 rounded bg-green-500 text-white hover:bg-green-600 ${isGenerating ? "opacity-50 cursor-not-allowed" : ""}`}
+                className={`px-4 py-2 rounded bg-green-500 text-white hover:bg-green-600 ${
+                  isGenerating ? "opacity-50 cursor-not-allowed" : ""
+                }`}
                 onClick={handleGenerateClaimLink}
                 disabled={isGenerating || !selectedCardId}
               >
                 {isGenerating ? "Generating..." : "Generate Link"}
               </button>
               <button
-                className={`px-4 py-2 rounded bg-purple-500 text-white hover:bg-purple-600 ${isGenerating ? "opacity-50 cursor-not-allowed" : ""}`}
+                className={`px-4 py-2 rounded bg-purple-500 text-white hover:bg-purple-600 ${
+                  isGenerating ? "opacity-50 cursor-not-allowed" : ""
+                }`}
                 onClick={handleGenerateClaimQR}
                 disabled={isGenerating || !selectedCardId}
               >

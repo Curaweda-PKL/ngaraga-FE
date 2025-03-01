@@ -1,13 +1,12 @@
-import { useEffect, useState } from "react";
+import {useEffect, useState} from "react";
+import {FaPlus, FaEyeSlash, FaSearch, FaTrash, FaUser} from "react-icons/fa";
+import {PaginationMember} from "./components/paginationMember";
+import {EyeIcon} from "./components/svgsIconMember/eyeIcon";
+import {TrashIcon} from "./components/svgsIconMember/trashIcon";
+import {CheckboxIcons} from "./components/svgsIconMember/checkboxIcons";
+import {SERVER_URL} from "@/middleware/utils";
 // Removed: import DatePicker from "react-datepicker";
 // Removed: import "react-datepicker/dist/react-datepicker.css";
-import { FaPlus, FaEyeSlash, FaSearch, FaTrash } from "react-icons/fa";
-import { PaginationMember } from "./components/paginationMember";
-import { LensIcon } from "./components/svgsIconMember/lensIcon";
-import { EyeIcon } from "./components/svgsIconMember/eyeIcon";
-import { TrashIcon } from "./components/svgsIconMember/trashIcon";
-import { CheckboxIcons } from "./components/svgsIconMember/checkboxIcons";
-import { SERVER_URL } from "@/middleware/utils"; // Import centralized server URL
 
 interface Member {
   id: string;
@@ -51,14 +50,14 @@ export const Member = () => {
         const accounts = json.data;
         const members: Member[] = accounts.map((account: any) => ({
           id: account.id,
-          name: account.name || "N/A",
-          username: account.fullName || "N/A",
-          email: account.email || "N/A",
-          registerDate: account.createdAt || "N/A",
-          purchase: "N/A",
-          totalOrders: "N/A",
-          card: "N/A",
-          specialCard: "N/A",
+          name: account.name || "0",
+          username: account.fullName || "0",
+          email: account.email || "0",
+          registerDate: account.createdAt || "0",
+          purchase: "0",
+          totalOrders: "0",
+          card: "0",
+          specialCard: "0",
           checked: false,
           isSuspended: account.isSuspended || false,
           image: account.image
@@ -100,7 +99,7 @@ export const Member = () => {
   const handleCheckboxChange = (id: string) => {
     setMemberData((prev) =>
       prev.map((member) =>
-        member.id === id ? { ...member, checked: !member.checked } : member
+        member.id === id ? {...member, checked: !member.checked} : member
       )
     );
   };
@@ -111,16 +110,14 @@ export const Member = () => {
 
     setMemberData((prev) =>
       prev.map((member) =>
-        filteredIds.has(member.id)
-          ? { ...member, checked: !allChecked }
-          : member
+        filteredIds.has(member.id) ? {...member, checked: !allChecked} : member
       )
     );
   };
 
   const handleDelete = async (userId?: string) => {
     const selectedUsers = userId
-      ? [{ id: userId }]
+      ? [{id: userId}]
       : memberData.filter((user) => user.checked);
 
     if (selectedUsers.length === 0) return;
@@ -173,7 +170,7 @@ export const Member = () => {
 
       setMemberData((prev) =>
         prev.map((user) =>
-          user.id === userId ? { ...user, isSuspended: true } : user
+          user.id === userId ? {...user, isSuspended: true} : user
         )
       );
       setSuccessMessage("User successfully suspended!");
@@ -203,7 +200,7 @@ export const Member = () => {
 
       setMemberData((prev) =>
         prev.map((user) =>
-          user.id === userId ? { ...user, isSuspended: false } : user
+          user.id === userId ? {...user, isSuspended: false} : user
         )
       );
       setSuccessMessage("User successfully unsuspended!");
@@ -241,7 +238,7 @@ export const Member = () => {
       setMemberData((prev) =>
         prev.map((user) =>
           selectedUsers.some((u) => u.id === user.id)
-            ? { ...user, isSuspended: isSuspending }
+            ? {...user, isSuspended: isSuspending}
             : user
         )
       );
@@ -358,7 +355,10 @@ export const Member = () => {
           <thead>
             <tr className="text-neutral-colors-700 font-[200]">
               <th className="p-2 w-12 text-center">
-                <div onClick={handleSelectAll} className="cursor-pointer">
+                <div
+                  onClick={handleSelectAll}
+                  className="cursor-pointer"
+                >
                   <CheckboxIcons
                     className="mx-auto"
                     checked={
@@ -387,14 +387,20 @@ export const Member = () => {
           <tbody>
             {filteredMembers.length === 0 ? (
               <tr>
-                <td colSpan={9} className="p-4 text-center">
+                <td
+                  colSpan={9}
+                  className="p-4 text-center"
+                >
                   No members found
                 </td>
               </tr>
             ) : (
               filteredMembers.map((member) => (
-                <tr key={member.id} className="border-t">
-                  <td className="p-4 text-center">
+                <tr
+                  key={member.id}
+                  className="border-t"
+                >
+                  <td className="p-4 align-middle text-center">
                     <div
                       onClick={() => handleCheckboxChange(member.id)}
                       className="cursor-pointer"
@@ -405,8 +411,8 @@ export const Member = () => {
                       />
                     </div>
                   </td>
-                  <td className="p-4">
-                    <div className="flex items-center gap-3 truncate">
+                  <td className="p-4 align-middle">
+                    <div className="flex items-center gap-3">
                       <div className="w-8 h-8 bg-gray-200 rounded-lg overflow-hidden shrink-0">
                         <img
                           src={
@@ -418,40 +424,38 @@ export const Member = () => {
                           className="w-full h-full object-cover"
                         />
                       </div>
-                      <div className="truncate">
-                        <div className="font-[500] text-neutral-colors-600 truncate">
-                          {member.name || "N/A"}
+                      <div>
+                        <div className="font-[500] text-neutral-colors-600">
+                          {member.name || "0"}
                         </div>
-                        <div className="text-sm text-neutral-colors-600 truncate">
-                          {member.username || "N/A"}
+                        <div className="text-sm text-neutral-colors-600">
+                          {member.username || "0"}
                         </div>
                       </div>
                     </div>
                   </td>
-                  <td className="p-4 truncate text-sm">
-                    {member.email || "N/A"}
-                  </td>
-                  <td className="p-4 hidden md:table-cell text-sm">
-                    {member.registerDate !== "N/A" &&
+                  <td className="p-4 align-middle">{member.email || "0"}</td>
+                  <td className="p-4 align-middle hidden md:table-cell">
+                    {member.registerDate !== "0" &&
                     !isNaN(new Date(member.registerDate).getTime())
                       ? new Date(member.registerDate).toLocaleDateString()
-                      : "N/A"}
+                      : "0"}
                   </td>
-                  <td className="p-4">{member.purchase || "N/A"}</td>
-                  <td className="p-4 hidden sm:table-cell whitespace-nowrap min-w-[120px] overflow-hidden">
-                    {member.totalOrders || "N/A"}
+                  <td className="p-4 align-middle">{member.purchase || "0"}</td>
+                  <td className="p-4 align-middle">
+                    {member.totalOrders || "0"}
                   </td>
-                  <td className="p-4 hidden sm:table-cell">
-                    {member.card || "N/A"}
+                  <td className="p-4 align-middle hidden sm:table-cell">
+                    {member.card || "0"}
                   </td>
-                  <td className="p-4 hidden sm:table-cell whitespace-nowrap min-w-[120px] overflow-hidden">
-                    {member.specialCard || "N/A"}
+                  <td className="p-4 align-middle hidden sm:table-cell">
+                    {member.specialCard || "0"}
                   </td>
-                  <td className="p-4">
+                  <td className="p-4 align-middle">
                     <div className="flex gap-1">
                       <button className="p-1.5 hover:bg-gray-100 rounded-full">
                         <a href="/admin/detail-member">
-                          <LensIcon />
+                          <FaUser />
                         </a>
                       </button>
                       <button
