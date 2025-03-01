@@ -3,7 +3,7 @@ import {useState, useRef} from "react";
 type Card = {
   id: number;
   title: string;
-  creator: string;
+  rarity: "Common" | "Rare" | "Epic" | "Legendary" | "Special";
   image: string;
   price?: string;
   index?: string;
@@ -27,14 +27,14 @@ const cardData: Card[] = [
   {
     id: 1,
     title: "Distant Galaxy",
-    creator: "Animakid",
+    rarity: "Rare",
     image: "/src/assets/img/Distant-Galaxy.png",
     price: "Rp. 200.000",
   },
   {
     id: 2,
     title: "Solar Symphony",
-    creator: "NebulaKid",
+    rarity: "Epic",
     image: "/src/assets/img/Solar-Symphony.png",
     price: "Rp. 250.000",
   },
@@ -44,7 +44,7 @@ const specialCardData: Card[] = [
   {
     id: 1,
     title: "Distant Galaxy",
-    creator: "MoonDancer",
+    rarity: "Legendary",
     image: "/src/assets/img/Distant-Galaxy.png",
     index: "04",
     total: "04",
@@ -52,43 +52,19 @@ const specialCardData: Card[] = [
   },
   {
     id: 2,
-    title: "Life On Edena",
-    creator: "NebulaKid",
-    image: "/src/assets/img/Life-On-Edena.png",
-    index: "02",
-    total: "02",
-  },
-  {
-    id: 3,
     title: "AstroFiction",
-    creator: "Spaceone",
+    rarity: "Epic",
     image: "/src/assets/img/AstroFiction.png",
     index: "06",
     total: "05",
   },
   {
-    id: 4,
-    title: "Life On Edena",
-    creator: "NebulaKid",
-    image: "/src/assets/img/Life-On-Edena.png",
-    index: "05",
-    total: "05",
-  },
-  {
-    id: 5,
+    id: 3,
     title: "Distant Galaxy",
-    creator: "MoonDancer",
+    rarity: "Special",
     image: "/src/assets/img/Distant-Galaxy.png",
     index: "00",
     total: "03",
-  },
-  {
-    id: 6,
-    title: "AstroFiction",
-    creator: "Spaceone",
-    image: "/src/assets/img/AstroFiction.png",
-    index: "00",
-    total: "01",
   },
 ];
 
@@ -218,6 +194,23 @@ export const CardSection = () => {
     }
   };
 
+  const getRarityColor = (rarity: string) => {
+    switch (rarity) {
+      case "Common":
+        return "text-gray-600";
+      case "Rare":
+        return "text-blue-600";
+      case "Epic":
+        return "text-purple-600";
+      case "Legendary":
+        return "text-yellow-600";
+      case "Special":
+        return "text-red-600";
+      default:
+        return "text-gray-600";
+    }
+  };
+
   return (
     <div className="w-full mb-10 px-4 sm:px-6 ">
       {/* Tabs */}
@@ -299,7 +292,7 @@ export const CardSection = () => {
         }
       >
         {currentData.map((item) => {
-          if ("image" in item && "title" in item && "creator" in item) {
+          if ("image" in item && "title" in item && "rarity" in item) {
             if (activeTab === "specialCards") {
               // Render Special Card with new design
               return (
@@ -320,8 +313,12 @@ export const CardSection = () => {
                       <h3 className="text-lg font-bold text-gray-800 mb-1">
                         {item.title}
                       </h3>
-                      <p className="text-sm text-gray-600 mb-2">
-                        {item.creator}
+                      <p
+                        className={`text-sm mb-2 ${getRarityColor(
+                          item.rarity
+                        )}`}
+                      >
+                        {item.rarity}
                       </p>
                       <div className="flex justify-between items-center">
                         <div className="text-xs text-gray-500">
@@ -330,6 +327,18 @@ export const CardSection = () => {
                         {item.achieved ? (
                           <div className="bg-call-to-action-600 text-call-to-action border border-call-to-action px-3 py-1 rounded-full text-xs font-medium flex items-center">
                             <span className="mr-1">✓</span> Achieved
+                          </div>
+                        ) : item.index === "00" && item.total === "03" ? (
+                          <div className="relative group">
+                            <button
+                              disabled
+                              className="bg-gray-300 text-gray-600 px-4 py-1 rounded-full text-xs font-medium cursor-not-allowed"
+                            >
+                              Locked
+                            </button>
+                            <div className="absolute bottom-full right-0 mb-2 w-48 bg-black text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+                              Missing requirements: 00/03
+                            </div>
                           </div>
                         ) : (
                           <button className="bg-call-to-action hover:bg-yellow-600 text-white px-4 py-1 rounded-full text-xs font-medium">
@@ -360,9 +369,13 @@ export const CardSection = () => {
                       <h3 className="text-xl sm:text-2xl font-bold text-[#171717]">
                         {item.title}
                       </h3>
-                      <span className="text-sm sm:text-base text-[#404040]">
-                        {item.creator}
-                      </span>
+                      <p
+                        className={`text-sm mb-2 ${getRarityColor(
+                          item.rarity
+                        )}`}
+                      >
+                        {item.rarity}
+                      </p>
                       {activeTab === "cards" && item.price && (
                         <span className="text-sm sm:text-base text-[#404040]">
                           {item.price}

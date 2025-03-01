@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useState} from "react";
 import axios from "axios";
-import { CgProfile } from "react-icons/cg";
 import {
   FaDiscord,
   FaGlobe,
@@ -9,8 +8,8 @@ import {
   FaYoutube,
   FaQrcode, // imported QR code icon
 } from "react-icons/fa";
-import { SERVER_URL } from "@/middleware/utils";
-import { Link } from "react-router-dom";
+import {SERVER_URL} from "@/middleware/utils";
+import {Link} from "react-router-dom";
 
 const ProfileSkeleton: React.FC = () => {
   return (
@@ -39,7 +38,8 @@ const ProfileSkeleton: React.FC = () => {
             </div>
             {/* Skeleton Social Links */}
             <div className="flex justify-center lg:justify-start space-x-6">
-              {Array.from({ length: 5 }).map((_, idx) => (
+              {Array.from({length: 5}).map((_, idx) => (
+
                 <div
                   key={idx}
                   className="w-10 h-10 bg-gray-300 rounded-full"

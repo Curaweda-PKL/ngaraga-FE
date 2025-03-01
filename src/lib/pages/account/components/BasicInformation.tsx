@@ -1,10 +1,10 @@
-import React from "react";
+import type React from "react";
 import PhoneInput from "@/lib/pages/checkout/components/PhoneInput";
-import { AiOutlineUser } from "react-icons/ai";
-import { MdOutlineMail } from "react-icons/md";
-import { CiGlobe, CiTwitter } from "react-icons/ci";
-import { AiOutlineDiscord, AiOutlineYoutube } from "react-icons/ai";
-import { IoLogoInstagram } from "react-icons/io";
+import {AiOutlineUser} from "react-icons/ai";
+import {MdOutlineMail} from "react-icons/md";
+import {CiGlobe, CiTwitter} from "react-icons/ci";
+import {AiOutlineDiscord, AiOutlineYoutube} from "react-icons/ai";
+import {IoLogoInstagram} from "react-icons/io";
 
 export interface FormData {
   userName: string;
@@ -41,6 +41,14 @@ const BasicInformation: React.FC<BasicInformationProps> = ({
   toggleColumn,
   onPhoneChange,
 }) => {
+  const placeholders = [
+    "website",
+    "discord",
+    "youtube",
+    "twitter",
+    "instagram",
+  ];
+
   return (
     <>
       {/* Username Field */}
@@ -110,11 +118,14 @@ const BasicInformation: React.FC<BasicInformationProps> = ({
 
       {/* Website Links */}
       {columns.map((column, index) => (
-        <div key={index} className="flex flex-col mt-4 space-y-2">
+        <div
+          key={index}
+          className="flex flex-col mt-4 space-y-2"
+        >
           <label className="inline-flex items-center cursor-pointer">
             <input
               type="checkbox"
-              checked={column.enabled ?? false} // Default ke false jika undefined
+              checked={column.enabled ?? false}
               onChange={() => toggleColumn(index)}
               className="sr-only peer"
             />
@@ -163,7 +174,7 @@ const BasicInformation: React.FC<BasicInformationProps> = ({
             )}
             <input
               type="text"
-              value={column.value}
+              value={column.enabled ? column.value : placeholders[index]}
               onChange={(e) => handleInputChange(index, e.target.value)}
               disabled={!column.enabled}
               className={`block w-full pl-12 border rounded-lg shadow-sm p-4 text-lg ${
