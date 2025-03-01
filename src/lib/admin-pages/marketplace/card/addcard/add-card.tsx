@@ -295,7 +295,7 @@ export const AddCard = () => {
       );
 
       // Default error message
-      let errorMessage = "Failed to create card. Please try again later.";
+      let errorMessage = "Failed to create card. Please check if there same SKU and the name of the existed card.";
 
       // Mapping for known unique constraint errors
       const uniqueConstraintErrors = [

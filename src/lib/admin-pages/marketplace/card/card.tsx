@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { Edit3, Eye, EyeOff, Trash2, Plus } from "lucide-react";
+import { Edit3, Eye, EyeOff, Trash2, Plus, QrCode } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { SERVER_URL } from "@/middleware/utils";
+import { QrCodeGeneratorModal } from "./qrModal/qrModal"; 
 
 export const Card = () => {
   const navigate = useNavigate();
 
-  // Notification state to show success/error messages.
+  // Notification state for success/error messages.
   const [notification, setNotification] = useState<{ message: string; type: "success" | "error" } | null>(null);
 
-  // Define card state with additional isSuspended property and discountedPrice.
+  // Card state.
   const [cards, setCards] = useState<
     {
       sku: string;
@@ -26,8 +27,13 @@ export const Card = () => {
       isSuspended: boolean;
     }[]
   >([]);
+  
+  // State to control the QR Code Generator modal and its initial values.
+  const [showQrModal, setShowQrModal] = useState(false);
+  const [qrModalInitialStartCode, setQrModalInitialStartCode] = useState("");
+  const [qrModalInitialEndCode, setQrModalInitialEndCode] = useState("");
 
-  // Fetch and map cards with fallback values.
+  // Fetch cards.
   useEffect(() => {
     const fetchCards = async () => {
       try {
@@ -35,21 +41,17 @@ export const Card = () => {
         const mappedCards = response.data.cards.map((card: any) => ({
           sku: card.sku || "N/A",
           uniqueCode: card.uniqueCode || "N/A",
-          // Use card.name first, fallback to card.characterName if needed.
           name: card.name || card.characterName || "N/A",
-          // If card.category is an object, use its name property; otherwise, assume card.category is already the name.
           category:
             (typeof card.category === "object" ? card.category.name : card.category) ||
             card.categoryName ||
             "N/A",
-          // Similar for categoryCode.
           categoryCode:
             (typeof card.category === "object" ? card.category.code : card.categoryCode) ||
             "N/A",
           image: card.image || "N/A",
           stock: card.stock !== undefined ? card.stock : "N/A",
           price: card.price !== undefined ? Number(card.price) : "N/A",
-          // If discountedPrice is not provided, fall back to price.
           discountedPrice:
             card.discountedPrice !== undefined && card.discountedPrice !== null
               ? Number(card.discountedPrice)
@@ -72,7 +74,7 @@ export const Card = () => {
     fetchCards();
   }, []);
 
-  // Helper to format image URL
+  // Helper to format image URL.
   const formatImageUrl = (image?: string): string => {
     if (!image || image === "N/A") return "N/A";
     const normalizedPath = image.replace(/\\/g, "/");
@@ -81,14 +83,13 @@ export const Card = () => {
       : `${SERVER_URL}/${normalizedPath}`;
   };
 
-  // Select/deselect all cards.
+  // Handlers for select, suspend, delete, bulk actions…
   const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { checked } = e.target;
     const updatedCards = cards.map((card) => ({ ...card, selected: checked }));
     setCards(updatedCards);
   };
 
-  // Select/deselect a single card.
   const handleSelectRow = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
     const { checked } = e.target;
     const updatedCards = [...cards];
@@ -96,7 +97,6 @@ export const Card = () => {
     setCards(updatedCards);
   };
 
-  // Toggle suspension status for a single card.
   const handleToggleSuspend = async (card: any) => {
     if (!card.uniqueCode) {
       setNotification({ message: "Unique code not found", type: "error" });
@@ -105,13 +105,10 @@ export const Card = () => {
     try {
       let response;
       if (card.isSuspended) {
-        // If already suspended, unsuspend it.
         response = await axios.patch(`${SERVER_URL}/api/cards/${card.uniqueCode}/unsuspend`);
       } else {
-        // Otherwise, suspend the card.
         response = await axios.patch(`${SERVER_URL}/api/cards/${card.uniqueCode}/suspend`);
       }
-      // Update local card state with new suspension status.
       const updatedCard = response.data.card;
       setCards((prev) =>
         prev.map((c) =>
@@ -124,7 +121,6 @@ export const Card = () => {
     }
   };
 
-  // Delete a single card.
   const handleDelete = async (card: any) => {
     if (!window.confirm("Are you sure you want to delete this card?")) return;
     try {
@@ -136,7 +132,6 @@ export const Card = () => {
     }
   };
 
-  // Bulk delete selected cards.
   const handleBulkDelete = async () => {
     const selectedCards = cards.filter((card) => card.selected);
     if (selectedCards.length === 0) {
@@ -157,7 +152,6 @@ export const Card = () => {
     }
   };
 
-  // Bulk suspend selected cards.
   const handleBulkSuspend = async () => {
     const selectedCards = cards.filter((card) => card.selected);
     if (selectedCards.length === 0) {
@@ -171,7 +165,6 @@ export const Card = () => {
           const response = await axios.patch(`${SERVER_URL}/api/cards/${card.uniqueCode}/suspend`);
           return response.data.card;
         } else {
-          // Return the card if it's already suspended.
           return card;
         }
       });
@@ -188,7 +181,6 @@ export const Card = () => {
     }
   };
 
-  // Check if all cards are selected.
   const allSelected = cards.length > 0 && cards.every((card) => card.selected);
 
   return (
@@ -209,12 +201,14 @@ export const Card = () => {
             <>
               <button
                 className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+                title="Suspend All Selected Items"
                 onClick={handleBulkSuspend}
               >
                 Suspend All Selected Items
               </button>
               <button
                 className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+                title="Delete All Selected Items"
                 onClick={handleBulkDelete}
               >
                 Delete All Selected Items
@@ -223,6 +217,7 @@ export const Card = () => {
           )}
           <button
             className="bg-call-to-actions-900 hover:bg-call-to-actions-800 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+            title="Add Card"
             onClick={() => navigate("/admin/add-card")}
           >
             <Plus className="w-4 h-4" />
@@ -249,9 +244,7 @@ export const Card = () => {
               <th>Category Code</th>
               <th>Stock</th>
               <th className="whitespace-nowrap overflow-hidden text-ellipsis">Price</th>
-              <th className="whitespace-nowrap overflow-hidden text-ellipsis">
-                Discounted Price
-              </th>
+              <th className="whitespace-nowrap overflow-hidden text-ellipsis">Discounted Price</th>
               <th>Action</th>
             </tr>
           </thead>
@@ -297,12 +290,14 @@ export const Card = () => {
                   <div className="flex items-center gap-2">
                     <button
                       className="p-2 hover:bg-gray-100 rounded-lg text-gray-600"
+                      title="Edit Card"
                       onClick={() => navigate(`/admin/edit-card/${card.uniqueCode}`)}
                     >
                       <Edit3 className="w-4 h-4" />
                     </button>
                     <button
                       className="p-2 hover:bg-gray-100 rounded-lg text-gray-600"
+                      title={card.isSuspended ? "Unsuspend Card" : "Suspend Card"}
                       onClick={() => handleToggleSuspend(card)}
                     >
                       {card.isSuspended ? (
@@ -311,8 +306,21 @@ export const Card = () => {
                         <Eye className="w-4 h-4" />
                       )}
                     </button>
+                    {/* New QR Code button placed beside the eye icon */}
+                    <button
+                      className="p-2 hover:bg-gray-100 rounded-lg text-gray-600"
+                      title="Generate QR Code"
+                      onClick={() => {
+                        setQrModalInitialStartCode(card.uniqueCode);
+                        setQrModalInitialEndCode(card.uniqueCode);
+                        setShowQrModal(true);
+                      }}
+                    >
+                      <QrCode className="w-4 h-4" />
+                    </button>
                     <button
                       className="p-2 hover:bg-gray-100 rounded-lg text-red-500"
+                      title="Delete Card"
                       onClick={() => handleDelete(card)}
                     >
                       <Trash2 className="w-4 h-4" />
@@ -331,6 +339,15 @@ export const Card = () => {
           </tbody>
         </table>
       </div>
+      {/* Render the QR Code Generator Modal */}
+      {showQrModal && (
+        <QrCodeGeneratorModal
+          isOpen={showQrModal}
+          onClose={() => setShowQrModal(false)}
+          initialStartCode={qrModalInitialStartCode}
+          initialEndCode={qrModalInitialEndCode}
+        />
+      )}
     </div>
   );
 };
