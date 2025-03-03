@@ -1,29 +1,90 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import QrReader from 'react-qr-scanner';
 
 const QrCodeComponent: React.FC = () => {
   const [message, setMessage] = useState<string>('');
+  const [scannedData, setScannedData] = useState<string | null>(null);
+  const [cameraDenied, setCameraDenied] = useState<boolean>(false);
+  // Used to force re-mounting the QrReader to re-request camera access.
+  const [qrReaderKey, setQrReaderKey] = useState<number>(0);
+  // Countdown in seconds before redirecting to /account.
+  const [countdown, setCountdown] = useState<number>(10);
 
-  const handleBackClick = () => {
-    window.history.back();
+  // Called when a QR code is scanned successfully.
+  const handleScan = (data: any) => {
+    if (data && data.text) {
+      const scannedText = data.text;
+      setScannedData(scannedText);
+      setMessage('QR Code scanned. Redirecting to account...');
+      console.log('QR Code scanned:', scannedText);
+      window.location.href = '/account';
+    }
   };
 
-  const handleProfileClick = () => {
-    window.location.href = '/account';
+  // Called if an error occurs during scanning.
+  const handleError = (err: any) => {
+    // Only log the error once.
+    if (!cameraDenied) {
+      console.error(err);
+    }
+    // Check for permission-related errors.
+    if (err && (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError')) {
+      if (!cameraDenied) {
+        setCameraDenied(true);
+        setMessage('Camera access is required. Please allow access in your browser settings.');
+        setCountdown(10);
+      }
+    } else {
+      setMessage('Error scanning QR Code');
+      setTimeout(() => {
+        window.location.href = '/account';
+      }, 3000);
+    }
   };
 
-  const handleQrClick = () => {
-    setMessage('QR Code clicked');
-    console.log('QR Code clicked');
+  const previewStyle = {
+    height: 240,
+    width: 320,
   };
 
-  const handleOtherClick = () => {
-    setMessage('Other action clicked');
-    console.log('Other action clicked');
+  // When camera access is denied, re-mount QrReader every 5 seconds to re-trigger the permission request.
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (cameraDenied) {
+      interval = setInterval(() => {
+        setQrReaderKey(prev => prev + 1);
+      }, 5000);
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [cameraDenied]);
+
+  // Countdown effect: every second decrease the countdown and redirect if it reaches 0.
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (cameraDenied && countdown > 0) {
+      timer = setTimeout(() => {
+        setCountdown(prev => prev - 1);
+      }, 1000);
+    } else if (cameraDenied && countdown <= 0) {
+      window.location.href = '/account';
+    }
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+  }, [cameraDenied, countdown]);
+
+  // Function to manually retry re-mounting the QrReader and reset the countdown.
+  const handleRetry = () => {
+    setQrReaderKey(prev => prev + 1);
+    setCountdown(10);
+    setMessage('Retrying camera permission...');
   };
 
   return (
     <div>
-      {/* Outer container */}
+      {/* Main container */}
       <div
         className="min-w-screen h-screen fixed left-0 top-0 flex justify-center items-center inset-0 z-50 bg-green-100 overflow-y-scroll bg-cover"
         style={{
@@ -48,10 +109,10 @@ const QrCodeComponent: React.FC = () => {
           {/* Header with navigation icons */}
           <div className="flex w-full flex-row justify-between items-center mb-2 px-2 text-gray-50 z-10 absolute top-7">
             <div className="flex flex-row items-center">
+              {/* Back button removed */}
               <svg
-                onClick={handleBackClick}
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-8 w-8 p-2 cursor-pointer hover:bg-gray-500 text-gray-50 rounded-full mr-3"
+                className="h-8 w-8 p-2 text-gray-50 rounded-full mr-3"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -66,10 +127,10 @@ const QrCodeComponent: React.FC = () => {
               <span className="text-sm">QR Code</span>
             </div>
             <div>
+              {/* Profile icon */}
               <svg
-                onClick={handleProfileClick}
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-8 w-8 p-2 cursor-pointer hover:bg-gray-500 text-gray-50 rounded-full"
+                className="h-8 w-8 p-2 text-gray-50 rounded-full"
                 viewBox="0 0 20 20"
                 fill="currentColor"
               >
@@ -95,42 +156,43 @@ const QrCodeComponent: React.FC = () => {
               </div>
             </div>
             <p className="text-gray-300 text-xs mt-3">Scan a QR Code</p>
-            {/* Footer action icons */}
-            <div className="mt-5 w-full flex items-center justify-between space-x-3 my-3 absolute bottom-0 left-0 px-2">
-              <div className="flex">
-                <svg
-                  onClick={handleQrClick}
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-8 w-8 p-2 cursor-pointer hover:bg-gray-600 text-gray-50 rounded-full"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </div>
-              <div className="ml-0">
-                <svg
-                  onClick={handleOtherClick}
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-8 w-8 p-2 cursor-pointer hover:bg-gray-600 text-gray-50 rounded-full"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </div>
-            </div>
+            {/* Footer actions removed */}
+            <div className="mt-5 w-full flex items-center justify-between space-x-3 my-3 absolute bottom-0 left-0 px-2"></div>
           </div>
         </div>
       </div>
+      {/* QR Scanner Overlay – always visible */}
+      <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-75 z-50">
+        <div className="relative w-80 h-80">
+          <QrReader
+            key={qrReaderKey}
+            delay={300}
+            onError={handleError}
+            onScan={handleScan}
+            style={previewStyle}
+          />
+          {/* Close button removed */}
+        </div>
+      </div>
+      {/* Popup notification when camera is denied */}
+      {cameraDenied && (
+        <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-red-700 bg-opacity-75 z-60">
+          <div className="bg-white p-4 rounded shadow-md text-center">
+            <p className="text-gray-800 mb-2">
+              Camera access is required. Please allow access in your browser settings.
+            </p>
+            <p className="text-gray-800 text-xs mb-2">
+              Redirecting to your account in {countdown} second{countdown !== 1 && 's'}...
+            </p>
+            <button
+              onClick={handleRetry}
+              className="bg-blue-600 text-white px-3 py-1 rounded text-xs hover:bg-blue-700"
+            >
+              Retry
+            </button>
+          </div>
+        </div>
+      )}
       {/* Optional message display */}
       {message && (
         <div className="fixed bottom-4 left-4 bg-gray-800 text-white px-4 py-2 rounded">
@@ -201,9 +263,6 @@ const QrCodeComponent: React.FC = () => {
           background-color: rgba(255, 255, 255, 0.3);
           transform: translate(-50%, -50%);
           border: solid 2px #2c303a;
-        }
-        .shadow-out {
-          box-shadow: rgba(17, 24, 39, 0.2) 0px 7px 29px 0px;
         }
       `}</style>
     </div>
