@@ -76,7 +76,7 @@ const CardForm: React.FC<CardFormProps> = ({
             <img
               src={formData.cardImage.toString()}
               alt="Card"
-              className="w-full h-48 object-cover rounded-lg"
+              className="w-full h-full object-contain rounded-lg"
             />
           ) : (
             <div className="space-y-4">

@@ -23,7 +23,7 @@ interface CardType {
   discountedPrice: number | string;
   selected: boolean;
   isSuspended: boolean;
-  productId?: number;
+  productId?: number ;
 }
 
 interface FetchCardsResponse {
@@ -295,11 +295,11 @@ export const Card: React.FC = () => {
           )}
           <button
             className="bg-call-to-actions-900 hover:bg-call-to-actions-800 text-white px-4 py-2 rounded-lg flex items-center gap-2"
-            title="Add Card"
+            title="Add Products"
             onClick={() => navigate("/admin/add-card")}
           >
             <Plus className="w-4 h-4" />
-            <span>Add Card</span>
+            <span>Add Products</span>
           </button>
         </div>
       </div>
@@ -398,7 +398,7 @@ export const Card: React.FC = () => {
                       </button>
                       <button
                         className="p-2 hover:bg-gray-100 rounded-lg text-red-500"
-                        title="Delete Card"
+                        title="Delete Card Stocks"
                         onClick={() => handleDelete(card)}
                       >
                         <Trash2 className="w-4 h-4" />
@@ -407,8 +407,13 @@ export const Card: React.FC = () => {
                         <button
                           className="p-2 hover:bg-gray-100 rounded-lg text-red-500"
                           title="Delete Product"
-                          onClick={() => handleDeleteProduct(card.productId)}
-                        >
+                          onClick={() => {
+                            if (card.productId !== undefined) {
+                              handleDeleteProduct(card.productId);
+                            } else {
+                              console.error("Product ID is undefined");
+                            }
+                          }}                        >
                           <Archive className="w-4 h-4" />
                         </button>
                       )}

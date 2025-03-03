@@ -1,30 +1,34 @@
-import React, { ChangeEvent, useEffect, useState } from "react";
+import React, {ChangeEvent, useEffect, useState} from "react";
 import axios from "axios";
 import "react-quill/dist/quill.snow.css";
-import { useNavigate } from "react-router-dom";
-
+import {useNavigate} from "react-router-dom";
 
 import CardForm from "../../card/addcard/components/cardForm";
 import CardSettings from "../../card/addcard/components/cardSetting";
+
 import { SERVER_URL } from "@/middleware/utils";
+
 
 export const AddSpecialCard = () => {
   const navigate = useNavigate();
 
   // States for API data
   const [apiCategories, setApiCategories] = useState<
-    { id: number; name: string; image: string | null }[]
+    {id: number; name: string; image: string | null}[]
   >([]);
   const [categoriesLoading, setCategoriesLoading] = useState(true);
   const [categoriesError, setCategoriesError] = useState<string | null>(null);
 
   const [apiCreators, setApiCreators] = useState<
-    { id: number; name: string; image: string | null }[]
+    {id: number; name: string; image: string | null}[]
   >([]);
   const [creatorsLoading, setCreatorsLoading] = useState(true);
   const [creatorsError, setCreatorsError] = useState<string | null>(null);
 
+
   const [apiTags, setApiTags] = useState<{ id: number; name: string }[]>([]);
+
+
   const [tagsLoading, setTagsLoading] = useState(true);
   const [tagsError, setTagsError] = useState<string | null>(null);
 
@@ -146,9 +150,12 @@ export const AddSpecialCard = () => {
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
+
     const { name, value, type } = e.target;
+
     const newValue =
       type === "checkbox" ? (e.target as HTMLInputElement).checked : value;
+
     setFormData((prev) => ({
       ...prev,
       [name]: newValue,
@@ -194,7 +201,7 @@ export const AddSpecialCard = () => {
 
   // Cancel handler
   const handleCancel = () => {
-    navigate("/admin/card");
+    navigate("/admin/special-card");
   };
 
   // Save handler (create new card)
@@ -287,28 +294,34 @@ export const AddSpecialCard = () => {
         error.response?.data || error.message
       );
 
+      const errorString =
+        error.response?.data?.error ||
+        error.response?.data?.message ||
+        error.message ||
+        "";
+
       // Default error message
-      let errorMessage = "Failed to create card. Please try again later.";
+      let errorMessage = errorString || "Failed to create card. Please check if the card with the same SKU and character name already exists.";
 
       // Mapping for known unique constraint errors
       const uniqueConstraintErrors = [
         {
           key: "Card_uniqueCode_key",
           message:
-            "A card with this unique code already exists. Generate a new SKU or character name",
+            "A card with this unique code already exists. Generate a new SKU or character name.",
         },
         {
           key: "Card_qrCode_key",
           message:
             "A card with this QR code already exists. Please try again with a different QR code.",
         },
+        {
+          key: "Card_characterName_sku_key",
+          message:
+            "A card with this character name and SKU already exists. Please choose a different character name and SKU.",
+        },
       ];
 
-      const errorString =
-        error.response?.data?.error ||
-        error.response?.data?.message ||
-        error.message ||
-        "";
 
       for (const { key, message } of uniqueConstraintErrors) {
         if (errorString.includes(key)) {
@@ -329,6 +342,7 @@ export const AddSpecialCard = () => {
     }
   };
 
+
   // Determine if the Save button should be disabled
   const isSaveDisabled =
     !formData.cardImage ||
@@ -343,7 +357,7 @@ export const AddSpecialCard = () => {
 
   return (
     <div className="max-w-7xl mx-auto p-6">
-      <h1 className="text-2xl font-semibold mb-6">Add Card</h1>
+      <h1 className="text-2xl font-semibold mb-6">Add Special Card</h1>
 
       {/* Message display */}
       {message && (

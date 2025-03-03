@@ -182,13 +182,17 @@ export const Master = () => {
     if (!isOpen) return null;
 
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+      <div
+        className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+        title="Modal Background"
+      >
         <div className="bg-white rounded-lg w-full max-w-md">
           <div className="flex justify-between items-center p-4 border-b">
             <h2 className="text-lg font-medium">{title}</h2>
             <button
               onClick={onClose}
               className="text-gray-400 hover:text-gray-600"
+              title="Close Modal"
             >
               <X className="w-5 h-5" />
             </button>
@@ -202,6 +206,7 @@ export const Master = () => {
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+              title="Enter Master Name"
             />
             <label className="block text-sm font-medium text-gray-700 mb-1 mt-3">
               Master Code (format: xxx; Number)
@@ -212,6 +217,7 @@ export const Master = () => {
               onChange={(e) => setInputCode(e.target.value)}
               placeholder="input master code"
               className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+              title="Enter Master Code in format xxx"
             />
             {inputCode && !isValidCode(inputCode) && (
               <p className="text-red-500 text-sm mt-1">
@@ -223,6 +229,7 @@ export const Master = () => {
             <button
               onClick={onClose}
               className="px-4 py-2 border rounded-lg text-gray-600 hover:bg-gray-50"
+              title="Cancel"
             >
               Cancel
             </button>
@@ -236,6 +243,7 @@ export const Master = () => {
                 onClose();
               }}
               className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600"
+              title={submitText}
             >
               {submitText}
             </button>
@@ -257,11 +265,17 @@ export const Master = () => {
       {/* Breadcrumb */}
       <div className="mb-4">
         <nav className="text-sm text-gray-500">
-          <a href="/admin/marketplace" className="hover:text-yellow-500">
+          <a
+            href="/admin/marketplace"
+            className="hover:text-yellow-500"
+            title="Go to Marketplace"
+          >
             Marketplace
           </a>
           <span className="mx-2">/</span>
-          <span className="text-yellow-500">Master</span>
+          <span className="text-yellow-500" title="Master Section">
+            Master
+          </span>
         </nav>
       </div>
 
@@ -273,6 +287,7 @@ export const Master = () => {
         <button
           onClick={() => setIsAddModalOpen(true)}
           className="bg-call-to-actions-900 hover:bg-call-to-actions-900 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+          title="Add Master"
         >
           <span className="text-xl">+</span> Add Master
         </button>
@@ -283,6 +298,7 @@ export const Master = () => {
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search and tap Enter"
             className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
+            title="Search Master"
           />
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
         </div>
@@ -290,7 +306,7 @@ export const Master = () => {
 
       {/* Master List Table */}
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y ">
+        <table className="min-w-full divide-y">
           <thead className="">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-bold text-black uppercase tracking-wider">
@@ -331,6 +347,7 @@ export const Master = () => {
                             setIsEditModalOpen(true);
                           }}
                           className="text-gray-400 hover:text-gray-600"
+                          title="Edit Master"
                         >
                           <Pencil className="w-5 h-5" />
                         </button>
@@ -339,6 +356,9 @@ export const Master = () => {
                             handleToggleSuspend(master.id, master.isSuspended)
                           }
                           className="text-gray-400 hover:text-gray-600"
+                          title={
+                            master.isSuspended ? "Unsuspend Master" : "Suspend Master"
+                          }
                         >
                           {master.isSuspended ? (
                             <EyeOff className="w-5 h-5" />
@@ -349,6 +369,7 @@ export const Master = () => {
                         <button
                           onClick={() => handleDeleteMaster(master.id)}
                           className="text-red-400 hover:text-red-600"
+                          title="Delete Master"
                         >
                           <Trash2 className="w-5 h-5" />
                         </button>

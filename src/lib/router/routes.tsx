@@ -47,6 +47,7 @@ import {RegisteredUsers} from "../admin-pages/event/registered-user";
 import SuccessVerify from "../pages/events/success-verify";
 import QrCodeComponent from "../pages/scan-qr/scan-qr";
 import QrCodesPage from "../admin-pages/marketplace/card/qrModal/qrPages";
+import SpecialQrCodesPage from "../admin-pages/marketplace/card/qrModal/specialQrpages";
 
 // Lazy-loaded Pages
 const Home = React.lazy(() => import("@/lib/pages/home/Home"));
@@ -145,7 +146,7 @@ export const adminRoutes: Array<PathRouteProps> = [
   {path: "edit-card/:id", element: <EditCard />},
   {path: "add-card", element: <AddCard />},
   {path: "special-card", element: <SpecialCard />},
-  {path: "edit-special", element: <EditSpecialCard />},
+  {path: "edit-special/:id", element: <EditSpecialCard />},
   {path: "add-special", element: <AddSpecialCard />},
   {path: "master", element: <Master />},
   {path: "series", element: <Series />},
@@ -175,6 +176,8 @@ export const adminRoutes: Array<PathRouteProps> = [
   {path: "add-admin", element: <AddAdmin />},
   {path: "profile", element: <ProfileSettings />},
   {path: "edit-profile/:id", element: <EditProfileAdmin />},
-  {path:"/cards/:productId/qr-codes", element:<QrCodesPage /> }
+  {path:"/cards/:productId/qr-codes", element:<QrCodesPage /> },
+  {path:"/special-cards/:productId/qr-codes", element:<SpecialQrCodesPage /> }
+
 
 ];

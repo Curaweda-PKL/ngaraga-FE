@@ -157,7 +157,7 @@ export const EditSpecialCard = () => {
           cardDetails: card.cardDetail || "",
           categories: [card.categoryId.toString()],
           creator: false,
-          selectedCreator: card.creatorIds ? card.creatorIds[0].toString() : "",
+          selectedCreator: card.creatorIds && card.creatorIds.length > 0 ? card.creatorIds[0].toString() : "",
           tag: false,
           tags: card.tagIds ? card.tagIds.map((id: number) => id.toString()) : [],
           source: false,
@@ -226,7 +226,7 @@ export const EditSpecialCard = () => {
 
   // Cancel handler
   const handleCancel = () => {
-    navigate("/admin/card");
+    navigate("/admin/special-card");
   };
 
   // Save handler (edit existing card)
@@ -277,7 +277,7 @@ export const EditSpecialCard = () => {
 
       setMessage({ type: "success", text: "Card updated successfully!" });
       setTimeout(() => {
-        navigate("/admin/card");
+        navigate("/admin/special-card");
       }, 1500);
     } catch (error: any) {
       console.error("Error updating card:", error.response?.data || error.message);
@@ -293,7 +293,7 @@ export const EditSpecialCard = () => {
 
   return (
     <div className="max-w-7xl mx-auto p-6">
-      <h1 className="text-2xl font-semibold mb-6">Edit Card</h1>
+      <h1 className="text-2xl font-semibold mb-6">Edit Special Card</h1>
 
       {/* Message display */}
       {message && (

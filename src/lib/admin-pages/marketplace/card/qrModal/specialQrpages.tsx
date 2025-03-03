@@ -5,7 +5,7 @@ import QRCode from "react-qr-code";
 import { zipSync } from "fflate";
 import { FaDownload, FaTrash, FaRegTrashAlt, FaQrcode } from "react-icons/fa";
 import { SERVER_URL } from "@/middleware/utils";
-import { QrCodeGeneratorModal } from "./qrModal";
+import { SpecialQrCodeGeneratorModal } from "./SpecialqrModal";
 
 interface Notification {
   message: string;
@@ -15,7 +15,7 @@ interface Notification {
 export interface CardType {
   id: number;
   uniqueCode: string;
-  qrCode?: string; // This field holds the URL that will be encoded in the QR code.
+  qrCode?: string; 
   name?: string;
 }
 
@@ -25,7 +25,7 @@ interface Product {
   // Add additional product fields as needed.
 }
 
-const QrCodesPage: React.FC = () => {
+const SpecialQrCodesPage: React.FC = () => {
   const { productId } = useParams<{ productId: string }>();
   const navigate = useNavigate();
   const [product, setProduct] = useState<Product | null>(null);
@@ -533,7 +533,7 @@ const QrCodesPage: React.FC = () => {
       </div>
 
       {showQrModal && (
-        <QrCodeGeneratorModal
+        <SpecialQrCodeGeneratorModal
           isOpen={showQrModal}
           onClose={() => setShowQrModal(false)}
           initialStartCode={qrModalInitialStartCode}
@@ -545,4 +545,4 @@ const QrCodesPage: React.FC = () => {
   );
 };
 
-export default QrCodesPage;
+export default SpecialQrCodesPage;
