@@ -12,3 +12,4 @@ declare module '*.mp4';
 declare module '*.webm';
 declare module '*.mov';
 declare module '*.js';
+declare module 'react-qr-scanner';

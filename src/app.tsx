@@ -13,6 +13,7 @@ const AppContent = () => {
     "/reset-password",
     "/login/admin",
     "/sentemail",
+
   ];
 
   const isAdminRoute = location.pathname.startsWith("/admin");

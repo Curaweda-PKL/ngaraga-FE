@@ -294,28 +294,34 @@ export const AddCard = () => {
         error.response?.data || error.message
       );
 
+      const errorString =
+        error.response?.data?.error ||
+        error.response?.data?.message ||
+        error.message ||
+        "";
+
       // Default error message
-      let errorMessage = "Failed to create card. Please try again later.";
+      let errorMessage = errorString || "Failed to create card. Please check if the card with the same SKU and character name already exists.";
 
       // Mapping for known unique constraint errors
       const uniqueConstraintErrors = [
         {
           key: "Card_uniqueCode_key",
           message:
-            "A card with this unique code already exists. Generate a new SKU or character name",
+            "A card with this unique code already exists. Generate a new SKU or character name.",
         },
         {
           key: "Card_qrCode_key",
           message:
             "A card with this QR code already exists. Please try again with a different QR code.",
         },
+        {
+          key: "Card_characterName_sku_key",
+          message:
+            "A card with this character name and SKU already exists. Please choose a different character name and SKU.",
+        },
       ];
 
-      const errorString =
-        error.response?.data?.error ||
-        error.response?.data?.message ||
-        error.message ||
-        "";
 
       for (const { key, message } of uniqueConstraintErrors) {
         if (errorString.includes(key)) {
@@ -335,6 +341,7 @@ export const AddCard = () => {
       });
     }
   };
+
 
   // Determine if the Save button should be disabled
   const isSaveDisabled =

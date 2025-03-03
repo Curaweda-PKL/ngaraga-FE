@@ -109,25 +109,26 @@ const Login: React.FC = () => {
 
       // Assume the API returns a user object with a role property
       const user = response.data?.user;
-      if (user && user.role === "ADMIN") {
-        const adminError = "Admins must log in through the admin portal.";
-        setError({ general: adminError });
-        setNotification({ type: "error", message: adminError });
-        setLoading(false);
-        return;
+
+      if (user && (user.role === "ADMIN" || user.role === "SUPERADMIN")) {
+        // Admin or Superadmin users go to the admin dashboard
+        setNotification({
+          type: "success",
+          message: "Logged in successfully! Redirecting to admin dashboard...",
+        });
+        setTimeout(() => {
+          window.location.href = "/admin/dashboard";
+        }, 500);
+      } else {
+        // Regular users are redirected to the home page
+        setNotification({
+          type: "success",
+          message: "Logged in successfully! Redirecting...",
+        });
+        setTimeout(() => {
+          window.location.href = "/";
+        }, 500);
       }
-
-      // Login success
-      setNotification({
-        type: "success",
-        message: "Logged in successfully! Redirecting...",
-      });
-      // Optionally, store token or user data here
-
-      // Redirect after a short delay
-      setTimeout(() => {
-        window.location.href = "/";
-      }, 2000);
     } catch (err: any) {
       console.error("Error during login:", err);
       let errorMessage = "Login failed! Please try again.";
@@ -136,7 +137,6 @@ const Login: React.FC = () => {
         errorMessage = err.response.data.message || errorMessage;
       }
 
-      // Check for a specific error message fragment and update it
       if (errorMessage.toLowerCase().includes("must have number")) {
         errorMessage = "Incorrect password. Please try again.";
       }

@@ -1,8 +1,8 @@
 // SidebarComponent.jsx or SidebarComponent.tsx
-import {useState} from "react";
-import {useNavigate, useLocation} from "react-router-dom";
-import {ChevronDown, ChevronUp} from "lucide-react";
-import {RiCoupon3Fill, RiPencilRuler2Fill} from "react-icons/ri";
+import { useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { ChevronDown, ChevronUp } from "lucide-react";
+import { RiCoupon3Fill, RiPencilRuler2Fill } from "react-icons/ri";
 import {
   FaHome,
   FaUsers,
@@ -18,12 +18,12 @@ import {
   FaCalendarAlt,
   FaShippingFast,
 } from "react-icons/fa";
-import {usePermissions} from "@/lib/context/permission-context";
+import { usePermissions } from "@/lib/context/permission-context";
 
 type MenuKey = "marketplace" | "pages";
 
 const SidebarComponent = () => {
-  const {permissions} = usePermissions();
+  const { permissions } = usePermissions();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -62,13 +62,13 @@ const SidebarComponent = () => {
   const hasPermission = (key: string) => permissions.includes(key);
 
   const toggleMenu = (menu: MenuKey) => {
-    setOpenMenus((prev) => ({...prev, [menu]: !prev[menu]}));
+    setOpenMenus((prev) => ({ ...prev, [menu]: !prev[menu] }));
   };
 
   // Utility to check if a route is active
   const isActiveRoute = (path: string) => location.pathname === path;
 
-  // Helper component for navigation items
+  // Helper component for navigation items with tooltip added
   const NavItem = ({
     to,
     icon,
@@ -82,6 +82,7 @@ const SidebarComponent = () => {
       <div
         onClick={() => navigate(to)}
         className={`nav-link ${isActiveRoute(to) ? "active" : ""}`}
+        title={label} // Tooltip added here
       >
         {icon}
         <span className="text-gray-800">{label}</span>
@@ -132,6 +133,7 @@ const SidebarComponent = () => {
                   <button
                     onClick={() => toggleMenu("marketplace")}
                     className="flex items-center justify-between w-full px-4 py-3 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+                    title="Marketplace" // Tooltip added here
                   >
                     <span className="flex items-center gap-3 ">
                       <FaShoppingCart className="FaShoppingCartCMS" />
@@ -177,13 +179,11 @@ const SidebarComponent = () => {
                           icon: <FaTags />,
                         },
                       ].map(
-                        ({name, permission, icon}) =>
+                        ({ name, permission, icon }) =>
                           hasPermission(permission) && (
                             <NavItem
                               key={name}
-                              to={`/admin/${name
-                                .toLowerCase()
-                                .replace(" ", "-")}`}
+                              to={`/admin/${name.toLowerCase().replace(" ", "-")}`}
                               icon={icon}
                               label={name}
                             />
@@ -200,6 +200,7 @@ const SidebarComponent = () => {
                   <button
                     onClick={() => toggleMenu("pages")}
                     className="flex items-center justify-between w-full px-4 py-3 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+                    title="Pages" // Tooltip added here
                   >
                     <span className="flex items-center gap-3 text-gray-800">
                       <FaSignInAlt />
@@ -245,13 +246,11 @@ const SidebarComponent = () => {
                           icon: <FaCalendarAlt />,
                         },
                       ].map(
-                        ({name, permission, icon}) =>
+                        ({ name, permission, icon }) =>
                           hasPermission(permission) && (
                             <NavItem
                               key={name}
-                              to={`/admin/${name
-                                .toLowerCase()
-                                .replace(" ", "-")}`}
+                              to={`/admin/${name.toLowerCase().replace(" ", "-")}`}
                               icon={icon}
                               label={name}
                             />
@@ -305,7 +304,7 @@ const SidebarComponent = () => {
                   icon: <FaUserShield />,
                 },
               ].map(
-                ({name, permission, icon}) =>
+                ({ name, permission, icon }) =>
                   hasPermission(permission) && (
                     <NavItem
                       key={name}
