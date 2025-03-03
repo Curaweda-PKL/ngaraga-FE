@@ -1,10 +1,18 @@
-import type React from "react";
+import React, { useEffect } from "react";
 import PhoneInput from "@/lib/pages/checkout/components/PhoneInput";
-import {AiOutlineUser} from "react-icons/ai";
-import {MdOutlineMail} from "react-icons/md";
-import {CiGlobe, CiTwitter} from "react-icons/ci";
-import {AiOutlineDiscord, AiOutlineYoutube} from "react-icons/ai";
-import {IoLogoInstagram} from "react-icons/io";
+import { AiOutlineUser, AiOutlineDiscord, AiOutlineYoutube } from "react-icons/ai";
+import { MdOutlineMail } from "react-icons/md";
+import { CiGlobe, CiTwitter } from "react-icons/ci";
+import { IoLogoInstagram } from "react-icons/io";
+
+// Define and export SocialLinks type
+export type SocialLinks = {
+  website: string;
+  discord: string;
+  youtube: string;
+  twitter: string;
+  instagram: string;
+};
 
 export interface FormData {
   userName: string;
@@ -48,6 +56,22 @@ const BasicInformation: React.FC<BasicInformationProps> = ({
     "twitter",
     "instagram",
   ];
+
+  // Ensure that all social link toggles are closed on first mount
+  useEffect(() => {
+    if (!columns || !toggleColumn) return;
+    try {
+      columns.forEach((column, index) => {
+        if (column.enabled) {
+          toggleColumn(index);
+        }
+      });
+    } catch (error) {
+      console.error("Error resetting social links toggles: ", error);
+    }
+    // Only run on initial mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <>
@@ -116,76 +140,80 @@ const BasicInformation: React.FC<BasicInformationProps> = ({
         placeholder="Bio"
       ></textarea>
 
-      {/* Website Links */}
-      {columns.map((column, index) => (
-        <div
-          key={index}
-          className="flex flex-col mt-4 space-y-2"
-        >
-          <label className="inline-flex items-center cursor-pointer">
-            <input
-              type="checkbox"
-              checked={column.enabled ?? false}
-              onChange={() => toggleColumn(index)}
-              className="sr-only peer"
-            />
-            <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600 dark:peer-checked:bg-blue-600"></div>
-          </label>
-          <div className="relative flex items-center w-full mt-2">
-            {index === 0 && (
-              <CiGlobe
-                size={24}
-                className={`absolute left-3 ${
-                  !column.enabled ? "text-gray-400" : "text-black"
-                }`}
+      {/* Social Links Section */}
+      <div className="mt-6">
+        <h3 className="text-xl font-semibold mb-2">Social Links (Optional)</h3>
+        {columns.map((column, index) => (
+          <div key={index} className="flex flex-col mt-4 space-y-2">
+            <label className="inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                checked={column.enabled ?? false}
+                onChange={() => toggleColumn(index)}
+                className="sr-only peer"
               />
-            )}
-            {index === 1 && (
-              <AiOutlineDiscord
-                size={24}
-                className={`absolute left-3 ${
-                  !column.enabled ? "text-gray-400" : "text-black"
+              <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600 dark:peer-checked:bg-blue-600"></div>
+            </label>
+            <div className="relative flex items-center w-full mt-2">
+              {index === 0 && (
+                <CiGlobe
+                  size={24}
+                  className={`absolute left-3 ${
+                    !column.enabled ? "text-gray-400" : "text-black"
+                  }`}
+                />
+              )}
+              {index === 1 && (
+                <AiOutlineDiscord
+                  size={24}
+                  className={`absolute left-3 ${
+                    !column.enabled ? "text-gray-400" : "text-black"
+                  }`}
+                />
+              )}
+              {index === 2 && (
+                <AiOutlineYoutube
+                  size={24}
+                  className={`absolute left-3 ${
+                    !column.enabled ? "text-gray-400" : "text-black"
+                  }`}
+                />
+              )}
+              {index === 3 && (
+                <CiTwitter
+                  size={24}
+                  className={`absolute left-3 ${
+                    !column.enabled ? "text-gray-400" : "text-black"
+                  }`}
+                />
+              )}
+              {index === 4 && (
+                <IoLogoInstagram
+                  size={24}
+                  className={`absolute left-3 ${
+                    !column.enabled ? "text-gray-400" : "text-black"
+                  }`}
+                />
+              )}
+              <input
+                type="text"
+                value={column.enabled ? column.value : placeholders[index]}
+                onChange={(e) => handleInputChange(index, e.target.value)}
+                disabled={!column.enabled}
+                className={`block w-full pl-12 border rounded-lg shadow-sm p-4 text-lg ${
+                  column.enabled
+                    ? "border-gray-300 focus:ring-yellow-500 focus:border-yellow-500"
+                    : "bg-gray-100 border-gray-200 text-gray-400"
                 }`}
+                title={
+                  placeholders[index].charAt(0).toUpperCase() +
+                  placeholders[index].slice(1)
+                }
               />
-            )}
-            {index === 2 && (
-              <AiOutlineYoutube
-                size={24}
-                className={`absolute left-3 ${
-                  !column.enabled ? "text-gray-400" : "text-black"
-                }`}
-              />
-            )}
-            {index === 3 && (
-              <CiTwitter
-                size={24}
-                className={`absolute left-3 ${
-                  !column.enabled ? "text-gray-400" : "text-black"
-                }`}
-              />
-            )}
-            {index === 4 && (
-              <IoLogoInstagram
-                size={24}
-                className={`absolute left-3 ${
-                  !column.enabled ? "text-gray-400" : "text-black"
-                }`}
-              />
-            )}
-            <input
-              type="text"
-              value={column.enabled ? column.value : placeholders[index]}
-              onChange={(e) => handleInputChange(index, e.target.value)}
-              disabled={!column.enabled}
-              className={`block w-full pl-12 border rounded-lg shadow-sm p-4 text-lg ${
-                column.enabled
-                  ? "border-gray-300 focus:ring-yellow-500 focus:border-yellow-500"
-                  : "bg-gray-100 border-gray-200 text-gray-400"
-              }`}
-            />
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </>
   );
 };

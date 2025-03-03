@@ -1,10 +1,10 @@
-import React, {useState, useEffect, useRef} from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
-import {SERVER_URL} from "@/middleware/utils";
+import { SERVER_URL } from "@/middleware/utils";
 import BasicInformation from "./components/BasicInformation";
-import type {FormData, Column} from "./components/BasicInformation";
+import type { FormData, Column } from "./components/BasicInformation";
 import AddressSection from "./components/AddressSection";
-import {FaTrash, FaPen} from "react-icons/fa";
+import { FaTrash, FaPen } from "react-icons/fa";
 
 // Define a type for social links.
 type SocialLinks = {
@@ -27,9 +27,10 @@ const EditProfilePage: React.FC = () => {
   });
 
   // Social links state as columns (ordered: website, discord, youtube, twitter, instagram)
+  // Set the initial toggle state to false
   const [columns, setColumns] = useState<Column[]>(
     [...Array(5)].map(() => ({
-      enabled: true,
+      enabled: false,
       value: "",
     }))
   );
@@ -48,17 +49,13 @@ const EditProfilePage: React.FC = () => {
   const [bannerFile, setBannerFile] = useState<File | null>(null);
 
   // Flags for removal actions
-  const [profileImageRemoved, setProfileImageRemoved] =
-    useState<boolean>(false);
+  const [profileImageRemoved, setProfileImageRemoved] = useState<boolean>(false);
   const [bannerImageRemoved, setBannerImageRemoved] = useState<boolean>(false);
 
   // Helper to normalize image URLs
   const normalizeImageUrl = (rawPath: string): string => {
     let normalizedPath = rawPath.replace(/\\/g, "/").replace(/^src\//, "");
-    normalizedPath = normalizedPath.replace(
-      "uploadsprofile",
-      "uploads/profile"
-    );
+    normalizedPath = normalizedPath.replace("uploadsprofile", "uploads/profile");
     return `${SERVER_URL}/${normalizedPath}`;
   };
 
@@ -75,8 +72,7 @@ const EditProfilePage: React.FC = () => {
     "https://images.unsplash.com/photo-1499336315816-097655dcfbda?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2710&q=80";
 
   // Profile & Banner image states with fallback values
-  const [profileImage, setProfileImage] =
-    useState<string>(fallbackProfileImage);
+  const [profileImage, setProfileImage] = useState<string>(fallbackProfileImage);
   const [bannerImage, setBannerImage] = useState<string>(fallbackBannerImage);
 
   // Refs for hidden file inputs
@@ -94,14 +90,14 @@ const EditProfilePage: React.FC = () => {
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
     >
   ) => {
-    const {name, value} = e.target;
-    setFormData((prev) => ({...prev, [name]: value}));
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   // Update individual social link value
   const handleInputChange = (index: number, value: string) => {
     setColumns((prev) =>
-      prev.map((col, idx) => (idx === index ? {...col, value} : col))
+      prev.map((col, idx) => (idx === index ? { ...col, value } : col))
     );
   };
 
@@ -109,7 +105,7 @@ const EditProfilePage: React.FC = () => {
   const toggleColumn = (index: number) => {
     setColumns((prev) =>
       prev.map((col, idx) =>
-        idx === index ? {...col, enabled: !col.enabled} : col
+        idx === index ? { ...col, enabled: !col.enabled } : col
       )
     );
   };
@@ -198,17 +194,18 @@ const EditProfilePage: React.FC = () => {
             ? JSON.parse(data.socialLinks)
             : data.socialLinks || {};
 
+        // Even if data exists, force toggles to be off by default.
         setColumns([
-          {enabled: true, value: socialLinksData.website || ""},
-          {enabled: true, value: socialLinksData.discord || ""},
-          {enabled: true, value: socialLinksData.youtube || ""},
-          {enabled: true, value: socialLinksData.twitter || ""},
-          {enabled: true, value: socialLinksData.instagram || ""},
+          { enabled: false, value: socialLinksData.website || "" },
+          { enabled: false, value: socialLinksData.discord || "" },
+          { enabled: false, value: socialLinksData.youtube || "" },
+          { enabled: false, value: socialLinksData.twitter || "" },
+          { enabled: false, value: socialLinksData.instagram || "" },
         ]);
         setOriginalSocialLinks(socialLinksData);
       } catch (err) {
         if (axios.isCancel(err)) {
-          console.log("Request dibatalkan:", err.message);
+          console.log("Request canceled:", err.message);
         } else {
           console.error("Error fetching profile:", err);
         }
@@ -224,7 +221,7 @@ const EditProfilePage: React.FC = () => {
     try {
       setLoading(true);
       setError(null);
-      setSuccessMessage(null); // Reset pesan sukses sebelum request
+      setSuccessMessage(null);
 
       const socialLinksPayload = {
         website: columns[0].enabled
@@ -271,13 +268,11 @@ const EditProfilePage: React.FC = () => {
 
       await axios.put(`${SERVER_URL}/api/account/profile`, formPayload, {
         withCredentials: true,
-        headers: {"Content-Type": "multipart/form-data"},
+        headers: { "Content-Type": "multipart/form-data" },
       });
 
-      // Tampilkan pesan sukses
       setSuccessMessage("Profil berhasil diperbarui!");
 
-      // Hapus pesan sukses setelah 3 detik
       setTimeout(() => {
         setSuccessMessage(null);
       }, 3000);
@@ -313,7 +308,7 @@ const EditProfilePage: React.FC = () => {
           <input
             type="file"
             accept="image/*"
-            style={{display: "none"}}
+            style={{ display: "none" }}
             ref={bannerInputRef}
             onChange={handleBannerFileChange}
           />
@@ -372,7 +367,7 @@ const EditProfilePage: React.FC = () => {
               <input
                 type="file"
                 accept="image/*"
-                style={{display: "none"}}
+                style={{ display: "none" }}
                 ref={profileInputRef}
                 onChange={handleProfileFileChange}
               />
@@ -424,7 +419,6 @@ const EditProfilePage: React.FC = () => {
 
             {error && <div className="mt-4 text-red-500">{error}</div>}
 
-            {/* Conditionally render the submit button only on the "basic" tab */}
             {activeTab === "basic" && (
               <button
                 type="submit"
