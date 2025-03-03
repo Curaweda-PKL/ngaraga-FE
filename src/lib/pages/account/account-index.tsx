@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { SERVER_URL } from "@/middleware/utils";
 import { ProfilePage } from "./components/profile-page";
-import { CardSection } from "./components/card-sections";
+import { CardSection } from "./components/card-sections/card-sections";
 
 const Account: React.FC = () => {
   const [token, setToken] = useState<string | null>(null);
@@ -44,7 +44,7 @@ const Account: React.FC = () => {
   };
 
   return (
-    <div className="relative min-h-screen bg-gray-100">
+    <div className="relative min-h-screen ">
       {/* Notification */}
       {claimStatus && (
         <div
