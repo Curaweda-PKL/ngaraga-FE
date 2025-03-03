@@ -6,7 +6,6 @@ export const SignInPage = () => {
   const [image, setImage] = useState<File | null>(null);
   const [title, setTitle] = useState(""); // Changed to empty string
   const [description, setDescription] = useState(""); // Changed to empty string
-  const [error, setError] = useState("");
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -29,17 +28,7 @@ export const SignInPage = () => {
     e.preventDefault();
     const file = e.dataTransfer.files[0];
     if (file) {
-      const img = new Image();
-      img.src = URL.createObjectURL(file);
-      img.onload = () => {
-        if (img.width === 1200 && img.height === 600) {
-          setImage(file);
-          setError("");
-        } else {
-          setError("Image must be exactly 1200x600 pixels.");
-          setImage(null);
-        }
-      };
+      setImage(file);
     }
   };
 
@@ -128,8 +117,6 @@ export const SignInPage = () => {
                 </label>
                 <p className="text-sm text-gray-500 mt-2">
                   Click to Upload or Drag & Drop
-                  <br />
-                  size: 1200x600 pixels
                   <br />
                   jpeg, jpg, png max 4mb
                 </p>
