@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import { Bell } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { SERVER_URL } from "@/middleware/utils"; // Use your server URL helper
+import { SERVER_URL } from "@/middleware/utils";
+import { io, Socket } from "socket.io-client";
 
 interface Notification {
   id: string;
@@ -14,50 +15,15 @@ interface Notification {
 const Navbar = () => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
-  // Use SERVER_URL for the placeholder image as well
   const [profileImage, setProfileImage] = useState<string>(`${SERVER_URL}/api/placeholder/32/32`);
   const navigate = useNavigate();
 
-  const [notifications] = useState<Notification[]>([
-    {
-      id: "1",
-      type: "pending",
-      title: "Pending Payment",
-      message:
-        "The order with number ORD456789123 under the name of customer Alex, amounting to Rp 200,000, is currently marked as Pending Payment. This order is for the purchase of the Dancing Robot 0512.",
-      time: "5h ago",
-    },
-    {
-      id: "2",
-      type: "success",
-      title: "Payment Success",
-      message:
-        "The order with number ORD456789123 under the name of customer Alex, amounting to Rp 200,000, has been successfully paid. This order is for the purchase of the Dancing Robot 0512.",
-      time: "5h ago",
-    },
-    {
-      id: "3",
-      type: "delivered",
-      title: "Delivered",
-      message:
-        "The order with number ORD456789123 under the name of customer Alex, amounting to Rp 200,000, has been successfully delivered. This order was for the purchase of the Dancing Robot 0512.",
-      time: "5h ago",
-    },
-    {
-      id: "4",
-      type: "event",
-      title: "Event",
-      message:
-        "Registration with the number ID123456789 under the name Andromeda Voyager for the event A Special Evening Celebration has been successfully completed.",
-      time: "5h ago",
-    },
-  ]);
-
+  const [notifications, setNotifications] = useState<Notification[]>([]);
   const profileRef = useRef<HTMLDivElement>(null);
   const notificationRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Fetch the admin profile on mount to retrieve the profile image
+    // Fetch admin profile image.
     const fetchProfileImage = async () => {
       try {
         const response = await fetch(`${SERVER_URL}/api/account/admin/profile`, {
@@ -65,10 +31,8 @@ const Navbar = () => {
         });
         if (response.ok) {
           const result = await response.json();
-          // Adjust the property access based on your response structure
           const userData = result.data.data;
           if (userData?.image) {
-            // Construct the URL to the image using SERVER_URL
             const imageUrl = `${SERVER_URL}/uploads/profile/${userData.image.split("\\").pop()}`;
             setProfileImage(imageUrl);
           }
@@ -82,17 +46,110 @@ const Navbar = () => {
 
     fetchProfileImage();
 
+    // Socket.IO connection for notifications.
+    const socket: Socket = io(SERVER_URL);
+    
+    // Listen for various card-related events.
+    socket.on("cardCreated", (data: { message: string; cards: any[]; timestamp: string }) => {
+      const newNotification: Notification = {
+        id: Date.now().toString() + "_created",
+        type: "success",
+        title: "Card Created",
+        message: `${data.message}. ${data.cards.length} card(s) created.`,
+        time: "Just now",
+      };
+      setNotifications((prev) => [newNotification, ...prev]);
+    });
+
+    socket.on("cardSuspended", (data: { message: string; card: any; timestamp: string }) => {
+      const newNotification: Notification = {
+        id: Date.now().toString() + "_suspended",
+        type: "event",
+        title: "Card Suspended",
+        message: data.message,
+        time: "Just now",
+      };
+      setNotifications((prev) => [newNotification, ...prev]);
+    });
+
+    socket.on("cardUnsuspended", (data: { message: string; card: any; timestamp: string }) => {
+      const newNotification: Notification = {
+        id: Date.now().toString() + "_unsuspended",
+        type: "event",
+        title: "Card Unsuspended",
+        message: data.message,
+        time: "Just now",
+      };
+      setNotifications((prev) => [newNotification, ...prev]);
+    });
+
+    socket.on("cardDeleted", (data: { message: string; uniqueCode: string; timestamp: string }) => {
+      const newNotification: Notification = {
+        id: Date.now().toString() + "_deleted",
+        type: "event",
+        title: "Card Deleted",
+        message: data.message,
+        time: "Just now",
+      };
+      setNotifications((prev) => [newNotification, ...prev]);
+    });
+
+    socket.on("cardEdited", (data: { message: string; card: any; timestamp: string }) => {
+      const newNotification: Notification = {
+        id: Date.now().toString() + "_edited",
+        type: "event",
+        title: "Card Updated",
+        message: data.message,
+        time: "Just now",
+      };
+      setNotifications((prev) => [newNotification, ...prev]);
+    });
+
+    socket.on("qrCodesGenerated", (data: { message: string; productId: number; newCardsCount: number; timestamp: string }) => {
+      const newNotification: Notification = {
+        id: Date.now().toString() + "_qrGenerated",
+        type: "success",
+        title: "QR Codes Generated",
+        message: `${data.message}. ${data.newCardsCount} new card(s) added.`,
+        time: "Just now",
+      };
+      setNotifications((prev) => [newNotification, ...prev]);
+    });
+
+    socket.on("cardClaimed", (data: { message: string; card: any; timestamp: string }) => {
+      const newNotification: Notification = {
+        id: Date.now().toString() + "_claimed",
+        type: "success",
+        title: "Card Claimed",
+        message: data.message,
+        time: "Just now",
+      };
+      setNotifications((prev) => [newNotification, ...prev]);
+    });
+
+    socket.on("qrCodeDeleted", (data: { message: string; uniqueCode: string; timestamp: string }) => {
+      const newNotification: Notification = {
+        id: Date.now().toString() + "_qrDeleted",
+        type: "event",
+        title: "QR Code Deleted",
+        message: data.message,
+        time: "Just now",
+      };
+      setNotifications((prev) => [newNotification, ...prev]);
+    });
+
+    // Clean up on component unmount.
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
+
+  useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        profileRef.current &&
-        !profileRef.current.contains(event.target as Node)
-      ) {
+      if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
         setIsProfileOpen(false);
       }
-      if (
-        notificationRef.current &&
-        !notificationRef.current.contains(event.target as Node)
-      ) {
+      if (notificationRef.current && !notificationRef.current.contains(event.target as Node)) {
         setIsNotificationOpen(false);
       }
     };
@@ -118,7 +175,6 @@ const Navbar = () => {
         method: "POST",
         credentials: "include",
       });
-
       if (response.ok) {
         navigate("/login/admin");
       } else {
@@ -138,7 +194,7 @@ const Navbar = () => {
     }[type] || "bg-gray-100 text-gray-500";
 
     return (
-      <div className={`p-2 rounded-lg ${iconClasses}`}>
+      <div className={`p-2 rounded-lg ${iconClasses}`} title={type.charAt(0).toUpperCase() + type.slice(1)}>
         <div className="w-6 h-6" />
       </div>
     );
@@ -154,6 +210,7 @@ const Navbar = () => {
               src="/src/assets/img/dogpng.png"
               alt="Logo"
               className="h-8 w-8 mr-3"
+              title="Logo"
             />
             <span className="text-xl font-semibold dark:text-white">
               NGARAGA
@@ -167,10 +224,13 @@ const Navbar = () => {
                 type="button"
                 onClick={() => setIsNotificationOpen(!isNotificationOpen)}
                 className="relative p-2 text-gray-600 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-300 rounded-lg dark:text-gray-400 dark:hover:text-white"
+                title="View notifications"
               >
                 <span className="sr-only">View notifications</span>
                 <Bell className="w-6 h-6" />
-                <div className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></div>
+                {notifications.length > 0 && (
+                  <div className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></div>
+                )}
               </button>
 
               {/* Notification Panel */}
@@ -181,25 +241,32 @@ const Navbar = () => {
                       Notifications
                     </h3>
                     <div className="space-y-4 max-h-[60vh] overflow-y-auto">
-                      {notifications.map((notification) => (
-                        <div
-                          key={notification.id}
-                          className="cursor-pointer flex items-start gap-4 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600"
-                        >
-                          {getNotificationIcon(notification.type)}
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-gray-900 dark:text-white">
-                              {notification.title}
-                            </p>
-                            <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-2">
-                              {notification.message}
-                            </p>
-                            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-                              {notification.time}
-                            </p>
-                          </div>
+                      {notifications.length === 0 ? (
+                        <div className="text-center text-sm text-gray-500 dark:text-gray-400">
+                          No notifications
                         </div>
-                      ))}
+                      ) : (
+                        notifications.map((notification) => (
+                          <div
+                            key={notification.id}
+                            className="cursor-pointer flex items-start gap-4 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600"
+                            title={`${notification.title}: ${notification.message}`}
+                          >
+                            {getNotificationIcon(notification.type)}
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium text-gray-900 dark:text-white">
+                                {notification.title}
+                              </p>
+                              <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-2">
+                                {notification.message}
+                              </p>
+                              <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                                {notification.time}
+                              </p>
+                            </div>
+                          </div>
+                        ))
+                      )}
                     </div>
                   </div>
                 </div>
@@ -213,12 +280,14 @@ const Navbar = () => {
                 onClick={() => setIsProfileOpen(!isProfileOpen)}
                 className="flex items-center text-sm bg-gray-800 rounded-full focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
                 aria-expanded={isProfileOpen}
+                title="Open user menu"
               >
                 <span className="sr-only">Open user menu</span>
                 <img
                   className="w-8 h-8 rounded-full object-cover"
                   src={profileImage}
                   alt="User profile"
+                  title="User profile"
                 />
               </button>
 
@@ -229,6 +298,7 @@ const Navbar = () => {
                       href="/admin/profile"
                       onClick={() => setIsProfileOpen(false)}
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white"
+                      title="Profile"
                     >
                       Profile
                     </a>
@@ -238,6 +308,7 @@ const Navbar = () => {
                         handleLogout();
                       }}
                       className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white text-left"
+                      title="Logout"
                     >
                       Logout
                     </button>
