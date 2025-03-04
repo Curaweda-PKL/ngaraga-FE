@@ -226,7 +226,7 @@ input:checked + label {
 }
 
 
-/* Replace your existing checkbox styles with these */
+/* Replacing existing checkbox styles with these */
 .bg-whitey {
   background-color: white;
   color: var(--neutral-colors-500);
@@ -242,6 +242,26 @@ input:checked + label {
 
 .text-cta-900 {
   color: var(--call-to-actions-900);
+}
+
+/* For Firefox */
+.scrollbar-transparent-actions {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+
+/* For WebKit browsers */
+.scrollbar-transparent-actions::-webkit-scrollbar {
+  height: 6px !important;
+  background-color: transparent !important;
+}
+
+.scrollbar-transparent-actions::-webkit-scrollbar-track {
+  background-color: transparent !important;
+}
+
+.scrollbar-transparent-actions::-webkit-scrollbar-thumb {
+  background-color: transparent !important;
 }
 
 

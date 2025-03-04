@@ -1,5 +1,13 @@
 import React, { useState, useEffect, ChangeEvent } from "react";
-import { Edit3, Eye, EyeOff, Trash2, Plus, QrCode, Archive } from "lucide-react";
+import {
+  Edit3,
+  Eye,
+  EyeOff,
+  Trash2,
+  Plus,
+  QrCode,
+  Archive,
+} from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import axios, { AxiosError } from "axios";
 import { SERVER_URL } from "@/middleware/utils";
@@ -23,7 +31,7 @@ interface CardType {
   discountedPrice: number | string;
   selected: boolean;
   isSuspended: boolean;
-  productId?: number ;
+  productId?: number;
 }
 
 interface FetchCardsResponse {
@@ -38,32 +46,40 @@ export const SpecialCard: React.FC = () => {
   // Fetch cards from the backend.
   const fetchCards = async (): Promise<void> => {
     try {
-      const response = await axios.get<FetchCardsResponse>(`${SERVER_URL}/api/cards/special`);
-      const mappedCards: CardType[] = response.data.cards.map((card: any): CardType => ({
-        id: card.id,
-        sku: card.sku || "N/A",
-        uniqueCode: card.uniqueCode || "N/A",
-        name: card.name || card.characterName || "N/A",
-        category:
-          (typeof card.category === "object" ? card.category.name : card.category) ||
-          card.categoryName ||
-          "N/A",
-        categoryCode:
-          (typeof card.category === "object" ? card.category.code : card.categoryCode) ||
-          "N/A",
-        image: card.image || "N/A",
-        stock: card.stock !== undefined ? card.stock : "N/A",
-        price: card.price !== undefined ? Number(card.price) : "N/A",
-        discountedPrice:
-          card.discountedPrice !== undefined && card.discountedPrice !== null
-            ? Number(card.discountedPrice)
-            : card.price !== undefined
-            ? Number(card.price)
-            : "N/A",
-        selected: false,
-        isSuspended: card.isSuspended || false,
-        productId: card.productId || (card.product ? card.product.id : undefined),
-      }));
+      const response = await axios.get<FetchCardsResponse>(
+        `${SERVER_URL}/api/cards/special`
+      );
+      const mappedCards: CardType[] = response.data.cards.map(
+        (card: any): CardType => ({
+          id: card.id,
+          sku: card.sku || "N/A",
+          uniqueCode: card.uniqueCode || "N/A",
+          name: card.name || card.characterName || "N/A",
+          category:
+            (typeof card.category === "object"
+              ? card.category.name
+              : card.category) ||
+            card.categoryName ||
+            "N/A",
+          categoryCode:
+            (typeof card.category === "object"
+              ? card.category.code
+              : card.categoryCode) || "N/A",
+          image: card.image || "N/A",
+          stock: card.stock !== undefined ? card.stock : "N/A",
+          price: card.price !== undefined ? Number(card.price) : "N/A",
+          discountedPrice:
+            card.discountedPrice !== undefined && card.discountedPrice !== null
+              ? Number(card.discountedPrice)
+              : card.price !== undefined
+              ? Number(card.price)
+              : "N/A",
+          selected: false,
+          isSuspended: card.isSuspended || false,
+          productId:
+            card.productId || (card.product ? card.product.id : undefined),
+        })
+      );
       setCards(mappedCards);
     } catch (error: unknown) {
       let message = "Error fetching cards";
@@ -93,7 +109,10 @@ export const SpecialCard: React.FC = () => {
     setCards(updatedCards);
   };
 
-  const handleSelectRow = (index: number, e: ChangeEvent<HTMLInputElement>): void => {
+  const handleSelectRow = (
+    index: number,
+    e: ChangeEvent<HTMLInputElement>
+  ): void => {
     const { checked } = e.target;
     const updatedCards = [...cards];
     updatedCards[index].selected = checked;
@@ -109,14 +128,20 @@ export const SpecialCard: React.FC = () => {
     try {
       let response;
       if (card.isSuspended) {
-        response = await axios.patch(`${SERVER_URL}/api/cards/${card.uniqueCode}/unsuspend`);
+        response = await axios.patch(
+          `${SERVER_URL}/api/cards/${card.uniqueCode}/unsuspend`
+        );
       } else {
-        response = await axios.patch(`${SERVER_URL}/api/cards/${card.uniqueCode}/suspend`);
+        response = await axios.patch(
+          `${SERVER_URL}/api/cards/${card.uniqueCode}/suspend`
+        );
       }
       const updatedCard = response.data.card;
       setCards((prev) =>
         prev.map((c) =>
-          c.uniqueCode === updatedCard.uniqueCode ? { ...c, isSuspended: updatedCard.isSuspended } : c
+          c.uniqueCode === updatedCard.uniqueCode
+            ? { ...c, isSuspended: updatedCard.isSuspended }
+            : c
         )
       );
       setNotification({ message: response.data.message, type: "success" });
@@ -139,7 +164,9 @@ export const SpecialCard: React.FC = () => {
     if (!confirmed) return;
 
     try {
-      const response = await axios.delete(`${SERVER_URL}/api/cards/delete/${card.uniqueCode}`);
+      const response = await axios.delete(
+        `${SERVER_URL}/api/cards/delete/${card.uniqueCode}`
+      );
       setNotification({ message: response.data.message, type: "success" });
       // Re–fetch the updated card list.
       fetchCards();
@@ -159,17 +186,24 @@ export const SpecialCard: React.FC = () => {
   const handleBulkDelete = async (): Promise<void> => {
     const selectedCards = cards.filter((card) => card.selected);
     if (selectedCards.length === 0) {
-      setNotification({ message: "No cards selected for deletion", type: "error" });
+      setNotification({
+        message: "No cards selected for deletion",
+        type: "error",
+      });
       return;
     }
-    if (!window.confirm("Are you sure you want to delete the selected cards?")) return;
+    if (!window.confirm("Are you sure you want to delete the selected cards?"))
+      return;
     try {
       const deletePromises = selectedCards.map(async (card) => {
         await axios.delete(`${SERVER_URL}/api/cards/delete/${card.uniqueCode}`);
         return card.uniqueCode;
       });
       await Promise.all(deletePromises);
-      setNotification({ message: "Selected cards deleted successfully", type: "success" });
+      setNotification({
+        message: "Selected cards deleted successfully",
+        type: "success",
+      });
       fetchCards();
     } catch (error: unknown) {
       let message = "Error deleting cards";
@@ -186,14 +220,20 @@ export const SpecialCard: React.FC = () => {
   const handleBulkSuspend = async (): Promise<void> => {
     const selectedCards = cards.filter((card) => card.selected);
     if (selectedCards.length === 0) {
-      setNotification({ message: "No cards selected for suspension", type: "error" });
+      setNotification({
+        message: "No cards selected for suspension",
+        type: "error",
+      });
       return;
     }
-    if (!window.confirm("Are you sure you want to suspend the selected cards?")) return;
+    if (!window.confirm("Are you sure you want to suspend the selected cards?"))
+      return;
     try {
       const suspendPromises = selectedCards.map(async (card) => {
         if (!card.isSuspended) {
-          const response = await axios.patch(`${SERVER_URL}/api/cards/${card.uniqueCode}/suspend`);
+          const response = await axios.patch(
+            `${SERVER_URL}/api/cards/${card.uniqueCode}/suspend`
+          );
           return response.data.card;
         } else {
           return card;
@@ -202,11 +242,16 @@ export const SpecialCard: React.FC = () => {
       const updatedCards = await Promise.all(suspendPromises);
       setCards((prev) =>
         prev.map((c) => {
-          const updated = updatedCards.find((u: CardType) => u.uniqueCode === c.uniqueCode);
+          const updated = updatedCards.find(
+            (u: CardType) => u.uniqueCode === c.uniqueCode
+          );
           return updated ? { ...c, isSuspended: updated.isSuspended } : c;
         })
       );
-      setNotification({ message: "Selected cards suspended successfully", type: "success" });
+      setNotification({
+        message: "Selected cards suspended successfully",
+        type: "success",
+      });
     } catch (error: unknown) {
       let message = "Error suspending cards";
       if (axios.isAxiosError(error)) {
@@ -221,7 +266,10 @@ export const SpecialCard: React.FC = () => {
   // Navigate to view QR codes.
   const handleQrButtonClick = (card: CardType): void => {
     if (!card.productId) {
-      setNotification({ message: "Product ID not found for this card", type: "error" });
+      setNotification({
+        message: "Product ID not found for this card",
+        type: "error",
+      });
       console.error("Product ID not found for this card");
       return;
     }
@@ -235,7 +283,9 @@ export const SpecialCard: React.FC = () => {
     );
     if (!confirmed) return;
     try {
-      const response = await axios.delete(`${SERVER_URL}/api/products/delete/${productId}`);
+      const response = await axios.delete(
+        `${SERVER_URL}/api/products/delete/${productId}`
+      );
       setNotification({ message: response.data.message, type: "success" });
       fetchCards();
     } catch (error: unknown) {
@@ -303,7 +353,7 @@ export const SpecialCard: React.FC = () => {
           </button>
         </div>
       </div>
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto  scrollbar-transparent-actions">
         <table className="table w-full">
           <thead>
             <tr>
@@ -311,18 +361,26 @@ export const SpecialCard: React.FC = () => {
                 <input
                   type="checkbox"
                   className="checkbox"
-                  checked={cards.length > 0 && cards.every((card) => card.selected)}
+                  checked={
+                    cards.length > 0 && cards.every((card) => card.selected)
+                  }
                   onChange={handleSelectAll}
                 />
               </th>
               <th>SKU &amp; Image</th>
-              <th className="whitespace-nowrap overflow-hidden text-ellipsis">Unique Code</th>
+              <th className="whitespace-nowrap overflow-hidden text-ellipsis">
+                Unique Code
+              </th>
               <th>Card Name</th>
               <th>Category Name</th>
               <th>Category Code</th>
               <th>Stock</th>
-              <th className="whitespace-nowrap overflow-hidden text-ellipsis">Price</th>
-              <th className="whitespace-nowrap overflow-hidden text-ellipsis">Discounted Price</th>
+              <th className="whitespace-nowrap overflow-hidden text-ellipsis">
+                Price
+              </th>
+              <th className="whitespace-nowrap overflow-hidden text-ellipsis">
+                Discounted Price
+              </th>
               <th>Action</th>
             </tr>
           </thead>
@@ -331,7 +389,8 @@ export const SpecialCard: React.FC = () => {
               // Show "Delete Product" only on the first occurrence of each productId.
               const isFirstOccurrence =
                 card.productId &&
-                cards.findIndex((c) => c.productId === card.productId) === index;
+                cards.findIndex((c) => c.productId === card.productId) ===
+                  index;
               return (
                 <tr key={index}>
                   <td>
@@ -374,13 +433,17 @@ export const SpecialCard: React.FC = () => {
                       <button
                         className="p-2 hover:bg-gray-100 rounded-lg text-gray-600"
                         title="Edit Card"
-                        onClick={() => navigate(`/admin/edit-special/${card.uniqueCode}`)}
+                        onClick={() =>
+                          navigate(`/admin/edit-special/${card.uniqueCode}`)
+                        }
                       >
                         <Edit3 className="w-4 h-4" />
                       </button>
                       <button
                         className="p-2 hover:bg-gray-100 rounded-lg text-gray-600"
-                        title={card.isSuspended ? "Unsuspend Card" : "Suspend Card"}
+                        title={
+                          card.isSuspended ? "Unsuspend Card" : "Suspend Card"
+                        }
                         onClick={() => handleToggleSuspend(card)}
                       >
                         {card.isSuspended ? (
@@ -413,10 +476,20 @@ export const SpecialCard: React.FC = () => {
                             } else {
                               console.error("Product ID is undefined");
                             }
-                          }}                        >
+                          }}
+                        >
                           <Archive className="w-4 h-4" />
                         </button>
                       )}
+                      <button
+                        className="p-2 hover:bg-gray-100 rounded-lg text-indigo-600"
+                        title="Assign Requirement"
+                        onClick={() =>
+                          navigate(`/admin/assign-requirement/${card.id}`)
+                        }
+                      >
+                        Assign Requirement
+                      </button>
                     </div>
                   </td>
                 </tr>

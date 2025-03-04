@@ -48,6 +48,7 @@ import SuccessVerify from "../pages/events/success-verify";
 import QrCodeComponent from "../pages/scan-qr/scan-qr";
 import QrCodesPage from "../admin-pages/marketplace/card/qrModal/qrPages";
 import SpecialQrCodesPage from "../admin-pages/marketplace/card/qrModal/specialQrpages";
+import AssignRequirement from "../admin-pages/marketplace/special-card/assign-card";
 
 // Lazy-loaded Pages
 const Home = React.lazy(() => import("@/lib/pages/home/Home"));
@@ -177,7 +178,8 @@ export const adminRoutes: Array<PathRouteProps> = [
   {path: "profile", element: <ProfileSettings />},
   {path: "edit-profile/:id", element: <EditProfileAdmin />},
   {path:"/cards/:productId/qr-codes", element:<QrCodesPage /> },
-  {path:"/special-cards/:productId/qr-codes", element:<SpecialQrCodesPage /> }
+  {path:"/special-cards/:productId/qr-codes", element:<SpecialQrCodesPage /> },
+  {path: "assign-requirement/:id", element: <AssignRequirement/>}
 
 
 ];
