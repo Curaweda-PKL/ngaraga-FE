@@ -191,7 +191,7 @@ export const ProfilePage: React.FC = () => {
       <div className="relative w-full lg:p-8">
         <div className="container mx-auto flex flex-col lg:flex-row items-center lg:items-start lg:justify-between">
           {/* Profile Content */}
-          <div className="flex-grow order-3 lg:order-none lg:mr-8 ml-4 lg:ml-8">
+          <div className="flex-grow order-3 lg:order-none lg:mr-8 ml-4 lg:ml-2">
             {/* Profile Image */}
             <div className="relative mb-8 lg:mb-12 order-1 lg:order-none">
               <div className="relative w-24 h-24 mx-auto lg:mx-0 -mt-12 lg:-mt-16">

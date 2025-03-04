@@ -3,59 +3,57 @@ import axios from "axios";
 import { SERVER_URL } from "@/middleware/utils";
 import Cards from "./cards";
 import SpecialCards from "./specialcard";
+import SpecialCardDetail from "../../specialcard-details";
 import Purchases from "./purchases";
-import { Card } from "./types";
-import { specialCardData, purchaseData } from "./data";
-
-// Custom icon when no owned cards are found – a card outline with a sad face.
-const NoOwnedCardsIcon = () => (
-  <svg
-    width="64"
-    height="64"
-    viewBox="0 0 64 64"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="4"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    {/* Card outline */}
-    <rect x="8" y="12" width="48" height="40" rx="4" ry="4" />
-    {/* Eyes */}
-    <circle cx="22" cy="30" r="3" fill="currentColor" />
-    <circle cx="42" cy="30" r="3" fill="currentColor" />
-    {/* Frowning mouth */}
-    <path d="M22 42 q10 8 20 0" />
-  </svg>
-);
+import { Card, SpecialCard } from "./types";
+import { purchaseData } from "./data";
 
 export const CardSection = () => {
   // Tab state: "cards", "specialCards", or "purchases"
   const [activeTab, setActiveTab] = useState<"cards" | "specialCards" | "purchases">("cards");
   const [activeFilter, setActiveFilter] = useState<"All" | "Payment" | "Packaging" | "Shipping" | "Delivered">("All");
   const [ownedCards, setOwnedCards] = useState<Card[]>([]);
+  const [specialCards, setSpecialCards] = useState<SpecialCard[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
+  const [loadingSpecialCards, setLoadingSpecialCards] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  // Flag to indicate the API returned a message about no owned cards.
+  const [errorSpecialCards, setErrorSpecialCards] = useState<string | null>(null);
+  const [claimError, setClaimError] = useState<string | null>(null);
+  const [claimingCardId, setClaimingCardId] = useState<number | null>(null);
   const [noCardsFound, setNoCardsFound] = useState<boolean>(false);
+  // State for selected special card detail (null means list view)
+  const [selectedSpecialCard, setSelectedSpecialCard] = useState<SpecialCard | null>(null);
+  
+  // Authenticated user data fetched from /api/me.
+  const [user, setUser] = useState<{ id: number } | null>(null);
   const tabsRef = useRef<HTMLDivElement>(null);
 
-  // Replace with actual user id from your auth context or props.
-  const userId = "123";
+  // Fetch the current user.
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await axios.get(`${SERVER_URL}/api/me`, { withCredentials: true });
+        setUser(response.data);
+      } catch (err) {
+        console.error("Failed to fetch user data", err);
+      }
+    };
+    fetchUser();
+  }, []);
 
+  // Filter purchase data based on active filter.
   const filteredPurchaseData =
     activeFilter === "All"
       ? purchaseData
       : purchaseData.filter((purchase) => purchase.status === activeFilter);
 
-  // Fetch owned cards when the "cards" tab is active.
+  // Fetch owned cards for the "cards" tab.
   useEffect(() => {
-    if (activeTab === "cards") {
+    if (activeTab === "cards" && user) {
       const fetchOwnedCards = async () => {
         setLoading(true);
         try {
-          // Use validateStatus so that 404 responses are not treated as errors.
-          const response = await axios.get(`${SERVER_URL}/api/owned/user/${userId}`, {
+          const response = await axios.get(`${SERVER_URL}/api/owned/user/${user.id}`, {
             validateStatus: (status) => status < 500,
             withCredentials: true,
           });
@@ -79,13 +77,57 @@ export const CardSection = () => {
 
       fetchOwnedCards();
     }
-  }, [activeTab, userId]);
+  }, [activeTab, user]);
+
+// Fetch special cards as soon as a user is available.
+useEffect(() => {
+  if (user) {
+    const fetchSpecialCards = async () => {
+      setLoadingSpecialCards(true);
+      try {
+        const response = await axios.get(`${SERVER_URL}/api/owned/special`, { withCredentials: true });
+        setSpecialCards(response.data.cards);
+        setErrorSpecialCards(null);
+      } catch (err) {
+        setErrorSpecialCards("Failed to fetch special cards. Please try again later.");
+        console.error(err);
+      } finally {
+        setLoadingSpecialCards(false);
+      }
+    };
+    fetchSpecialCards();
+  }
+}, [user]);
+
+
+  // Handler to claim a special card.
+  const handleClaimSpecialCard = async (card: SpecialCard) => {
+    // Allow claiming only if the card is eligible.
+    if (card.claimStatus !== "eligible") return;
+    setClaimingCardId(card.id);
+    setClaimError(null);
+    try {
+      await axios.post(
+        `${SERVER_URL}/special-cards/claim`,
+        { cardId: card.id },
+        { withCredentials: true }
+      );
+      // Refresh the special cards after a successful claim.
+      const response = await axios.get(`${SERVER_URL}/owned/special`, { withCredentials: true });
+      setSpecialCards(response.data.cards);
+    } catch (err) {
+      setClaimError("Failed to claim special card. Please try again later.");
+      console.error(err);
+    } finally {
+      setClaimingCardId(null);
+    }
+  };
 
   return (
     <div className="w-full mb-10 px-4 sm:px-6">
       {/* Tabs */}
       <div
-        className="flex items-center justify-start space-x-4 sm:space-x-8 border-b border-gray-700 pb-4 mb-8 overflow-x-auto"
+        className="flex items-center justify-start space-x-4 sm:space-x-8 border-b border-gray-700 pb-4 mb-8 overflow-x-auto ml-4"
         ref={tabsRef}
       >
         <div className="relative">
@@ -107,9 +149,12 @@ export const CardSection = () => {
             className={`tab-specialCards text-sm sm:text-lg font-semibold whitespace-nowrap ${
               activeTab === "specialCards" ? "text-[#2B2B2B]" : "text-gray-400"
             }`}
-            onClick={() => setActiveTab("specialCards")}
+            onClick={() => {
+              setActiveTab("specialCards");
+              setSelectedSpecialCard(null); // Reset to list view
+            }}
           >
-            Special Card ({specialCardData.length})
+            Special Card ({specialCards.length})
           </button>
           {activeTab === "specialCards" && (
             <div className="absolute bottom-[-16px] left-0 right-0 h-[2px] bg-[#2B2B2B]" />
@@ -171,8 +216,55 @@ export const CardSection = () => {
           )}
         </>
       )}
-      {activeTab === "specialCards" && <SpecialCards data={specialCardData} />}
+
+{activeTab === "specialCards" && (
+  <>
+    {loadingSpecialCards ? (
+      <div className="text-center py-10">Loading special cards...</div>
+    ) : errorSpecialCards ? (
+      <div className="text-center py-10 text-red-500">{errorSpecialCards}</div>
+    ) : selectedSpecialCard ? (
+      <SpecialCardDetail
+        specialCardId={selectedSpecialCard.id}
+        onBack={() => setSelectedSpecialCard(null)}
+      />
+    ) : (
+      <>
+        {claimError && (
+          <div className="text-center py-4 text-red-500">{claimError}</div>
+        )}
+        <SpecialCards
+          data={specialCards}
+          onCardClick={(card) => setSelectedSpecialCard(card)}
+          onClaim={handleClaimSpecialCard}
+          claimingCardId={claimingCardId}
+        />
+      </>
+    )}
+  </>
+)}
+
+
       {activeTab === "purchases" && <Purchases data={filteredPurchaseData} />}
     </div>
   );
 };
+
+// A simple icon component for when no owned cards are found.
+const NoOwnedCardsIcon = () => (
+  <svg
+    width="64"
+    height="64"
+    viewBox="0 0 64 64"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="4"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <rect x="8" y="12" width="48" height="40" rx="4" ry="4" />
+    <circle cx="22" cy="30" r="3" fill="currentColor" />
+    <circle cx="42" cy="30" r="3" fill="currentColor" />
+    <path d="M22 42 q10 8 20 0" />
+  </svg>
+);
