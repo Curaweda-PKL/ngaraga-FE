@@ -80,7 +80,7 @@ export const SectionFourForm: React.FC = () => {
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-      <h2 className="text-lg font-medium mb-8">Section 4</h2>
+      <h2 className="text-lg font-medium mb-8">Section 4 - Categories</h2>
       <div className="space-y-6">
         <div className="grid grid-cols-2 gap-x-8">
           {/* Left Column - Title */}

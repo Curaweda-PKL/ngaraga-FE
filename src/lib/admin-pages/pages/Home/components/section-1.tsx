@@ -125,7 +125,7 @@ export const HeroBanner = () => {
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-      <h2 className="text-lg font-medium mb-8">Hero Banner</h2>
+      <h2 className="text-lg font-medium mb-8">Section 1 - Hero Banner</h2>
 
       {errorMessage && (
         <div className="mb-4 text-red-600">{errorMessage}</div>

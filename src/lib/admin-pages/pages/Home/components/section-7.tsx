@@ -42,7 +42,11 @@ export const SectionSevenForm = () => {
     scanCardImage: null,
     tradingImage: null,
   });
-  const [successMessage, setSuccessMessage] = useState("");
+  const [message, setMessage] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const handleImageChange = (key: keyof FormData, file: File | null) => {
     setFormData((prev) => ({
@@ -59,19 +63,25 @@ export const SectionSevenForm = () => {
   };
 
   const handleSubmit = async () => {
-    setSuccessMessage("");
+    setMessage(null);
+    setLoading(true);
+
     if (
       !formData.title ||
       !formData.findCardTitle ||
       !formData.scanCardTitle ||
       !formData.tradingTitle
     ) {
-      setSuccessMessage("Harap isi semua field yang diperlukan.");
+      setMessage({
+        type: "error",
+        text: "Harap isi semua field yang diperlukan.",
+      });
+      setLoading(false); // Kembalikan loading jika validasi gagal
       return;
     }
 
     const formDataToSend = new FormData();
-    formDataToSend.append("slug", "section-seven");
+    formDataToSend.append("slug", "flash-sale");
     formDataToSend.append("title", formData.title);
     formDataToSend.append("description", formData.description);
     formDataToSend.append("findCardTitle", formData.findCardTitle);
@@ -81,7 +91,6 @@ export const SectionSevenForm = () => {
     formDataToSend.append("scanCardDescription", formData.scanCardDescription);
     formDataToSend.append("tradingDescription", formData.tradingDescription);
 
-    // Append image files if they exist
     if (formData.findCardImage)
       formDataToSend.append("findCardImage", formData.findCardImage);
     if (formData.scanCardImage)
@@ -100,10 +109,17 @@ export const SectionSevenForm = () => {
       }
 
       const result = await response.json();
-      setSuccessMessage(result.message || "Data berhasil disimpan!");
+      setMessage({
+        type: "success",
+        text: result.message || "Data berhasil disimpan!",
+      });
     } catch (error) {
-      console.error("Error:", error);
-      setSuccessMessage("Terjadi kesalahan saat menyimpan data.");
+      setMessage({
+        type: "error",
+        text: "Terjadi kesalahan saat menyimpan data.",
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -123,7 +139,6 @@ export const SectionSevenForm = () => {
         }
       };
     }, [currentImage]);
-    
 
     return (
       <div className="relative border-dashed border-2 border-gray-300 rounded-lg p-4 bg-yellow-50">
@@ -164,7 +179,16 @@ export const SectionSevenForm = () => {
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 p-6">
-      <h2 className="text-lg font-medium mb-6">Section 7</h2>
+      <h2 className="text-lg font-medium mb-6">Section 7 - Find Card Scan Card Trading Card</h2>
+      {message && (
+        <div
+          className={`mb-4 text-center ${
+            message.type === "success" ? "text-green-600" : "text-red-600"
+          }`}
+        >
+          {message.text}
+        </div>
+      )}
 
       <div className="space-y-6">
         {/* Title and Description */}
@@ -315,18 +339,12 @@ export const SectionSevenForm = () => {
         <div className="flex justify-end">
           <button
             onClick={handleSubmit}
-            className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600"
+            disabled={loading}
+            className="px-4 py-2 bg-[#E9B824] text-white rounded-md hover:bg-[#d6a820] disabled:opacity-50"
           >
-            Save
+            {loading ? "Saving..." : "Save"}
           </button>
         </div>
-
-        {/* Success Message */}
-        {successMessage && (
-          <div className="mt-4 text-center text-green-600">
-            {successMessage}
-          </div>
-        )}
       </div>
     </div>
   );
