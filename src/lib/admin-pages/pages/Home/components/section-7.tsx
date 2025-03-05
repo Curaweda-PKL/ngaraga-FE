@@ -81,7 +81,7 @@ export const SectionSevenForm = () => {
     }
 
     const formDataToSend = new FormData();
-    formDataToSend.append("slug", "flash-sale");
+    formDataToSend.append("slug", "findscan-trading");
     formDataToSend.append("title", formData.title);
     formDataToSend.append("description", formData.description);
     formDataToSend.append("findCardTitle", formData.findCardTitle);

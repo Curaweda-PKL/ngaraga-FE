@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import mushroom from "../../../../assets/img/mushroom.png";
 import { SERVER_URL } from "@/middleware/utils";
 
 export const Event: React.FC = () => {
@@ -62,25 +61,49 @@ export const Event: React.FC = () => {
     <div
       className="relative mt-24 flex justify-center items-end h-screen bg-cover bg-center"
       style={{
-        backgroundImage: `linear-gradient(180deg, rgba(221, 177, 31, 0) 0%, rgba(221, 177, 31, 0.5) 100%), url(${mushroom})`,
+        backgroundColor: "#3B3B3B", // Warna abu-abu solid
       }}
     >
       <div className="absolute inset-0 flex justify-between items-end p-8 sm:p-12 md:p-16 lg:p-20">
-        <div className="flex flex-col space-y-8 text-white">
-          <div className="flex items-center space-x-3 px-3 py-2 bg-gray-300 rounded-xl w-fit">
-            <img src="https://via.placeholder.com/40" alt="Avatar" className="w-8 h-8 rounded-full" />
-            <span className="text-black font-semibold">Shroomie</span>
-          </div>
-
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold">
-            {flashSale ? flashSale.flashSaleTitle : "Loading..."}
-          </h1>
-
-          <button className="py-2 px-6 sm:py-3 sm:px-8 bg-call-to-action text-white font-medium rounded-lg shadow-md hover:bg-call-to-actions-700 transition w-28 sm:w-36 md:w-40 lg:w-44">
-            See Card
-          </button>
+        {/* Kiri: Informasi Kategori */}
+        <div className="flex flex-col space-y-4 text-white">
+          {flashSale?.heroCard?.product?.category && (
+            <>
+              <img
+                src={`${SERVER_URL}/${flashSale.heroCard.product.category.image}`}
+                alt={flashSale.heroCard.characterName}
+                className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-full"
+                onError={(e) => {
+                  console.error("Error loading category image:", e);
+                  e.currentTarget.src = "https://via.placeholder.com/150"; // Fallback image
+                }}
+              />
+              <span className="text-lg sm:text-xl md:text-2xl font-semibold">
+                {flashSale.heroCard.characterName}
+              </span>
+            </>
+          )}
         </div>
 
+        {/* Tengah: Gambar Kartu */}
+        <div className="flex justify-center items-center w-full h-full">
+          {flashSale?.heroCard?.product?.image && (
+            <img
+              src={`${SERVER_URL}/${flashSale.heroCard.product.image}`}
+              alt={flashSale.heroCard.characterName}
+              className="h-full max-h-screen w-auto object-contain"
+              style={{
+                maxWidth: "100%", // Lebar maksimum sesuai ukuran asli gambar
+              }}
+              onError={(e) => {
+                console.error("Error loading card image:", e);
+                e.currentTarget.src = "https://via.placeholder.com/520x344"; // Fallback image
+              }}
+            />
+          )}
+        </div>
+
+        {/* Kanan: Timer dan Tombol */}
         <div className="flex flex-col items-center text-white p-4 sm:p-6 md:p-8 lg:p-10 bg-gray-700 bg-opacity-50 backdrop-blur-md rounded-xl">
           <p className="text-sm sm:text-base md:text-lg font-mono mb-4 font-medium">Auction ends in:</p>
           <div className="flex text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold font-mono space-x-3">
@@ -91,4 +114,3 @@ export const Event: React.FC = () => {
     </div>
   );
 };
-

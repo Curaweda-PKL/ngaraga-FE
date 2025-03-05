@@ -33,45 +33,44 @@ export const SectionEightForm = () => {
   };
 
   const handleSubmit = async () => {
-    setSuccessMessage("");
-    setErrorMessage("");
+  setSuccessMessage("");
+  setErrorMessage("");
 
-    if (!formData.title) {
-      setErrorMessage("Harap isi title.");
-      return;
+  if (!formData.title) {
+    setErrorMessage("Harap isi title.");
+    return;
+  }
+
+  const formDataToSend = new FormData();
+  formDataToSend.append("slug", formData.slug); // Pastikan slug dikirim
+  formDataToSend.append("title", formData.title);
+  formDataToSend.append("description", formData.description);
+  if (formData.image) formDataToSend.append("image", formData.image);
+
+  try {
+    const response = await fetch(`${SERVER_URL}/api/join-weekly`, {
+      method: "POST",
+      body: formDataToSend,
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Gagal menyimpan data.");
     }
 
-    const formDataToSend = new FormData();
-    formDataToSend.append("slug", formData.slug);
-    formDataToSend.append("title", formData.title);
-    formDataToSend.append("description", formData.description);
-    if (formData.image) formDataToSend.append("image", formData.image);
-
-    try {
-      const response = await fetch(`${SERVER_URL}/api/join-weekly`, {
-        method: "POST",
-        body: formDataToSend,
-      });
-
-      if (!response.ok) {
-        throw new Error("Gagal menyimpan data.");
-      }
-
-      const result = await response.json();
-      setSuccessMessage(
-        result.message || "Join Weekly Update saved successfully."
-      );
-      setFormData({
-        slug: "section-eight",
-        title: "",
-        description: "",
-        image: null,
-      });
-    } catch (error) {
-      console.error("Error:", error);
-      setErrorMessage("Terjadi kesalahan saat menyimpan data.");
-    }
-  };
+    const result = await response.json();
+    setSuccessMessage(result.message || "Join Weekly Update saved successfully.");
+    setFormData({
+      slug: "join-weekly",
+      title: "",
+      description: "",
+      image: null,
+    });
+  } catch (error) {
+    console.error("Error:", error);
+    setErrorMessage("Terjadi kesalahan saat menyimpan data.");
+  }
+};
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 p-6">
