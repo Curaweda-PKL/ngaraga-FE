@@ -102,6 +102,16 @@ export const SpecialCard: React.FC = () => {
     return () => clearInterval(interval);
   }, []);
 
+  // Auto-clear notifications after 2 seconds.
+  useEffect(() => {
+    if (notification) {
+      const timer = setTimeout(() => {
+        setNotification(null);
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [notification]);
+
   // Bulk selection handlers.
   const handleSelectAll = (e: ChangeEvent<HTMLInputElement>): void => {
     const { checked } = e.target;
