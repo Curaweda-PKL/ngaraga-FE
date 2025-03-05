@@ -1,6 +1,6 @@
-import React from "react";
-import {DetailCards} from "./components/detail-cards";
-import {MoreCardSection} from "./components/more-card";
+import React, { memo } from "react";
+import { DetailCards } from "./components/detail-cards";
+import { MoreCardSection } from "./components/more-card";
 
 const CardDetail: React.FC = () => {
   return (
@@ -11,4 +11,4 @@ const CardDetail: React.FC = () => {
   );
 };
 
-export default CardDetail;
+export default memo(CardDetail);

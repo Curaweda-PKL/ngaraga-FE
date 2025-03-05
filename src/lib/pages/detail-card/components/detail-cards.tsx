@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, memo, useCallback } from "react";
 import axios from "axios";
 import parse from "html-react-parser";
 import { CiShoppingCart } from "react-icons/ci";
@@ -6,9 +6,9 @@ import { useParams, useNavigate } from "react-router-dom";
 import { SERVER_URL } from "@/middleware/utils";
 import { motion, AnimatePresence } from "framer-motion";
 
-export const DetailCards: React.FC = () => {
+export const DetailCards: React.FC = memo(() => {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate(); // Initialize navigate
+  const navigate = useNavigate();
   const [card, setCard] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
@@ -20,12 +20,12 @@ export const DetailCards: React.FC = () => {
   const [showSidebar, setShowSidebar] = useState<boolean>(false);
 
   // Helper function: returns a full URL for an image.
-  const getImageUrl = (img?: string, directory?: string): string => {
+  const getImageUrl = useCallback((img?: string, directory?: string): string => {
     if (!img) return "";
     if (img.startsWith("http://") || img.startsWith("https://")) return img;
     const dirPath = directory ? `/${directory}` : "";
     return `${SERVER_URL}${dirPath}/${img}`;
-  };
+  }, []);
 
   // Fetch card details.
   useEffect(() => {
@@ -52,8 +52,8 @@ export const DetailCards: React.FC = () => {
     }
   }, [id]);
 
-  // Handler to add card to cart.
-  const handleAddToCart = async () => {
+  // Handler to add card to cart, memoized to prevent recreation on each render.
+  const handleAddToCart = useCallback(async () => {
     if (!card) {
       setCartError("Card data is not available.");
       setShowSidebar(true);
@@ -64,7 +64,6 @@ export const DetailCards: React.FC = () => {
       setCartLoading(true);
       setCartError("");
       setCartSuccess("");
-      // POST request with credentials.
       const response = await axios.post(
         `${SERVER_URL}/api/cart/add`,
         {
@@ -77,8 +76,6 @@ export const DetailCards: React.FC = () => {
       console.log("Cart response:", response.data);
     } catch (err: any) {
       console.error("Error adding card to cart:", err);
-      // If the error indicates the user is not logged in (e.g., 401 Unauthorized),
-      // redirect to the login page.
       if (err.response && err.response.status === 401) {
         return navigate("/login");
       }
@@ -90,7 +87,7 @@ export const DetailCards: React.FC = () => {
       setCartLoading(false);
       setShowSidebar(true);
     }
-  };
+  }, [card, navigate]);
 
   if (loading) {
     return (
@@ -266,11 +263,14 @@ export const DetailCards: React.FC = () => {
                 Close
               </button>
             </div>
-            {/* Display Product Card Summary */}
             {product && (
               <div className="flex items-center border p-4 rounded-md mb-4">
                 <img
-                  src={getImageUrl(product?.cardImage) || getImageUrl(product?.image) || "https://via.placeholder.com/100"}
+                  src={
+                    getImageUrl(product?.cardImage) ||
+                    getImageUrl(product?.image) ||
+                    "https://via.placeholder.com/100"
+                  }
                   alt={product?.name}
                   className="w-16 h-16 object-cover rounded"
                 />
@@ -303,4 +303,4 @@ export const DetailCards: React.FC = () => {
       </AnimatePresence>
     </div>
   );
-};
+});
