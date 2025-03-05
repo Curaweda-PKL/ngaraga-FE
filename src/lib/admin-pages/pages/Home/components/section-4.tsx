@@ -20,15 +20,14 @@ interface HeroCategoryPayload {
   slug: string;
   heroCategoryTitle: string;
   heroCategoryDescription: string;
-  heroCategoryImage: string;
+  categoryIds: number[]; // Array of category IDs
 }
 
 export const SectionFourForm: React.FC = () => {
   // Form state for hero category fields
   const [title, setTitle] = useState<string>("Browse Categories");
   const [description, setDescription] = useState<string>("");
-  // Selected category (only one will be used to retrieve its image)
-  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
+  const [selectedCategories, setSelectedCategories] = useState<Category[]>([]); // Array of selected categories
 
   // State for categories list and dropdown control
   const [categories, setCategories] = useState<Category[]>([]);
@@ -43,7 +42,6 @@ export const SectionFourForm: React.FC = () => {
     const fetchCategories = async () => {
       try {
         const response = await axios.get(`${SERVER_URL}/api/categories/all`);
-        // Assuming response.data.categories is an array of categories
         setCategories(response.data.categories);
       } catch (err) {
         console.error("Error fetching categories", err);
@@ -57,12 +55,19 @@ export const SectionFourForm: React.FC = () => {
   const handleSave = async () => {
     setMessage("");
     setError("");
-    // Prepare payload using a fixed slug ("hero-category") as identifier.
+
+    // Validate if at least one category is selected
+    if (selectedCategories.length === 0) {
+      setError("Please select at least one category.");
+      return;
+    }
+
+    // Prepare payload
     const payload: HeroCategoryPayload = {
       slug: "hero-category",
       heroCategoryTitle: title,
       heroCategoryDescription: description,
-      heroCategoryImage: selectedCategory ? selectedCategory.image || "" : "",
+      categoryIds: selectedCategories.map((cat) => cat.id), // Extract category IDs
     };
 
     try {
@@ -76,6 +81,23 @@ export const SectionFourForm: React.FC = () => {
         setError("An error occurred while saving hero category.");
       }
     }
+  };
+
+  // Handle category selection
+  const handleCategorySelect = (category: Category) => {
+    if (selectedCategories.length >= 8) {
+      setError("You can select a maximum of 8 categories.");
+      return;
+    }
+    if (!selectedCategories.some((cat) => cat.id === category.id)) {
+      setSelectedCategories([...selectedCategories, category]);
+    }
+    setIsDropdownOpen(false);
+  };
+
+  // Handle category removal
+  const handleCategoryRemove = (categoryId: number) => {
+    setSelectedCategories(selectedCategories.filter((cat) => cat.id !== categoryId));
   };
 
   return (
@@ -97,7 +119,6 @@ export const SectionFourForm: React.FC = () => {
                   onChange={(e) => setTitle(e.target.value)}
                   className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
-                {/* Optional clear button */}
                 <button className="absolute right-3 top-1/2 -translate-y-1/2">
                   <IoMdClose className="text-gray-400 hover:text-gray-600 w-5 h-5" />
                 </button>
@@ -130,7 +151,7 @@ export const SectionFourForm: React.FC = () => {
         {/* Category Selection */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Select Category <span className="text-red-500">*</span>
+            Select Categories (Max 8) <span className="text-red-500">*</span>
           </label>
           <div className="relative">
             <button
@@ -139,7 +160,9 @@ export const SectionFourForm: React.FC = () => {
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
             >
               <span className="text-gray-500">
-                {selectedCategory ? selectedCategory.name : "Choose a Category"}
+                {selectedCategories.length > 0
+                  ? `${selectedCategories.length} categories selected`
+                  : "Choose categories"}
               </span>
               <IoChevronDownOutline
                 className={`text-gray-400 w-5 h-5 transform transition-transform ${
@@ -149,25 +172,45 @@ export const SectionFourForm: React.FC = () => {
             </button>
             {isDropdownOpen && (
               <div className="absolute z-10 mt-2 w-full border border-gray-300 rounded-lg bg-white shadow-lg max-h-60 overflow-auto">
-                {categories.map((category) => (
-                  <div
-                    key={category.id}
-                    onClick={() => {
-                      setSelectedCategory(category);
-                      setIsDropdownOpen(false);
-                    }}
-                    className="cursor-pointer px-4 py-2 hover:bg-blue-100"
-                  >
-                    <div className="flex items-center gap-3">
-                      {category.image && (
-                        <img src={category.image} alt={category.name} className="w-6 h-6" />
-                      )}
-                      <span>{category.name}</span>
+                {categories
+                  .filter((cat) => !selectedCategories.some((selected) => selected.id === cat.id))
+                  .map((category) => (
+                    <div
+                      key={category.id}
+                      onClick={() => handleCategorySelect(category)}
+                      className="cursor-pointer px-4 py-2 hover:bg-blue-100"
+                    >
+                      <div className="flex items-center gap-3">
+                        {category.image && (
+                          <img src={category.image} alt={category.name} className="w-6 h-6" />
+                        )}
+                        <span>{category.name}</span>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
               </div>
             )}
+          </div>
+
+          {/* Display selected categories */}
+          <div className="mt-4 flex flex-wrap gap-2">
+            {selectedCategories.map((category) => (
+              <div
+                key={category.id}
+                className="flex items-center gap-2 bg-gray-100 rounded-lg px-3 py-1.5"
+              >
+                {category.image && (
+                  <img src={category.image} alt={category.name} className="w-4 h-4" />
+                )}
+                <span>{category.name}</span>
+                <button
+                  onClick={() => handleCategoryRemove(category.id)}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  <IoMdClose className="w-4 h-4" />
+                </button>
+              </div>
+            ))}
           </div>
         </div>
 
@@ -189,4 +232,3 @@ export const SectionFourForm: React.FC = () => {
     </div>
   );
 };
-
