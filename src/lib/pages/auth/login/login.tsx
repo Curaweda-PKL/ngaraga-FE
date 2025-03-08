@@ -6,6 +6,7 @@ import LoginImage from "@/assets/img/spacestarry.png";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { SERVER_URL } from "@/middleware/utils";
+import { useNavigate } from "react-router-dom";
 
 type LoginFormData = {
   email: string;
@@ -27,6 +28,8 @@ const Login: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [thumbnailData, setThumbnailData] = useState<any>(null);
+
+  const navigate = useNavigate();
 
   // Fetch thumbnail data
   useEffect(() => {
@@ -108,7 +111,7 @@ const Login: React.FC = () => {
       );
 
       // Assume the API returns a user object with a role property
-      const user = response.data?.user;
+      const user = response.data?.account;
 
       if (user && (user.role === "ADMIN" || user.role === "SUPERADMIN")) {
         // Admin or Superadmin users go to the admin dashboard
@@ -117,8 +120,8 @@ const Login: React.FC = () => {
           message: "Logged in successfully! Redirecting to admin dashboard...",
         });
         setTimeout(() => {
-          window.location.href = "/admin/dashboard";
-        }, 500);
+          navigate("/admin/dashboard", { replace: true });
+        }, 0);
       } else {
         // Regular users are redirected to the home page
         setNotification({
@@ -126,8 +129,8 @@ const Login: React.FC = () => {
           message: "Logged in successfully! Redirecting...",
         });
         setTimeout(() => {
-          window.location.href = "/";
-        }, 500);
+          navigate("/", { replace: true });
+        }, 0);
       }
     } catch (err: any) {
       console.error("Error during login:", err);

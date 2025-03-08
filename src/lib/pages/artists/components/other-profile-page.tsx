@@ -64,7 +64,6 @@ export const OtherProfilePage: React.FC = () => {
   const [isFollowing, setIsFollowing] = useState<boolean>(false);
   const [followNotification, setFollowNotification] = useState<string | null>(null);
 
-  // Simulate current logged-in user (you can replace this with your auth context)
   const currentUserId = localStorage.getItem("userId") || "";
 
   // Fetch the user profile when the component mounts or when "$name" changes.

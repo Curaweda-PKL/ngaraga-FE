@@ -73,9 +73,9 @@ const SpecialCardDetail = React.lazy(
   () => import("@/lib/pages/account/specialcard-details")
 );
 const ViewDetail = React.lazy(() => import("@/lib/pages/account/view-details"));
-const DetailSpecial = React.lazy(
-  () => import("@/lib/pages/detail-card/detail-special-index")
-);
+// const DetailSpecial = React.lazy(
+//   () => import("@/lib/pages/detail-card/detail-special-index")
+// );
 const DetailCards = React.lazy(
   () => import("../pages/detail-card/detail-cards-index")
 );
@@ -112,7 +112,6 @@ export const routes: Array<PathRouteProps> = [
   {path: "/account/:name", element: <Artists />},
   {path: "/marketplace", element: <Marketplace />},
   {path: "/detail-cards/:id", element: <DetailCards />},
-  {path: "/detail-special-card", element: <DetailSpecial />},
   {path: "/special-card-detail", element: <SpecialCardDetail />},
   {path: "/view-detail", element: <ViewDetail />},
   {path: "/rankings", element: <TopCollectors />},

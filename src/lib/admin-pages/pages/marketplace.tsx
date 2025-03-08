@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { SERVER_URL } from "@/middleware/utils"; // Import centralized server URL
+import { SERVER_URL } from "@/middleware/utils";
 
 export const MarketplaceForm: React.FC = () => {
   const [title, setTitle] = useState(""); // initial state is empty
@@ -94,3 +94,5 @@ export const MarketplaceForm: React.FC = () => {
     </div>
   );
 };
+
+export default React.memo(MarketplaceForm);

@@ -1,13 +1,15 @@
-import React, { memo, useEffect, useState } from "react";
+import React, { memo, useEffect, useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { SERVER_URL } from "@/middleware/utils";
+import { useInView } from "react-intersection-observer";
+import { useQuery } from "@tanstack/react-query";
 
 export type Card = {
   id: number;
   name: string;
   category: string;
-  categoryImage: string; 
+  categoryImage: string;
   image: string;
   price?: string;
   discountedPrice?: string;
@@ -19,22 +21,38 @@ interface MarketplaceCardSectionProps {
   filteredCards: Card[] | null;
 }
 
-const CardItem: React.FC<{ card: Card }> = memo(({ card }) => {
-  // Process main image path
-  const imagePath = card.image ? card.image.replace(/\\/g, "/") : "";
-  const imageSrc = imagePath ? `${SERVER_URL}/${imagePath}` : "/placeholder.svg";
+// Helper to remove any leading protocol and prefix with SERVER_URL for production.
+// const getImageSrc = (src: string): string => {
+//   if (!src) return "/placeholder.svg";
+//   // Replace backslashes with forward slashes
+//   let cleaned = src.replace(/\\/g, "/");
+//   // Remove protocol (http:// or https://) if it exists
+//   cleaned = cleaned.replace(/^https?:\/\//, "");
+//   return `${SERVER_URL}/${cleaned}`;
+// };
 
-  // Process category image path with conditional SERVER_URL prefix
+//dev
+const getImageSrc = (src: string): string => {
+  if (!src) return "/placeholder.svg";
+  // Replace backslashes with forward slashes
+  let cleaned = src.replace(/\\/g, "/");
+  // Remove protocol (http:// or https://) if it exists
+  cleaned = cleaned.replace(/^https?:\/\//, "");
+  return `https://${cleaned}`;
+};
+
+
+const CardItem: React.FC<{ card: Card }> = memo(({ card }) => {
+  // Use the helper to always prefix with SERVER_URL.
+  const imageSrc = getImageSrc(card.image);
+
   let categoryImageSrc = "/placeholder.svg";
   if (card.categoryImage && card.categoryImage !== "N/A") {
-    categoryImageSrc =
-      card.categoryImage.startsWith("http")
-        ? card.categoryImage
-        : `${SERVER_URL}/${card.categoryImage.replace(/\\/g, "/")}`;
+    categoryImageSrc = getImageSrc(card.categoryImage);
   }
 
-  // Determine if the card is "Legendary"
-  const isLegendary = card.category === "Legendary" || card.category === "Legendaris";
+  const isLegendary =
+    card.category === "Legendary" || card.category === "Legendaris";
 
   return (
     <Link to={`/detail-cards/${card.id}`}>
@@ -48,12 +66,13 @@ const CardItem: React.FC<{ card: Card }> = memo(({ card }) => {
             src={imageSrc}
             alt={card.name}
             className="w-full h-full object-cover p-4"
+            loading="lazy"
           />
-          {/* Category image overlay */}
           <img
             src={categoryImageSrc}
             alt={card.category}
             className="absolute bottom-2 right-2 w-10 h-10 rounded-full border-2 border-white"
+            loading="lazy"
           />
           {isLegendary && (
             <div className="absolute top-2 left-2 flex items-center">
@@ -76,21 +95,27 @@ const CardItem: React.FC<{ card: Card }> = memo(({ card }) => {
         </figure>
         <div className="p-4 sm:p-6 flex flex-col justify-between flex-grow">
           <div>
-            <h3 className={`text-xl sm:text-2xl font-bold ${isLegendary ? "text-yellow-600" : "text-gray-800"}`}>
+            <h3
+              className={`text-xl sm:text-2xl font-bold ${
+                isLegendary ? "text-yellow-600" : "text-gray-800"
+              }`}
+            >
               {card.name}
             </h3>
             <span className="inline-block mt-4 px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-600">
               {card.category}
             </span>
           </div>
-          <div className="">
+          <div>
             {card.discountedPrice ? (
               <p className="text-sm sm:text-base text-gray-600">
                 Rp {card.discountedPrice}{" "}
                 <span className="line-through">Rp {card.price}</span>
               </p>
             ) : (
-              <p className="text-sm sm:text-base text-gray-600">Price: {card.price}</p>
+              <p className="text-sm sm:text-base text-gray-600">
+                Price: {card.price}
+              </p>
             )}
           </div>
         </div>
@@ -99,93 +124,113 @@ const CardItem: React.FC<{ card: Card }> = memo(({ card }) => {
   );
 });
 
-export default CardItem;
+export const MarketplaceCardSection: React.FC<MarketplaceCardSectionProps> = memo(
+  ({ filteredCards }) => {
+    // Virtualization state: controls how many cards are rendered.
+    const [visibleCount, setVisibleCount] = useState<number>(8);
+    const { ref: sentinelRef, inView } = useInView({ threshold: 0 });
 
-export const MarketplaceCardSection: React.FC<MarketplaceCardSectionProps> = memo(({ filteredCards }) => {
-  const [cards, setCards] = useState<Card[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string>("");
-
-  useEffect(() => {
-    if (filteredCards !== null) {
-      setCards(filteredCards);
-      setLoading(false);
-    } else {
-      const fetchMarketplaceCards = async () => {
-        try {
-          const response = await axios.get(`${SERVER_URL}/api/available/marketplace/cards`);
-          if (response.data?.cards) {
-            const transformedCards = response.data.cards.map((card: any) => ({
-              id: card.id,
-              name: card.name,
-              category: card.category,
-              categoryImage: card.categoryImage, // mapping new property
-              image: card.image,
-              price: card.price,
-              discountedPrice: card.discountedPrice,
-            }));
-            setCards(transformedCards);
-          }
-        } catch (err) {
-          console.error("Error fetching cards:", err);
-          setError("Failed to fetch cards");
-        } finally {
-          setLoading(false);
+    // React Query fetch: always called, but enabled only when filteredCards is null.
+    const { data: queryCards, isLoading, error } = useQuery<Card[], Error>({
+      queryKey: ["marketplaceCards"],
+      queryFn: async () => {
+        const response = await axios.get(
+          `${SERVER_URL}/api/available/marketplace/cards`
+        );
+        if (response.data?.cards) {
+          return response.data.cards.map((card: any): Card => ({
+            id: card.id,
+            name: card.name,
+            category: card.category,
+            categoryImage: card.categoryImage,
+            image: card.image,
+            price: card.price,
+            discountedPrice: card.discountedPrice,
+          }));
         }
-      };
-      fetchMarketplaceCards();
+        throw new Error("Failed to fetch cards");
+      },
+      enabled: filteredCards === null,
+      initialData: [],
+    });
+
+    // Always compute cards as a Card[].
+    const cards: Card[] = useMemo(() => {
+      return filteredCards !== null ? filteredCards : queryCards;
+    }, [filteredCards, queryCards]);
+
+    // Memoize the sliced array to avoid unnecessary recalculations.
+    const visibleCards = useMemo(() => cards.slice(0, visibleCount), [
+      cards,
+      visibleCount,
+    ]);
+
+    // Increase visibleCount when the sentinel comes into view.
+    useEffect(() => {
+      if (inView && visibleCount < cards.length) {
+        setVisibleCount((prev) => prev + 4);
+      }
+    }, [inView, visibleCount, cards.length]);
+
+    if (filteredCards === null && isLoading) {
+      return (
+        <div className="w-full mb-10 lg:ml-8">
+          <p>Loading...</p>
+        </div>
+      );
     }
-  }, [filteredCards]);
 
-  if (loading) {
+    if (error) {
+      return (
+        <div className="w-full mb-10 lg:ml-8">
+          <p className="text-red-500">
+            {error.message || "An error occurred while fetching cards."}
+          </p>
+        </div>
+      );
+    }
+
+    if (cards.length === 0) {
+      return (
+        <div className="w-full mb-10 lg:ml-8 flex flex-col items-center justify-center gap-4 py-12">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="64"
+            height="64"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#404040"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <circle cx="12" cy="12" r="10" />
+            <path d="M8 14s1.5 2 4 2 4-2 4-2" />
+            <line x1="9" y1="9" x2="9.01" y2="9" />
+            <line x1="15" y1="9" x2="15.01" y2="9" />
+          </svg>
+          <p className="text-[#404040]">
+            {filteredCards ? "No cards with this type" : "No cards available"}
+          </p>
+        </div>
+      );
+    }
+
     return (
       <div className="w-full mb-10 lg:ml-8">
-        <p>Loading...</p>
+        <div className="grid gap-6 px-6 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 lg:mr-8">
+          {visibleCards.map((card: Card) => (
+            <CardItem key={card.id} card={card} />
+          ))}
+        </div>
+        {visibleCount < cards.length && (
+          <div ref={sentinelRef} className="py-4 text-center">
+            Loading more cards...
+          </div>
+        )}
       </div>
     );
   }
+);
 
-  if (error) {
-    return (
-      <div className="w-full mb-10 lg:ml-8">
-        <p className="text-red-500">{error}</p>
-      </div>
-    );
-  }
-
-  if (cards.length === 0) {
-    return (
-      <div className="w-full mb-10 lg:ml-8 flex flex-col items-center justify-center gap-4 py-12">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="64"
-          height="64"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="#404040"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <circle cx="12" cy="12" r="10" />
-          <path d="M8 14s1.5 2 4 2 4-2 4-2" />
-          <line x1="9" y1="9" x2="9.01" y2="9" />
-          <line x1="15" y1="9" x2="15.01" y2="9" />
-        </svg>
-        <p className="text-[#404040]">
-          {filteredCards ? "No cards with this type" : "No cards available"}
-        </p>
-      </div>
-    );
-  }
-
-  return (
-    <div className="w-full mb-10 lg:ml-8">
-      <div className="grid gap-6 px-6 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 lg:mr-8">
-        {cards.map((card) => (
-          <CardItem key={card.id} card={card} />
-        ))}
-      </div>
-    </div>
-  );
-});
+export default MarketplaceCardSection;

@@ -8,7 +8,7 @@ import { SERVER_URL } from "@/middleware/utils";
 type Card = {
   id: number;
   title: string;
-  creator: string;
+  category: string; // use this field for category
   image: string;
   categoryImage: string; 
   price?: string;
@@ -32,7 +32,7 @@ const CardItem: React.FC<{ card: Card; onClick: () => void }> = ({ card, onClick
     <div
       key={card.id} // stable, unique key
       onClick={onClick}
-      className="w-full h-[400px] flex flex-col items-start gap-4 bg-[#F2F2F2] rounded-2xl shadow-xl transition-transform hover:scale-[1.02] sm:w-full cursor-pointer"
+      className="w-full h-[400px] flex flex-col items-start gap-4  rounded-2xl shadow-xl transition-transform hover:scale-[1.02] sm:w-full cursor-pointer"
     >
       <figure className="w-full h-[260px] rounded-t-2xl overflow-hidden relative">
         {card.image ? (
@@ -94,8 +94,9 @@ const CardItem: React.FC<{ card: Card; onClick: () => void }> = ({ card, onClick
         <h3 className="text-2xl font-bold text-[#171717] font-[Poppins] sm:text-lg">
           {card.title}
         </h3>
-        <span className="text-base text-[#404040] font-[Nunito] sm:text-sm">
-          {card.creator}
+        {/* Category flair background */}
+        <span className="inline-block mt-1 px-3 py-1 rounded-full bg-gray-100 text-gray-600 font-[Nunito] sm:text-sm">
+          {card.category}
         </span>
         {card.price && (
           <span className="text-base text-[#404040] font-[Nunito] sm:text-sm">
@@ -132,7 +133,7 @@ export const MoreCardSection: React.FC = () => {
         response.data?.cards.map((card: any) => ({
           id: card.id,
           title: card.name,
-          creator: card.category,
+          category: card.category, // use category field here
           image: card.image,
           categoryImage: card.categoryImage,
           price: card.price,
@@ -141,8 +142,14 @@ export const MoreCardSection: React.FC = () => {
       if (newCards.length < LIMIT) {
         setHasMore(false);
       }
-      // Append new cards to the existing list.
-      setCards((prev) => [...prev, ...newCards]);
+      // Append new cards to the existing list, skipping duplicates by title.
+      setCards((prev) => {
+        const existingTitles = new Set(prev.map((c) => c.title));
+        const uniqueNewCards = newCards.filter(
+          (card) => !existingTitles.has(card.title)
+        );
+        return [...prev, ...uniqueNewCards];
+      });
     } catch (err) {
       console.error("Error fetching cards:", err);
       setError("Failed to fetch cards");
