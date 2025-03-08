@@ -49,13 +49,17 @@ const EditProfilePage: React.FC = () => {
   const [bannerFile, setBannerFile] = useState<File | null>(null);
 
   // Flags for removal actions
-  const [profileImageRemoved, setProfileImageRemoved] = useState<boolean>(false);
+  const [profileImageRemoved, setProfileImageRemoved] =
+    useState<boolean>(false);
   const [bannerImageRemoved, setBannerImageRemoved] = useState<boolean>(false);
 
   // Helper to normalize image URLs
   const normalizeImageUrl = (rawPath: string): string => {
     let normalizedPath = rawPath.replace(/\\/g, "/").replace(/^src\//, "");
-    normalizedPath = normalizedPath.replace("uploadsprofile", "uploads/profile");
+    normalizedPath = normalizedPath.replace(
+      "uploadsprofile",
+      "uploads/profile"
+    );
     return `${SERVER_URL}/${normalizedPath}`;
   };
 
@@ -72,7 +76,8 @@ const EditProfilePage: React.FC = () => {
     "https://images.unsplash.com/photo-1499336315816-097655dcfbda?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2710&q=80";
 
   // Profile & Banner image states with fallback values
-  const [profileImage, setProfileImage] = useState<string>(fallbackProfileImage);
+  const [profileImage, setProfileImage] =
+    useState<string>(fallbackProfileImage);
   const [bannerImage, setBannerImage] = useState<string>(fallbackBannerImage);
 
   // Refs for hidden file inputs
@@ -296,15 +301,26 @@ const EditProfilePage: React.FC = () => {
           {successMessage}
         </div>
       )}
-      <section className="relative h-64">
+      <section className="relative h-96">
+        {" "}
+        {/* Ubah h-64 menjadi h-96 atau lebih */}
         <div
           className="absolute top-0 w-full h-full bg-center bg-cover"
           style={{
-            background: `linear-gradient(180deg, rgba(221, 177, 31, 0) 0%, rgba(221, 177, 31, 0.5) 100%), url('${bannerImage}')`,
+            backgroundImage: `url('${bannerImage}')`,
             backgroundSize: "cover",
             backgroundPosition: "center",
           }}
         >
+          {/* Overlay Gradien */}
+          <div
+            className="absolute top-0 w-full h-full"
+            style={{
+              background:
+                "linear-gradient(180deg, rgba(221, 177, 31, 0) 0%, rgba(221, 177, 31, 0.5) 100%)",
+            }}
+          ></div>
+
           <input
             type="file"
             accept="image/*"
