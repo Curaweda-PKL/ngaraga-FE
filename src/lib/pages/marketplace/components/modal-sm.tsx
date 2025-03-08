@@ -23,7 +23,7 @@ const useClickOutside = (ref: React.RefObject<HTMLDivElement>, handler: () => vo
   }, [ref, handler]);
 };
 
-const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onApply, children }) => {
+const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, children }) => {
   const modalRef = useRef<HTMLDivElement>(null);
   useClickOutside(modalRef, onClose);
 

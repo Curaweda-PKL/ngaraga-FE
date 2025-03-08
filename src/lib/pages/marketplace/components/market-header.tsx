@@ -1,11 +1,17 @@
-import React, { useState, useCallback, useEffect, memo } from "react";
-import { MdArrowDropDown } from "react-icons/md";
-import { PiSlidersHorizontalDuotone } from "react-icons/pi";
+import React, { useState, useCallback, useEffect, memo, lazy} from "react";
 import { useQuery } from "@tanstack/react-query";
 import { DropdownMarket } from "./dropdown-market";
 import FilterModal from "./modal-sm";
 import { SERVER_URL } from "@/middleware/utils";
 import { Card } from "./marketplace-card-section";
+
+const PiSlidersHorizontalDuotone = lazy(() =>
+  import("react-icons/pi").then((module) => ({ default: module.PiSlidersHorizontalDuotone }))
+);
+
+const MdArrowDropDown = lazy(() =>
+  import("react-icons/md").then((module) => ({ default: module.MdArrowDropDown }))
+);
 
 interface MarketHeaderProps {
   onFilteredCards: (cards: Card[] | null) => void;

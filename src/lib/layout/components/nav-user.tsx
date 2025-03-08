@@ -1,25 +1,23 @@
+import { SERVER_URL } from "@/middleware/utils";
+import axios from "axios";
 import React, {
-  useEffect,
-  useRef,
-  useState,
-  useCallback,
-  useMemo,
+  lazy,
   memo,
   Suspense,
-  lazy,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
 } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
 import { usePermissions } from "../../context/permission-context";
-import { SERVER_URL } from "@/middleware/utils";
 
 // Lazy-load icons from react-icons
 const LazyFaBars = lazy(() =>
   import("react-icons/fa").then((module) => ({ default: module.FaBars }))
 );
-const LazyFaTimes = lazy(() =>
-  import("react-icons/fa").then((module) => ({ default: module.FaTimes }))
-);
+
 const LazyFaUserFriends = lazy(() =>
   import("react-icons/fa").then((module) => ({ default: module.FaUserFriends }))
 );
