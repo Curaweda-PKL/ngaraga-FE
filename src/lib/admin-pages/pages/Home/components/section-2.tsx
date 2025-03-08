@@ -114,7 +114,7 @@ export const SectionTwoForm = () => {
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-      <h2 className="text-lg font-medium mb-2">Trending Cards</h2>
+      <h2 className="text-lg font-medium mb-2">Section 2 - Trending Cards</h2>
       <p className="text-sm text-gray-600 mb-8">
         Enter a title and description for the trending cards section, then select between 1 and 3 unique cards from the dropdown.
         Duplicate card selection is not allowed.
