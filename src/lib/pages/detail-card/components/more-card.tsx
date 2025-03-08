@@ -3,36 +3,51 @@ import { FaRocket } from "react-icons/fa";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useInView } from "react-intersection-observer";
-import { SERVER_URL } from "@/middleware/utils";
+import { SERVER_URL, IS_DEV } from "@/middleware/utils";
 
-type Card = {
+export type Card = {
   id: number;
   title: string;
   category: string; // use this field for category
   image: string;
-  categoryImage: string; 
+  categoryImage: string;
   price?: string;
 };
 
-const CardItem: React.FC<{ card: Card; onClick: () => void }> = ({ card, onClick }) => {
-  // Process main image path
-  const imagePath = card.image ? card.image.replace(/\\/g, "/") : "";
-  const imageSrc = imagePath ? `${SERVER_URL}/${imagePath}` : "/placeholder.svg";
+/**
+ * Helper to generate an image URL.
+ * - Replaces backslashes with forward slashes.
+ * - Removes any leading protocol.
+ * - In development mode, returns a URL prefixed with "https://".
+ * - In production mode, returns a URL prefixed with SERVER_URL.
+ */
+const getImageSrc = (src: string): string => {
+  if (!src) return "/placeholder.svg";
+  // Normalize path separators.
+  let cleaned = src.replace(/\\/g, "/");
+  // Remove any protocol if it exists.
+  cleaned = cleaned.replace(/^https?:\/\//, "");
+  return IS_DEV ? `https://${cleaned}` : `${SERVER_URL}/${cleaned}`;
+};
 
-  // Process category image path with conditional SERVER_URL prefix
+const CardItem: React.FC<{ card: Card; onClick: () => void }> = ({ card, onClick }) => {
+  // Use the helper to process the main image.
+  const imageSrc = getImageSrc(card.image);
+
+  // Process category image with conditional prefix.
   let categoryImageSrc = "/placeholder.svg";
   if (card.categoryImage && card.categoryImage !== "N/A") {
     categoryImageSrc =
       card.categoryImage.startsWith("http")
         ? card.categoryImage
-        : `${SERVER_URL}/${card.categoryImage.replace(/\\/g, "/")}`;
+        : getImageSrc(card.categoryImage);
   }
 
   return (
     <div
-      key={card.id} // stable, unique key
+      key={card.id}
       onClick={onClick}
-      className="w-full h-[400px] flex flex-col items-start gap-4  rounded-2xl shadow-xl transition-transform hover:scale-[1.02] sm:w-full cursor-pointer"
+      className="w-full h-[400px] flex flex-col items-start gap-4 rounded-2xl shadow-xl transition-transform hover:scale-[1.02] sm:w-full cursor-pointer"
     >
       <figure className="w-full h-[260px] rounded-t-2xl overflow-hidden relative">
         {card.image ? (
@@ -122,7 +137,7 @@ export const MoreCardSection: React.FC = () => {
 
   const LIMIT = 20; // Number of cards to fetch per page
 
-  // Fetch cards for a given page
+  // Fetch cards for a given page.
   const fetchCards = useCallback(async (pageNumber: number) => {
     setLoading(true);
     try {
@@ -133,16 +148,14 @@ export const MoreCardSection: React.FC = () => {
         response.data?.cards.map((card: any) => ({
           id: card.id,
           title: card.name,
-          category: card.category, // use category field here
+          category: card.category,
           image: card.image,
           categoryImage: card.categoryImage,
           price: card.price,
         })) || [];
-      // If fewer than LIMIT cards are returned, there are no more cards to load.
       if (newCards.length < LIMIT) {
         setHasMore(false);
       }
-      // Append new cards to the existing list, skipping duplicates by title.
       setCards((prev) => {
         const existingTitles = new Set(prev.map((c) => c.title));
         const uniqueNewCards = newCards.filter(
@@ -158,12 +171,12 @@ export const MoreCardSection: React.FC = () => {
     }
   }, []);
 
-  // Initial load and subsequent loads when page changes
+  // Initial load and subsequent loads when page changes.
   useEffect(() => {
     fetchCards(page);
   }, [page, fetchCards]);
 
-  // When the sentinel comes into view and more data is available, load the next page.
+  // When the sentinel is in view and more data is available, load the next page.
   useEffect(() => {
     if (inView && !loading && hasMore) {
       setPage((prev) => prev + 1);
@@ -194,7 +207,7 @@ export const MoreCardSection: React.FC = () => {
       <div className="grid gap-6 px-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 ml-2 lg:mr-6">
         {cards.map((card) => (
           <CardItem
-            key={card.id} // stable, unique key
+            key={card.id}
             card={card}
             onClick={() => navigate(`/detail-cards/${card.id}`)}
           />

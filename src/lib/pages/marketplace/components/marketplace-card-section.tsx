@@ -1,7 +1,7 @@
 import React, { memo, useEffect, useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
-import { SERVER_URL } from "@/middleware/utils";
+import { SERVER_URL, IS_DEV } from "@/middleware/utils";
 import { useInView } from "react-intersection-observer";
 import { useQuery } from "@tanstack/react-query";
 
@@ -16,41 +16,23 @@ export type Card = {
 };
 
 interface MarketplaceCardSectionProps {
-  // When filtering, an array (even empty) is provided.
-  // When no filtering is applied, the prop is null.
   filteredCards: Card[] | null;
+  searchQuery?: string;
 }
 
-// Helper to remove any leading protocol and prefix with SERVER_URL for production.
-// const getImageSrc = (src: string): string => {
-//   if (!src) return "/placeholder.svg";
-//   // Replace backslashes with forward slashes
-//   let cleaned = src.replace(/\\/g, "/");
-//   // Remove protocol (http:// or https://) if it exists
-//   cleaned = cleaned.replace(/^https?:\/\//, "");
-//   return `${SERVER_URL}/${cleaned}`;
-// };
-
-//dev
+// Helper to generate image source.
 const getImageSrc = (src: string): string => {
   if (!src) return "/placeholder.svg";
-  // Replace backslashes with forward slashes
-  let cleaned = src.replace(/\\/g, "/");
-  // Remove protocol (http:// or https://) if it exists
-  cleaned = cleaned.replace(/^https?:\/\//, "");
-  return `https://${cleaned}`;
+  let cleaned = src.replace(/\\/g, "/").replace(/^https?:\/\//, "");
+  return IS_DEV ? `https://${cleaned}` : `${SERVER_URL}/${cleaned}`;
 };
 
-
 const CardItem: React.FC<{ card: Card }> = memo(({ card }) => {
-  // Use the helper to always prefix with SERVER_URL.
   const imageSrc = getImageSrc(card.image);
-
   let categoryImageSrc = "/placeholder.svg";
   if (card.categoryImage && card.categoryImage !== "N/A") {
     categoryImageSrc = getImageSrc(card.categoryImage);
   }
-
   const isLegendary =
     card.category === "Legendary" || card.category === "Legendaris";
 
@@ -125,12 +107,10 @@ const CardItem: React.FC<{ card: Card }> = memo(({ card }) => {
 });
 
 export const MarketplaceCardSection: React.FC<MarketplaceCardSectionProps> = memo(
-  ({ filteredCards }) => {
-    // Virtualization state: controls how many cards are rendered.
+  ({ filteredCards, searchQuery }) => {
     const [visibleCount, setVisibleCount] = useState<number>(8);
     const { ref: sentinelRef, inView } = useInView({ threshold: 0 });
 
-    // React Query fetch: always called, but enabled only when filteredCards is null.
     const { data: queryCards, isLoading, error } = useQuery<Card[], Error>({
       queryKey: ["marketplaceCards"],
       queryFn: async () => {
@@ -154,23 +134,37 @@ export const MarketplaceCardSection: React.FC<MarketplaceCardSectionProps> = mem
       initialData: [],
     });
 
-    // Always compute cards as a Card[].
+    // Compute cards from filteredCards prop or fetched data.
     const cards: Card[] = useMemo(() => {
       return filteredCards !== null ? filteredCards : queryCards;
     }, [filteredCards, queryCards]);
 
-    // Memoize the sliced array to avoid unnecessary recalculations.
-    const visibleCards = useMemo(() => cards.slice(0, visibleCount), [
-      cards,
+    // Apply fuzzy search: split search query into words and filter cards where every word is found.
+    const finalCards = useMemo(() => {
+      if (searchQuery && searchQuery.trim() !== "") {
+        const words = searchQuery.toLowerCase().split(/\s+/);
+        const filtered = cards.filter((card) => {
+          const cardText = `${card.name} ${card.category}`.toLowerCase();
+          return words.every((word) => cardText.includes(word));
+        });
+        console.log("Filtered cards count:", filtered.length, "for query:", searchQuery);
+        return filtered;
+      }
+      return cards;
+    }, [cards, searchQuery]);
+    
+
+    // Compute visible cards.
+    const visibleCards = useMemo(() => finalCards.slice(0, visibleCount), [
+      finalCards,
       visibleCount,
     ]);
 
-    // Increase visibleCount when the sentinel comes into view.
     useEffect(() => {
-      if (inView && visibleCount < cards.length) {
+      if (inView && visibleCount < finalCards.length) {
         setVisibleCount((prev) => prev + 4);
       }
-    }, [inView, visibleCount, cards.length]);
+    }, [inView, visibleCount, finalCards.length]);
 
     if (filteredCards === null && isLoading) {
       return (
@@ -179,7 +173,6 @@ export const MarketplaceCardSection: React.FC<MarketplaceCardSectionProps> = mem
         </div>
       );
     }
-
     if (error) {
       return (
         <div className="w-full mb-10 lg:ml-8">
@@ -189,8 +182,7 @@ export const MarketplaceCardSection: React.FC<MarketplaceCardSectionProps> = mem
         </div>
       );
     }
-
-    if (cards.length === 0) {
+    if (finalCards.length === 0) {
       return (
         <div className="w-full mb-10 lg:ml-8 flex flex-col items-center justify-center gap-4 py-12">
           <svg
@@ -223,7 +215,7 @@ export const MarketplaceCardSection: React.FC<MarketplaceCardSectionProps> = mem
             <CardItem key={card.id} card={card} />
           ))}
         </div>
-        {visibleCount < cards.length && (
+        {visibleCount < finalCards.length && (
           <div ref={sentinelRef} className="py-4 text-center">
             Loading more cards...
           </div>

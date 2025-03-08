@@ -1,6 +1,7 @@
-import React, { useState, memo, useMemo, useCallback } from "react";
+import React, { useState, memo, useMemo } from "react";
 import { FaDiscord, FaInstagram, FaTwitter, FaYoutube } from "react-icons/fa";
 import { SERVER_URL } from "@/middleware/utils";
+import { useMutation } from "react-query";
 
 // Static text and constants extracted outside the component
 const FOOTER_TEXT =
@@ -8,8 +9,6 @@ const FOOTER_TEXT =
 const NEWSLETTER_TEXT =
   "Get exclusive promotions & updates straight to your inbox";
 const COPYRIGHT_TEXT = "© Ngaraga by Dolanan yuk x Curaweda.";
-const DEFAULT_AVATAR =
-  "https://comickaze.in/wp-content/uploads/woocommerce-placeholder-600x600.png";
 
 const Footer: React.FC = () => {
   const [email, setEmail] = useState<string>("");
@@ -26,24 +25,29 @@ const Footer: React.FC = () => {
     []
   );
 
-  // Memoized subscription handler to avoid re-creation on each render
-  const handleSubscription = useCallback(async () => {
-    try {
+  // Use react-query for subscription mutation
+  const mutation = useMutation(
+    async (email: string) => {
       const response = await fetch(`${SERVER_URL}/api/subscribe`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
       });
-      if (response.ok) {
+      if (!response.ok) {
+        throw new Error("Subscription failed");
+      }
+      return response.json();
+    },
+    {
+      onSuccess: () => {
         setMessage("Email verification has been sent! Please check your inbox.");
         setEmail("");
-      } else {
+      },
+      onError: () => {
         setMessage("There was an error with the subscription. Please try again.");
-      }
-    } catch (error) {
-      setMessage("An error occurred. Please try again later.");
+      },
     }
-  }, [email]);
+  );
 
   return (
     <footer className="bg-[#3B3B3B] px-4 py-8 sm:px-6 md:px-8 lg:px-16 xl:px-24 text-white">
@@ -60,10 +64,9 @@ const Footer: React.FC = () => {
               Ngaraga
             </a>
           </div>
-          <div>          <p className="text-sm text-white max-w-xs mx-auto md:mx-0">
+          <p className="text-sm text-white max-w-xs mx-auto md:mx-0">
             {FOOTER_TEXT}
-          </p></div>
-
+          </p>
           <div className="grid gap-4">
             <p className="text-sm text-white">Join our vibrant community</p>
             <div className="flex gap-3 justify-center md:justify-start">
@@ -127,9 +130,10 @@ const Footer: React.FC = () => {
             />
             <button
               className="bg-call-to-actions-800 px-6 py-3 text-sm text-white transition-all duration-300 hover:bg-call-to-actions-800 rounded-lg border border-l-transparent hover:text-black"
-              onClick={handleSubscription}
+              onClick={() => mutation.mutate(email)}
+              disabled={mutation.isLoading}
             >
-              Subscribe
+              {mutation.isLoading ? "Subscribing..." : "Subscribe"}
             </button>
           </div>
           {message && <p className="mt-2 text-sm text-white">{message}</p>}

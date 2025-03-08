@@ -25,24 +25,20 @@ const useClickOutside = (ref: React.RefObject<HTMLDivElement>, handler: () => vo
 
 const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onApply, children }) => {
   const modalRef = useRef<HTMLDivElement>(null);
-
-  // Close modal when clicking outside of it
   useClickOutside(modalRef, onClose);
 
-  // Prevent scrolling when the modal is open
+  // Prevent body scroll when modal is open.
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "";
     }
-
     return () => {
       document.body.style.overflow = "";
     };
   }, [isOpen]);
 
-  // Framer Motion animation variants for the modal
   const modalVariants = {
     hidden: { opacity: 0, translateY: "100%" },
     visible: { opacity: 1, translateY: "0%" },
@@ -52,10 +48,10 @@ const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onApply, chi
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-end">
+    <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-end md:items-center justify-center">
       <motion.div
         ref={modalRef}
-        className="bg-white w-full max-h-[80%] min-h-[70%] overflow-y-auto rounded-t-2xl p-6 shadow-lg relative"
+        className="bg-white w-full max-w-md max-h-[80%] overflow-y-auto rounded-2xl p-6 shadow-lg"
         variants={modalVariants}
         initial="hidden"
         animate="visible"
@@ -78,27 +74,19 @@ const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onApply, chi
         </div>
 
         {/* Modal Content */}
-        <div className="mb-6 overflow-y-auto">
+        <div className="mb-6">
           {children || (
             <ul className="space-y-4">
               <li className="flex items-center">
-                <input
-                  type="radio"
-                  id="art"
-                  name="category"
-                  className="mr-3 accent-[--call-to-action]"
-                />
+                <input type="radio" id="art" name="category" className="mr-3 accent-[--call-to-action]" />
                 <label htmlFor="art" className="text-gray-700">Art</label>
               </li>
-              {/* Add more list items as necessary */}
             </ul>
           )}
         </div>
 
-        {/* Divider */}
-        <hr className="my-4 border-t-2 border-gray-200" />
-
         {/* Modal Footer */}
+        <hr className="my-4 border-t-2 border-gray-200" />
         <div className="flex justify-between">
           <button
             className="flex-1 border border-call-to-action text-call-to-action py-2 px-4 rounded-lg mr-2"
