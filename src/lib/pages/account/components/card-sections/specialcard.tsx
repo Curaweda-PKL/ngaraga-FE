@@ -26,13 +26,27 @@ const getRarityColor = (rarity: string): string => {
   }
 };
 
-// Utility to strip HTML tags from a string.
+const getRarityBackground = (rarity: string): string => {
+  switch (rarity) {
+    case "Common":
+      return "bg-gray-100";
+    case "Rare":
+      return "bg-blue-100";
+    case "Epic":
+      return "bg-purple-100";
+    case "Legendary":
+      return "bg-yellow-100";
+    case "Special":
+      return "bg-red-100";
+    default:
+      return "bg-gray-100";
+  }
+};
+
 const stripHtmlTags = (html: string): string => {
   return html.replace(/<[^>]+>/g, "").trim();
 };
 
-// Utility to format image URL.
-// If the image path does not start with "http", assume it's relative and prepend the SERVER_URL.
 const formatImageUrl = (imagePath: string): string => {
   if (imagePath.startsWith("http://") || imagePath.startsWith("https://")) {
     return imagePath;
@@ -42,85 +56,105 @@ const formatImageUrl = (imagePath: string): string => {
 };
 
 const SpecialCards: React.FC<SpecialCardsProps> = ({ data, onCardClick, onClaim, claimingCardId }) => {
+  if (data.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12">
+        <svg
+          width="100"
+          height="100"
+          viewBox="0 0 64 64"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="mb-6 text-gray-400"
+        >
+          <polygon points="32 4 39 24 60 24 42 38 49 58 32 46 15 58 22 38 4 24 25 24" />
+        </svg>
+        <p className="text-gray-500 text-xl">
+          No special cards available. Start collecting some special cards!
+        </p>
+      </div>
+    );
+  }
+
   return (
-    <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+    <div className="grid gap-8 sm:gap-10 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       {data.map((item) => {
-        // Determine image source: use card's image if available,
-        // otherwise use the image from the associated product,
-        // and fallback to a placeholder if neither exists.
         const imageSrc = item.image
           ? formatImageUrl(item.image)
           : item.product?.image
           ? formatImageUrl(item.product.image)
           : "/placeholder.svg";
 
-        // Fallback for computed properties:
         const ownedCount: number = item.ownedNormalCount ?? 0;
         const requiredCount: number = item.requiredNormalCount ?? 0;
+        const isEligible = ownedCount >= requiredCount && item.claimStatus !== "claimed";
 
         return (
           <div
             key={item.id}
-            className="cursor-pointer block"
+            className="cursor-pointer"
             onClick={() => onCardClick(item)}
           >
-            <div className="w-full flex flex-col rounded-lg overflow-hidden transition-transform hover:scale-[1.02]">
-              <figure className="w-full h-[240px] rounded-t-lg overflow-hidden relative">
-                <img
-                  src={imageSrc}
-                  alt={item.title || item.characterName || "Special Card"}
-                  className="w-full h-full object-cover"
-                />
-              </figure>
-              <div className="bg-gray-100 p-4 rounded-b-lg">
-                <h3 className="text-lg font-bold text-gray-800 mb-1">
-                  {item.title || item.characterName || "Untitled Card"}
-                </h3>
-                <p className={`text-sm mb-2 ${getRarityColor(item.rarity)}`}>
-                  {item.rarity}
-                </p>
-                <div className="flex justify-between items-center">
-                  <div className="text-xs text-gray-500">
-                    {item.product?.cardDetail
-                      ? stripHtmlTags(item.product.cardDetail)
-                      : "No Category"}
-                  </div>
-                  {item.claimStatus === "claimed" ? (
-                    <div className="bg-call-to-action-600 text-call-to-action border border-call-to-action px-3 py-1 rounded-full text-xs font-medium flex items-center">
-                      <span className="mr-1">✓</span> Achieved
+            {/* Gradient border wrapper for an exquisite look */}
+            <div className="p-1 bg-gradient-to-r from-pink-500 to-yellow-500 rounded-2xl">
+              <div className="w-full flex flex-col rounded-2xl overflow-hidden transition-transform transform duration-300 hover:scale-105 shadow-xl bg-white">
+                <figure className="w-full h-60 relative overflow-hidden">
+                  <img
+                    src={imageSrc}
+                    alt={item.title || item.characterName || "Special Card"}
+                    className="w-full h-full object-cover"
+                  />
+                  {/* Subtle overlay gradient for added drama */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent opacity-30"></div>
+                </figure>
+                <div className="p-6 bg-white">
+                  <h3 className="text-2xl font-serif font-bold text-gray-800 mb-2">
+                    {item.title || item.characterName || "Untitled Card"}
+                  </h3>
+                  <p
+                    className={`inline-block text-base uppercase tracking-wider font-bold mb-3 px-4 py-1 rounded-full ${getRarityColor(item.rarity)} ${getRarityBackground(item.rarity)} shadow-sm`}
+                  >
+                    {item.rarity}
+                  </p>
+                  <p className="text-sm text-gray-500 mb-4">
+                    Owned: {ownedCount} / Required: {requiredCount}
+                  </p>
+                  <div className="flex justify-between items-center">
+                    <div className="inline-block text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full shadow-inner">
+                      {item.product?.cardDetail ? stripHtmlTags(item.product.cardDetail) : "No Category"}
                     </div>
-                  ) : item.claimStatus === "eligible" ? (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onClaim(item);
-                      }}
-                      disabled={claimingCardId === item.id}
-                      className="bg-call-to-action hover:bg-yellow-600 text-white px-4 py-1 rounded-full text-xs font-medium"
-                    >
-                      {claimingCardId === item.id ? "Claiming..." : "Klaim"}
-                    </button>
-                  ) : item.claimStatus === "locked" ||
-                    (item.specialRequirement && !item.claimStatus) ? (
-                    <div className="relative group">
-                      <button
-                        disabled
-                        className="bg-gray-300 text-gray-600 px-4 py-1 rounded-full text-xs font-medium cursor-not-allowed"
-                      >
-                        Locked
-                      </button>
-                      <div className="absolute bottom-full right-0 mb-2 w-48 bg-black text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
-                        Required: {requiredCount} / Owned: {ownedCount}
+                    {item.claimStatus === "claimed" ? (
+                      <div className="bg-green-50 text-green-600 border border-green-600 px-4 py-1 rounded-full text-sm font-medium flex items-center">
+                        <span className="mr-1">✓</span> Achieved
                       </div>
-                    </div>
-                  ) : (
-                    <button
-                      disabled
-                      className="bg-gray-300 text-gray-600 px-4 py-1 rounded-full text-xs font-medium cursor-not-allowed"
-                    >
-                      Unassigned
-                    </button>
-                  )}
+                    ) : isEligible ? (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onClaim(item);
+                        }}
+                        disabled={claimingCardId === item.id}
+                        className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-1 rounded-full text-sm font-medium shadow-md"
+                      >
+                        {claimingCardId === item.id ? "Claiming..." : "Claim"}
+                      </button>
+                    ) : (
+                      <div className="relative group">
+                        <button
+                          disabled
+                          className="bg-gray-200 text-gray-600 px-4 py-1 rounded-full text-sm font-medium cursor-not-allowed"
+                        >
+                          Locked
+                        </button>
+                        <div className="absolute bottom-full right-0 mb-2 w-48 bg-black text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+                          Required: {requiredCount} / Owned: {ownedCount}
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>

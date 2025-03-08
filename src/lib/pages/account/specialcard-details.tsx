@@ -7,23 +7,9 @@ type SpecialCardDetailProps = {
   onBack: () => void;
 };
 
-type RequirementStatus = {
-  meetsRequirement: boolean;
-  ownedIds: number[];
-  missingIds: number[];
-  requirement: {
-    id: number;
-    requiredNormalCards: number[];
-    createdAt: string;
-    updatedAt: string;
-    specialCardId: number;
-    // additional fields if needed
-  };
-};
-
 type RequirementResponse = {
-  specialCard: any; // Use your appropriate type if available
-  requiredNormalCards: any[]; // Use your appropriate type if available
+  specialCard: any;
+  requiredNormalCards: any[];
   meetsRequirement: boolean;
   ownedIds: number[];
   missingIds: number[];
@@ -55,7 +41,9 @@ const SpecialCardDetail: React.FC<SpecialCardDetailProps> = ({ specialCardId, on
   if (error) return <p className="text-center py-10 text-red-500">{error}</p>;
   if (!data) return null;
 
-  const { specialCard, requiredNormalCards, ownedIds, missingIds, meetsRequirement } = data;
+  const { specialCard, requiredNormalCards, ownedIds, meetsRequirement } = data;
+  // Updated achieved condition: if specialCard.status is "CONFIRMED" or meetsRequirement is true.
+  const isAchieved = specialCard?.status === "CONFIRMED" || meetsRequirement;
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 sm:py-8">
@@ -76,6 +64,20 @@ const SpecialCardDetail: React.FC<SpecialCardDetailProps> = ({ specialCardId, on
         Minted on {new Date(specialCard?.createdAt).toLocaleDateString()}
       </p>
 
+      {/* Achieved Banner */}
+      {isAchieved && (
+        <div className="mb-8">
+          <div className="relative">
+            <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-blue-500 opacity-60 rounded-lg blur-md"></div>
+            <div className="relative flex justify-center items-center py-4">
+              <span className="text-4xl font-extrabold text-white drop-shadow-2xl">
+                ACHIEVED
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Required Cards Section */}
       <div className="mb-8 sm:mb-12">
         <h2 className="text-lg sm:text-xl mb-4 sm:mb-6">
@@ -83,7 +85,10 @@ const SpecialCardDetail: React.FC<SpecialCardDetailProps> = ({ specialCardId, on
         </h2>
         <div className="space-y-4 sm:space-y-0 sm:grid sm:grid-cols-2 sm:gap-6">
           {requiredNormalCards.map((card: any) => (
-            <div key={card.id} className="flex flex-col sm:flex-row bg-gray-50 rounded-2xl overflow-hidden">
+            <div
+              key={card.id}
+              className="flex flex-col sm:flex-row bg-gray-50 rounded-2xl overflow-hidden shadow-sm"
+            >
               <div className="w-full sm:w-40 h-48 sm:h-40">
                 <img
                   src={`${SERVER_URL}/${card.product?.image || "placeholder.svg"}`}
@@ -92,15 +97,19 @@ const SpecialCardDetail: React.FC<SpecialCardDetailProps> = ({ specialCardId, on
                 />
               </div>
               <div className="flex-1 p-4">
-                <h3 className="font-bold text-lg mb-1">{card.characterName || card.product?.name}</h3>
+                <h3 className="font-bold text-lg mb-1">
+                  {card.characterName || card.product?.name}
+                </h3>
                 <p className="text-gray-600 mb-2">{card.product?.name}</p>
                 <p className="text-gray-600 mb-1">Price</p>
-                <p className="font-bold mb-4">Rp {card.product?.price?.toLocaleString()}</p>
+                <p className="font-bold mb-4">
+                  Rp {card.product?.price?.toLocaleString()}
+                </p>
                 <div className="flex gap-3">
-                  <button className="flex-1 sm:flex-none bg-call-to-action text-white px-4 py-2 rounded-lg hover:bg-yellow-600">
+                  <button className="flex-1 sm:flex-none bg-call-to-action text-white px-4 py-2 rounded-lg hover:bg-yellow-600 transition-colors">
                     Add to Cart
                   </button>
-                  <button className="flex-1 sm:flex-none border border-call-to-action text-call-to-action px-4 py-2 rounded-lg">
+                  <button className="flex-1 sm:flex-none border border-call-to-action text-call-to-action px-4 py-2 rounded-lg transition-colors">
                     Checkout
                   </button>
                 </div>
@@ -108,56 +117,43 @@ const SpecialCardDetail: React.FC<SpecialCardDetailProps> = ({ specialCardId, on
             </div>
           ))}
         </div>
-        {/* Display requirement status details */}
         <div className="mt-4 text-sm text-gray-500">
           Required Normal Cards: {specialCard?.specialRequirement?.requiredNormalCards?.length || 0} | Owned: {ownedIds.length}
         </div>
       </div>
 
-
-{/* Created By Section */}
-<div className="mb-6 sm:mb-8">
-  <h2 className="text-lg sm:text-xl font-bold mb-4">Created By</h2>
-  <div className="flex items-center gap-3">
-    <div className="w-12 h-12 rounded-full bg-gray-200">
-      <img
-        src={
-          specialCard?.creators?.[0]?.image 
-            ? `${SERVER_URL}/uploads/creator/${specialCard.creators[0].image.replace(/\\/g, "/")}` 
-            : "/placeholder.svg?height=48&width=48"
-        }
-        alt={specialCard?.creators?.[0]?.name || "Creator"}
-        className="w-full h-full rounded-full object-cover"
-      />
-    </div>
-    <span className="font-medium">
-      {specialCard?.creators?.[0]?.name || "Unknown Creator"}
-    </span>
-  </div>
-</div>
+      {/* Created By Section */}
+      <div className="mb-6 sm:mb-8">
+        <h2 className="text-lg sm:text-xl font-bold mb-4">Created By</h2>
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 rounded-full bg-gray-200 overflow-hidden">
+            <img
+              src={
+                specialCard?.creators?.[0]?.image 
+                  ? `${SERVER_URL}/uploads/creator/${specialCard.creators[0].image.replace(/\\/g, "/")}` 
+                  : "/placeholder.svg?height=48&width=48"
+              }
+              alt={specialCard?.creators?.[0]?.name || "Creator"}
+              className="w-full h-full object-cover"
+            />
+          </div>
+          <span className="font-medium">
+            {specialCard?.creators?.[0]?.name || "Unknown Creator"}
+          </span>
+        </div>
+      </div>
 
       {/* Description Section */}
       <div className="mb-6 sm:mb-8">
         <h2 className="text-lg sm:text-xl font-bold mb-4">Description</h2>
         <div className="space-y-4 text-gray-600">
-          <p>{specialCard?.product?.cardDetail ? specialCard.product.cardDetail.replace(/<[^>]+>/g, "") : "No description available."}</p>
+          <p>
+            {specialCard?.product?.cardDetail
+              ? specialCard.product.cardDetail.replace(/<[^>]+>/g, "")
+              : "No description available."}
+          </p>
         </div>
       </div>
-
-      {/* Details Section */}
-      {/* <div className="mb-6 sm:mb-8">
-        <h2 className="text-lg sm:text-xl font-bold mb-4">Details</h2>
-        <div className="space-y-2">
-          <button className="flex items-center text-gray-600 hover:text-gray-800">
-            <span className="mr-2">🌐</span>
-            View on Etherscan
-          </button>
-          <button className="flex items-center text-gray-600 hover:text-gray-800">
-            <span className="mr-2">🌐</span>
-            View Original
-          </button>
-        </div>
-      </div> */}
 
       {/* Tags Section */}
       <div className="mb-10">

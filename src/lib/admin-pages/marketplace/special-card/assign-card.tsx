@@ -20,6 +20,7 @@ interface CardType {
   stock: number;
   price: number;
   discountedPrice: number;
+  productId: number;
 }
 
 export const AssignRequirement: React.FC = () => {
@@ -45,54 +46,60 @@ export const AssignRequirement: React.FC = () => {
   // Fetch all NORMAL cards.
   const fetchNormalCards = async () => {
     try {
-      const response = await axios.get<{ cards: any[] }>(`${SERVER_URL}/api/cards/normal`, { withCredentials: true });
+      const response = await axios.get<{ cards: any[] }>(
+        `${SERVER_URL}/api/cards/normal`,
+        { withCredentials: true }
+      );
       const mappedCards: CardType[] = response.data.cards.map((card: any) => ({
         id: card.id,
         sku: card.sku || "N/A",
         uniqueCode: card.uniqueCode || "N/A",
         name: card.name || card.characterName || "N/A",
-        category: typeof card.category === "object" ? card.category.name : card.category || "N/A",
-        categoryCode: typeof card.category === "object" ? card.category.code : card.categoryCode || "N/A",
+        category:
+          typeof card.category === "object" ? card.category.name : card.category || "N/A",
+        categoryCode:
+          typeof card.category === "object" ? card.category.code : card.categoryCode || "N/A",
         image: card.image || "N/A",
         stock: card.stock,
         price: Number(card.price),
         discountedPrice: Number(card.discountedPrice),
+        productId: card.productId, // include productId for later matching
       }));
       setNormalCards(mappedCards);
     } catch (error: any) {
-      const message = error.response?.data?.message || error.message || "Error fetching normal cards";
+      const message =
+        error.response?.data?.message || error.message || "Error fetching normal cards";
       setNotification({ message, type: "error" });
     }
   };
 
   // Fetch assigned NORMAL cards for this special card.
+  // Updated to expect the backend to return an array of product IDs.
   const fetchAssignedNormalCards = async () => {
     if (!id) return;
     try {
-      // Integrates the GET endpoint /api/special-cards/requirements/:id
-      const response = await axios.get<{ requiredNormalCards: any[] }>(`${SERVER_URL}/api/special-cards/requirements/${id}`, { withCredentials: true });
-      const mappedAssigned: CardType[] = response.data.requiredNormalCards.map((card: any) => ({
-        id: card.id,
-        sku: card.sku || "N/A",
-        uniqueCode: card.uniqueCode || "N/A",
-        name: card.name || card.characterName || "N/A",
-        category: typeof card.category === "object" ? card.category.name : card.category || "N/A",
-        categoryCode: typeof card.category === "object" ? card.category.code : card.categoryCode || "N/A",
-        image: card.image || (card.product && card.product.image) || "N/A",
-        stock: card.stock,
-        price: Number(card.price),
-        discountedPrice: Number(card.discountedPrice),
-      }));
+      // GET endpoint /api/special-cards/requirements/:id returns { requiredNormalCards: number[] }
+      const response = await axios.get<{ requiredNormalCards: number[] }>(
+        `${SERVER_URL}/api/special-cards/requirements/${id}`,
+        { withCredentials: true }
+      );
+      const requiredProductIds = response.data.requiredNormalCards;
+      // Filter the normalCards state to get those whose productId is in the required list.
+      const mappedAssigned = normalCards.filter((card) =>
+        requiredProductIds.includes(card.productId)
+      );
       setAssignedNormalCards(mappedAssigned);
-      // Pre-select the already assigned cards.
-      const assignedIds = mappedAssigned.map(card => card.id);
+      // Pre-select the already assigned cards by their id.
+      const assignedIds = mappedAssigned.map((card) => card.id);
       setSelectedNormalCardIds(assignedIds);
     } catch (error: any) {
-      // If no assignment exists, we clear any previous assignments.
       if (error.response && error.response.status === 404) {
         setAssignedNormalCards([]);
       } else {
-        const message = error.response?.data?.message || error.message || "Error fetching assigned normal cards";
+        const message =
+          error.response?.data?.message ||
+          error.message ||
+          "Error fetching assigned normal cards";
         setNotification({ message, type: "error" });
       }
     }
@@ -102,11 +109,12 @@ export const AssignRequirement: React.FC = () => {
     fetchNormalCards();
   }, []);
 
+  // When normalCards have been fetched, fetch the assigned ones.
   useEffect(() => {
-    if (id) {
+    if (id && normalCards.length > 0) {
       fetchAssignedNormalCards();
     }
-  }, [id]);
+  }, [id, normalCards]);
 
   // Handle checkbox changes.
   const handleCheckboxChange = (cardId: number, e: ChangeEvent<HTMLInputElement>) => {
@@ -137,13 +145,18 @@ export const AssignRequirement: React.FC = () => {
         id: parseInt(id, 10),
         requiredNormalCardIds: selectedNormalCardIds,
       };
-      const response = await axios.post(`${SERVER_URL}/api/special-cards/assign`, payload, { withCredentials: true });
+      const response = await axios.post(
+        `${SERVER_URL}/api/special-cards/assign`,
+        payload,
+        { withCredentials: true }
+      );
       setNotification({ message: response.data.message, type: "success" });
       // Refresh assigned cards after a successful update.
       fetchAssignedNormalCards();
       navigate("/admin/special-card");
     } catch (error: any) {
-      const message = error.response?.data?.message || error.message || "Error assigning requirement";
+      const message =
+        error.response?.data?.message || error.message || "Error assigning requirement";
       setNotification({ message, type: "error" });
     } finally {
       setLoading(false);
@@ -156,7 +169,9 @@ export const AssignRequirement: React.FC = () => {
       {notification && (
         <div
           className={`mb-4 p-2 rounded ${
-            notification.type === "success" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+            notification.type === "success"
+              ? "bg-green-100 text-green-800"
+              : "bg-red-100 text-red-800"
           }`}
         >
           {notification.message}
@@ -165,10 +180,15 @@ export const AssignRequirement: React.FC = () => {
       {/* Display currently assigned normal cards */}
       {assignedNormalCards.length > 0 && (
         <div className="mb-4">
-          <h2 className="text-lg font-medium mb-2">Currently Assigned Normal Cards:</h2>
+          <h2 className="text-lg font-medium mb-2">
+            Currently Assigned Normal Cards:
+          </h2>
           <div className="grid grid-cols-1 gap-2">
             {assignedNormalCards.map((card) => (
-              <div key={card.id} className="flex items-center gap-4 p-2 border rounded">
+              <div
+                key={card.id}
+                className="flex items-center gap-4 p-2 border rounded"
+              >
                 {card.image && card.image !== "N/A" ? (
                   <img
                     src={formatImageUrl(card.image)}
@@ -191,9 +211,13 @@ export const AssignRequirement: React.FC = () => {
       )}
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
-          <h2 className="text-lg font-medium mb-2">Select Required Normal Cards:</h2>
+          <h2 className="text-lg font-medium mb-2">
+            Select Required Normal Cards:
+          </h2>
           {normalCards.length === 0 ? (
-            <p>No normal cards available. Please add normal cards first.</p>
+            <p>
+              No normal cards available. Please add normal cards first.
+            </p>
           ) : (
             <div className="grid grid-cols-1 gap-2">
               {normalCards.map((card) => (
@@ -208,7 +232,7 @@ export const AssignRequirement: React.FC = () => {
                   />
                   <label
                     htmlFor={`card-${card.id}`}
-                    className="bg-whitey p-2 rounded flex items-center gap-4 cursor-pointer"
+                    className="bg-gray-50 p-2 rounded flex items-center gap-4 cursor-pointer border"
                   >
                     {card.image && card.image !== "N/A" ? (
                       <img
