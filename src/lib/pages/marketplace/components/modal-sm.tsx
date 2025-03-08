@@ -94,12 +94,7 @@ const FilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onApply, chi
           >
             Cancel
           </button>
-          <button
-            className="flex-1 bg-[--call-to-action] text-white py-2 px-4 rounded-lg ml-2 hover:bg-[--call-to-actions-700]"
-            onClick={onApply}
-          >
-            Apply
-          </button>
+
         </div>
       </motion.div>
     </div>

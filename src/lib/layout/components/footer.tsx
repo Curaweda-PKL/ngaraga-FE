@@ -1,7 +1,7 @@
-import React, { useState, memo, useMemo } from "react";
-import { FaDiscord, FaInstagram, FaTwitter, FaYoutube } from "react-icons/fa";
+import React, { useState, memo, useMemo } from "react"; 
+import { FaDiscord, FaInstagram, FaTwitter, FaYoutube, FaSpinner } from "react-icons/fa";
 import { SERVER_URL } from "@/middleware/utils";
-import { useMutation } from "react-query";
+import { useMutation } from "@tanstack/react-query";
 
 // Static text and constants extracted outside the component
 const FOOTER_TEXT =
@@ -26,8 +26,8 @@ const Footer: React.FC = () => {
   );
 
   // Use react-query for subscription mutation
-  const mutation = useMutation(
-    async (email: string) => {
+  const mutation = useMutation<any, Error, string>({
+    mutationFn: async (email) => {
       const response = await fetch(`${SERVER_URL}/api/subscribe`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -38,16 +38,17 @@ const Footer: React.FC = () => {
       }
       return response.json();
     },
-    {
-      onSuccess: () => {
-        setMessage("Email verification has been sent! Please check your inbox.");
-        setEmail("");
-      },
-      onError: () => {
-        setMessage("There was an error with the subscription. Please try again.");
-      },
-    }
-  );
+    onSuccess: () => {
+      setMessage("Email verification has been sent! Please check your inbox.");
+      setEmail("");
+    },
+    onError: () => {
+      setMessage("There was an error with the subscription. Please try again.");
+    },
+  });
+
+  // Derive loading state based on mutation status ("pending" indicates loading)
+  const isLoading = mutation.status === "pending";
 
   return (
     <footer className="bg-[#3B3B3B] px-4 py-8 sm:px-6 md:px-8 lg:px-16 xl:px-24 text-white">
@@ -124,16 +125,23 @@ const Footer: React.FC = () => {
             <input
               type="email"
               placeholder="Enter your email here"
-              className="flex-1 px-4 text-sm bg-[#2b2b2b] text-white border-transparent rounded-lg focus:border-0"
+              className="flex-1 px-4 text-sm bg-[#2b2b2b] text-white border-transparent rounded-l-lg focus:outline-none"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
             <button
-              className="bg-call-to-actions-800 px-6 py-3 text-sm text-white transition-all duration-300 hover:bg-call-to-actions-800 rounded-lg border border-l-transparent hover:text-black"
               onClick={() => mutation.mutate(email)}
-              disabled={mutation.isLoading}
+              disabled={isLoading}
+              className="flex items-center justify-center gap-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-white font-semibold rounded-r-lg px-6 py-3 shadow-lg transition-colors duration-300 hover:from-yellow-500 hover:to-orange-600 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {mutation.isLoading ? "Subscribing..." : "Subscribe"}
+              {isLoading ? (
+                <>
+                  <FaSpinner className="animate-spin" />
+                  Subscribing...
+                </>
+              ) : (
+                "Subscribe"
+              )}
             </button>
           </div>
           {message && <p className="mt-2 text-sm text-white">{message}</p>}
