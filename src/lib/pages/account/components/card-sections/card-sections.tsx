@@ -8,7 +8,7 @@ import Purchases from "./purchases";
 import { Card, SpecialCard } from "./types";
 import { purchaseData } from "./data";
 
-export const CardSection = () => {
+export const CardSections: React.FC = () => {
   // Tab state: "cards", "specialCards", or "purchases"
   const [activeTab, setActiveTab] = useState<"cards" | "specialCards" | "purchases">("cards");
   const [activeFilter, setActiveFilter] = useState<"All" | "Payment" | "Packaging" | "Shipping" | "Delivered">("All");
@@ -47,77 +47,87 @@ export const CardSection = () => {
       ? purchaseData
       : purchaseData.filter((purchase) => purchase.status === activeFilter);
 
-  // Fetch owned cards for the "cards" tab.
-  useEffect(() => {
-    if (activeTab === "cards" && user) {
-      const fetchOwnedCards = async () => {
-        setLoading(true);
-        try {
-          const response = await axios.get(`${SERVER_URL}/api/owned/user/${user.id}`, {
-            validateStatus: (status) => status < 500,
-            withCredentials: true,
-          });
-          if (response.status === 404 && response.data.message === "No owned cards found for this user") {
-            setNoCardsFound(true);
-            setOwnedCards([]);
-          } else if (response.status >= 200 && response.status < 300) {
-            setNoCardsFound(false);
-            setOwnedCards(response.data);
-          } else {
-            setError("Failed to fetch owned cards. Please try again later.");
-          }
-          setError(null);
-        } catch (err) {
-          setError("Failed to fetch owned cards. Please try again later.");
-          console.error(err);
-        } finally {
-          setLoading(false);
-        }
-      };
-
-      fetchOwnedCards();
-    }
-  }, [activeTab, user]);
-
-// Fetch special cards as soon as a user is available.
+// Fetch owned cards for the "cards" tab.
 useEffect(() => {
-  if (user) {
-    const fetchSpecialCards = async () => {
-      setLoadingSpecialCards(true);
+  if (activeTab === "cards" && user) {
+    const fetchOwnedCards = async () => {
+      setLoading(true);
       try {
-        const response = await axios.get(`${SERVER_URL}/api/owned/special`, { withCredentials: true });
-        setSpecialCards(response.data.cards);
-        setErrorSpecialCards(null);
+        const response = await axios.get(`${SERVER_URL}/api/owned/user/${user.id}`, {
+          validateStatus: (status) => status < 500,
+          withCredentials: true,
+        });
+        if (
+          response.status === 404 &&
+          response.data.message === "No owned cards found for this user"
+        ) {
+          setNoCardsFound(true);
+          setOwnedCards([]);
+        } else if (response.status >= 200 && response.status < 300) {
+          setNoCardsFound(false);
+          // Update here: use response.data.cards since your response is { cards: [...] }
+          setOwnedCards(response.data.cards);
+          setError(null);
+        } else {
+          setError("Failed to fetch owned cards. Please try again later.");
+        }
       } catch (err) {
-        setErrorSpecialCards("Failed to fetch special cards. Please try again later.");
-        console.error(err);
+        console.error("Error fetching owned cards:", err);
+        setError("Failed to fetch owned cards. Please try again later.");
       } finally {
-        setLoadingSpecialCards(false);
+        setLoading(false);
       }
     };
-    fetchSpecialCards();
-  }
-}, [user]);
 
+    fetchOwnedCards();
+  }
+}, [activeTab, user]);
+
+
+  // Fetch special cards as soon as a user is available.
+  useEffect(() => {
+    if (user) {
+      const fetchSpecialCards = async () => {
+        setLoadingSpecialCards(true);
+        try {
+          const response = await axios.get(`${SERVER_URL}/api/owned/special`, { withCredentials: true });
+          setSpecialCards(response.data.cards);
+          setErrorSpecialCards(null);
+        } catch (err) {
+          // If error is a 404 with "No special cards found", treat it as an empty list
+          if (axios.isAxiosError(err) && err.response?.status === 404 && err.response.data.message === "No special cards found") {
+            setSpecialCards([]);
+            setErrorSpecialCards(null);
+          } else {
+            console.error("Error fetching special cards:", err);
+            setErrorSpecialCards("Failed to fetch special cards. Please try again later.");
+          }
+        } finally {
+          setLoadingSpecialCards(false);
+        }
+      };
+      fetchSpecialCards();
+    }
+  }, [user]);
+  
 
   // Handler to claim a special card.
   const handleClaimSpecialCard = async (card: SpecialCard) => {
-    // Allow claiming only if the card is eligible.
     if (card.claimStatus !== "eligible") return;
     setClaimingCardId(card.id);
     setClaimError(null);
     try {
       await axios.post(
-        `${SERVER_URL}/special-cards/claim`,
+        `${SERVER_URL}/api/special-cards/claim`,
         { cardId: card.id },
         { withCredentials: true }
       );
       // Refresh the special cards after a successful claim.
-      const response = await axios.get(`${SERVER_URL}/owned/special`, { withCredentials: true });
+      const response = await axios.get(`${SERVER_URL}/api/owned/special`, { withCredentials: true });
       setSpecialCards(response.data.cards);
     } catch (err) {
+      console.error("Error claiming special card:", err);
       setClaimError("Failed to claim special card. Please try again later.");
-      console.error(err);
     } finally {
       setClaimingCardId(null);
     }
@@ -151,7 +161,7 @@ useEffect(() => {
             }`}
             onClick={() => {
               setActiveTab("specialCards");
-              setSelectedSpecialCard(null); // Reset to list view
+              setSelectedSpecialCard(null);
             }}
           >
             Special Card ({specialCards.length})
@@ -212,38 +222,38 @@ useEffect(() => {
           ) : ownedCards.length === 0 ? (
             <div className="text-center py-10">No cards to display.</div>
           ) : (
-            <Cards data={ownedCards} />
+            // Wrap the ownedCards array into an object (grouped under "All") to match the expected prop type.
+<Cards data={{ All: Array.isArray(ownedCards) ? ownedCards : [] }} />
           )}
         </>
       )}
 
-{activeTab === "specialCards" && (
-  <>
-    {loadingSpecialCards ? (
-      <div className="text-center py-10">Loading special cards...</div>
-    ) : errorSpecialCards ? (
-      <div className="text-center py-10 text-red-500">{errorSpecialCards}</div>
-    ) : selectedSpecialCard ? (
-      <SpecialCardDetail
-        specialCardId={selectedSpecialCard.id}
-        onBack={() => setSelectedSpecialCard(null)}
-      />
-    ) : (
-      <>
-        {claimError && (
-          <div className="text-center py-4 text-red-500">{claimError}</div>
-        )}
-        <SpecialCards
-          data={specialCards}
-          onCardClick={(card) => setSelectedSpecialCard(card)}
-          onClaim={handleClaimSpecialCard}
-          claimingCardId={claimingCardId}
-        />
-      </>
-    )}
-  </>
-)}
-
+      {activeTab === "specialCards" && (
+        <>
+          {loadingSpecialCards ? (
+            <div className="text-center py-10">Loading special cards...</div>
+          ) : errorSpecialCards ? (
+            <div className="text-center py-10 text-red-500">{errorSpecialCards}</div>
+          ) : selectedSpecialCard ? (
+            <SpecialCardDetail
+              specialCardId={selectedSpecialCard.id}
+              onBack={() => setSelectedSpecialCard(null)}
+            />
+          ) : (
+            <>
+              {claimError && (
+                <div className="text-center py-4 text-red-500">{claimError}</div>
+              )}
+              <SpecialCards
+                data={specialCards}
+                onCardClick={(card) => setSelectedSpecialCard(card)}
+                onClaim={handleClaimSpecialCard}
+                claimingCardId={claimingCardId}
+              />
+            </>
+          )}
+        </>
+      )}
 
       {activeTab === "purchases" && <Purchases data={filteredPurchaseData} />}
     </div>
@@ -268,3 +278,4 @@ const NoOwnedCardsIcon = () => (
     <path d="M22 42 q10 8 20 0" />
   </svg>
 );
+

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { SERVER_URL } from "@/middleware/utils";
 import { ProfilePage } from "./components/profile-page";
-import { CardSection } from "./components/card-sections/card-sections";
+import { CardSections } from "./components/card-sections/card-sections";
 
 const Account: React.FC = () => {
   const [token, setToken] = useState<string | null>(null);
@@ -32,9 +32,22 @@ const Account: React.FC = () => {
   const handleClaim = async () => {
     if (!token) return;
     try {
-      const response = await axios.post(`${SERVER_URL}/api/claim-card`, { token }, { withCredentials: true });
+      const response = await axios.post(
+        `${SERVER_URL}/api/claim-card`,
+        { token },
+        { withCredentials: true }
+      );
       setClaimStatus("Claim successful! Your card has been added to your collection.");
       console.log("Claimed card:", response.data.card);
+
+      // Remove token param and reload page so the card section re-fetches data
+      const params = new URLSearchParams(window.location.search);
+      if (params.has("token")) {
+        params.delete("token");
+        const newUrl = `${window.location.pathname}?${params.toString()}`;
+        window.history.replaceState({}, document.title, newUrl);
+        window.location.reload();
+      }
     } catch (error: any) {
       const errorMessage = error.response?.data?.message || error.message;
       setClaimStatus(`Claim failed: ${errorMessage}`);
@@ -44,7 +57,7 @@ const Account: React.FC = () => {
   };
 
   return (
-    <div className="relative min-h-screen ">
+    <div className="relative min-h-screen">
       {/* Notification */}
       {claimStatus && (
         <div
@@ -84,7 +97,7 @@ const Account: React.FC = () => {
 
       {/* Main Content */}
       <ProfilePage />
-      <CardSection />
+      <CardSections />
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import {
   FaDiscord,
@@ -8,8 +8,8 @@ import {
   FaYoutube,
   FaQrcode, // imported QR code icon
 } from "react-icons/fa";
-import {SERVER_URL} from "@/middleware/utils";
-import {Link} from "react-router-dom";
+import { SERVER_URL } from "@/middleware/utils";
+import { Link } from "react-router-dom";
 
 const ProfileSkeleton: React.FC = () => {
   return (
@@ -38,8 +38,7 @@ const ProfileSkeleton: React.FC = () => {
             </div>
             {/* Skeleton Social Links */}
             <div className="flex justify-center lg:justify-start space-x-6">
-              {Array.from({length: 5}).map((_, idx) => (
-
+              {Array.from({ length: 5 }).map((_, idx) => (
                 <div
                   key={idx}
                   className="w-10 h-10 bg-gray-300 rounded-full"
@@ -209,7 +208,7 @@ export const ProfilePage: React.FC = () => {
                 <span>Edit Profile</span>
               </button>
               <button className="transition duration-300 text-white bg-call-to-actions-900 transform border-2 border-call-to-action font-bold py-2 px-6 rounded-lg flex items-center justify-center space-x-2 hover:bg-call-to-actions-800 hover:text-white">
-                <FaQrcode />
+                <FaQrcode className="text-[26px] lg:text-3xl" />
                 <span>Scan QR</span>
               </button>
             </div>
@@ -250,14 +249,14 @@ export const ProfilePage: React.FC = () => {
             {/* Links */}
             <div className="mb-8">
               <h3 className="text-xl font-bold text-[#525252] mb-2">Links</h3>
-              <div className="flex justify-center lg:justify-start space-x-6 text-3xl">
+              <div className="flex justify-center lg:justify-start space-x-6">
                 <a
                   href={website}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="transition transform duration-300 text-[#858584] hover:text-[#ff9800]"
                 >
-                  <FaGlobe />
+                  <FaGlobe className="text-[26px] lg:text-3xl" />
                 </a>
                 <a
                   href={discord}
@@ -265,7 +264,7 @@ export const ProfilePage: React.FC = () => {
                   rel="noopener noreferrer"
                   className="transition transform duration-300 text-[#858584] hover:text-[#5865F2]"
                 >
-                  <FaDiscord />
+                  <FaDiscord className="text-[26px] lg:text-3xl" />
                 </a>
                 <a
                   href={youtube}
@@ -273,7 +272,7 @@ export const ProfilePage: React.FC = () => {
                   rel="noopener noreferrer"
                   className="transition transform duration-300 text-[#858584] hover:text-[#FF0000]"
                 >
-                  <FaYoutube />
+                  <FaYoutube className="text-[26px] lg:text-3xl" />
                 </a>
                 <a
                   href={twitter}
@@ -281,7 +280,7 @@ export const ProfilePage: React.FC = () => {
                   rel="noopener noreferrer"
                   className="transition transform duration-300 text-[#858584] hover:text-[#1DA1F2]"
                 >
-                  <FaTwitter />
+                  <FaTwitter className="text-[26px] lg:text-3xl" />
                 </a>
                 <a
                   href={instagram}
@@ -289,7 +288,7 @@ export const ProfilePage: React.FC = () => {
                   rel="noopener noreferrer"
                   className="transition transform duration-300 text-[#858584] hover:text-[#E1306C]"
                 >
-                  <FaInstagram />
+                  <FaInstagram className="text-[26px] lg:text-3xl" />
                 </a>
               </div>
             </div>

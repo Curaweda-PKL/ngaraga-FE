@@ -12,7 +12,10 @@
   };
   
  // types.ts
+//  it might wrong
 export type Card = {
+  category: string;
+  product: any;
   id: number;
   title?: string;
   rarity: "Common" | "Rare" | "Epic" | "Legendary" | "Special";
@@ -22,6 +25,8 @@ export type Card = {
   total?: string;
   achieved?: boolean;
   characterName: string;
+  name: string;
+  categoryImage?: string;
 };
 
 export type Product = {
