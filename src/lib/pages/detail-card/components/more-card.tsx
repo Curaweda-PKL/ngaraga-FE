@@ -32,7 +32,7 @@ const CardItem: React.FC<{ card: Card; onClick: () => void }> = ({ card, onClick
     <div
       key={card.id} // stable, unique key
       onClick={onClick}
-      className="w-full h-[400px] flex flex-col items-start gap-4 bg-[#F2F2F2] rounded-2xl shadow-xl transition-transform hover:scale-[1.02] sm:w-full cursor-pointer"
+      className="w-full h-[400px] flex flex-col items-start gap-4  rounded-2xl shadow-xl transition-transform hover:scale-[1.02] sm:w-full cursor-pointer"
     >
       <figure className="w-full h-[260px] rounded-t-2xl overflow-hidden relative">
         {card.image ? (
