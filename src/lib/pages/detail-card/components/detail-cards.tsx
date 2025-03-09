@@ -3,7 +3,7 @@ import axios from "axios";
 import parse from "html-react-parser";
 import { CiShoppingCart } from "react-icons/ci";
 import { useParams, useNavigate } from "react-router-dom";
-import { SERVER_URL } from "@/middleware/utils";
+import { SERVER_URL, IS_DEV } from "@/middleware/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { useQuery, useMutation } from "@tanstack/react-query";
 
@@ -38,19 +38,16 @@ interface CardType {
 }
 
 // -------------------
-// Skeleton Loader (Tailwind/daisyUI)
+// Skeleton Loader
 // -------------------
 const DetailCardSkeleton = memo(() => (
   <div className="flex flex-col relative">
-    {/* Banner Skeleton */}
     <div className="relative w-full h-[40vh] mt-4 border-b border-gray-300 bg-gray-200 animate-pulse" />
     <div className="relative bg-white p-4 m-4 rounded-lg sm:p-10 sm:m-8 space-y-6">
-      {/* Title and Date Skeleton */}
       <div className="space-y-2">
         <div className="h-8 bg-gray-200 rounded animate-pulse w-1/2" />
         <div className="h-6 bg-gray-200 rounded animate-pulse w-1/3" />
       </div>
-      {/* Creator Skeleton */}
       <div className="flex items-center space-x-4">
         <div className="w-12 h-12 rounded-full bg-gray-200 animate-pulse" />
         <div className="space-y-2">
@@ -58,13 +55,11 @@ const DetailCardSkeleton = memo(() => (
           <div className="h-4 w-16 bg-gray-200 rounded animate-pulse" />
         </div>
       </div>
-      {/* Description Skeleton */}
       <div className="space-y-2">
         <div className="h-4 bg-gray-200 rounded animate-pulse w-full" />
         <div className="h-4 bg-gray-200 rounded animate-pulse w-full" />
         <div className="h-4 bg-gray-200 rounded animate-pulse w-5/6" />
       </div>
-      {/* Details and Tag Skeleton */}
       <div className="space-y-4">
         <div className="h-4 bg-gray-200 rounded animate-pulse w-20" />
         <div className="flex space-x-2">
@@ -92,7 +87,6 @@ const BannerImage = memo(({ src, alt }: { src: string; alt: string }) => (
 
 const ActionButtons = memo(({ onAddToCart, cartMutating }: { onAddToCart: () => void; cartMutating: boolean }) => (
   <>
-    {/* Desktop */}
     <div className="hidden sm:flex absolute top-4 right-4 space-x-2">
       <button
         onClick={onAddToCart}
@@ -107,7 +101,6 @@ const ActionButtons = memo(({ onAddToCart, cartMutating }: { onAddToCart: () => 
         <a href="/checkout">Checkout</a>
       </button>
     </div>
-    {/* Mobile */}
     <div className="flex justify-between sm:hidden mt-4 mb-2">
       <button
         onClick={onAddToCart}
@@ -212,21 +205,46 @@ const fetchCardDetail = async (id: string): Promise<CardType> => {
 };
 
 // -------------------
+// Helper to Build Image URLs
+// -------------------
+const getImageUrl = (img?: string, directory?: string): string => {
+  if (!img) return "";
+  
+  let imageUrl = img;
+  
+  // If the image string might be a JSON string, try to parse it.
+  try {
+    const parsed = JSON.parse(img);
+    if (parsed && parsed.url) {
+      imageUrl = parsed.url;
+    }
+  } catch (e) {
+    // If parsing fails, assume it's a normal string.
+  }
+  
+  // If imageUrl is already an absolute URL, return it directly.
+  if (imageUrl.startsWith("http://") || imageUrl.startsWith("https://")) {
+    return imageUrl;
+  }
+  
+  const dirPath = directory ? `/${directory}` : "";
+  
+  // In development, return a relative URL.
+  if (IS_DEV) {
+    return `${dirPath}/${imageUrl}`;
+  }
+  
+  // In production, prefix with the SERVER_URL.
+  return `${SERVER_URL}${dirPath}/${imageUrl}`;
+};
+
+// -------------------
 // Main Component
 // -------------------
 export const DetailCards: React.FC = memo(() => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
-  // Helper to build full image URLs.
-  const getImageUrl = useCallback((img?: string, directory?: string): string => {
-    if (!img) return "";
-    if (img.startsWith("http://") || img.startsWith("https://")) return img;
-    const dirPath = directory ? `/${directory}` : "";
-    return `${SERVER_URL}${dirPath}/${img}`;
-  }, []);
-
-  // Use React Query (object syntax)
   const { data: card, isLoading, error } = useQuery<CardType, Error>({
     queryKey: ["cardDetail", id],
     queryFn: () => fetchCardDetail(id!),
@@ -234,7 +252,6 @@ export const DetailCards: React.FC = memo(() => {
     staleTime: 1000 * 60 * 5,
   });
 
-  // Mutation for adding the card to the cart.
   const addToCartMutation = useMutation({
     mutationFn: async (): Promise<any> => {
       if (!card) throw new Error("Card data is not available.");
@@ -252,21 +269,19 @@ export const DetailCards: React.FC = memo(() => {
     },
   });
 
-  // Instead of isMutating property, we check if status === "pending"
   const isMutating = addToCartMutation.status === "pending";
 
   const handleAddToCart = useCallback(() => {
     addToCartMutation.mutate();
   }, [addToCartMutation]);
 
-  // Memoized computed values.
   const bannerImage = useMemo(() => {
     return (
       getImageUrl(card?.sourceImage) ||
       getImageUrl(card?.product?.cardImage) ||
       "https://i.ibb.co/f8ZDQzh/DAENDELS-LEGEND.jpg"
     );
-  }, [card, getImageUrl]);
+  }, [card]);
 
   const titleText = useMemo(() => {
     return card?.product?.name || card?.characterName || "Product Name";

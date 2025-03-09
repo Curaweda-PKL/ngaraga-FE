@@ -1,4 +1,4 @@
-import {useState, useEffect, useRef} from "react";
+import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import QRCode from "react-qr-code";
 import {
@@ -11,32 +11,20 @@ import {
   Link2,
   User,
 } from "lucide-react";
-import {Link, useNavigate} from "react-router-dom";
-import {SERVER_URL} from "@/middleware/utils";
+import { Link, useNavigate } from "react-router-dom";
+import { SERVER_URL } from "@/middleware/utils";
 
 export const Events = () => {
   // --- States for Events List ---
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedEvents, setSelectedEvents] = useState<string[]>([]);
-  const [events, setEvents] = useState<
-    {
-      id: string;
-      name: string;
-      schedule: string;
-      type: string;
-      image: string;
-      isSuspended: boolean;
-    }[]
-  >([]);
+  const [selectedEvents, setSelectedEvents] = useState([]);
+  const [events, setEvents] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
   const navigate = useNavigate();
 
   // --- Notification state for success/error messages ---
-  const [notification, setNotification] = useState<{
-    type: "success" | "error";
-    message: string;
-  } | null>(null);
+  const [notification, setNotification] = useState(null);
 
   // --- New modal state for Generating a Claim Link / QR ---
   const [claimLinkModalOpen, setClaimLinkModalOpen] = useState(false);
@@ -45,10 +33,8 @@ export const Events = () => {
   const [isGenerating, setIsGenerating] = useState(false);
 
   // --- New state for Cards (for the select option) ---
-  const [cardRewards, setCardRewards] = useState<
-    {id: string | number; name: string}[]
-  >([]);
-  const [selectedCardId, setSelectedCardId] = useState<string | number>("");
+  const [cardRewards, setCardRewards] = useState([]);
+  const [selectedCardId, setSelectedCardId] = useState("");
 
   // --- Ref for QR Code element (for downloading) ---
   const qrRef = useRef(null);
@@ -58,7 +44,7 @@ export const Events = () => {
     axios
       .get(`${SERVER_URL}/api/events/admin`)
       .then((response) => {
-        const fetchedEvents = response.data.map((event: any) => ({
+        const fetchedEvents = response.data.map((event) => ({
           id: event.id,
           name: event.eventName,
           schedule: `${new Date(event.eventTime).toLocaleTimeString([], {
@@ -82,7 +68,7 @@ export const Events = () => {
       .get(`${SERVER_URL}/api/cards/all`)
       .then((response) => {
         const cardsData = response.data.cards;
-        const mappedCards = cardsData.map((card: any) => ({
+        const mappedCards = cardsData.map((card) => ({
           id: card.id,
           name: card.name,
         }));
@@ -125,7 +111,7 @@ export const Events = () => {
     currentEvents.every((event) => selectedEvents.includes(event.id));
 
   // --- Handlers for Event selection, deletion, etc. ---
-  const handleSelectAll = (checked: boolean) => {
+  const handleSelectAll = (checked) => {
     if (checked) {
       const newSelected = [...selectedEvents];
       currentEvents.forEach((event) => {
@@ -142,7 +128,7 @@ export const Events = () => {
     }
   };
 
-  const handleSelectEvent = (id: string, checked: boolean) => {
+  const handleSelectEvent = (id, checked) => {
     if (checked) {
       setSelectedEvents((prev) => [...prev, id]);
     } else {
@@ -150,7 +136,7 @@ export const Events = () => {
     }
   };
 
-  const handleDeleteEvent = (id: string) => {
+  const handleDeleteEvent = (id) => {
     if (!window.confirm("Are you sure you want to delete this event?")) {
       return;
     }
@@ -208,12 +194,8 @@ export const Events = () => {
     return buttons;
   };
 
-  // --- New Handler: Directly toggle suspend/unsuspend without modal ---
-  const handleToggleSuspend = (event: {
-    id: string;
-    name: string;
-    isSuspended: boolean;
-  }) => {
+  // --- Handler: Toggle suspend/unsuspend event ---
+  const handleToggleSuspend = (event) => {
     const action = event.isSuspended ? "unsuspend" : "suspend";
     const url = `${SERVER_URL}/api/events/${event.id}/${action}`;
     axios
@@ -221,14 +203,12 @@ export const Events = () => {
       .then(() => {
         setEvents((prevEvents) =>
           prevEvents.map((ev) =>
-            ev.id === event.id ? {...ev, isSuspended: action === "suspend"} : ev
+            ev.id === event.id ? { ...ev, isSuspended: action === "suspend" } : ev
           )
         );
         setNotification({
           type: "success",
-          message: `Event ${
-            action === "suspend" ? "suspended" : "unsuspended"
-          } successfully.`,
+          message: `Event ${action === "suspend" ? "suspended" : "unsuspended"} successfully.`,
         });
       })
       .catch((error) => {
@@ -240,42 +220,24 @@ export const Events = () => {
       });
   };
 
-  // --- New Handler: Generate Claim Link for the selected card ---
-  const handleGenerateClaimLink = () => {
+  // --- New Handler: Generate Claim Link using the new endpoint ---
+  const handleGenerateClaim = () => {
     if (!selectedCardId) return;
     setIsGenerating(true);
     axios
       .post(
         `${SERVER_URL}/api/cardRewards/${selectedCardId}/generateClaimLink`,
         {},
-        {withCredentials: true}
+        { withCredentials: true }
       )
       .then((response) => {
-        setGeneratedLink(response.data.claimUrl);
+        // Both the link and QR code will use the newly generated claim URL.
+        const claimUrl = response.data.claimUrl;
+        setGeneratedLink(claimUrl);
+        setGeneratedQRCode(claimUrl);
       })
       .catch((error) => {
         console.error("Error generating claim link:", error);
-      })
-      .finally(() => {
-        setIsGenerating(false);
-      });
-  };
-
-  // --- New Handler: Generate QR Code for the claim link ---
-  const handleGenerateClaimQR = () => {
-    if (!selectedCardId) return;
-    setIsGenerating(true);
-    axios
-      .post(
-        `${SERVER_URL}/api/cardRewards/${selectedCardId}/generateClaimLink`,
-        {},
-        {withCredentials: true}
-      )
-      .then((response) => {
-        setGeneratedQRCode(response.data.claimUrl);
-      })
-      .catch((error) => {
-        console.error("Error generating QR code:", error);
       })
       .finally(() => {
         setIsGenerating(false);
@@ -295,19 +257,16 @@ export const Events = () => {
       })
       .catch((error) => {
         console.error("Copy failed:", error);
-        setNotification({type: "error", message: "Failed to copy link."});
+        setNotification({ type: "error", message: "Failed to copy link." });
       });
   };
 
   // --- New Handler: Download the generated QR Code as PNG, JPG, or WEBP ---
-  const downloadQRAs = (mimeType: string, extension: string) => {
+  const downloadQRAs = (mimeType, extension) => {
     if (!qrRef.current) return;
-
-    // Use type assertion to tell TypeScript what type qrRef.current is
-    const element = qrRef.current as HTMLElement;
+    const element = qrRef.current;
     const svg = element.querySelector("svg");
     if (!svg) return;
-
     const serializer = new XMLSerializer();
     let svgString = serializer.serializeToString(svg);
     if (!svgString.match(/^<svg[^>]+xmlns="http:\/\/www\.w3\.org\/2000\/svg"/))
@@ -331,9 +290,7 @@ export const Events = () => {
       canvas.width = img.width;
       canvas.height = img.height;
       const ctx = canvas.getContext("2d");
-      // Add null check for ctx
       if (!ctx) return;
-
       if (mimeType !== "image/png") {
         ctx.fillStyle = "#ffffff";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -430,18 +387,13 @@ export const Events = () => {
           </thead>
           <tbody>
             {currentEvents.map((event) => (
-              <tr
-                key={event.id}
-                className="border-b"
-              >
+              <tr key={event.id} className="border-b">
                 <td className="p-4">
                   <input
                     type="checkbox"
                     className="rounded border-gray-300"
                     checked={selectedEvents.includes(event.id)}
-                    onChange={(e) =>
-                      handleSelectEvent(event.id, e.target.checked)
-                    }
+                    onChange={(e) => handleSelectEvent(event.id, e.target.checked)}
                   />
                 </td>
                 <td className="p-4">
@@ -503,10 +455,7 @@ export const Events = () => {
             ))}
             {currentEvents.length === 0 && (
               <tr>
-                <td
-                  colSpan={5}
-                  className="p-4 text-center text-gray-500"
-                >
+                <td colSpan={5} className="p-4 text-center text-gray-500">
                   No events found.
                 </td>
               </tr>
@@ -522,18 +471,14 @@ export const Events = () => {
           <>
             <button
               className="px-3 py-1 rounded text-gray-600 hover:bg-gray-100"
-              onClick={() =>
-                currentPage > 1 && setCurrentPage((prev) => prev - 1)
-              }
+              onClick={() => currentPage > 1 && setCurrentPage((prev) => prev - 1)}
               disabled={currentPage === 1}
             >
               Prev
             </button>
             <button
               className="px-3 py-1 rounded text-gray-600 hover:bg-gray-100"
-              onClick={() =>
-                currentPage < totalPages && setCurrentPage((prev) => prev + 1)
-              }
+              onClick={() => currentPage < totalPages && setCurrentPage((prev) => prev + 1)}
               disabled={currentPage === totalPages}
             >
               Next
@@ -542,7 +487,7 @@ export const Events = () => {
         )}
       </div>
 
-      {/* --- New Modal for Generating Claim Link / QR --- */}
+      {/* --- Modal for Generating Claim Link / QR --- */}
       {claimLinkModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center z-50">
           <div
@@ -552,10 +497,7 @@ export const Events = () => {
           <div className="bg-white rounded-lg shadow-lg z-10 p-6 w-96">
             <h2 className="text-xl font-semibold mb-4">Generate Claim Link</h2>
             <p className="mb-4 text-sm text-gray-600">
-              Tutorial: Select the card from the dropdown below, then click
-              "Generate Link" to create a secure claim link or "Generate QR" to
-              create a QR code version of the claim link. Share the link or QR
-              code with your users so they can claim the reward.
+              Select the card from the dropdown below then click "Generate Link" or "Generate QR" to create a fresh claim URL.
             </p>
             <div className="mb-4">
               <label className="block mb-1 font-medium">Select Card:</label>
@@ -566,10 +508,7 @@ export const Events = () => {
               >
                 {cardRewards.length > 0 ? (
                   cardRewards.map((reward) => (
-                    <option
-                      key={reward.id}
-                      value={reward.id}
-                    >
+                    <option key={reward.id} value={reward.id}>
                       {reward.name}
                     </option>
                   ))
@@ -578,7 +517,6 @@ export const Events = () => {
                 )}
               </select>
             </div>
-            {/* Display generated link with copy button */}
             <div className="mb-4">
               <div className="flex items-center gap-2">
                 <input
@@ -597,41 +535,34 @@ export const Events = () => {
                 </button>
               </div>
             </div>
-            {/* Display QR code (and download buttons) if generated */}
-            <div className="mb-4">
-              {generatedQRCode && (
-                <div className="flex flex-col items-center">
-                  <p className="mb-2 text-sm text-gray-600">QR Code:</p>
-                  <div ref={qrRef}>
-                    <QRCode
-                      value={generatedQRCode}
-                      size={128}
-                    />
-                  </div>
-                  <div className="mt-2 flex gap-2">
-                    <button
-                      onClick={() => downloadQRAs("image/png", "png")}
-                      className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-                    >
-                      Download PNG
-                    </button>
-                    <button
-                      onClick={() => downloadQRAs("image/jpeg", "jpg")}
-                      className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
-                    >
-                      Download JPG
-                    </button>
-                    <button
-                      onClick={() => downloadQRAs("image/webp", "webp")}
-                      className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600"
-                    >
-                      Download WEBP
-                    </button>
-                  </div>
+            {generatedQRCode && (
+              <div className="mb-4 flex flex-col items-center">
+                <p className="mb-2 text-sm text-gray-600">QR Code:</p>
+                <div ref={qrRef}>
+                  <QRCode value={generatedQRCode} size={128} />
                 </div>
-              )}
-            </div>
-            {/* Buttons for generating link and QR */}
+                <div className="mt-2 flex gap-2">
+                  <button
+                    onClick={() => downloadQRAs("image/png", "png")}
+                    className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+                  >
+                    Download PNG
+                  </button>
+                  <button
+                    onClick={() => downloadQRAs("image/jpeg", "jpg")}
+                    className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
+                  >
+                    Download JPG
+                  </button>
+                  <button
+                    onClick={() => downloadQRAs("image/webp", "webp")}
+                    className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600"
+                  >
+                    Download WEBP
+                  </button>
+                </div>
+              </div>
+            )}
             <div className="flex justify-end gap-2">
               <button
                 className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
@@ -643,7 +574,7 @@ export const Events = () => {
                 className={`px-4 py-2 rounded bg-green-500 text-white hover:bg-green-600 ${
                   isGenerating ? "opacity-50 cursor-not-allowed" : ""
                 }`}
-                onClick={handleGenerateClaimLink}
+                onClick={handleGenerateClaim}
                 disabled={isGenerating || !selectedCardId}
               >
                 {isGenerating ? "Generating..." : "Generate Link"}
@@ -652,7 +583,7 @@ export const Events = () => {
                 className={`px-4 py-2 rounded bg-purple-500 text-white hover:bg-purple-600 ${
                   isGenerating ? "opacity-50 cursor-not-allowed" : ""
                 }`}
-                onClick={handleGenerateClaimQR}
+                onClick={handleGenerateClaim}
                 disabled={isGenerating || !selectedCardId}
               >
                 {isGenerating ? "Generating..." : "Generate QR"}

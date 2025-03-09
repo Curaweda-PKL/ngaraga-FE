@@ -42,6 +42,10 @@ export const SpecialCard: React.FC = () => {
   const navigate = useNavigate();
   const [notification, setNotification] = useState<Notification | null>(null);
   const [cards, setCards] = useState<CardType[]>([]);
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const cardsPerPage = 10;
 
   // Fetch cards from the backend.
   const fetchCards = async (): Promise<void> => {
@@ -178,7 +182,6 @@ export const SpecialCard: React.FC = () => {
         `${SERVER_URL}/api/cards/delete/${card.uniqueCode}`
       );
       setNotification({ message: response.data.message, type: "success" });
-      // Re–fetch the updated card list.
       fetchCards();
     } catch (error: unknown) {
       let message = "Error deleting card";
@@ -273,6 +276,55 @@ export const SpecialCard: React.FC = () => {
     }
   };
 
+  // Bulk unsuspend cards.
+  const handleBulkUnsuspend = async (): Promise<void> => {
+    const selectedCards = cards.filter((card) => card.selected);
+    if (selectedCards.length === 0) {
+      setNotification({
+        message: "No cards selected for unsuspension",
+        type: "error",
+      });
+      return;
+    }
+    if (
+      !window.confirm("Are you sure you want to unsuspend the selected cards?")
+    )
+      return;
+    try {
+      const unsuspendPromises = selectedCards.map(async (card) => {
+        if (card.isSuspended) {
+          const response = await axios.patch(
+            `${SERVER_URL}/api/cards/${card.uniqueCode}/unsuspend`
+          );
+          return response.data.card;
+        } else {
+          return card;
+        }
+      });
+      const updatedCards = await Promise.all(unsuspendPromises);
+      setCards((prev) =>
+        prev.map((c) => {
+          const updated = updatedCards.find(
+            (u: CardType) => u.uniqueCode === c.uniqueCode
+          );
+          return updated ? { ...c, isSuspended: updated.isSuspended } : c;
+        })
+      );
+      setNotification({
+        message: "Selected cards unsuspended successfully",
+        type: "success",
+      });
+    } catch (error: unknown) {
+      let message = "Error unsuspending cards";
+      if (axios.isAxiosError(error)) {
+        message = error.response?.data?.message || error.message;
+      } else if (error instanceof Error) {
+        message = error.message;
+      }
+      setNotification({ message, type: "error" });
+    }
+  };
+
   // Navigate to view QR codes.
   const handleQrButtonClick = (card: CardType): void => {
     if (!card.productId) {
@@ -319,6 +371,12 @@ export const SpecialCard: React.FC = () => {
       : `${SERVER_URL}/${normalizedPath}`;
   };
 
+  // Pagination calculations.
+  const indexOfLastCard = currentPage * cardsPerPage;
+  const indexOfFirstCard = indexOfLastCard - cardsPerPage;
+  const currentCards = cards.slice(indexOfFirstCard, indexOfLastCard);
+  const totalPages = Math.ceil(cards.length / cardsPerPage);
+
   return (
     <div className="p-6">
       {notification && (
@@ -345,6 +403,13 @@ export const SpecialCard: React.FC = () => {
                 Suspend All Selected Items
               </button>
               <button
+                className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+                title="Unsuspend All Selected Items"
+                onClick={handleBulkUnsuspend}
+              >
+                Unsuspend All Selected Items
+              </button>
+              <button
                 className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
                 title="Delete All Selected Items"
                 onClick={handleBulkDelete}
@@ -363,8 +428,8 @@ export const SpecialCard: React.FC = () => {
           </button>
         </div>
       </div>
-      <div className="overflow-x-auto  scrollbar-transparent-actions">
-        <table className="table w-full">
+      <div className="scrollbar-transparent-actions overflow-x-auto">
+        <table className="table min-w-max w-full">
           <thead>
             <tr>
               <th>
@@ -377,38 +442,34 @@ export const SpecialCard: React.FC = () => {
                   onChange={handleSelectAll}
                 />
               </th>
-              <th>SKU &amp; Image</th>
-              <th className="whitespace-nowrap overflow-hidden text-ellipsis">
-                Unique Code
-              </th>
+              <th className="min-w-[150px]">SKU &amp; Image</th>
+              <th className="min-w-[150px]">Unique Code</th>
               <th>Card Name</th>
               <th>Category Name</th>
               <th>Category Code</th>
               <th>Stock</th>
-              <th className="whitespace-nowrap overflow-hidden text-ellipsis">
-                Price
-              </th>
-              <th className="whitespace-nowrap overflow-hidden text-ellipsis">
-                Discounted Price
-              </th>
+              <th>Price</th>
+              <th>Discounted Price</th>
               <th>Action</th>
             </tr>
           </thead>
           <tbody>
-            {cards.map((card, index) => {
+            {currentCards.map((card, index) => {
+              // Calculate the actual index relative to the full cards array.
+              const actualIndex = index + indexOfFirstCard;
               // Show "Delete Product" only on the first occurrence of each productId.
               const isFirstOccurrence =
                 card.productId &&
                 cards.findIndex((c) => c.productId === card.productId) ===
-                  index;
+                  actualIndex;
               return (
-                <tr key={index}>
+                <tr key={actualIndex}>
                   <td>
                     <input
                       type="checkbox"
                       className="checkbox"
                       checked={card.selected}
-                      onChange={(e) => handleSelectRow(index, e)}
+                      onChange={(e) => handleSelectRow(actualIndex, e)}
                     />
                   </td>
                   <td>
@@ -417,7 +478,7 @@ export const SpecialCard: React.FC = () => {
                         <img
                           src={formatImageUrl(card.image)}
                           alt={card.sku}
-                          className="w-10 h-auto object-contain rounded-lg"
+                          className="w-10 min-h-10 max-h-10 object-cover rounded-lg"
                         />
                       ) : null}
                       <span>{card.sku}</span>
@@ -514,6 +575,26 @@ export const SpecialCard: React.FC = () => {
             )}
           </tbody>
         </table>
+      </div>
+      {/* Pagination Controls */}
+      <div className="flex justify-end items-center mt-4 gap-4">
+        <button
+          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+          disabled={currentPage === 1}
+          className="px-4 py-2 rounded disabled:opacity-50"
+        >
+          Previous
+        </button>
+        <span>
+          Page {currentPage} of {totalPages}
+        </span>
+        <button
+          onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+          disabled={currentPage === totalPages}
+          className="px-4 py-2 bg-neutral-colors-100 rounded disabled:opacity-50"
+        >
+          Next
+        </button>
       </div>
     </div>
   );

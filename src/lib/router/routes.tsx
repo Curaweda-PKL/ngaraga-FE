@@ -112,7 +112,7 @@ export const routes: Array<PathRouteProps> = [
   {path: "/account/:name", element: <Artists />},
   {path: "/marketplace", element: <Marketplace />},
   {path: "/detail-cards/:id", element: <DetailCards />},
-  {path: "/special-card-detail", element: <SpecialCardDetail />},
+  {path: "/special-card-detail", element: <SpecialCardDetail specialCardId={1} onBack={() => window.history.back()} />  },
   {path: "/view-detail", element: <ViewDetail />},
   {path: "/rankings", element: <TopCollectors />},
   {path: "/events", element: <BrowseEvents />},

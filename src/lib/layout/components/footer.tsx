@@ -1,6 +1,7 @@
-import React, { useState, memo, useMemo, useCallback } from "react";
-import { FaDiscord, FaInstagram, FaTwitter, FaYoutube } from "react-icons/fa";
+import React, { useState, memo, useMemo } from "react"; 
+import { FaDiscord, FaInstagram, FaTwitter, FaYoutube, FaSpinner } from "react-icons/fa";
 import { SERVER_URL } from "@/middleware/utils";
+import { useMutation } from "@tanstack/react-query";
 
 // Static text and constants extracted outside the component
 const FOOTER_TEXT =
@@ -8,8 +9,6 @@ const FOOTER_TEXT =
 const NEWSLETTER_TEXT =
   "Get exclusive promotions & updates straight to your inbox";
 const COPYRIGHT_TEXT = "© Ngaraga by Dolanan yuk x Curaweda.";
-const DEFAULT_AVATAR =
-  "https://comickaze.in/wp-content/uploads/woocommerce-placeholder-600x600.png";
 
 const Footer: React.FC = () => {
   const [email, setEmail] = useState<string>("");
@@ -26,24 +25,30 @@ const Footer: React.FC = () => {
     []
   );
 
-  // Memoized subscription handler to avoid re-creation on each render
-  const handleSubscription = useCallback(async () => {
-    try {
+  // Use react-query for subscription mutation
+  const mutation = useMutation<any, Error, string>({
+    mutationFn: async (email) => {
       const response = await fetch(`${SERVER_URL}/api/subscribe`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
       });
-      if (response.ok) {
-        setMessage("Email verification has been sent! Please check your inbox.");
-        setEmail("");
-      } else {
-        setMessage("There was an error with the subscription. Please try again.");
+      if (!response.ok) {
+        throw new Error("Subscription failed");
       }
-    } catch (error) {
-      setMessage("An error occurred. Please try again later.");
-    }
-  }, [email]);
+      return response.json();
+    },
+    onSuccess: () => {
+      setMessage("Email verification has been sent! Please check your inbox.");
+      setEmail("");
+    },
+    onError: () => {
+      setMessage("There was an error with the subscription. Please try again.");
+    },
+  });
+
+  // Derive loading state based on mutation status ("pending" indicates loading)
+  const isLoading = mutation.status === "pending";
 
   return (
     <footer className="bg-[#3B3B3B] px-4 py-8 sm:px-6 md:px-8 lg:px-16 xl:px-24 text-white">
@@ -60,10 +65,9 @@ const Footer: React.FC = () => {
               Ngaraga
             </a>
           </div>
-          <div>          <p className="text-sm text-white max-w-xs mx-auto md:mx-0">
+          <p className="text-sm text-white max-w-xs mx-auto md:mx-0">
             {FOOTER_TEXT}
-          </p></div>
-
+          </p>
           <div className="grid gap-4">
             <p className="text-sm text-white">Join our vibrant community</p>
             <div className="flex gap-3 justify-center md:justify-start">
@@ -121,15 +125,23 @@ const Footer: React.FC = () => {
             <input
               type="email"
               placeholder="Enter your email here"
-              className="flex-1 px-4 text-sm bg-[#2b2b2b] text-white border-transparent rounded-lg focus:border-0"
+              className="flex-1 px-4 text-sm bg-[#2b2b2b] text-white border-transparent rounded-l-lg focus:outline-none"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
             <button
-              className="bg-call-to-actions-800 px-6 py-3 text-sm text-white transition-all duration-300 hover:bg-call-to-actions-800 rounded-lg border border-l-transparent hover:text-black"
-              onClick={handleSubscription}
+              onClick={() => mutation.mutate(email)}
+              disabled={isLoading}
+              className="flex items-center justify-center gap-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-white font-semibold rounded-r-lg px-6 py-3 shadow-lg transition-colors duration-300 hover:from-yellow-500 hover:to-orange-600 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Subscribe
+              {isLoading ? (
+                <>
+                  <FaSpinner className="animate-spin" />
+                  Subscribing...
+                </>
+              ) : (
+                "Subscribe"
+              )}
             </button>
           </div>
           {message && <p className="mt-2 text-sm text-white">{message}</p>}
