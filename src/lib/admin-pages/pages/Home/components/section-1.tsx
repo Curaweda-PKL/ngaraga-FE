@@ -41,7 +41,7 @@ export const HeroBanner = () => {
         }
       } catch (error) {
         console.error("Error fetching cards:", error);
-        setErrorMessage("Error fetching available cards.");
+        setErrorMessage("");
       }
     };
 

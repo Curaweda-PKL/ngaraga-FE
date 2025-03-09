@@ -36,7 +36,7 @@ export const SectionTwoForm = () => {
         }
       } catch (error) {
         console.error("Error fetching cards:", error);
-        setErrorMessage("Error fetching available cards.");
+        setErrorMessage("");
       }
     };
     fetchAvailableCards();

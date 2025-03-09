@@ -18,22 +18,24 @@ export const MarketplaceForm: React.FC = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const response = await axios.get(
-          `${SERVER_URL}/api/page-content/marketplace`
-        );
-        if (response.data.data) {
-          setExistingData(response.data.data); // Simpan data yang sudah ada
-          setTitle(response.data.data.title); // Set title dari data yang sudah ada
-          setDescription(response.data.data.description); // Set description dari data yang sudah ada
+        const response = await axios.get(`${SERVER_URL}/api/page-content/marketplace`);
+        console.log("Response data:", response.data); // Debugging
+        if (response.data && response.data.title && response.data.description) {
+          setExistingData({
+            title: response.data.title,
+            description: response.data.description,
+          });
+          setTitle(response.data.title);
+          setDescription(response.data.description);
         }
       } catch (error) {
         console.error("Error fetching data:", error);
-        setError("Failed to fetch existing data. Please try again.");
+        setError("");
       } finally {
         setLoading(false);
       }
     };
-
+  
     fetchData();
   }, []);
 
