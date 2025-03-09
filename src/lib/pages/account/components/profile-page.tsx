@@ -173,16 +173,23 @@ export const ProfilePage: React.FC = () => {
   return (
     <div className="flex flex-col">
       {/* Background Section (Banner) */}
-      <section className="relative h-48">
+      <section className="relative h-80">
         <div
           className="absolute top-0 w-full h-full bg-center bg-cover"
           style={{
-            background: `linear-gradient(180deg, rgba(221, 177, 31, 0) 0%, rgba(221, 177, 31, 0.5) 100%), url('${bannerUrl}')`,
+            backgroundImage: `url('${bannerUrl}')`, // Hanya gunakan gambar banner
             backgroundSize: "cover",
-            backgroundPosition: "center",
+            backgroundPosition: "center", // Pastikan gambar terpusat
           }}
         >
-          <span className="w-full h-full absolute opacity-60 bg-purple-700" />
+          {/* Overlay Gradien Dihapus atau Dikomentari */}
+          {/* <div
+      className="absolute top-0 w-full h-full"
+      style={{
+        background:
+          "linear-gradient(180deg, rgba(221, 177, 31, 0) 0%, rgba(221, 177, 31, 0.5) 100%)",
+      }}
+    ></div> */}
         </div>
       </section>
 
@@ -198,6 +205,9 @@ export const ProfilePage: React.FC = () => {
                   src={avatarUrl}
                   alt="Profile"
                   className="absolute w-full h-full shadow-xl rounded-2xl border-4 border-gray-800 object-cover"
+                  style={{
+                    objectPosition: "center", // Memastikan gambar terpusat
+                  }}
                 />
               </div>
             </div>
@@ -316,4 +326,3 @@ export const ProfilePage: React.FC = () => {
     </div>
   );
 };
-

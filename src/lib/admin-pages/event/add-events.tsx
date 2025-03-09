@@ -3,7 +3,11 @@ import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { Upload } from "lucide-react";
 import axios from "axios";
-import Select, { components, OptionProps, SingleValueProps } from "react-select";
+import Select, {
+  components,
+  OptionProps,
+  SingleValueProps,
+} from "react-select";
 import { useNavigate } from "react-router-dom";
 import { SERVER_URL } from "@/middleware/utils";
 
@@ -46,13 +50,34 @@ export const AddEvents = () => {
   });
 
   // States for preview URLs
-  const [eventImagePreview, setEventImagePreview] = useState<string | null>(null);
-  const [guestAvatarPreview, setGuestAvatarPreview] = useState<string | null>(null);
+  const [eventImagePreview, setEventImagePreview] = useState<string | null>(
+    null
+  );
+  const [guestAvatarPreview, setGuestAvatarPreview] = useState<string | null>(
+    null
+  );
 
   // States for fetching cards
   const [cards, setCards] = useState<Card[]>([]);
   const [cardsLoading, setCardsLoading] = useState<boolean>(false);
   const [cardsError, setCardsError] = useState<string>("");
+
+  //validtae banner image
+  const validateImageDimensions = (
+    file: File,
+    width: number,
+    height: number
+  ): Promise<boolean> => {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.src = URL.createObjectURL(file);
+      img.onload = () => {
+        const isValid = img.width === width && img.height === height;
+        resolve(isValid);
+      };
+      img.onerror = () => resolve(false);
+    });
+  };
 
   // Fetch cards on mount
   useEffect(() => {
@@ -95,40 +120,46 @@ export const AddEvents = () => {
   );
 
   // Custom single value to display selected option with image and name
-// Custom single value component for react-select
-const CustomSingleValue = (props: SingleValueProps<CardOption, false>) => (
-  <components.SingleValue {...props}>
-    <div style={{ display: "flex", alignItems: "center" }}>
-      <img
-        src={props.data.image}
-        alt={props.data.label}
-        style={{
-          width: 30,
-          height: 30,
-          objectFit: "cover",
-          marginRight: 10,
-        }}
-      />
-      <span style={{ color: "#000", fontSize: "0.9rem" }}>
-        {props.data.label || "Unnamed Card"}
-      </span>
-    </div>
-  </components.SingleValue>
-);
-
+  // Custom single value component for react-select
+  const CustomSingleValue = (props: SingleValueProps<CardOption, false>) => (
+    <components.SingleValue {...props}>
+      <div style={{ display: "flex", alignItems: "center" }}>
+        <img
+          src={props.data.image}
+          alt={props.data.label}
+          style={{
+            width: 30,
+            height: 30,
+            objectFit: "cover",
+            marginRight: 10,
+          }}
+        />
+        <span style={{ color: "#000", fontSize: "0.9rem" }}>
+          {props.data.label || "Unnamed Card"}
+        </span>
+      </div>
+    </components.SingleValue>
+  );
 
   // Handlers for form inputs and file uploads
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value, type } = e.target;
-    const newValue = type === "checkbox" ? (e.target as HTMLInputElement).checked : value;
+    const newValue =
+      type === "checkbox" ? (e.target as HTMLInputElement).checked : value;
     setFormData((prev) => ({ ...prev, [name]: newValue }));
   };
 
-  const handleImageUpload = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      // Validasi ukuran gambar (1200x300)
+      const isValid = await validateImageDimensions(file, 1200, 300);
+      if (!isValid) {
+        alert("Please upload an image with dimensions 1200px x 300px.");
+        return;
+      }
       setFormData((prev) => ({ ...prev, eventImage: file }));
       setEventImagePreview(URL.createObjectURL(file));
     }
@@ -143,12 +174,19 @@ const CustomSingleValue = (props: SingleValueProps<CardOption, false>) => (
   };
 
   // For drag and drop functionality
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => e.preventDefault();
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) =>
+    e.preventDefault();
 
-  const handleImageDrop = (e: React.DragEvent<HTMLDivElement>) => {
+  const handleImageDrop = async (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     const file = e.dataTransfer.files?.[0];
     if (file) {
+      // Validasi ukuran gambar (1200x300)
+      const isValid = await validateImageDimensions(file, 1200, 300);
+      if (!isValid) {
+        alert("Please upload an image with dimensions 1200px x 300px.");
+        return;
+      }
       setFormData((prev) => ({ ...prev, eventImage: file }));
       setEventImagePreview(URL.createObjectURL(file));
     }
@@ -263,7 +301,13 @@ const CustomSingleValue = (props: SingleValueProps<CardOption, false>) => (
                   <p className="text-sm text-gray-500">
                     Click to Upload or Drag & Drop
                   </p>
-                  <p className="text-xs text-gray-400">jpeg, jpg, png, max 4mb</p>
+                  <p className="text-xs text-gray-400">
+                    jpeg, jpg, png, max 4mb
+                  </p>
+                  <p className="text-xs text-red-500">
+                    Image must be 1200px x 300px
+                  </p>{" "}
+                  {/* Pesan validasi */}
                 </div>
               )}
             </div>
@@ -309,7 +353,10 @@ const CustomSingleValue = (props: SingleValueProps<CardOption, false>) => (
           <div>
             <div className="flex items-center justify-between mb-2">
               <label className="text-sm">Event Benefit *</label>
-              <label htmlFor="eventBenefit" className="relative inline-block w-10 h-6">
+              <label
+                htmlFor="eventBenefit"
+                className="relative inline-block w-10 h-6"
+              >
                 <input
                   type="checkbox"
                   id="eventBenefit"
@@ -330,24 +377,27 @@ const CustomSingleValue = (props: SingleValueProps<CardOption, false>) => (
               <p>No cards available.</p>
             ) : (
               <Select
-              isDisabled={!formData.eventBenefit}
-              options={cardOptions}
-              value={formData.selectedCard}
-              onChange={(selectedOption) =>
-                setFormData((prev) => ({ ...prev, selectedCard: selectedOption }))
-              }
-              placeholder="Choose a Card"
-              components={{
-                Option: CustomOption,
-                SingleValue: CustomSingleValue,
-              }}
-              styles={{
-                control: (provided) => ({
-                  ...provided,
-                  borderRadius: "0.5rem",
-                }),
-              }}
-            />
+                isDisabled={!formData.eventBenefit}
+                options={cardOptions}
+                value={formData.selectedCard}
+                onChange={(selectedOption) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    selectedCard: selectedOption,
+                  }))
+                }
+                placeholder="Choose a Card"
+                components={{
+                  Option: CustomOption,
+                  SingleValue: CustomSingleValue,
+                }}
+                styles={{
+                  control: (provided) => ({
+                    ...provided,
+                    borderRadius: "0.5rem",
+                  }),
+                }}
+              />
             )}
           </div>
 
@@ -435,7 +485,10 @@ const CustomSingleValue = (props: SingleValueProps<CardOption, false>) => (
           <div>
             <div className="flex items-center justify-between mb-2">
               <label className="text-sm">Special Guest</label>
-              <label htmlFor="specialGuest" className="relative inline-block w-10 h-6">
+              <label
+                htmlFor="specialGuest"
+                className="relative inline-block w-10 h-6"
+              >
                 <input
                   type="checkbox"
                   id="specialGuest"
@@ -501,8 +554,12 @@ const CustomSingleValue = (props: SingleValueProps<CardOption, false>) => (
                           className="hidden"
                           onChange={handleGuestAvatarUpload}
                         />
-                        <p className="text-sm text-gray-500">Click to Upload or Drag & Drop</p>
-                        <p className="text-xs text-gray-400">jpeg, jpg, png, max 4mb</p>
+                        <p className="text-sm text-gray-500">
+                          Click to Upload or Drag & Drop
+                        </p>
+                        <p className="text-xs text-gray-400">
+                          jpeg, jpg, png, max 4mb
+                        </p>
                       </div>
                     )}
                   </div>
@@ -515,7 +572,9 @@ const CustomSingleValue = (props: SingleValueProps<CardOption, false>) => (
 
       {/* Action Buttons */}
       <div className="flex justify-end gap-4 mt-6">
-        <button className="px-6 py-2 border rounded-lg hover:bg-gray-50">Cancel</button>
+        <button className="px-6 py-2 border rounded-lg hover:bg-gray-50">
+          Cancel
+        </button>
         <button
           onClick={handleSubmit}
           className="px-6 py-2 bg-call-to-actions-900 text-white rounded-lg hover:bg-yellow-600"

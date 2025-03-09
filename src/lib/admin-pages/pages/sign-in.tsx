@@ -175,6 +175,8 @@ export const SignInPage = () => {
                   Click to Upload or Drag & Drop
                   <br />
                   jpeg, jpg, png max 4mb
+                  <br />
+                  Recommended image size: 800px x 960px
                 </p>
               </>
             )}

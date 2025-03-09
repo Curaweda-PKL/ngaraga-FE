@@ -301,50 +301,60 @@ const EditProfilePage: React.FC = () => {
           {successMessage}
         </div>
       )}
-      <section className="relative h-96">
-        {" "}
-        {/* Ubah h-64 menjadi h-96 atau lebih */}
-        <div
-          className="absolute top-0 w-full h-full bg-center bg-cover"
-          style={{
-            backgroundImage: `url('${bannerImage}')`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-          }}
-        >
-          {/* Overlay Gradien */}
+      <section className="relative h-80">
+        {bannerImage === fallbackBannerImage ? (
           <div
-            className="absolute top-0 w-full h-full"
+            className="absolute top-0 w-full h-full bg-gray-200 flex items-center justify-center text-center p-4"
             style={{
-              background:
-                "linear-gradient(180deg, rgba(221, 177, 31, 0) 0%, rgba(221, 177, 31, 0.5) 100%)",
+              backgroundSize: "cover",
+              backgroundPosition: "center",
             }}
-          ></div>
-
-          <input
-            type="file"
-            accept="image/*"
-            style={{ display: "none" }}
-            ref={bannerInputRef}
-            onChange={handleBannerFileChange}
-          />
-          <div className="absolute bottom-4 left-4 flex space-x-4">
-            <button
-              type="button"
-              onClick={() => bannerInputRef.current?.click()}
-              className="bg-white text-gray-800 p-2 rounded-full hover:bg-gray-200"
-            >
-              <FaPen size={20} />
-            </button>
-            <button
-              type="button"
-              onClick={handleBannerRemove}
-              className="bg-white text-red-500 p-2 rounded-full hover:bg-gray-200"
-            >
-              <FaTrash size={20} />
-            </button>
+          >
+            <p className="text-gray-600">
+              Rekomendasi ukuran banner: 1200px x 300px
+            </p>
           </div>
-        </div>
+        ) : (
+          <div
+            className="absolute top-0 w-full h-full bg-center bg-cover"
+            style={{
+              backgroundImage: `url('${bannerImage}')`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+            }}
+          >
+            {/* Input file untuk banner */}
+            <input
+              type="file"
+              accept="image/*"
+              style={{ display: "none" }}
+              ref={bannerInputRef}
+              onChange={handleBannerFileChange}
+            />
+            {/* Tombol Edit dan Hapus Banner */}
+            <div className="absolute bottom-4 left-4 flex space-x-4">
+              <button
+                type="button"
+                onClick={() => bannerInputRef.current?.click()}
+                className="bg-white text-gray-800 p-2 rounded-full hover:bg-gray-200"
+              >
+                <FaPen size={20} />
+              </button>
+              <button
+                type="button"
+                onClick={handleBannerRemove}
+                className="bg-white text-red-500 p-2 rounded-full hover:bg-gray-200"
+              >
+                <FaTrash size={20} />
+              </button>
+            </div>
+
+            {/* Pesan Rekomendasi Ukuran Banner */}
+            <div className="absolute bottom-4 right-4 text-sm text-white bg-black bg-opacity-50 p-2 rounded">
+              Rekomendasi ukuran banner: 1200px x 300px
+            </div>
+          </div>
+        )}
       </section>
 
       <div className="container mx-auto px-6 py-10">
