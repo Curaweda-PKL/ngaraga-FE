@@ -24,7 +24,7 @@ interface MarketplaceCardSectionProps {
 const getImageSrc = (src: string): string => {
   if (!src) return "/placeholder.svg";
   let cleaned = src.replace(/\\/g, "/").replace(/^https?:\/\//, "");
-  return IS_DEV ? `https://${cleaned}` : `${SERVER_URL}/${cleaned}`;
+  return IS_DEV ? `${SERVER_URL}/${cleaned}` : `${SERVER_URL}/${cleaned}`;
 };
 
 const CardItem: React.FC<{ card: Card }> = memo(({ card }) => {
