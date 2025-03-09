@@ -17,7 +17,6 @@ interface Reward {
   characterName: string;
   cardDetail: string;
   isClaimable?: boolean;
-  // isClaimed will be computed based on eventData.CardClaim
   isClaimed?: boolean;
 }
 
@@ -48,19 +47,35 @@ interface MainContentProps {
     eventSpecialGuestImage?: string;
     eventDescription: string;
     cardRewards?: Reward[];
-    // Include CardClaim from the API response
     CardClaim?: CardClaim[];
   } | null;
 }
+
+// Simple error notification component positioned at top right
+const ErrorNotification: React.FC<{ message: string; onClose: () => void }> = ({
+  message,
+  onClose,
+}) => (
+  <div className="fixed top-4 right-4 bg-red-600 text-white px-4 py-2 rounded shadow-lg z-50">
+    <div className="flex items-center">
+      <span>{message}</span>
+      <button onClick={onClose} className="ml-2 text-xl font-bold">
+        &times;
+      </button>
+    </div>
+  </div>
+);
 
 const MainContent: React.FC<MainContentProps> = ({ eventData }) => {
   const location = useLocation();
   const [activeTab, setActiveTab] = useState<"description" | "benefit">("description");
   const [isShareModalOpen, setShareModalOpen] = useState(false);
   const [pendingClaimId, setPendingClaimId] = useState<number | null>(null);
-  const [pendingClaimAttempted, setPendingClaimAttempted] = useState(false);
   const [isConfirming, setIsConfirming] = useState(false);
   const [claimConfirmed, setClaimConfirmed] = useState(false);
+  const [claimToken, setClaimToken] = useState<string | null>(null);
+  const [showClaimModal, setShowClaimModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const title = eventData?.eventName || "A Special Evening Celebration";
   const eventTime = eventData
@@ -92,28 +107,51 @@ const MainContent: React.FC<MainContentProps> = ({ eventData }) => {
   const description =
     eventData?.eventDescription || "Step into a world of elegance and charm...";
 
-  // Check for token in URL to create a pending claim
+  // On mount, check for token in URL or localStorage and show the modal if found.
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
-    const token = queryParams.get("token");
-    if (token && !pendingClaimAttempted) {
-      setPendingClaimAttempted(true);
-      axios
-        .get(`${SERVER_URL}/api/cardRewards/claim?token=${token}`, { withCredentials: true })
-        .then((response) => {
-          if (response.data.pendingClaimId) {
-            setPendingClaimId(response.data.pendingClaimId);
-          } else {
-            console.error("Failed to create pending claim.");
-          }
-        })
-        .catch((error) => {
-          console.error("Error creating pending claim:", error);
-        });
-    }
-  }, [location.search, pendingClaimAttempted]);
+    const tokenFromUrl = queryParams.get("token");
+    const storedToken = localStorage.getItem("claimToken");
 
-  // Handler for confirming claim
+    if (tokenFromUrl) {
+      localStorage.setItem("claimToken", tokenFromUrl);
+      setClaimToken(tokenFromUrl);
+      setShowClaimModal(true);
+    } else if (storedToken) {
+      setClaimToken(storedToken);
+      setShowClaimModal(true);
+    }
+  }, [location.search]);
+
+  // Function to initiate the claim (GET request)
+  const handleInitiateClaim = async () => {
+    if (!claimToken) {
+      setErrorMessage("No token provided.");
+      return;
+    }
+    try {
+      const response = await axios.get(`${SERVER_URL}/api/cardRewards/claim?token=${claimToken}`, {
+        withCredentials: true,
+      });
+      if (response.data.pendingClaimId) {
+        setPendingClaimId(response.data.pendingClaimId);
+      } else if (response.data.message === "Invalid or expired token.") {
+        setErrorMessage(response.data.message);
+        localStorage.removeItem("claimToken");
+        setClaimToken(null);
+        setShowClaimModal(false);
+      } else {
+        console.error("Failed to create pending claim.");
+        setErrorMessage("Failed to create pending claim.");
+      }
+    } catch (error: any) {
+      console.error("Error initiating claim:", error);
+      const errMsg = error.response?.data?.message || "Error initiating claim";
+      setErrorMessage(errMsg);
+    }
+  };
+
+  // Handler for confirming claim (POST request)
   const handleConfirmClaim = async () => {
     if (!pendingClaimId) return;
     setIsConfirming(true);
@@ -125,20 +163,76 @@ const MainContent: React.FC<MainContentProps> = ({ eventData }) => {
       );
       setClaimConfirmed(true);
       setPendingClaimId(null);
+      localStorage.removeItem("claimToken");
+      setShowClaimModal(false);
     } catch (error: any) {
       console.error("Error confirming claim:", error);
+      const errMsg = error.response?.data?.message || "Error confirming claim";
+      setErrorMessage(errMsg);
     } finally {
       setIsConfirming(false);
     }
   };
 
+  // Option to cancel the claim modal
+  const handleCloseModal = () => {
+    localStorage.removeItem("claimToken");
+    setClaimToken(null);
+    setShowClaimModal(false);
+  };
+
+  // The modal JSX (can be extracted to its own component)
+  const ClaimModal = () => (
+    <div className="fixed inset-0 flex items-center justify-center z-50">
+      <div className="absolute inset-0 bg-black opacity-50" onClick={handleCloseModal}></div>
+      <div className="bg-white rounded-lg shadow-lg z-10 p-6 w-96">
+        <h2 className="text-xl font-semibold mb-4">Claim Your Reward</h2>
+        <p className="mb-4 text-sm text-gray-600">
+          Do you want to claim your event reward? Click "Claim Reward" to initiate the process.
+        </p>
+        {!pendingClaimId && (
+          <button
+            onClick={handleInitiateClaim}
+            className="w-full px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 mb-2"
+          >
+            Claim Reward
+          </button>
+        )}
+        {pendingClaimId && (
+          <button
+            onClick={handleConfirmClaim}
+            disabled={isConfirming}
+            className="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+          >
+            {isConfirming ? "Confirming..." : "Confirm Claim"}
+          </button>
+        )}
+        <button
+          onClick={handleCloseModal}
+          className="w-full mt-4 px-4 py-2 border rounded-lg hover:bg-gray-100"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  );
+
+  // Determine confirmed claims (if any)
+  const confirmedClaims = eventData?.CardClaim?.filter(
+    (claim) => claim.status === "confirmed"
+  );
+
   return (
     <div className="w-full px-4 sm:px-6 py-4 sm:py-8">
+      {/* Error notification (top right) */}
+      {errorMessage && (
+        <ErrorNotification message={errorMessage} onClose={() => setErrorMessage(null)} />
+      )}
+      {showClaimModal && <ClaimModal />}
       <div className="flex flex-col md:flex-row mx-auto">
         {/* Left Column */}
         <div className="w-full md:w-1/2 md:pr-6 mb-8 md:mb-0">
           <h1 className="text-2xl sm:text-4xl font-bold mb-6">{title}</h1>
-
           <div className="mb-8">
             <h3 className="text-xl mb-4">Schedule</h3>
             <ul className="space-y-3">
@@ -156,7 +250,6 @@ const MainContent: React.FC<MainContentProps> = ({ eventData }) => {
               </li>
             </ul>
           </div>
-
           {hasGuest && (
             <div className="mb-8">
               <h3 className="text-xl mb-4">Special Guest</h3>
@@ -177,13 +270,11 @@ const MainContent: React.FC<MainContentProps> = ({ eventData }) => {
               </div>
             </div>
           )}
-
           <Link to={`/register-events/${eventData?.id}`} className="block mb-8">
             <button className="w-full sm:w-auto sm:min-w-[200px] bg-call-to-actions-900 text-white py-3 px-6 rounded-lg font-medium">
               Register Now
             </button>
           </Link>
-
           <div>
             <h3 className="text-xl mb-4">Share Event</h3>
             <div className="flex gap-4">
@@ -235,89 +326,65 @@ const MainContent: React.FC<MainContentProps> = ({ eventData }) => {
               <p className="px-0 md:px-4" dangerouslySetInnerHTML={{ __html: description }} />
             </div>
           ) : (
+            // In the Benefit tab, only display the claimed reward if confirmed.
             <div className="space-y-4">
-{eventData?.cardRewards && eventData.cardRewards.length ? (
-  eventData.cardRewards.map((reward) => {
-    // Determine if this reward has been claimed by checking CardClaim array
-    const isRewardClaimed = eventData?.CardClaim?.some(
-      (claim) => claim.cardRewardId === reward.id && claim.status === "confirmed"
-    );
-    return (
-      <div key={reward.id} className="border border-gray-300 rounded-lg p-4 shadow-sm">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full sm:w-auto">
-            <img
-              src={reward.image ? `${SERVER_URL}/${reward.image}` : '/api/placeholder/80/80'}
-              alt={reward.characterName}
-              className="w-20 h-20 rounded-lg object-contain"
-            />
-            <div>
-              <h4 className="text-lg font-semibold">{reward.characterName}</h4>
-              <p
-                className="text-gray-700"
-                dangerouslySetInnerHTML={{ __html: reward.cardDetail }}
-              />
-            </div>
-          </div>
-          <div className="w-full sm:w-auto mt-4 sm:mt-0">
-            {isRewardClaimed || claimConfirmed ? (
-              <button
-                className="block w-full sm:w-auto bg-green-600 text-white px-4 py-2 rounded-lg flex items-center justify-center cursor-default"
-                disabled
-              >
-                <svg
-                  className="w-5 h-5 mr-2 text-white animate-bounce"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M5 13l4 4L19 7"
-                  ></path>
-                </svg>
-                Claimed
-              </button>
-            ) : pendingClaimId ? (
-              <button
-                onClick={handleConfirmClaim}
-                disabled={isConfirming}
-                className="block w-full sm:w-auto bg-green-600 text-white px-4 py-2 rounded-lg"
-              >
-                {isConfirming ? "Confirming..." : "Confirm Claim"}
-              </button>
-            ) : reward.isClaimable ? (
-              <button
-                className="w-full sm:w-auto bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 cursor-not-allowed"
-                disabled
-              >
-                Claim (use link)
-              </button>
-            ) : (
-              <button
-                className="w-full sm:w-auto bg-gray-400 text-white px-4 py-2 rounded-lg cursor-not-allowed"
-                disabled
-              >
-                Claim
-              </button>
-            )}
-          </div>
-        </div>
-      </div>
-    );
-  })
-) : (
-  <p className="text-gray-400 text-center md:text-left">No benefits available.</p>
-)}
-
+              {confirmedClaims && confirmedClaims.length > 0 ? (
+                confirmedClaims.map((claim) => {
+                  // Use claim.cardReward if available; otherwise, fallback to find the reward details.
+                  const reward =
+                    claim.cardReward ||
+                    eventData?.cardRewards?.find((r) => r.id === claim.cardRewardId);
+                  return (
+                    reward && (
+                      <div key={reward.id} className="border border-gray-300 rounded-lg p-4 shadow-sm">
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full sm:w-auto">
+                            <img
+                          src={
+                            reward.image
+                              ? `${SERVER_URL}/${reward.image}`
+                              : `${SERVER_URL}/src/uploads/card/placeholder.png`
+                          }
+                              alt={reward.characterName}
+                              className="w-20 h-20 rounded-lg object-contain"
+                            />
+                            <div>
+                              <h4 className="text-lg font-semibold">{reward.characterName}</h4>
+                              <p className="text-gray-700" dangerouslySetInnerHTML={{ __html: reward.cardDetail }} />
+                            </div>
+                          </div>
+                          <div className="w-full sm:w-auto mt-4 sm:mt-0">
+                            <button
+                              className="block w-full sm:w-auto bg-green-600 text-white px-4 py-2 rounded-lg flex items-center justify-center cursor-default"
+                              disabled
+                            >
+                              <svg
+                                className="w-5 h-5 mr-2 text-white animate-bounce"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth="2"
+                                  d="M5 13l4 4L19 7"
+                                ></path>
+                              </svg>
+                              Claimed
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  );
+                })
+              ) : null}
             </div>
           )}
         </div>
       </div>
-
       {isShareModalOpen && <ShareModal onClose={() => setShareModalOpen(false)} isOpen={isShareModalOpen} />}
     </div>
   );
