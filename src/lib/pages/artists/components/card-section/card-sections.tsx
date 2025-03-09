@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, memo } from "react";
+import { useParams } from "react-router-dom";
 import axios from "axios";
 import { SERVER_URL } from "@/middleware/utils";
 import Cards from "./cards";
@@ -12,6 +13,14 @@ const MemoizedCards = memo(Cards);
 const MemoizedSpecialCards = memo(SpecialCards);
 
 export const CardSections: React.FC = () => {
+  // Extract the username from the URL using useParams.
+  const { name } = useParams<{ name: string }>();
+
+  // Early return until the username param is available.
+  if (!name) {
+    return <div className="text-center py-10">Loading...</div>;
+  }
+
   // Tab state: only "cards" or "specialCards"
   const [activeTab, setActiveTab] = useState<"cards" | "specialCards">("cards");
   const [ownedCards, setOwnedCards] = useState<Card[]>([]);
@@ -25,11 +34,7 @@ export const CardSections: React.FC = () => {
   const [noCardsFound, setNoCardsFound] = useState<boolean>(false);
   // State for selected special card detail (null means list view)
   const [selectedSpecialCard, setSelectedSpecialCard] = useState<SpecialCard | null>(null);
-  
-  // Authenticated user data fetched from /api/me.
-  const [user, setUser] = useState<{
-    name: any; id: number 
-} | null>(null);
+
   const tabsRef = useRef<HTMLDivElement>(null);
 
   // Virtualization states: control how many items are rendered.
@@ -40,63 +45,54 @@ export const CardSections: React.FC = () => {
   const { ref: cardsRef, inView: cardsInView } = useInView({ threshold: 0 });
   const { ref: specialCardsRef, inView: specialCardsInView } = useInView({ threshold: 0 });
 
-  // Fetch the current user.
+  // Fetch owned cards for the "cards" tab.
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const response = await axios.get(`${SERVER_URL}/api/me`, { withCredentials: true });
-        setUser(response.data);
-      } catch (err) {
-        console.error("Failed to fetch user data", err);
-      }
-    };
-    fetchUser();
-  }, []);
-
-// Fetch owned cards for the "cards" tab.
-useEffect(() => {
-  if (activeTab === "cards" && user) {
-    const fetchOwnedCards = async () => {
-      setLoading(true);
-      try {
-        // Use the user's name instead of id.
-        const response = await axios.get(`${SERVER_URL}/api/owned/user/${user.name}`, {
-          validateStatus: (status) => status < 500,
-          withCredentials: true,
-        });
-        if (
-          response.status === 404 &&
-          response.data.message === "No owned cards found for this user"
-        ) {
-          setNoCardsFound(true);
-          setOwnedCards([]);
-        } else if (response.status >= 200 && response.status < 300) {
-          setNoCardsFound(false);
-          setOwnedCards(response.data.cards); // response is { cards: [...] }
-          setError(null);
-        } else {
+    if (activeTab === "cards") {
+      const fetchOwnedCards = async () => {
+        setLoading(true);
+        try {
+          // Use the username from the URL param.
+          const response = await axios.get(
+            `${SERVER_URL}/api/owned/user/name/${name}`,
+            {
+              validateStatus: (status) => status < 500,
+              withCredentials: true,
+            }
+          );
+          if (
+            response.status === 404 &&
+            response.data.message === "No owned cards found for this user"
+          ) {
+            setNoCardsFound(true);
+            setOwnedCards([]);
+          } else if (response.status >= 200 && response.status < 300) {
+            setNoCardsFound(false);
+            setOwnedCards(response.data.cards); // response is { cards: [...] }
+            setError(null);
+          } else {
+            setError("Failed to fetch owned cards. Please try again later.");
+          }
+        } catch (err) {
+          console.error("Error fetching owned cards:", err);
           setError("Failed to fetch owned cards. Please try again later.");
+        } finally {
+          setLoading(false);
         }
-      } catch (err) {
-        console.error("Error fetching owned cards:", err);
-        setError("Failed to fetch owned cards. Please try again later.");
-      } finally {
-        setLoading(false);
-      }
-    };
+      };
 
-    fetchOwnedCards();
-  }
-}, [activeTab, user]);
+      fetchOwnedCards();
+    }
+  }, [activeTab, name]);
 
-// Fetch special cards as soon as a user is available.
-useEffect(() => {
-  if (user) {
+  // Fetch special cards using the username from the URL.
+  useEffect(() => {
     const fetchSpecialCards = async () => {
       setLoadingSpecialCards(true);
       try {
-        // Use the user's name in the endpoint.
-        const response = await axios.get(`${SERVER_URL}/api/owned/special/${user.name}`, { withCredentials: true });
+        const response = await axios.get(
+          `${SERVER_URL}/api/owned/special/${name}`,
+          { withCredentials: true }
+        );
         setSpecialCards(response.data.cards);
         setErrorSpecialCards(null);
       } catch (err) {
@@ -116,10 +112,8 @@ useEffect(() => {
       }
     };
     fetchSpecialCards();
-  }
-}, [user]);
+  }, [name]);
 
-  
   // Handler to claim a special card.
   const handleClaimSpecialCard = async (card: SpecialCard) => {
     if (card.claimStatus !== "eligible") return;
@@ -132,7 +126,10 @@ useEffect(() => {
         { withCredentials: true }
       );
       // Refresh the special cards after a successful claim.
-      const response = await axios.get(`${SERVER_URL}/api/owned/special`, { withCredentials: true });
+      const response = await axios.get(
+        `${SERVER_URL}/api/owned/special/${name}`,
+        { withCredentials: true }
+      );
       setSpecialCards(response.data.cards);
     } catch (err) {
       console.error("Error claiming special card:", err);
@@ -145,14 +142,18 @@ useEffect(() => {
   // Increase visible cards when the sentinel for cards is in view.
   useEffect(() => {
     if (activeTab === "cards" && cardsInView && visibleCardsCount < ownedCards.length) {
-      setVisibleCardsCount(prev => prev + 10);
+      setVisibleCardsCount((prev) => prev + 10);
     }
   }, [activeTab, cardsInView, visibleCardsCount, ownedCards.length]);
 
   // Increase visible special cards when the sentinel for special cards is in view.
   useEffect(() => {
-    if (activeTab === "specialCards" && specialCardsInView && visibleSpecialCardsCount < specialCards.length) {
-      setVisibleSpecialCardsCount(prev => prev + 10);
+    if (
+      activeTab === "specialCards" &&
+      specialCardsInView &&
+      visibleSpecialCardsCount < specialCards.length
+    ) {
+      setVisibleSpecialCardsCount((prev) => prev + 10);
     }
   }, [activeTab, specialCardsInView, visibleSpecialCardsCount, specialCards.length]);
 

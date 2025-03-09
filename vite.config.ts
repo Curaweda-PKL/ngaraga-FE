@@ -27,6 +27,9 @@ function lineCountPlugin(options: { ignore: string[] } = { ignore: [] }) {
 }
 
 export default defineConfig({
+  define: {
+    "process.env": process.env,
+  },
   plugins: [
     // Use Million for performance optimizations
     million.vite({ auto: true }),

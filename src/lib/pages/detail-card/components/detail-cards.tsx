@@ -207,33 +207,39 @@ const fetchCardDetail = async (id: string): Promise<CardType> => {
 // -------------------
 // Helper to Build Image URLs
 // -------------------
-const getImageUrl = (img?: string, directory?: string): string => {
+const getImageUrl = (img? : string, directory? : string) => {
   if (!img) return "";
-  
+
   let imageUrl = img;
-  
+
   // If the image string might be a JSON string, try to parse it.
   try {
     const parsed = JSON.parse(img);
-    if (parsed && parsed.url) {
+    // Ensure parsed.url exists and is a string.
+    if (parsed && typeof parsed.url === "string") {
       imageUrl = parsed.url;
     }
   } catch (e) {
     // If parsing fails, assume it's a normal string.
   }
-  
+
+  // Ensure imageUrl is a string.
+  if (typeof imageUrl !== "string") {
+    imageUrl = String(imageUrl);
+  }
+
   // If imageUrl is already an absolute URL, return it directly.
   if (imageUrl.startsWith("http://") || imageUrl.startsWith("https://")) {
     return imageUrl;
   }
-  
+
   const dirPath = directory ? `/${directory}` : "";
-  
+
   // In development, return a relative URL.
   if (IS_DEV) {
     return `${dirPath}/${imageUrl}`;
   }
-  
+
   // In production, prefix with the SERVER_URL.
   return `${SERVER_URL}${dirPath}/${imageUrl}`;
 };
@@ -277,7 +283,7 @@ export const DetailCards: React.FC = memo(() => {
 
   const bannerImage = useMemo(() => {
     return (
-      getImageUrl(card?.sourceImage) ||
+      // getImageUrl(card?.sourceImage) ||
       getImageUrl(card?.product?.cardImage) ||
       "https://i.ibb.co/f8ZDQzh/DAENDELS-LEGEND.jpg"
     );
