@@ -38,7 +38,10 @@ export const ProfileSkeleton: React.FC = () => {
             {/* Skeleton Social Links */}
             <div className="flex justify-center lg:justify-start space-x-6">
               {Array.from({ length: 5 }).map((_, idx) => (
-                <div key={idx} className="w-10 h-10 bg-gray-300 rounded-full"></div>
+                <div
+                  key={idx}
+                  className="w-10 h-10 bg-gray-300 rounded-full"
+                ></div>
               ))}
             </div>
           </div>
@@ -62,7 +65,9 @@ export const OtherProfilePage: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [isFollowing, setIsFollowing] = useState<boolean>(false);
-  const [followNotification, setFollowNotification] = useState<string | null>(null);
+  const [followNotification, setFollowNotification] = useState<string | null>(
+    null
+  );
 
   const currentUserId = localStorage.getItem("userId") || "";
 
@@ -247,16 +252,16 @@ export const OtherProfilePage: React.FC = () => {
       )}
 
       {/* Background Section (Banner) */}
-      <section className="relative h-48">
+      <section className="relative h-96">
         <div
           className="absolute top-0 w-full h-full bg-center bg-cover"
           style={{
-            background: `linear-gradient(180deg, rgba(221, 177, 31, 0) 0%, rgba(221, 177, 31, 0.5) 100%), url('${bannerUrl}')`,
+            background: `url('${bannerUrl}')`,
             backgroundSize: "cover",
             backgroundPosition: "center",
           }}
         >
-          <span className="w-full h-full absolute opacity-60 bg-purple-700" />
+          <span className="w-full h-full absolute opacity-60" />
         </div>
       </section>
 
