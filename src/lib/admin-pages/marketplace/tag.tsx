@@ -28,6 +28,10 @@ export const Tag = () => {
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6;
+
   // Fetch all tags from the API
   useEffect(() => {
     const fetchTags = async () => {
@@ -148,6 +152,12 @@ export const Tag = () => {
     tag.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  // Pagination calculations.
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentTags = filteredTags.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredTags.length / itemsPerPage);
+
   // Modal component remains unchanged in terms of style and functionality.
   const Modal: React.FC<ModalProps> = ({
     isOpen,
@@ -174,6 +184,7 @@ export const Tag = () => {
             <button
               onClick={onClose}
               className="text-gray-400 hover:text-gray-600"
+              title="Close Modal"
             >
               <X className="w-5 h-5" />
             </button>
@@ -190,6 +201,7 @@ export const Tag = () => {
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                  title="Enter tag name"
                 />
               </div>
             </div>
@@ -199,12 +211,14 @@ export const Tag = () => {
             <button
               onClick={onClose}
               className="px-4 py-2 border rounded-lg text-gray-600 hover:bg-gray-50"
+              title="Cancel"
             >
               Cancel
             </button>
             <button
               onClick={() => onSubmit(inputValue)}
               className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600"
+              title={submitText}
             >
               {submitText}
             </button>
@@ -228,6 +242,7 @@ export const Tag = () => {
           <button
             onClick={() => setIsAddModalOpen(true)}
             className="bg-call-to-actions-900 hover:bg-call-to-actions-800 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+            title="Add Tag"
           >
             <span className="text-xl">+</span> Add Tag
           </button>
@@ -238,7 +253,11 @@ export const Tag = () => {
               placeholder="Search"
               className="pl-10 pr-4 py-2 border rounded-lg w-64 focus:outline-none focus:ring-2 focus:ring-yellow-500"
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setCurrentPage(1); // Reset pagination when searching
+              }}
+              title="Search Tags"
             />
             <svg
               className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
@@ -248,6 +267,7 @@ export const Tag = () => {
               strokeWidth="2"
               viewBox="0 0 24 24"
               stroke="currentColor"
+              title="Search Icon"
             >
               <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
@@ -268,7 +288,7 @@ export const Tag = () => {
       )}
 
       <div className="grid grid-cols-2 gap-4">
-        {filteredTags.map((tag) => (
+        {currentTags.map((tag) => (
           <div
             key={tag.id}
             className="bg-white rounded-lg p-4 flex items-center justify-between border border-gray-100"
@@ -283,12 +303,14 @@ export const Tag = () => {
                   setIsEditModalOpen(true);
                 }}
                 className="text-gray-400 hover:text-gray-600"
+                title="Edit Tag"
               >
                 <Pencil className="w-5 h-5" />
               </button>
               <button
                 onClick={() => handleToggleSuspend(tag)}
                 className="text-gray-400 hover:text-gray-600"
+                title={tag.isSuspended ? "Unsuspend Tag" : "Suspend Tag"}
               >
                 {tag.isSuspended ? (
                   <EyeOff className="w-5 h-5" />
@@ -299,12 +321,38 @@ export const Tag = () => {
               <button
                 onClick={() => handleDeleteTag(tag)}
                 className="text-red-400 hover:text-red-600"
+                title="Delete Tag"
               >
                 <Trash2 className="w-5 h-5" />
               </button>
             </div>
           </div>
         ))}
+      </div>
+
+      {/* Pagination Controls */}
+      <div className="flex justify-end items-center mt-6 space-x-4">
+        <button
+          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+          disabled={currentPage === 1}
+          className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
+          title="Previous Page"
+        >
+          Previous
+        </button>
+        <span className="text-gray-700">
+          Page {currentPage} of {totalPages}
+        </span>
+        <button
+          onClick={() =>
+            setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+          }
+          disabled={currentPage === totalPages || totalPages === 0}
+          className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
+          title="Next Page"
+        >
+          Next
+        </button>
       </div>
 
       <Modal

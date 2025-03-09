@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import axios from 'axios';
-import { SERVER_URL } from "@/middleware/utils";
+import { SERVER_URL } from "@/middleware/utils"; // Import centralized server URL
 
 type PermissionContextType = {
   permissions: string[];
@@ -9,6 +9,7 @@ type PermissionContextType = {
   refresh: () => Promise<void>;
 };
 
+// Provide a complete default value including `role`
 const PermissionContext = createContext<PermissionContextType>({
   permissions: [],
   loading: true,
@@ -18,6 +19,7 @@ const PermissionContext = createContext<PermissionContextType>({
 
 export const PermissionProvider = ({ children }: { children: React.ReactNode }) => {
   const [permissions, setPermissions] = useState<string[]>([]);
+  const [initialLoad, setInitialLoad] = useState(true);
   const [loading, setLoading] = useState(true);
   const [role, setRole] = useState<string | null>(null);
 
@@ -25,27 +27,25 @@ export const PermissionProvider = ({ children }: { children: React.ReactNode }) 
     try {
       setLoading(true);
       const response = await axios.get(`${SERVER_URL}/api/me`, { withCredentials: true });
+      
+      // Update permissions from the response
       setPermissions(response.data.permissions || []);
-      setRole(response.data.role || null);
+      setRole(response.data.role || null);  // Set the user's role correctly
     } catch (error) {
       console.error('Permission fetch failed:', error);
       setPermissions([]);
       setRole(null);
     } finally {
       setLoading(false);
+      setInitialLoad(false);
     }
   };
 
-  // Initial load plus polling every 60 seconds for real-time updates.
   useEffect(() => {
-    fetchPermissions(); // initial load
-
-    const interval = setInterval(() => {
+    if (initialLoad) {
       fetchPermissions();
-    }, 60000); // poll every 60 seconds 
-
-    return () => clearInterval(interval);
-  }, []);
+    }
+  }, [initialLoad]);
 
   return (
     <PermissionContext.Provider

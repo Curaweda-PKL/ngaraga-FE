@@ -34,37 +34,44 @@ export const Card: React.FC = () => {
   const navigate = useNavigate();
   const [notification, setNotification] = useState<Notification | null>(null);
   const [cards, setCards] = useState<CardType[]>([]);
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const cardsPerPage = 10;
 
   // Fetch cards from the backend.
   const fetchCards = async (): Promise<void> => {
     try {
       const response = await axios.get<FetchCardsResponse>(`${SERVER_URL}/api/cards/normal`);
-      const mappedCards: CardType[] = response.data.cards.map((card: any): CardType => ({
-        id: card.id,
-        sku: card.sku || "N/A",
-        uniqueCode: card.uniqueCode || "N/A",
-        name: card.name || card.characterName || "N/A",
-        category:
-          (typeof card.category === "object" ? card.category.name : card.category) ||
-          card.categoryName ||
-          "N/A",
-        categoryCode:
-          (typeof card.category === "object" ? card.category.code : card.categoryCode) ||
-          "N/A",
-        image: card.image || "N/A",
-        stock: card.stock !== undefined ? card.stock : "N/A",
-        price: card.price !== undefined ? Number(card.price) : "N/A",
-        discountedPrice:
-          card.discountedPrice !== undefined && card.discountedPrice !== null
-            ? Number(card.discountedPrice)
-            : card.price !== undefined
-            ? Number(card.price)
-            : "N/A",
-        selected: false,
-        isSuspended: card.isSuspended || false,
-        productId: card.productId || (card.product ? card.product.id : undefined),
-      }));
-      setCards(mappedCards);
+      setCards((prevCards) =>
+        response.data.cards.map((card: any): CardType => {
+          const existingCard = prevCards.find((c) => c.uniqueCode === card.uniqueCode);
+          return {
+            id: card.id,
+            sku: card.sku || "N/A",
+            uniqueCode: card.uniqueCode || "N/A",
+            name: card.name || card.characterName || "N/A",
+            category:
+              (typeof card.category === "object" ? card.category.name : card.category) ||
+              card.categoryName ||
+              "N/A",
+            categoryCode:
+              (typeof card.category === "object" ? card.category.code : card.categoryCode) ||
+              "N/A",
+            image: card.image || "N/A",
+            stock: card.stock !== undefined ? card.stock : "N/A",
+            price: card.price !== undefined ? Number(card.price) : "N/A",
+            discountedPrice:
+              card.discountedPrice !== undefined && card.discountedPrice !== null
+                ? Number(card.discountedPrice)
+                : card.price !== undefined
+                ? Number(card.price)
+                : "N/A",
+            selected: existingCard ? existingCard.selected : false,
+            isSuspended: card.isSuspended || false,
+            productId: card.productId || (card.product ? card.product.id : undefined),
+          };
+        })
+      );
     } catch (error: unknown) {
       let message = "Error fetching cards";
       if (axios.isAxiosError(error)) {
@@ -144,14 +151,13 @@ export const Card: React.FC = () => {
   // Delete a single card and then re–fetch the updated list.
   const handleDelete = async (card: CardType): Promise<void> => {
     const confirmed = window.confirm(
-      "Are you sure you want to delete this card? You cannot revert this action!"
+      "Are you sure you want to delete this card? if there only 1 stock the product is deleted too! You cannot revert this action! you really cant revert this action!"
     );
     if (!confirmed) return;
 
     try {
       const response = await axios.delete(`${SERVER_URL}/api/cards/delete/${card.uniqueCode}`);
       setNotification({ message: response.data.message, type: "success" });
-      // Re–fetch the updated card list.
       fetchCards();
     } catch (error: unknown) {
       let message = "Error deleting card";
@@ -172,7 +178,7 @@ export const Card: React.FC = () => {
       setNotification({ message: "No cards selected for deletion", type: "error" });
       return;
     }
-    if (!window.confirm("Are you sure you want to delete the selected cards?")) return;
+    if (!window.confirm("Are you sure you want to delete this card? if there only 1 stock the product is deleted too! You cannot revert this action! you really cant revert this action! ")) return;
     try {
       const deletePromises = selectedCards.map(async (card) => {
         await axios.delete(`${SERVER_URL}/api/cards/delete/${card.uniqueCode}`);
@@ -228,6 +234,42 @@ export const Card: React.FC = () => {
     }
   };
 
+  // Bulk unsuspend cards.
+  const handleBulkUnsuspend = async (): Promise<void> => {
+    const selectedCards = cards.filter((card) => card.selected);
+    if (selectedCards.length === 0) {
+      setNotification({ message: "No cards selected for unsuspension", type: "error" });
+      return;
+    }
+    if (!window.confirm("Are you sure you want to unsuspend the selected cards?")) return;
+    try {
+      const unsuspendPromises = selectedCards.map(async (card) => {
+        if (card.isSuspended) {
+          const response = await axios.patch(`${SERVER_URL}/api/cards/${card.uniqueCode}/unsuspend`);
+          return response.data.card;
+        } else {
+          return card;
+        }
+      });
+      const updatedCards = await Promise.all(unsuspendPromises);
+      setCards((prev) =>
+        prev.map((c) => {
+          const updated = updatedCards.find((u: CardType) => u.uniqueCode === c.uniqueCode);
+          return updated ? { ...c, isSuspended: updated.isSuspended } : c;
+        })
+      );
+      setNotification({ message: "Selected cards unsuspended successfully", type: "success" });
+    } catch (error: unknown) {
+      let message = "Error unsuspending cards";
+      if (axios.isAxiosError(error)) {
+        message = error.response?.data?.message || error.message;
+      } else if (error instanceof Error) {
+        message = error.message;
+      }
+      setNotification({ message, type: "error" });
+    }
+  };
+
   // Navigate to view QR codes.
   const handleQrButtonClick = (card: CardType): void => {
     if (!card.productId) {
@@ -269,6 +311,12 @@ export const Card: React.FC = () => {
       : `${SERVER_URL}/${normalizedPath}`;
   };
 
+  // Pagination calculations.
+  const indexOfLastCard = currentPage * cardsPerPage;
+  const indexOfFirstCard = indexOfLastCard - cardsPerPage;
+  const currentCards = cards.slice(indexOfFirstCard, indexOfLastCard);
+  const totalPages = Math.ceil(cards.length / cardsPerPage);
+
   return (
     <div className="p-6">
       {notification && (
@@ -295,6 +343,13 @@ export const Card: React.FC = () => {
                 Suspend All Selected Items
               </button>
               <button
+                className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+                title="Unsuspend All Selected Items"
+                onClick={handleBulkUnsuspend}
+              >
+                Unsuspend All Selected Items
+              </button>
+              <button
                 className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
                 title="Delete All Selected Items"
                 onClick={handleBulkDelete}
@@ -313,8 +368,8 @@ export const Card: React.FC = () => {
           </button>
         </div>
       </div>
-      <div className="overflow-x-auto">
-        <table className="table w-full">
+      <div className= "scrollbar-transparent-actions overflow-x-auto">
+        <table className=" table min-w-max w-full">
           <thead>
             <tr>
               <th>
@@ -325,31 +380,33 @@ export const Card: React.FC = () => {
                   onChange={handleSelectAll}
                 />
               </th>
-              <th>SKU &amp; Image</th>
-              <th className="whitespace-nowrap overflow-hidden text-ellipsis">Unique Code</th>
-              <th>Card Name</th>
-              <th>Category Name</th>
-              <th>Category Code</th>
-              <th>Stock</th>
-              <th className="whitespace-nowrap overflow-hidden text-ellipsis">Price</th>
-              <th className="whitespace-nowrap overflow-hidden text-ellipsis">Discounted Price</th>
-              <th>Action</th>
+              <th className="min-w-[150px]">SKU &amp; Image</th>
+              <th className="min-w-[150px]">Unique Code</th>
+              <th className="">Card Name</th>
+              <th className="">Category Name</th>
+              <th className="">Category Code</th>
+              <th className="">Stock</th>
+              <th className="">Price</th>
+              <th className="">Discounted Price</th>
+              <th className="">Action</th>
             </tr>
           </thead>
           <tbody>
-            {cards.map((card, index) => {
+            {currentCards.map((card, index) => {
+              // Calculate the actual index relative to the full array.
+              const actualIndex = index + indexOfFirstCard;
               // Show "Delete Product" only on the first occurrence of each productId.
               const isFirstOccurrence =
                 card.productId &&
-                cards.findIndex((c) => c.productId === card.productId) === index;
+                cards.findIndex((c) => c.productId === card.productId) === actualIndex;
               return (
-                <tr key={index}>
+                <tr key={actualIndex}>
                   <td>
                     <input
                       type="checkbox"
                       className="checkbox"
                       checked={card.selected}
-                      onChange={(e) => handleSelectRow(index, e)}
+                      onChange={(e) => handleSelectRow(actualIndex, e)}
                     />
                   </td>
                   <td>
@@ -358,7 +415,7 @@ export const Card: React.FC = () => {
                         <img
                           src={formatImageUrl(card.image)}
                           alt={card.sku}
-                          className="w-10 h-auto object-cover rounded-lg"
+                          className="w-10 min-h-10 max-h-10 object-cover rounded-lg"
                         />
                       ) : null}
                       <span>{card.sku}</span>
@@ -442,6 +499,26 @@ export const Card: React.FC = () => {
             )}
           </tbody>
         </table>
+      </div>
+      {/* Pagination Controls */}
+      <div className="flex justify-end items-center mt-4 gap-4">
+        <button
+          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+          disabled={currentPage === 1}
+          className="px-4 py-2  rounded disabled:opacity-50"
+        >
+          Previous
+        </button>
+        <span>
+          Page {currentPage} of {totalPages}
+        </span>
+        <button
+          onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+          disabled={currentPage === totalPages}
+          className="px-4 py-2 bg-neutral-colors-100 rounded disabled:opacity-50"
+        >
+          Next
+        </button>
       </div>
     </div>
   );

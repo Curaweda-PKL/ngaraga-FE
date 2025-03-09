@@ -27,7 +27,9 @@ export const CardSections: React.FC = () => {
   const [selectedSpecialCard, setSelectedSpecialCard] = useState<SpecialCard | null>(null);
   
   // Authenticated user data fetched from /api/me.
-  const [user, setUser] = useState<{ id: number } | null>(null);
+  const [user, setUser] = useState<{
+    name: any; id: number 
+} | null>(null);
   const tabsRef = useRef<HTMLDivElement>(null);
 
   // Virtualization states: control how many items are rendered.
@@ -51,70 +53,72 @@ export const CardSections: React.FC = () => {
     fetchUser();
   }, []);
 
-  // Fetch owned cards for the "cards" tab.
-  useEffect(() => {
-    if (activeTab === "cards" && user) {
-      const fetchOwnedCards = async () => {
-        setLoading(true);
-        try {
-          const response = await axios.get(`${SERVER_URL}/api/owned/user/${user.id}`, {
-            validateStatus: (status) => status < 500,
-            withCredentials: true,
-          });
-          if (
-            response.status === 404 &&
-            response.data.message === "No owned cards found for this user"
-          ) {
-            setNoCardsFound(true);
-            setOwnedCards([]);
-          } else if (response.status >= 200 && response.status < 300) {
-            setNoCardsFound(false);
-            // Assuming the response structure is { cards: [...] }
-            setOwnedCards(response.data.cards);
-            setError(null);
-          } else {
-            setError("Failed to fetch owned cards. Please try again later.");
-          }
-        } catch (err) {
-          console.error("Error fetching owned cards:", err);
+// Fetch owned cards for the "cards" tab.
+useEffect(() => {
+  if (activeTab === "cards" && user) {
+    const fetchOwnedCards = async () => {
+      setLoading(true);
+      try {
+        // Use the user's name instead of id.
+        const response = await axios.get(`${SERVER_URL}/api/owned/user/${user.name}`, {
+          validateStatus: (status) => status < 500,
+          withCredentials: true,
+        });
+        if (
+          response.status === 404 &&
+          response.data.message === "No owned cards found for this user"
+        ) {
+          setNoCardsFound(true);
+          setOwnedCards([]);
+        } else if (response.status >= 200 && response.status < 300) {
+          setNoCardsFound(false);
+          setOwnedCards(response.data.cards); // response is { cards: [...] }
+          setError(null);
+        } else {
           setError("Failed to fetch owned cards. Please try again later.");
-        } finally {
-          setLoading(false);
         }
-      };
+      } catch (err) {
+        console.error("Error fetching owned cards:", err);
+        setError("Failed to fetch owned cards. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
+    };
 
-      fetchOwnedCards();
-    }
-  }, [activeTab, user]);
+    fetchOwnedCards();
+  }
+}, [activeTab, user]);
 
-  // Fetch special cards as soon as a user is available.
-  useEffect(() => {
-    if (user) {
-      const fetchSpecialCards = async () => {
-        setLoadingSpecialCards(true);
-        try {
-          const response = await axios.get(`${SERVER_URL}/api/owned/special`, { withCredentials: true });
-          setSpecialCards(response.data.cards);
+// Fetch special cards as soon as a user is available.
+useEffect(() => {
+  if (user) {
+    const fetchSpecialCards = async () => {
+      setLoadingSpecialCards(true);
+      try {
+        // Use the user's name in the endpoint.
+        const response = await axios.get(`${SERVER_URL}/api/owned/special/${user.name}`, { withCredentials: true });
+        setSpecialCards(response.data.cards);
+        setErrorSpecialCards(null);
+      } catch (err) {
+        if (
+          axios.isAxiosError(err) &&
+          err.response?.status === 404 &&
+          err.response.data.message === "No special cards found"
+        ) {
+          setSpecialCards([]);
           setErrorSpecialCards(null);
-        } catch (err) {
-          if (
-            axios.isAxiosError(err) &&
-            err.response?.status === 404 &&
-            err.response.data.message === "No special cards found"
-          ) {
-            setSpecialCards([]);
-            setErrorSpecialCards(null);
-          } else {
-            console.error("Error fetching special cards:", err);
-            setErrorSpecialCards("Failed to fetch special cards. Please try again later.");
-          }
-        } finally {
-          setLoadingSpecialCards(false);
+        } else {
+          console.error("Error fetching special cards:", err);
+          setErrorSpecialCards("Failed to fetch special cards. Please try again later.");
         }
-      };
-      fetchSpecialCards();
-    }
-  }, [user]);
+      } finally {
+        setLoadingSpecialCards(false);
+      }
+    };
+    fetchSpecialCards();
+  }
+}, [user]);
+
   
   // Handler to claim a special card.
   const handleClaimSpecialCard = async (card: SpecialCard) => {
