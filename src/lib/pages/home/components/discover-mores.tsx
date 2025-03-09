@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { SERVER_URL } from "@/middleware/utils";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion"; // Import motion dari framer-motion
 
 // Type definitions for API response
 interface CategoryItem {
@@ -33,17 +34,13 @@ interface DiscoverApiResponse {
 
 export const DiscoverMoreCards = () => {
   const navigate = useNavigate();
-  const [discoverData, setDiscoverData] = useState<DiscoverCardData | null>(
-    null
-  );
+  const [discoverData, setDiscoverData] = useState<DiscoverCardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     axios
-      .get<DiscoverApiResponse>(
-        `${SERVER_URL}/api/explore-trending/explore-trending`
-      )
+      .get<DiscoverApiResponse>(`${SERVER_URL}/api/explore-trending/explore-trending`)
       .then((response) => {
         setDiscoverData(response.data.exploreTrendingCard);
         setLoading(false);
@@ -55,11 +52,71 @@ export const DiscoverMoreCards = () => {
       });
   }, []);
 
-  if (loading) return <div className="text-center p-8">Loading...</div>;
-  if (error || !discoverData)
+  // Jika data masih loading, tampilkan animasi loading
+  if (loading) {
     return (
-      <div className="text-center p-8 text-red-500">Failed to load data</div>
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <motion.svg
+          className="w-20 h-20"
+          viewBox="0 0 50 50"
+          fill="none"
+          stroke="#e53e3e"
+          strokeWidth="5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          animate={{ rotate: 360 }}
+          transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+        >
+          <circle cx="25" cy="25" r="20" />
+        </motion.svg>
+        <p className="text-xl mt-4">Loading...</p>
+      </div>
     );
+  }
+
+  // Jika terjadi error, tampilkan animasi error
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <motion.svg
+          className="w-20 h-20"
+          viewBox="0 0 50 50"
+          fill="none"
+          stroke="#e53e3e"
+          strokeWidth="5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          animate={{ rotate: 360 }}
+          transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+        >
+          <circle cx="25" cy="25" r="20" />
+        </motion.svg>
+        <p className="text-xl mt-4">Something went wrong. Please try again later.</p>
+      </div>
+    );
+  }
+
+  // Jika data tidak ditemukan, tampilkan animasi no data
+  if (!discoverData) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <motion.svg
+          className="w-20 h-20"
+          viewBox="0 0 50 50"
+          fill="none"
+          stroke="#e53e3e"
+          strokeWidth="5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          animate={{ rotate: 360 }}
+          transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+        >
+          <circle cx="25" cy="25" r="20" />
+        </motion.svg>
+        <p className="text-xl mt-4">No data found.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex items-center justify-center bg-background-primary pt-24">
@@ -71,8 +128,7 @@ export const DiscoverMoreCards = () => {
               {discoverData.exploreTrendingTitle || "Discover More Cards"}
             </h2>
             <p className="text-2xl text-[#404040] font-[Nunito]">
-              {discoverData.exploreTrendingDescription ||
-                "Explore New Trending Cards"}
+              {discoverData.exploreTrendingDescription || "Explore New Trending Cards"}
             </p>
           </div>
           {/* Button for Large Screens */}
@@ -88,10 +144,12 @@ export const DiscoverMoreCards = () => {
         <div className="grid gap-6 md:grid-cols-3 px-8 mb-8">
           {discoverData.card.length > 0 ? (
             discoverData.card.map((card) => (
-              <div
+              <motion.div
                 key={card.id}
                 onClick={() => navigate(`/detail-cards/${card.id}`)}
-                className="cursor-pointer w-full flex flex-col items-start gap-4 bg-[#F2F2F2] rounded-2xl shadow-xl transition-transform hover:scale-[1.02]"
+                className="cursor-pointer w-full flex flex-col items-start gap-4 bg-[#F2F2F2] rounded-2xl shadow-xl"
+                whileHover={{ scale: 1.05 }} // Animasi saat hover
+                whileTap={{ scale: 0.95 }} // Animasi saat diklik
               >
                 {/* Image */}
                 <figure className="w-full rounded-t-2xl overflow-hidden">
@@ -132,7 +190,7 @@ export const DiscoverMoreCards = () => {
                     {card.product.price}
                   </span>
                 </div>
-              </div>
+              </motion.div>
             ))
           ) : (
             <div className="col-span-3 text-center text-gray-500">

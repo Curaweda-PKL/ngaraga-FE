@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { SERVER_URL } from "@/middleware/utils";
+import { motion } from "framer-motion"; // Import motion untuk animasi fallback
 
 // Interface untuk data dari backend
 interface PageContent {
@@ -27,6 +28,24 @@ interface Step {
   image: string;
 }
 
+// Fallback Data
+const FALLBACK_PAGE_CONTENT: PageContent = {
+  title: "How It Works",
+  description: "Find Out How To Get Started",
+  findCardTitle: "Find Your Card",
+  findCardDescription:
+    "Set up your wallet of choice. Connect it to the Animalket by clicking the wallet icon in the top right corner.",
+  findCardImage: "https://via.placeholder.com/150",
+  scanCardTitle: "Scan Your Card",
+  scanCardDescription:
+    "Upload your work and setup your collection. Add a description, social links and floor price.",
+  scanCardImage: "https://via.placeholder.com/150",
+  tradingTitle: "It's Work",
+  tradingDescription:
+    "Choose between auctions and fixed-price listings. Start earning by selling your NFTs or trading others.",
+  tradingImage: "https://via.placeholder.com/150",
+};
+
 export const HowItWorks = () => {
   const [steps, setSteps] = useState<Step[]>([]);
   const [loading, setLoading] = useState(true);
@@ -47,31 +66,34 @@ export const HowItWorks = () => {
         const { pageContent } = data;
 
         // Set title dan description dari backend
-        setPageTitle(pageContent.title || "How It Works"); // Fallback title
-        setPageDescription(pageContent.description || "Find Out How To Get Started"); // Fallback description
+        setPageTitle(pageContent.title || FALLBACK_PAGE_CONTENT.title);
+        setPageDescription(pageContent.description || FALLBACK_PAGE_CONTENT.description);
 
         // Format data untuk disesuaikan dengan struktur `steps`
         const formattedSteps: Step[] = [
           {
-            title: pageContent.findCardTitle || "Find Your Card", // Fallback title
+            title: pageContent.findCardTitle || FALLBACK_PAGE_CONTENT.findCardTitle,
             description:
-              pageContent.findCardDescription ||
-              "Set up your wallet of choice. Connect it to the Animalket by clicking the wallet icon in the top right corner.", // Fallback description
-            image: `${SERVER_URL}/uploads/pageContent/${pageContent.findCardImage}`, // Sesuaikan path gambar
+              pageContent.findCardDescription || FALLBACK_PAGE_CONTENT.findCardDescription,
+            image: pageContent.findCardImage
+              ? `${SERVER_URL}/uploads/pageContent/${pageContent.findCardImage}`
+              : FALLBACK_PAGE_CONTENT.findCardImage,
           },
           {
-            title: pageContent.scanCardTitle || "Scan Your Card", // Fallback title
+            title: pageContent.scanCardTitle || FALLBACK_PAGE_CONTENT.scanCardTitle,
             description:
-              pageContent.scanCardDescription ||
-              "Upload your work and setup your collection. Add a description, social links and floor price.", // Fallback description
-            image: `${SERVER_URL}/uploads/pageContent/${pageContent.scanCardImage}`, // Sesuaikan path gambar
+              pageContent.scanCardDescription || FALLBACK_PAGE_CONTENT.scanCardDescription,
+            image: pageContent.scanCardImage
+              ? `${SERVER_URL}/uploads/pageContent/${pageContent.scanCardImage}`
+              : FALLBACK_PAGE_CONTENT.scanCardImage,
           },
           {
-            title: pageContent.tradingTitle || "It's Work", // Fallback title
+            title: pageContent.tradingTitle || FALLBACK_PAGE_CONTENT.tradingTitle,
             description:
-              pageContent.tradingDescription ||
-              "Choose between auctions and fixed-price listings. Start earning by selling your NFTs or trading others.", // Fallback description
-            image: `${SERVER_URL}/uploads/pageContent/${pageContent.tradingImage}`, // Sesuaikan path gambar
+              pageContent.tradingDescription || FALLBACK_PAGE_CONTENT.tradingDescription,
+            image: pageContent.tradingImage
+              ? `${SERVER_URL}/uploads/pageContent/${pageContent.tradingImage}`
+              : FALLBACK_PAGE_CONTENT.tradingImage,
           },
         ];
 
@@ -81,6 +103,27 @@ export const HowItWorks = () => {
         console.error("Error fetching data:", error);
         setError(error instanceof Error ? error.message : "An unknown error occurred");
         setLoading(false);
+
+        // Gunakan fallback data jika terjadi error
+        setPageTitle(FALLBACK_PAGE_CONTENT.title);
+        setPageDescription(FALLBACK_PAGE_CONTENT.description);
+        setSteps([
+          {
+            title: FALLBACK_PAGE_CONTENT.findCardTitle,
+            description: FALLBACK_PAGE_CONTENT.findCardDescription,
+            image: FALLBACK_PAGE_CONTENT.findCardImage,
+          },
+          {
+            title: FALLBACK_PAGE_CONTENT.scanCardTitle,
+            description: FALLBACK_PAGE_CONTENT.scanCardDescription,
+            image: FALLBACK_PAGE_CONTENT.scanCardImage,
+          },
+          {
+            title: FALLBACK_PAGE_CONTENT.tradingTitle,
+            description: FALLBACK_PAGE_CONTENT.tradingDescription,
+            image: FALLBACK_PAGE_CONTENT.tradingImage,
+          },
+        ]);
       }
     };
 
@@ -92,21 +135,38 @@ export const HowItWorks = () => {
   }
 
   if (error) {
-    return <div>Error: {error}</div>;
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <motion.svg
+          className="w-20 h-20"
+          viewBox="0 0 50 50"
+          fill="none"
+          stroke="#e53e3e"
+          strokeWidth="5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          animate={{ rotate: 360 }}
+          transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+        >
+          <circle cx="25" cy="25" r="20" />
+        </motion.svg>
+        <p className="text-xl mt-4">Something went wrong. Using fallback data.</p>
+      </div>
+    );
   }
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-background-primary mt-20 lg:mt-0">
       <div className="flex flex-col lg:flex-row items-center bg-transparent gap-8 max-w-6xl w-full rounded-2xl overflow-hidden">
         <div className="text-[#404040] w-full">
-          <div className="mx-auto space-y-12 p-8 sm:p-12 lg:p-16"> {/* Sesuaikan padding dengan WeeklyUpdateForm */}
+          <div className="mx-auto space-y-12 p-8 sm:p-12 lg:p-16">
             {/* Title Section */}
             <div className="relative">
               <h1 className="text-4xl font-bold text-[#171717] mb-4">
-                {pageTitle} {/* Judul dari backend */}
+                {pageTitle}
               </h1>
               <p className="text-2xl text-[#404040]">
-                {pageDescription} {/* Deskripsi dari backend */}
+                {pageDescription}
               </p>
             </div>
 
@@ -123,7 +183,7 @@ export const HowItWorks = () => {
                       <img
                         src={step.image}
                         alt={step.title}
-                        className="w-16 h-16 object-contain rounded-full" // Menggunakan object-contain agar gambar tidak di-crop
+                        className="w-16 h-16 object-contain rounded-full"
                         onError={(e) => {
                           console.error("Error loading image:", e);
                           e.currentTarget.src = "https://via.placeholder.com/150"; // Fallback image

@@ -1,11 +1,27 @@
 import React, { useState, useEffect } from "react";
 import { SERVER_URL } from "@/middleware/utils";
+import { motion } from "framer-motion"; // Import motion untuk animasi
 
 export const Event: React.FC = () => {
   const [endTime, setEndTime] = useState<number | null>(null);
   const [timeRemaining, setTimeRemaining] = useState<number | null>(null);
   const [flashSale, setFlashSale] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const slug = "flash-sale";
+
+  // Fallback Data
+  const FALLBACK_FLASH_SALE = {
+    heroCard: {
+      characterName: "Flash Sale",
+      product: {
+        category: {
+          image: "https://via.placeholder.com/150",
+        },
+        image: "https://via.placeholder.com/520x344",
+      },
+    },
+  };
 
   useEffect(() => {
     const fetchFlashSale = async () => {
@@ -26,9 +42,15 @@ export const Event: React.FC = () => {
           setTimeRemaining(remainingSeconds);
         } else {
           console.error("Failed to fetch flash sale:", data.message);
+          setError("Failed to fetch flash sale data.");
+          setFlashSale(FALLBACK_FLASH_SALE); // Gunakan fallback data
         }
       } catch (error) {
         console.error("Failed to fetch flash sale:", error);
+        setError("Something went wrong. Please try again later.");
+        setFlashSale(FALLBACK_FLASH_SALE); // Gunakan fallback data
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -56,6 +78,39 @@ export const Event: React.FC = () => {
     const remainingSeconds = seconds % 60;
     return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${remainingSeconds.toString().padStart(2, "0")}`;
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-[#3B3B3B]">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+          className="w-20 h-20 border-4 border-t-[#e53e3e] border-r-[#e53e3e] border-b-[#e53e3e] border-l-transparent rounded-full"
+        />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-[#3B3B3B]">
+        <motion.svg
+          className="w-20 h-20"
+          viewBox="0 0 50 50"
+          fill="none"
+          stroke="#e53e3e"
+          strokeWidth="5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          animate={{ rotate: 360 }}
+          transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+        >
+          <circle cx="25" cy="25" r="20" />
+        </motion.svg>
+        <p className="text-xl mt-4 text-white">{error}</p>
+      </div>
+    );
+  }
 
   return (
     <div
