@@ -93,6 +93,7 @@ export const SectionEightForm = () => {
               onChange={(e) =>
                 setFormData((prev) => ({ ...prev, title: e.target.value }))
               }
+              placeholder="Join our weekly update"
               className="w-full border rounded-lg px-4 py-2.5 pr-10"
             />
             <button
@@ -117,6 +118,7 @@ export const SectionEightForm = () => {
                   description: e.target.value,
                 }))
               }
+              placeholder="Enter description"
               className="w-full border rounded-lg px-4 py-2.5 pr-10"
             />
             <button

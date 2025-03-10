@@ -179,7 +179,7 @@ export const SectionSevenForm = () => {
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 p-6">
-      <h2 className="text-lg font-medium mb-6">Section 7 - Find Card Scan Card Trading Card</h2>
+      <h2 className="text-lg font-medium mb-6">Section 7 - How it Works</h2>
       {message && (
         <div
           className={`mb-4 text-center ${
@@ -201,7 +201,7 @@ export const SectionSevenForm = () => {
               type="text"
               value={formData.title}
               onChange={(e) => handleInputChange("title", e.target.value)}
-              placeholder="Enter title"
+              placeholder="how it works"
               className="w-full border rounded-lg px-4 py-2.5"
             />
           </div>
@@ -213,7 +213,7 @@ export const SectionSevenForm = () => {
               type="text"
               value={formData.description}
               onChange={(e) => handleInputChange("description", e.target.value)}
-              placeholder="Enter description"
+              placeholder="Find out how to get started"
               className="w-full border rounded-lg px-4 py-2.5"
             />
           </div>
@@ -265,7 +265,7 @@ export const SectionSevenForm = () => {
               onChange={(e) =>
                 handleInputChange("findCardTitle", e.target.value)
               }
-              placeholder="Enter find card title"
+              placeholder="Find your Card"
               className="w-full border rounded-lg px-4 py-2.5"
             />
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -277,7 +277,7 @@ export const SectionSevenForm = () => {
               onChange={(e) =>
                 handleInputChange("findCardDescription", e.target.value)
               }
-              placeholder="Enter find card description"
+              placeholder="Enter description"
               className="w-full border rounded-lg px-4 py-2.5"
             />
           </div>
@@ -291,7 +291,7 @@ export const SectionSevenForm = () => {
               onChange={(e) =>
                 handleInputChange("scanCardTitle", e.target.value)
               }
-              placeholder="Enter scan card title"
+              placeholder="Scan Your Card"
               className="w-full border rounded-lg px-4 py-2.5"
             />
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -303,7 +303,7 @@ export const SectionSevenForm = () => {
               onChange={(e) =>
                 handleInputChange("scanCardDescription", e.target.value)
               }
-              placeholder="Enter scan card description"
+              placeholder="Enter description"
               className="w-full border rounded-lg px-4 py-2.5"
             />
           </div>
@@ -317,7 +317,7 @@ export const SectionSevenForm = () => {
               onChange={(e) =>
                 handleInputChange("tradingTitle", e.target.value)
               }
-              placeholder="Enter trading title"
+              placeholder="Its work"
               className="w-full border rounded-lg px-4 py-2.5"
             />
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -329,7 +329,7 @@ export const SectionSevenForm = () => {
               onChange={(e) =>
                 handleInputChange("tradingDescription", e.target.value)
               }
-              placeholder="Enter trading description"
+              placeholder="Enter description"
               className="w-full border rounded-lg px-4 py-2.5"
             />
           </div>
