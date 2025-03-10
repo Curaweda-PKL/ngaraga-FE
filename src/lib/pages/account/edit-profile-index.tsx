@@ -133,9 +133,9 @@ const EditProfilePage: React.FC = () => {
         return;
       }
       const previewUrl = URL.createObjectURL(file);
-      setBannerImage(previewUrl);
-      setBannerFile(file);
-      setBannerImageRemoved(false);
+      setBannerImage(previewUrl); // Set pratinjau gambar
+      setBannerFile(file); // Simpan file untuk diunggah nanti
+      setBannerImageRemoved(false); // Reset status penghapusan banner
     }
   };
 
@@ -297,49 +297,33 @@ const EditProfilePage: React.FC = () => {
     <div className="flex flex-col">
       {/* Background Banner */}
       {successMessage && (
-        <div className="mt-4 p-3 bg-green-500 text-white rounded-lg">
+        <div className="mt-4 p-3 bg-green-500 text-white rounded-lg text-center">
           {successMessage}
         </div>
       )}
-      <section className="relative h-80">
-        {bannerImage === fallbackBannerImage ? (
-          <div
-            className="absolute top-0 w-full h-full bg-gray-200 flex items-center justify-center text-center p-4"
-            style={{
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-            }}
-          >
-            <p className="text-gray-600">
-              Rekomendasi ukuran banner: 1200px x 300px
-            </p>
-          </div>
-        ) : (
-          <div
-            className="absolute top-0 w-full h-full bg-center bg-cover"
-            style={{
-              backgroundImage: `url('${bannerImage}')`,
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-            }}
-          >
-            {/* Input file untuk banner */}
-            <input
-              type="file"
-              accept="image/*"
-              style={{ display: "none" }}
-              ref={bannerInputRef}
-              onChange={handleBannerFileChange}
-            />
-            {/* Tombol Edit dan Hapus Banner */}
-            <div className="absolute bottom-4 left-4 flex space-x-4">
-              <button
-                type="button"
-                onClick={() => bannerInputRef.current?.click()}
-                className="bg-white text-gray-800 p-2 rounded-full hover:bg-gray-200"
-              >
-                <FaPen size={20} />
-              </button>
+      <section className="relative h-48 sm:h-80">
+        <div
+          className="absolute top-0 w-full h-full bg-center bg-cover"
+          style={{ backgroundImage: `url('${bannerImage}')` }}
+        >
+          {/* Input file untuk banner */}
+          <input
+            type="file"
+            accept="image/*"
+            style={{ display: "none" }}
+            ref={bannerInputRef}
+            onChange={handleBannerFileChange}
+          />
+          {/* Tombol Edit dan Hapus Banner */}
+          <div className="absolute bottom-4 left-4 flex space-x-4">
+            <button
+              type="button"
+              onClick={() => bannerInputRef.current?.click()}
+              className="bg-white text-gray-800 p-2 rounded-full hover:bg-gray-200"
+            >
+              <FaPen size={20} />
+            </button>
+            {bannerImage !== fallbackBannerImage && (
               <button
                 type="button"
                 onClick={handleBannerRemove}
@@ -347,20 +331,15 @@ const EditProfilePage: React.FC = () => {
               >
                 <FaTrash size={20} />
               </button>
-            </div>
-
-            {/* Pesan Rekomendasi Ukuran Banner */}
-            <div className="absolute bottom-4 right-4 text-sm text-white bg-black bg-opacity-50 p-2 rounded">
-              Rekomendasi ukuran banner: 1200px x 300px
-            </div>
+            )}
           </div>
-        )}
+        </div>
       </section>
 
-      <div className="container mx-auto px-6 py-10">
+      <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-10">
         <form
           onSubmit={handleSubmit}
-          className="bg-white rounded-xl p-10 flex flex-col sm:flex-row sm:space-x-10"
+          className="bg-white rounded-xl p-4 sm:p-10 flex flex-col sm:flex-row sm:space-x-10"
         >
           {/* Left Section: Tabs & Profile Picture */}
           <div className="flex flex-col sm:flex-row sm:w-1/3">
@@ -389,7 +368,7 @@ const EditProfilePage: React.FC = () => {
               </button>
             </div>
 
-            <div className="flex flex-col items-center ml-14 mt-6 sm:mt-0 sm:pl-6 relative">
+            <div className="flex flex-col items-center mt-6 sm:mt-0 sm:pl-6 relative">
               <input
                 type="file"
                 accept="image/*"
@@ -397,7 +376,7 @@ const EditProfilePage: React.FC = () => {
                 ref={profileInputRef}
                 onChange={handleProfileFileChange}
               />
-              <div className="relative w-32 h-32 mt-4 mb-6">
+              <div className="relative w-24 h-24 sm:w-32 sm:h-32 mt-4 mb-6">
                 <img
                   src={profileImage || "/placeholder.svg"}
                   alt="Profile"
@@ -426,7 +405,7 @@ const EditProfilePage: React.FC = () => {
           </div>
 
           {/* Right Section: Form Content */}
-          <div className="flex-grow">
+          <div className="flex-grow mt-6 sm:mt-0">
             {activeTab === "basic" ? (
               <BasicInformation
                 formData={formData}
@@ -443,13 +422,17 @@ const EditProfilePage: React.FC = () => {
               />
             )}
 
-            {error && <div className="mt-4 text-red-500">{error}</div>}
+            {error && (
+              <div className="mt-4 text-red-500 text-center sm:text-left">
+                {error}
+              </div>
+            )}
 
             {activeTab === "basic" && (
               <button
                 type="submit"
                 disabled={loading}
-                className="mt-6 bg-call-to-actions-900 text-white py-3 px-5 rounded-md text-sm font-medium hover:bg-yellow-600 focus:ring-2 focus:ring-yellow-400"
+                className="mt-6 bg-call-to-actions-900 text-white py-3 px-5 rounded-md text-sm font-medium hover:bg-yellow-600 focus:ring-2 focus:ring-yellow-400 w-full sm:w-auto"
               >
                 {loading ? "Updating..." : "Update"}
               </button>
