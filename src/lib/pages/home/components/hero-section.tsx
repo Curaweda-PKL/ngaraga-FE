@@ -1,4 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, memo, useMemo } from "react";
+import { useInView } from "react-intersection-observer";
+import { useQuery } from "@tanstack/react-query";
 import { RiRocketFill } from "react-icons/ri";
 import "./style.css";
 import { useNavigate } from "react-router-dom";
@@ -6,26 +8,6 @@ import $ from "jquery";
 import axios from "axios";
 import { SERVER_URL } from "@/middleware/utils";
 import { motion, useMotionValue, useSpring } from "framer-motion";
-
-// Helper component for animated count-up using Framer Motion
-const AnimatedNumber = ({ value }: { value: number }) => {
-  const motionValue = useMotionValue(0);
-  const springValue = useSpring(motionValue, { stiffness: 100, damping: 20 });
-  const [displayValue, setDisplayValue] = useState(0);
-
-  useEffect(() => {
-    motionValue.set(value);
-  }, [value, motionValue]);
-
-  useEffect(() => {
-    const unsubscribe = springValue.on("change", (latest) => {
-      setDisplayValue(Math.floor(latest));
-    });
-    return () => unsubscribe();
-  }, [springValue]);
-
-  return <motion.span>{displayValue}</motion.span>;
-};
 
 // Type definitions for API response
 interface Creator {
@@ -67,8 +49,28 @@ interface ApiResponse {
   stats: Stats;
 }
 
+// AnimatedNumber component wrapped with memo
+const AnimatedNumber = memo(({ value }: { value: number }) => {
+  const motionValue = useMotionValue(0);
+  const springValue = useSpring(motionValue, { stiffness: 100, damping: 20 });
+  const [displayValue, setDisplayValue] = useState(0);
+
+  useEffect(() => {
+    motionValue.set(value);
+  }, [value, motionValue]);
+
+  useEffect(() => {
+    const unsubscribe = springValue.on("change", (latest) => {
+      setDisplayValue(Math.floor(latest));
+    });
+    return () => unsubscribe();
+  }, [springValue]);
+
+  return <motion.span>{displayValue}</motion.span>;
+});
+
 // Fallback component for network errors with animated SVG
-const ErrorFallback = () => {
+const ErrorFallback = memo(() => {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">
       <motion.svg
@@ -87,61 +89,72 @@ const ErrorFallback = () => {
       <p className="text-xl mt-4">Something went wrong with</p>
     </div>
   );
-};
+});
 
-export const HeroFrame = () => {
+// Main HeroFrame component wrapped with memo
+export const HeroFrame = memo(() => {
   const navigate = useNavigate();
   const xRef = useRef<NodeJS.Timeout | null>(null);
-  const [heroBanner, setHeroBanner] = useState<HeroBanner | null>(null);
-  const [stats, setStats] = useState<Stats | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
-  // Fetch hero banner data and stats using axios and SERVER_URL
+  // Set up the inView hook – load heavy content only when visible
+  const { ref, inView } = useInView({
+    triggerOnce: true,
+    threshold: 0.1,
+  });
+
+  // Fetch hero banner data using react-query, enabled only when in view
+  const { data, isLoading, error } = useQuery<ApiResponse>({
+    queryKey: ["hero-banner"],
+    queryFn: async () => {
+      const res = await axios.get<ApiResponse>(
+        `${SERVER_URL}/api/hero-banner/hero-banner`
+      );
+      return res.data;
+    },
+    enabled: inView,
+  });
+
+  // Destructure fetched data
+  const heroBanner = data?.heroBanner;
+  const stats = data?.stats;
+
+  // Memoize card image URL derivation
+  const cardImage = useMemo(() => {
+    const rawCardImage =
+      heroBanner?.heroCard?.product?.image ||
+      "https://i.ibb.co/com/f8ZDQzh/DAENDELS-LEGEND.jpg";
+    const normalizedCardImage = rawCardImage.replace(/\\/g, "/");
+    return normalizedCardImage.startsWith("http") ||
+      normalizedCardImage.startsWith("https")
+      ? `${SERVER_URL}/${normalizedCardImage}`
+      : `${SERVER_URL}/${normalizedCardImage}`;
+  }, [heroBanner]);
+
+  // Update CSS variable for card image when cardImage changes
   useEffect(() => {
-    axios
-      .get<ApiResponse>(`${SERVER_URL}/api/hero-banner/hero-banner`)
-      .then((response) => {
-        const data = response.data;
-        setHeroBanner(data.heroBanner);
-        setStats(data.stats);
-        setLoading(false);
-      })
-      .catch((err: Error) => {
-        console.error("Error fetching hero banner:", err);
-        setError(err.message);
-        setLoading(false);
-      });
-  }, []);
-
-  // --- Card Image Setup ---
-  const rawCardImage =
-    heroBanner?.heroCard?.product?.image ||
-    "https://i.ibb.co/com/f8ZDQzh/DAENDELS-LEGEND.jpg";
-  const normalizedCardImage = rawCardImage.replace(/\\/g, "/");
-  const cardImage = normalizedCardImage.startsWith("http")
-    ? normalizedCardImage
-    : `${SERVER_URL}/${normalizedCardImage}`;
-
-  useEffect(() => {
-    console.log("Pikafront image URL:", cardImage);
-    document.documentElement.style.setProperty("--pikafront", `url(${cardImage})`);
+    if (cardImage) {
+      console.log("Pikafront image URL:", cardImage);
+      document.documentElement.style.setProperty("--pikafront", `url(${cardImage})`);
+    }
   }, [cardImage]);
 
-  // --- Creator Image Setup ---
-  const rawCreatorImage =
-    heroBanner?.heroCard?.creators && heroBanner.heroCard.creators[0]?.image
-      ? heroBanner.heroCard.creators[0].image
-      : "https://placeimg.com/64/64/people";
-  const normalizedCreatorImage = rawCreatorImage.replace(/\\/g, "/");
-  const creatorImage = normalizedCreatorImage.startsWith("http")
-    ? normalizedCreatorImage
-    : normalizedCreatorImage.startsWith("src/uploads")
-    ? `${SERVER_URL}/api/${normalizedCreatorImage}`
-    : `${SERVER_URL}/src/uploads/creator/${normalizedCreatorImage}`;
+  // Memoize creator image URL derivation
+  const creatorImage = useMemo(() => {
+    const rawCreatorImage =
+      heroBanner?.heroCard?.creators && heroBanner.heroCard.creators[0]?.image
+        ? heroBanner.heroCard.creators[0].image
+        : "https://placeimg.com/64/64/people";
+    const normalizedCreatorImage = rawCreatorImage.replace(/\\/g, "/");
+    return normalizedCreatorImage.startsWith("http")
+      ? normalizedCreatorImage
+      : normalizedCreatorImage.startsWith("src/uploads")
+      ? `${SERVER_URL}/api/${normalizedCreatorImage}`
+      : `${SERVER_URL}/src/uploads/creator/${normalizedCreatorImage}`;
+  }, [heroBanner]);
 
-  // jQuery animation effects (unchanged)
+  // jQuery animation effects – only initialize when in view
   useEffect(() => {
+    if (!inView) return;
     const script = document.createElement("script");
     script.type = "module";
     script.src = "/src/lib/pages/home/components/style.js";
@@ -212,7 +225,7 @@ export const HeroFrame = () => {
         clearTimeout(xRef.current);
       }
     };
-  }, []);
+  }, [inView]);
 
   // Fallback values if heroBanner data is missing
   const cardName = heroBanner?.heroCard?.characterName || "Space Walking";
@@ -231,11 +244,16 @@ export const HeroFrame = () => {
     }
   };
 
-  if (loading) return <div>Loading...</div>;
+  // If the component is not in view, render a placeholder container with the ref attached.
+  if (!inView) {
+    return <div ref={ref} style={{ minHeight: "100vh" }} />;
+  }
+
+  if (isLoading) return <div ref={ref}>Loading...</div>;
   if (error) return <ErrorFallback />;
 
   return (
-    <div className="flex items-center justify-center min-h-screen p-4 sm:p-6 md:p-8">
+    <div ref={ref} className="flex items-center justify-center min-h-screen p-4 sm:p-6 md:p-8">
       <div className="flex flex-col lg:flex-row font-[Nunito Sans] items-center bg-transparent border border-transparent gap-6 sm:gap-8 max-w-6xl w-full rounded-2xl overflow-hidden">
         {/* Left Section */}
         <div className="flex flex-col items-center lg:items-start gap-6 sm:gap-8 w-full lg:w-1/2 p-4 sm:p-6">
@@ -289,7 +307,6 @@ export const HeroFrame = () => {
             className="card-container pika animated p-0"
             onClick={handleCardClick}
           ></div>
-          {/* Content Below the Card */}
           <div className="flex flex-col items-start gap-4 p-4 sm:p-6">
             <h2 className="text-4xl sm:text-5xl font-semibold text-[#171717] font-mono ml-[-10px] lg:text-2xl lg:ml-0">
               {cardName}
@@ -307,4 +324,4 @@ export const HeroFrame = () => {
       </div>
     </div>
   );
-};
+});
