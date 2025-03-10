@@ -16,7 +16,6 @@ interface DiscoverCardItem {
   characterName: string;
   product: {
     image: string;
-    price: string;
     category?: CategoryItem; // Mengambil kategori berdasarkan categoryId
   };
 }
@@ -185,10 +184,6 @@ export const DiscoverMoreCards = () => {
                   ) : (
                     <span className="text-base text-gray-400">No category</span>
                   )}
-
-                  <span className="text-lg text-[#262626] font-[Nunito]">
-                    {card.product.price}
-                  </span>
                 </div>
               </motion.div>
             ))

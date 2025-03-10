@@ -57,7 +57,9 @@ const ErrorFallback = () => {
 
 export const TrendingCards = () => {
   const navigate = useNavigate();
-  const [trendingCard, setTrendingCard] = useState<TrendingCardData | null>(null);
+  const [trendingCard, setTrendingCard] = useState<TrendingCardData | null>(
+    null
+  );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -80,7 +82,9 @@ export const TrendingCards = () => {
   const getCardImage = (rawImage: string): string => {
     if (!rawImage) return "";
     const normalized = rawImage.replace(/\\/g, "/");
-    return normalized.startsWith("http") ? normalized : `${SERVER_URL}/${normalized}`;
+    return normalized.startsWith("http")
+      ? normalized
+      : `${SERVER_URL}/${normalized}`;
   };
 
   // Navigate to detail page using the card's id when clicked
@@ -117,12 +121,14 @@ export const TrendingCards = () => {
                   onClick={() => handleCardClick(card.id)}
                   className="cursor-pointer w-full max-w-[330px] flex flex-col items-start gap-4 flex-shrink-0 rounded-lg transition-transform hover:scale-105 mx-auto"
                 >
-                  <figure className="w-full">
+                  <figure className="max-w-fit mx-auto">
+                    {" "}
+                    {/* Tambahkan max-w-fit dan mx-auto */}
                     {cardImage ? (
                       <img
                         src={cardImage}
                         alt={card.characterName}
-                        className="w-full rounded-t-lg h-[200px] object-cover"
+                        className="rounded-t-lg object-contain bg-gray-100" // Hapus w-full dan h-[200px]
                       />
                     ) : (
                       <div className="w-full h-[200px] flex items-center justify-center bg-gray-700 text-white rounded-t-lg">
@@ -140,7 +146,9 @@ export const TrendingCards = () => {
                           {card.creators[0].name}
                         </span>
                       ) : (
-                        <span className="text-sm text-[#404040]">Unknown Creator</span>
+                        <span className="text-sm text-[#404040]">
+                          Unknown Creator
+                        </span>
                       )}
                     </div>
                   </div>
