@@ -1,25 +1,63 @@
-import {BrowseCategories} from "./components/browse-categories";
-import {DiscoverMoreCards} from "./components/discover-mores";
-import {HowItWorks} from "./components/Find-Out";
-import {HeroFrame} from "./components/hero-section";
-import {CollectorCards} from "./components/top-collectors";
-import {TrendingCards} from "./components/trending-cards";
-import {WeeklyUpdateForm} from "./components/Weekly-Update";
-import {Event} from "./components/event";
+import React, { memo } from "react";
+import { useInView } from "react-intersection-observer";
+import { BrowseCategories } from "./components/browse-categories";
+import { DiscoverMoreCards } from "./components/discover-mores";
+import { HowItWorks } from "./components/Find-Out";
+import { HeroFrame } from "./components/hero-section";
+import { CollectorCards } from "./components/top-collectors";
+import { TrendingCards } from "./components/trending-cards";
+import { WeeklyUpdateForm } from "./components/Weekly-Update";
+import { Event } from "./components/event";
 
-const Home = () => {
+// Lazy-load component using the Intersection Observer API.
+const LazyLoadComponent = ({
+  children,
+  placeholderHeight = "100vh",
+}: {
+  children: React.ReactNode;
+  placeholderHeight?: string;
+}) => {
+  const { ref, inView } = useInView({
+    triggerOnce: true,
+    threshold: 0.1,
+  });
+
   return (
-    <div className="text-[#262626]">
-      <HeroFrame />
-      <TrendingCards />
-      <CollectorCards />
-      <BrowseCategories />
-      <DiscoverMoreCards />
-      <Event />
-      <HowItWorks />
-      <WeeklyUpdateForm />
+    <div ref={ref}>
+      {inView ? children : <div style={{ minHeight: placeholderHeight }} />}
     </div>
   );
 };
 
-export default Home;
+const Home = () => {
+  return (
+    <div className="text-[#262626]">
+      <LazyLoadComponent placeholderHeight="100vh">
+        <HeroFrame />
+      </LazyLoadComponent>
+      <LazyLoadComponent placeholderHeight="100vh">
+        <TrendingCards />
+      </LazyLoadComponent>
+      <LazyLoadComponent placeholderHeight="100vh">
+        <CollectorCards />
+      </LazyLoadComponent>
+      <LazyLoadComponent placeholderHeight="100vh">
+        <BrowseCategories />
+      </LazyLoadComponent>
+      <LazyLoadComponent placeholderHeight="100vh">
+        <DiscoverMoreCards />
+      </LazyLoadComponent>
+      <LazyLoadComponent placeholderHeight="100vh">
+        <Event />
+      </LazyLoadComponent>
+      <LazyLoadComponent placeholderHeight="100vh">
+        <HowItWorks />
+      </LazyLoadComponent>
+      <LazyLoadComponent placeholderHeight="100vh">
+        <WeeklyUpdateForm />
+      </LazyLoadComponent>
+    </div>
+  );
+};
+
+export default memo(Home);
