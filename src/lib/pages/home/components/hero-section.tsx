@@ -126,7 +126,7 @@ export const HeroFrame = memo(() => {
     const normalizedCardImage = rawCardImage.replace(/\\/g, "/");
     return normalizedCardImage.startsWith("http") ||
       normalizedCardImage.startsWith("https")
-      ? `${SERVER_URL}/${normalizedCardImage}`
+      ? normalizedCardImage
       : `${SERVER_URL}/${normalizedCardImage}`;
   }, [heroBanner]);
 
