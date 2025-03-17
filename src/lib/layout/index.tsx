@@ -1,13 +1,14 @@
-import type {ReactNode} from "react";
-import {Footer} from "./components/footer";
-import {Meta} from "./components/meta";
-import {Navbar} from "./components/nav-user";
+import React, { memo } from "react";
+import type { ReactNode } from "react";
+import { Meta } from "./components/meta";
+import Footer from "./components/footer";
+import { Navbar } from "./components/nav-user";
 
 type LayoutProps = {
   children: ReactNode;
 };
 
-export const Layout = ({children}: LayoutProps) => {
+export const Layout = memo(({ children }: LayoutProps) => {
   return (
     <div className="flex flex-col min-h-screen w-full overflow-hidden">
       {/* Meta tags for SEO */}
@@ -20,7 +21,7 @@ export const Layout = ({children}: LayoutProps) => {
 
       {/* Main Content */}
       <main className="flex-grow w-full">
-        <div className="mx-auto w-full ">{children}</div>
+        <div className="mx-auto w-full">{children}</div>
       </main>
 
       {/* Footer */}
@@ -29,4 +30,4 @@ export const Layout = ({children}: LayoutProps) => {
       </footer>
     </div>
   );
-};
+});

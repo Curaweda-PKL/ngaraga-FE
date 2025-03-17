@@ -44,7 +44,7 @@ export const SectionThreeForm = () => {
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 p-6">
-      <h2 className="text-lg font-medium mb-6">Section 3</h2>
+      <h2 className="text-lg font-medium mb-6">Section 3 - Top Collectors</h2>
 
       {/* Message Display */}
       {message.text && (
@@ -69,7 +69,7 @@ export const SectionThreeForm = () => {
             <input
               type="text"
               value={formData.title}
-              placeholder="Join our weekly Update"
+              placeholder="Top Collectors"
               onChange={(e) =>
                 setFormData((prev) => ({ ...prev, title: e.target.value }))
               }
@@ -98,7 +98,7 @@ export const SectionThreeForm = () => {
             <input
               type="text"
               value={formData.description}
-              placeholder="Get exclusive promotions & updates straight to your inbox."
+              placeholder="Top Collector Description"
               onChange={(e) =>
                 setFormData((prev) => ({ ...prev, description: e.target.value }))
               }

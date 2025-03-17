@@ -1,17 +1,54 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { SERVER_URL } from "@/middleware/utils"; // Import centralized server URL
+import { SERVER_URL } from "@/middleware/utils";
 
 export const MarketplaceForm: React.FC = () => {
-  const [title, setTitle] = useState(""); // initial state is empty
-  const [description, setDescription] = useState(""); // initial state is empty
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
+  const [title, setTitle] = useState(""); // State untuk title
+  const [description, setDescription] = useState(""); // State untuk description
+  const [loading, setLoading] = useState(false); // State untuk loading
+  const [error, setError] = useState(""); // State untuk error
+  const [success, setSuccess] = useState(""); // State untuk success
+  const [existingData, setExistingData] = useState<{
+    title: string;
+    description: string;
+  } | null>(null); // State untuk menyimpan data yang sudah ada
+
+  // Fetch existing data on component mount
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const response = await axios.get(`${SERVER_URL}/api/page-content/marketplace`);
+        console.log("Response data:", response.data); // Debugging
+        if (response.data && response.data.title && response.data.description) {
+          setExistingData({
+            title: response.data.title,
+            description: response.data.description,
+          });
+          setTitle(response.data.title);
+          setDescription(response.data.description);
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setError("");
+      } finally {
+        setLoading(false);
+      }
+    };
+  
+    fetchData();
+  }, []);
 
   const handleCancel = () => {
-    setTitle("");
-    setDescription("");
+    if (existingData) {
+      // Jika ada data yang sudah ada, kembalikan ke nilai tersebut
+      setTitle(existingData.title);
+      setDescription(existingData.description);
+    } else {
+      // Jika tidak ada data yang sudah ada, reset ke nilai default
+      setTitle("");
+      setDescription("");
+    }
   };
 
   const handleUpdate = async () => {
@@ -25,13 +62,23 @@ export const MarketplaceForm: React.FC = () => {
       );
       if (response.status === 200) {
         setSuccess("Marketplace content updated successfully!");
+        // Fetch updated data from the server
+        const fetchResponse = await axios.get(
+          `${SERVER_URL}/api/page-content/marketplace`
+        );
+        setExistingData(fetchResponse.data.data); // Perbarui existingData dengan data terbaru
       }
     } catch (error) {
+      console.error("Error updating data:", error);
       setError("Failed to update marketplace content. Please try again.");
     } finally {
       setLoading(false);
     }
   };
+
+  if (loading) {
+    return <div>Loading...</div>; // Tampilkan loading indicator
+  }
 
   return (
     <div className="p-6 min-h-screen">
@@ -94,3 +141,5 @@ export const MarketplaceForm: React.FC = () => {
     </div>
   );
 };
+
+export default React.memo(MarketplaceForm);

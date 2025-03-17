@@ -1,12 +1,12 @@
 import React from "react";
-import {ProfilePage} from "../artists/components/other-profile-page";
+import {OtherProfilePage} from "../artists/components/other-profile-page";
 import {DetailBio} from "./components/detail-bio";
 import {MoreCardSection} from "./components/more-card";
 
 const DetailSpecial: React.FC = () => {
   return (
     <div>
-      <ProfilePage />
+      <OtherProfilePage />
       <DetailBio />
       <MoreCardSection />
     </div>

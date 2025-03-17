@@ -1,10 +1,10 @@
-// src/EditProfilePage.tsx
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { SERVER_URL } from "@/middleware/utils";
 import BasicInformation from "./components/BasicInformation";
 import type { FormData, Column } from "./components/BasicInformation";
 import AddressSection from "./components/AddressSection";
+import { FaTrash, FaPen } from "react-icons/fa";
 
 // Define a type for social links.
 type SocialLinks = {
@@ -27,9 +27,10 @@ const EditProfilePage: React.FC = () => {
   });
 
   // Social links state as columns (ordered: website, discord, youtube, twitter, instagram)
+  // Set the initial toggle state to false
   const [columns, setColumns] = useState<Column[]>(
     [...Array(5)].map(() => ({
-      enabled: true,
+      enabled: false,
       value: "",
     }))
   );
@@ -132,9 +133,9 @@ const EditProfilePage: React.FC = () => {
         return;
       }
       const previewUrl = URL.createObjectURL(file);
-      setBannerImage(previewUrl);
-      setBannerFile(file);
-      setBannerImageRemoved(false);
+      setBannerImage(previewUrl); // Set pratinjau gambar
+      setBannerFile(file); // Simpan file untuk diunggah nanti
+      setBannerImageRemoved(false); // Reset status penghapusan banner
     }
   };
 
@@ -193,25 +194,27 @@ const EditProfilePage: React.FC = () => {
           setBannerImage(normalizedBannerUrl);
         }
 
-        let socialLinksData = typeof data.socialLinks === "string"
-        ? JSON.parse(data.socialLinks)
-        : data.socialLinks || {};
+        let socialLinksData =
+          typeof data.socialLinks === "string"
+            ? JSON.parse(data.socialLinks)
+            : data.socialLinks || {};
 
-      setColumns([
-        { enabled: true, value: socialLinksData.website || "" },
-        { enabled: true, value: socialLinksData.discord || "" },
-        { enabled: true, value: socialLinksData.youtube || "" },
-        { enabled: true, value: socialLinksData.twitter || "" },
-        { enabled: true, value: socialLinksData.instagram || "" },
-      ]);
-      setOriginalSocialLinks(socialLinksData);
-    } catch (err) {
-      if (axios.isCancel(err)) {
-        console.log("Request dibatalkan:", err.message);
-      } else {
-        console.error("Error fetching profile:", err);
+        // Even if data exists, force toggles to be off by default.
+        setColumns([
+          { enabled: false, value: socialLinksData.website || "" },
+          { enabled: false, value: socialLinksData.discord || "" },
+          { enabled: false, value: socialLinksData.youtube || "" },
+          { enabled: false, value: socialLinksData.twitter || "" },
+          { enabled: false, value: socialLinksData.instagram || "" },
+        ]);
+        setOriginalSocialLinks(socialLinksData);
+      } catch (err) {
+        if (axios.isCancel(err)) {
+          console.log("Request canceled:", err.message);
+        } else {
+          console.error("Error fetching profile:", err);
+        }
       }
-    }
     };
 
     fetchProfile();
@@ -223,7 +226,7 @@ const EditProfilePage: React.FC = () => {
     try {
       setLoading(true);
       setError(null);
-      setSuccessMessage(null); // Reset pesan sukses sebelum request
+      setSuccessMessage(null);
 
       const socialLinksPayload = {
         website: columns[0].enabled
@@ -273,10 +276,8 @@ const EditProfilePage: React.FC = () => {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
-      // Tampilkan pesan sukses
       setSuccessMessage("Profil berhasil diperbarui!");
 
-      // Hapus pesan sukses setelah 3 detik
       setTimeout(() => {
         setSuccessMessage(null);
       }, 3000);
@@ -296,19 +297,16 @@ const EditProfilePage: React.FC = () => {
     <div className="flex flex-col">
       {/* Background Banner */}
       {successMessage && (
-        <div className="mt-4 p-3 bg-green-500 text-white rounded-lg">
+        <div className="mt-4 p-3 bg-green-500 text-white rounded-lg text-center">
           {successMessage}
         </div>
       )}
-      <section className="relative h-64">
+      <section className="relative h-48 sm:h-80">
         <div
           className="absolute top-0 w-full h-full bg-center bg-cover"
-          style={{
-            background: `linear-gradient(180deg, rgba(221, 177, 31, 0) 0%, rgba(221, 177, 31, 0.5) 100%), url('${bannerImage}')`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-          }}
+          style={{ backgroundImage: `url('${bannerImage}')` }}
         >
+          {/* Input file untuk banner */}
           <input
             type="file"
             accept="image/*"
@@ -316,29 +314,32 @@ const EditProfilePage: React.FC = () => {
             ref={bannerInputRef}
             onChange={handleBannerFileChange}
           />
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex space-x-4">
+          {/* Tombol Edit dan Hapus Banner */}
+          <div className="absolute bottom-4 left-4 flex space-x-4">
             <button
               type="button"
               onClick={() => bannerInputRef.current?.click()}
-              className="bg-call-to-actions-900 text-white py-2 px-6 rounded-lg hover:bg-opacity-80"
+              className="bg-white text-gray-800 p-2 rounded-full hover:bg-gray-200"
             >
-              Replace
+              <FaPen size={20} />
             </button>
-            <button
-              type="button"
-              onClick={handleBannerRemove}
-              className="bg-neutral-colors-100 text-call-to-actions-900 py-2 px-6 rounded-lg hover:bg-opacity-80"
-            >
-              Remove
-            </button>
+            {bannerImage !== fallbackBannerImage && (
+              <button
+                type="button"
+                onClick={handleBannerRemove}
+                className="bg-white text-red-500 p-2 rounded-full hover:bg-gray-200"
+              >
+                <FaTrash size={20} />
+              </button>
+            )}
           </div>
         </div>
       </section>
 
-      <div className="container mx-auto px-6 py-10">
+      <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-10">
         <form
           onSubmit={handleSubmit}
-          className="bg-white rounded-xl p-10 flex flex-col sm:flex-row sm:space-x-10"
+          className="bg-white rounded-xl p-4 sm:p-10 flex flex-col sm:flex-row sm:space-x-10"
         >
           {/* Left Section: Tabs & Profile Picture */}
           <div className="flex flex-col sm:flex-row sm:w-1/3">
@@ -367,7 +368,7 @@ const EditProfilePage: React.FC = () => {
               </button>
             </div>
 
-            <div className="flex flex-col items-center ml-14 mt-6 sm:mt-0 sm:pl-6 relative">
+            <div className="flex flex-col items-center mt-6 sm:mt-0 sm:pl-6 relative">
               <input
                 type="file"
                 accept="image/*"
@@ -375,34 +376,36 @@ const EditProfilePage: React.FC = () => {
                 ref={profileInputRef}
                 onChange={handleProfileFileChange}
               />
-              <div className="relative w-32 h-32 mt-4 mb-6">
+              <div className="relative w-24 h-24 sm:w-32 sm:h-32 mt-4 mb-6">
                 <img
-                  src={profileImage}
+                  src={profileImage || "/placeholder.svg"}
                   alt="Profile"
                   className="w-full h-full rounded-lg object-cover shadow-lg"
                 />
-                {profileImage !== fallbackProfileImage && (
+                <div className="absolute bottom-2 left-2 flex space-x-2">
                   <button
                     type="button"
-                    onClick={handleProfileRemove}
-                    className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1 text-xs"
+                    onClick={() => profileInputRef.current?.click()}
+                    className="bg-white text-gray-800 p-2 rounded-full hover:bg-gray-200"
                   >
-                    &times;
+                    <FaPen size={16} />
                   </button>
-                )}
+                  {profileImage !== fallbackProfileImage && (
+                    <button
+                      type="button"
+                      onClick={handleProfileRemove}
+                      className="bg-white text-red-500 p-2 rounded-full hover:bg-gray-200"
+                    >
+                      <FaTrash size={16} />
+                    </button>
+                  )}
+                </div>
               </div>
-              <button
-                type="button"
-                onClick={() => profileInputRef.current?.click()}
-                className="bg-call-to-actions-900 text-white px-8 py-2 rounded-lg flex items-center space-x-3 text-lg font-medium hover:bg-yellow-600"
-              >
-                Replace
-              </button>
             </div>
           </div>
 
           {/* Right Section: Form Content */}
-          <div className="flex-grow">
+          <div className="flex-grow mt-6 sm:mt-0">
             {activeTab === "basic" ? (
               <BasicInformation
                 formData={formData}
@@ -419,14 +422,17 @@ const EditProfilePage: React.FC = () => {
               />
             )}
 
-            {error && <div className="mt-4 text-red-500">{error}</div>}
+            {error && (
+              <div className="mt-4 text-red-500 text-center sm:text-left">
+                {error}
+              </div>
+            )}
 
-            {/* Conditionally render the submit button only on the "basic" tab */}
             {activeTab === "basic" && (
               <button
                 type="submit"
                 disabled={loading}
-                className="mt-6 bg-call-to-actions-900 text-white py-3 px-5 rounded-md text-sm font-medium hover:bg-yellow-600 focus:ring-2 focus:ring-yellow-400"
+                className="mt-6 bg-call-to-actions-900 text-white py-3 px-5 rounded-md text-sm font-medium hover:bg-yellow-600 focus:ring-2 focus:ring-yellow-400 w-full sm:w-auto"
               >
                 {loading ? "Updating..." : "Update"}
               </button>

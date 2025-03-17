@@ -259,7 +259,7 @@ const CardSettings: React.FC<CardSettingsProps> = ({
       {/* Source Image Section */}
       <div>
         <div className="flex items-center justify-between mb-2 mt-2">
-          <label className="text-sm">Source</label>
+          <label className="text-sm">Source *optional</label>
           <label className="inline-flex items-center cursor-pointer">
             <input
               type="checkbox"

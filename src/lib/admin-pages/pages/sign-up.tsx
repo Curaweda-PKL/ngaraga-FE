@@ -1,13 +1,39 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import { SERVER_URL } from "@/middleware/utils"; // Import centralized server URL
 
 export const SignUpPage = () => {
   const [image, setImage] = useState<File | null>(null);
-  const [title, setTitle] = useState(""); // Set initial state to empty string
-  const [description, setDescription] = useState(""); // Set initial state to empty string
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [existingData, setExistingData] = useState<{
+    title: string;
+    description: string;
+    image: string | null;
+  } | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        const response = await axios.get(`${SERVER_URL}/api/auththumb/sign-up`);
+        if (response.data.data) {
+          setExistingData(response.data.data);
+          setTitle(response.data.data.title);
+          setDescription(response.data.data.description);
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -16,18 +42,34 @@ export const SignUpPage = () => {
     }
   };
 
-  const handleRemoveImage = () => {
-    setImage(null);
+  const handleRemoveImage = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Hentikan event bubbling
+    setImage(null); // Hapus gambar yang baru diunggah
+    setExistingData((prev) => (prev ? { ...prev, image: null } : null)); // Hapus gambar yang sudah ada
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    const file = e.dataTransfer.files[0];
+    if (file) {
+      setImage(file);
+    }
   };
 
   const handleUpdate = async () => {
-    if (!image) {
+    if (!image && !existingData?.image) {
       alert("Please upload an image.");
       return;
     }
 
     const formData = new FormData();
-    formData.append("image", image);
+    if (image) {
+      formData.append("image", image);
+    }
     formData.append("title", title);
     formData.append("description", description);
 
@@ -44,6 +86,10 @@ export const SignUpPage = () => {
 
       if (response.data.message === "Thumbnail uploaded successfully") {
         alert("Details updated successfully!");
+        const fetchResponse = await axios.get(
+          `${SERVER_URL}/api/auththumb/sign-up`
+        );
+        setExistingData(fetchResponse.data.data);
       } else {
         alert("Failed to upload thumbnail.");
       }
@@ -52,6 +98,10 @@ export const SignUpPage = () => {
       alert("An error occurred while updating details.");
     }
   };
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white shadow-md rounded-md">
@@ -66,21 +116,33 @@ export const SignUpPage = () => {
           </label>
           <div
             className="border-dashed border-2 border-call-to-action rounded-lg p-4 text-center bg-yellow-50 cursor-pointer"
+            onDragOver={handleDragOver}
+            onDrop={handleDrop}
             onClick={() => fileInputRef.current?.click()}
-            onDragOver={(e) => e.preventDefault()}
-            onDrop={(e) => {
-              e.preventDefault();
-              const file = e.dataTransfer.files[0];
-              if (file) {
-                setImage(file);
-              }
-            }}
           >
             {image ? (
               <div className="relative">
                 <img
                   src={URL.createObjectURL(image)}
                   alt="Uploaded"
+                  className="w-full h-48 object-cover rounded"
+                />
+                <div className="absolute top-2 right-2 flex space-x-2">
+                  <button
+                    onClick={handleRemoveImage}
+                    className="p-2 bg-red-500 text-white rounded-full"
+                  >
+                    <span role="img" aria-label="delete">
+                      🗑️
+                    </span>
+                  </button>
+                </div>
+              </div>
+            ) : existingData?.image ? (
+              <div className="relative">
+                <img
+                  src={`${SERVER_URL}/${existingData.image}`} // Tampilkan gambar yang sudah ada
+                  alt="Existing"
                   className="w-full h-48 object-cover rounded"
                 />
                 <div className="absolute top-2 right-2 flex space-x-2">
@@ -114,6 +176,8 @@ export const SignUpPage = () => {
                   Click to Upload or Drag & Drop
                   <br />
                   jpeg, jpg, png max 4mb
+                  <br />
+                  Recommended image size: 800px x 960px
                 </p>
               </>
             )}
@@ -126,6 +190,12 @@ export const SignUpPage = () => {
             <img
               src={URL.createObjectURL(image)}
               alt="Preview"
+              className="w-48 h-48 object-cover rounded-md shadow"
+            />
+          ) : existingData?.image ? (
+            <img
+              src={`${SERVER_URL}/${existingData.image}`}
+              alt="Existing Preview"
               className="w-48 h-48 object-cover rounded-md shadow"
             />
           ) : (
@@ -185,4 +255,3 @@ export const SignUpPage = () => {
     </div>
   );
 };
-  

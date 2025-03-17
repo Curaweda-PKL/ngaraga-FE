@@ -508,7 +508,7 @@ export const Series = () => {
 
       {/* Pagination (optional) */}
       {totalPages > 1 && (
-        <div className="flex justify-center items-center mt-4 gap-2">
+        <div className="flex justify-end items-center mt-4 gap-2">
           <button
             onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
             className="p-2 border rounded-lg hover:bg-gray-50"

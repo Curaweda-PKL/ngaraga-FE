@@ -1,6 +1,6 @@
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
-import {CgProfile} from "react-icons/cg";
+import { CgProfile } from "react-icons/cg";
 import {
   FaDiscord,
   FaGlobe,
@@ -8,9 +8,10 @@ import {
   FaTwitter,
   FaYoutube,
 } from "react-icons/fa";
-import {useParams} from "react-router-dom";
+import { useParams } from "react-router-dom";
+import { SERVER_URL } from "@/middleware/utils";
 
-const ProfileSkeleton: React.FC = () => {
+export const ProfileSkeleton: React.FC = () => {
   return (
     <div className="flex flex-col">
       {/* Skeleton Banner */}
@@ -36,7 +37,7 @@ const ProfileSkeleton: React.FC = () => {
             </div>
             {/* Skeleton Social Links */}
             <div className="flex justify-center lg:justify-start space-x-6">
-              {Array.from({length: 5}).map((_, idx) => (
+              {Array.from({ length: 5 }).map((_, idx) => (
                 <div
                   key={idx}
                   className="w-10 h-10 bg-gray-300 rounded-full"
@@ -55,14 +56,20 @@ const ProfileSkeleton: React.FC = () => {
   );
 };
 
-export const ProfilePage: React.FC = () => {
+export const OtherProfilePage: React.FC = () => {
   // Retrieve the dynamic "$name" parameter from the URL.
-  const {name} = useParams<{name: string}>();
+  const { name } = useParams<{ name: string }>();
 
-  // Local state for profile data, loading, and errors.
+  // State for profile data, loading, error, and follow status.
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [isFollowing, setIsFollowing] = useState<boolean>(false);
+  const [followNotification, setFollowNotification] = useState<string | null>(
+    null
+  );
+
+  const currentUserId = localStorage.getItem("userId") || "";
 
   // Fetch the user profile when the component mounts or when "$name" changes.
   useEffect(() => {
@@ -70,9 +77,11 @@ export const ProfilePage: React.FC = () => {
       try {
         const response = await axios.get(
           `http://localhost:3000/api/account/${name}`,
-          {withCredentials: true}
+          { withCredentials: true }
         );
         setProfile(response.data);
+        // Assume the API returns an "isFollowing" field indicating if the current user follows this profile.
+        setIsFollowing(response.data.isFollowing || false);
       } catch (err: any) {
         console.error("Error fetching profile:", err);
         setError("Failed to load profile.");
@@ -85,6 +94,59 @@ export const ProfilePage: React.FC = () => {
       fetchProfile();
     }
   }, [name]);
+
+  // Auto-clear follow notifications after 5 seconds.
+  useEffect(() => {
+    if (followNotification) {
+      const timer = setTimeout(() => {
+        setFollowNotification(null);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [followNotification]);
+
+  const handleFollow = async () => {
+    if (!profile) return;
+    // Prevent a user from following themselves.
+    if (currentUserId === profile.id?.toString()) {
+      setFollowNotification("You cannot follow yourself.");
+      return;
+    }
+    try {
+      const response = await axios.post(
+        `${SERVER_URL}/api/follow/${profile.id}`,
+        {},
+        { withCredentials: true }
+      );
+      setFollowNotification("Successfully followed user.");
+      setIsFollowing(true);
+      console.log("Follow response:", response.data);
+    } catch (error: any) {
+      const message = error.response?.data?.message || error.message;
+      setFollowNotification(`Follow failed: ${message}`);
+    }
+  };
+
+  const handleUnfollow = async () => {
+    if (!profile) return;
+    // Prevent a user from unfollowing themselves.
+    if (currentUserId === profile.id?.toString()) {
+      setFollowNotification("You cannot unfollow yourself.");
+      return;
+    }
+    try {
+      const response = await axios.delete(
+        `${SERVER_URL}/api/follow/${profile.id}`,
+        { withCredentials: true }
+      );
+      setFollowNotification("Successfully unfollowed user.");
+      setIsFollowing(false);
+      console.log("Unfollow response:", response.data);
+    } catch (error: any) {
+      const message = error.response?.data?.message || error.message;
+      setFollowNotification(`Unfollow failed: ${message}`);
+    }
+  };
 
   // Render the skeleton if loading.
   if (loading) {
@@ -175,18 +237,31 @@ export const ProfilePage: React.FC = () => {
       : "https://instagram.com";
 
   return (
-    <div className="flex flex-col">
+    <div className="relative">
+      {/* Follow/Unfollow Notification */}
+      {followNotification && (
+        <div
+          className={`fixed top-4 right-4 z-50 px-4 py-2 rounded shadow-lg transition-opacity duration-300 ${
+            followNotification.startsWith("Successfully")
+              ? "bg-green-500 text-white"
+              : "bg-red-500 text-white"
+          }`}
+        >
+          {followNotification}
+        </div>
+      )}
+
       {/* Background Section (Banner) */}
-      <section className="relative h-48">
+      <section className="relative h-96">
         <div
           className="absolute top-0 w-full h-full bg-center bg-cover"
           style={{
-            background: `linear-gradient(180deg, rgba(221, 177, 31, 0) 0%, rgba(221, 177, 31, 0.5) 100%), url('${bannerUrl}')`,
+            background: `url('${bannerUrl}')`,
             backgroundSize: "cover",
             backgroundPosition: "center",
           }}
         >
-          <span className="w-full h-full absolute opacity-60 bg-purple-700" />
+          <span className="w-full h-full absolute opacity-60" />
         </div>
       </section>
 
@@ -206,12 +281,21 @@ export const ProfilePage: React.FC = () => {
               </div>
             </div>
 
-            {/* Buttons (for smaller screens) */}
+            {/* Buttons for smaller screens */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 lg:hidden">
-              <button className="transition duration-300 text-white bg-call-to-actions-900 transform border-2 border-call-to-action font-bold py-2 px-6 rounded-lg flex items-center justify-center space-x-2 hover:bg-call-to-actions-800 hover:text-white">
-                <CgProfile />
-                <span>Edit Profile</span>
-              </button>
+              {currentUserId === profile.id?.toString() ? (
+                <button className="transition duration-300 text-white bg-call-to-actions-900 transform border-2 border-call-to-action font-bold py-2 px-6 rounded-lg flex items-center justify-center space-x-2 hover:bg-call-to-actions-800 hover:text-white">
+                  <CgProfile />
+                  <span>Edit Profile</span>
+                </button>
+              ) : (
+                <button
+                  onClick={isFollowing ? handleUnfollow : handleFollow}
+                  className="transition duration-300 text-white bg-call-to-actions-900 transform border-2 border-call-to-action font-bold py-2 px-6 rounded-lg flex items-center justify-center space-x-2 hover:bg-call-to-actions-800 hover:text-white"
+                >
+                  <span>{isFollowing ? "Unfollow" : "+ Follow"}</span>
+                </button>
+              )}
             </div>
 
             {/* Profile Name */}
@@ -297,9 +381,14 @@ export const ProfilePage: React.FC = () => {
 
           {/* Buttons for larger screens */}
           <div className="hidden lg:flex mt-6 lg:mt-0 justify-end space-x-4 order-2 lg:order-none">
-            <button className="btn bg-call-to-actions-900 text-white hover:bg-call-to-actions-800">
-              <span>+ Follow</span>
-            </button>
+            {currentUserId !== profile.id?.toString() && (
+              <button
+                onClick={isFollowing ? handleUnfollow : handleFollow}
+                className="btn bg-call-to-actions-900 text-white hover:bg-call-to-actions-800"
+              >
+                <span>{isFollowing ? "Unfollow" : "+ Follow"}</span>
+              </button>
+            )}
           </div>
         </div>
       </div>

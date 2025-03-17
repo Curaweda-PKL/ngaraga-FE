@@ -45,6 +45,10 @@ import {EditProfileAdmin} from "../admin-pages/admin/edit-admin";
 import {EditCouponForm} from "../admin-pages/coupon/edit-coupon";
 import {RegisteredUsers} from "../admin-pages/event/registered-user";
 import SuccessVerify from "../pages/events/success-verify";
+import QrCodeComponent from "../pages/scan-qr/scan-qr";
+import QrCodesPage from "../admin-pages/marketplace/card/qrModal/qrPages";
+import SpecialQrCodesPage from "../admin-pages/marketplace/card/qrModal/specialQrpages";
+import AssignRequirement from "../admin-pages/marketplace/special-card/assign-card";
 
 // Lazy-loaded Pages
 const Home = React.lazy(() => import("@/lib/pages/home/Home"));
@@ -69,9 +73,9 @@ const SpecialCardDetail = React.lazy(
   () => import("@/lib/pages/account/specialcard-details")
 );
 const ViewDetail = React.lazy(() => import("@/lib/pages/account/view-details"));
-const DetailSpecial = React.lazy(
-  () => import("@/lib/pages/detail-card/detail-special-index")
-);
+// const DetailSpecial = React.lazy(
+//   () => import("@/lib/pages/detail-card/detail-special-index")
+// );
 const DetailCards = React.lazy(
   () => import("../pages/detail-card/detail-cards-index")
 );
@@ -108,8 +112,7 @@ export const routes: Array<PathRouteProps> = [
   {path: "/account/:name", element: <Artists />},
   {path: "/marketplace", element: <Marketplace />},
   {path: "/detail-cards/:id", element: <DetailCards />},
-  {path: "/detail-special-card", element: <DetailSpecial />},
-  {path: "/special-card-detail", element: <SpecialCardDetail />},
+  {path: "/special-card-detail", element: <SpecialCardDetail specialCardId={1} onBack={() => window.history.back()} />  },
   {path: "/view-detail", element: <ViewDetail />},
   {path: "/rankings", element: <TopCollectors />},
   {path: "/events", element: <BrowseEvents />},
@@ -118,6 +121,9 @@ export const routes: Array<PathRouteProps> = [
   {path: "/sentEmail", element: <SentEmail />},
   {path: "/success/registered/event", element: <SuccesRegist />},
   {path: "/success/emailverified", element: <SuccessVerify />},
+  {path: "/scan-qr", element: <QrCodeComponent />},
+
+
 ];
 
 export const privateRoutes: Array<PathRouteProps> = [
@@ -140,7 +146,7 @@ export const adminRoutes: Array<PathRouteProps> = [
   {path: "edit-card/:id", element: <EditCard />},
   {path: "add-card", element: <AddCard />},
   {path: "special-card", element: <SpecialCard />},
-  {path: "edit-special", element: <EditSpecialCard />},
+  {path: "edit-special/:id", element: <EditSpecialCard />},
   {path: "add-special", element: <AddSpecialCard />},
   {path: "master", element: <Master />},
   {path: "series", element: <Series />},
@@ -170,4 +176,9 @@ export const adminRoutes: Array<PathRouteProps> = [
   {path: "add-admin", element: <AddAdmin />},
   {path: "profile", element: <ProfileSettings />},
   {path: "edit-profile/:id", element: <EditProfileAdmin />},
+  {path:"/cards/:productId/qr-codes", element:<QrCodesPage /> },
+  {path:"/special-cards/:productId/qr-codes", element:<SpecialQrCodesPage /> },
+  {path: "assign-requirement/:id", element: <AssignRequirement/>}
+
+
 ];

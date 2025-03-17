@@ -1,35 +1,107 @@
-import {useEffect, useRef, useState} from "react";
-import {FaBars, FaTimes, FaUserFriends} from "react-icons/fa";
-import {CiShoppingCart} from "react-icons/ci";
-import {Link, useNavigate} from "react-router-dom";
+import { SERVER_URL } from "@/middleware/utils";
 import axios from "axios";
-import {usePermissions} from "../../context/permission-context";
-import {SERVER_URL} from "@/middleware/utils"; // Import centralized server URL
+import React, {
+  lazy,
+  memo,
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { usePermissions } from "../../context/permission-context";
 
-export const Navbar: React.FC = () => {
+// Lazy-load icons from react-icons
+const LazyFaBars = lazy(() =>
+  import("react-icons/fa").then((module) => ({ default: module.FaBars }))
+);
+
+const LazyFaUserFriends = lazy(() =>
+  import("react-icons/fa").then((module) => ({ default: module.FaUserFriends }))
+);
+const LazyFaDiscord = lazy(() =>
+  import("react-icons/fa").then((module) => ({ default: module.FaDiscord }))
+);
+const LazyFaYoutube = lazy(() =>
+  import("react-icons/fa").then((module) => ({ default: module.FaYoutube }))
+);
+const LazyFaTwitter = lazy(() =>
+  import("react-icons/fa").then((module) => ({ default: module.FaTwitter }))
+);
+const LazyFaInstagram = lazy(() =>
+  import("react-icons/fa").then((module) => ({ default: module.FaInstagram }))
+);
+const LazyCiShoppingCart = lazy(() =>
+  import("react-icons/ci").then((module) => ({ default: module.CiShoppingCart }))
+);
+
+// Lazy-load the mobile sidebar (extracted as a separate component)
+const Sidebar = lazy(() => import("./sidebar"));
+
+const DEFAULT_AVATAR =
+  "https://comickaze.in/wp-content/uploads/woocommerce-placeholder-600x600.png";
+
+export const Navbar: React.FC = memo(() => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
-
-  // Use the permission context to determine authentication state
-  const {role, loading} = usePermissions();
-  const isAuthenticated = !loading && Boolean(role);
-
-  // We'll store just the normalized path from the API here.
   const [userAvatarUrl, setUserAvatarUrl] = useState("");
 
-  // Default avatar image if none is returned
-  const defaultAvatar =
-    "https://comickaze.in/wp-content/uploads/woocommerce-placeholder-600x600.png";
+  // Permissions from context
+  const { role, loading } = usePermissions();
+  const isAuthenticated = !loading && Boolean(role);
 
-  // Compute the full avatar URL. The API returns a relative path, so we prepend our base URL.
-  const avatarUrl = userAvatarUrl
-    ? `${SERVER_URL}/${userAvatarUrl}`
-    : defaultAvatar;
+  // Memoize computed avatar URL
+  const avatarUrl = useMemo(
+    () =>
+      userAvatarUrl ? `${SERVER_URL}/${userAvatarUrl}` : DEFAULT_AVATAR,
+    [userAvatarUrl]
+  );
 
-  // Ref for the dropdown container
+  // Ref for dropdown container
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Memoize social links with lazy-loaded icons
+  const socialLinks = useMemo(
+    () => [
+      {
+        icon: (
+          <Suspense fallback={null}>
+            <LazyFaDiscord className="h-5 w-5" />
+          </Suspense>
+        ),
+        href: "#",
+      },
+      {
+        icon: (
+          <Suspense fallback={null}>
+            <LazyFaYoutube className="h-5 w-5" />
+          </Suspense>
+        ),
+        href: "#",
+      },
+      {
+        icon: (
+          <Suspense fallback={null}>
+            <LazyFaTwitter className="h-5 w-5" />
+          </Suspense>
+        ),
+        href: "#",
+      },
+      {
+        icon: (
+          <Suspense fallback={null}>
+            <LazyFaInstagram className="h-5 w-5" />
+          </Suspense>
+        ),
+        href: "#",
+      },
+    ],
+    []
+  );
 
   // Close dropdown if clicked outside
   useEffect(() => {
@@ -43,36 +115,27 @@ export const Navbar: React.FC = () => {
     };
 
     document.addEventListener("mousedown", handleClickOutside);
-    return () => {
+    return () =>
       document.removeEventListener("mousedown", handleClickOutside);
-    };
   }, []);
 
+  // Fetch user data if authenticated
   useEffect(() => {
     if (isAuthenticated) {
       const fetchUserData = async () => {
         try {
           const response = await axios.get(
             `${SERVER_URL}/api/account/profile`,
-            {withCredentials: true}
+            { withCredentials: true }
           );
-
-          // Use fullName if available, otherwise fall back to name.
           setUsername(response.data.fullName || response.data.name);
-
           const userImage = response.data.image;
           if (userImage) {
-            // Normalize path:
-            let normalizedPath = userImage
-              .replace(/\\/g, "/")
-              .replace(/^src\//, "");
-
-            // Ensure the correct structure "uploads/profile/"
+            let normalizedPath = userImage.replace(/\\/g, "/").replace(/^src\//, "");
             normalizedPath = normalizedPath.replace(
               "uploadsprofile",
               "uploads/profile"
             );
-
             setUserAvatarUrl(normalizedPath);
           }
         } catch (error) {
@@ -84,27 +147,31 @@ export const Navbar: React.FC = () => {
     }
   }, [isAuthenticated]);
 
-  const toggleSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen);
-  };
+  // Memoized event handlers
+  const toggleSidebar = useCallback(() => {
+    setIsSidebarOpen((prev) => !prev);
+  }, []);
 
-  const toggleDropdown = () => {
-    setIsDropdownOpen(!isDropdownOpen);
-  };
+  const toggleDropdown = useCallback(() => {
+    setIsDropdownOpen((prev) => !prev);
+  }, []);
 
-  const navigateToPage = (page: string) => {
-    navigate(`/${page}`);
-    toggleSidebar();
-  };
+  const navigateToPage = useCallback(
+    (page: string) => {
+      navigate(`/${page}`);
+      setIsSidebarOpen(false);
+    },
+    [navigate]
+  );
 
-  const handleLogout = async () => {
+  const handleLogout = useCallback(async () => {
     try {
-      await axios.post(`${SERVER_URL}/api/logout`, {}, {withCredentials: true});
+      await axios.post(`${SERVER_URL}/api/logout`, {}, { withCredentials: true });
       navigateToPage("login");
     } catch (error) {
       console.error("Logout failed:", error);
     }
-  };
+  }, [navigateToPage]);
 
   return (
     <>
@@ -113,22 +180,21 @@ export const Navbar: React.FC = () => {
         <div className="navbar-start flex items-center space-x-4">
           {/* Hamburger menu for small screens */}
           <div className="dropdown lg:hidden sm:mr-2 md:mr-3">
-            <div
-              role="button"
-              className="btn btn-ghost"
-              onClick={toggleSidebar}
-            >
-              <FaBars size={20} />
+            <div role="button" className="btn btn-ghost" onClick={toggleSidebar}>
+              <Suspense fallback={<span>...</span>}>
+                <LazyFaBars size={20} />
+              </Suspense>
             </div>
           </div>
 
           {/* Logo button */}
           <Link
-            to={"/"}
+            to="/"
             className="btn btn-ghost text-xl flex items-center text-black hover:bg-transparent"
           >
             <img
               src="/src/assets/img/LOGO.png"
+              loading="lazy"
               alt="Ngaraga Logo"
               className="w-8 h-8 mr-2 -ml-4 lg:ml-2"
             />
@@ -158,59 +224,55 @@ export const Navbar: React.FC = () => {
             className="cursor-pointer flex items-center"
             onClick={() => navigateToPage("cart")}
           >
-            <CiShoppingCart
-              size={31}
-              className="lg:mr-3 ShoppingCartIcon"
-            />
+            <Suspense fallback={<span>Cart</span>}>
+              <LazyCiShoppingCart size={31} className="ShoppingCartIcon" />
+            </Suspense>
           </a>
 
-          {/* Conditional rendering for Sign In / Sign Up buttons or Avatar */}
+          {/* Conditional rendering for authentication */}
           {!isAuthenticated ? (
             <>
-              {/* Sign-in Button */}
+              {/* Sign In */}
               <a
                 className="btn bg-white border-call-to-action rounded-lg text-orange-300 sm:flex lg:flex items-center gap-2 lg:mr-2 ml-2 hover:bg-call-to-actions-800 hover:text-white transition"
                 onClick={() => navigateToPage("login")}
               >
-                <FaUserFriends size={18} />
+                <Suspense fallback={<span>Icon</span>}>
+                  <LazyFaUserFriends size={18} />
+                </Suspense>
                 Sign In
               </a>
-
-              {/* Sign-up Button */}
+              {/* Sign Up */}
               <a
                 className="btn bg-call-to-action border-transparent rounded-lg text-white hidden lg:flex items-center gap-2 hover:bg-call-to-actions-800 transition"
                 onClick={() => navigateToPage("signup")}
               >
-                <FaUserFriends size={18} />
+                <Suspense fallback={<span>Icon</span>}>
+                  <LazyFaUserFriends size={18} />
+                </Suspense>
                 Sign Up
               </a>
             </>
           ) : (
-            // Logged in view with dropdown (ref added here)
-            <div
-              className="relative flex items-center space-x-2"
-              ref={dropdownRef}
-            >
+            // Logged in view with dropdown
+            <div className="relative flex items-center space-x-2" ref={dropdownRef}>
               <span className="hidden sm:block text-sm font-medium ml-2">
                 {username || "Loading..."}
               </span>
-              <button
-                className="avatar btn btn-ghost"
-                onClick={toggleDropdown}
-              >
+              <button className="avatar btn btn-ghost" onClick={toggleDropdown}>
                 <div className="w-8 h-8 rounded-full">
                   <img
                     src={avatarUrl}
+                    loading="lazy"
                     alt="User Avatar"
                   />
                 </div>
               </button>
-
               {/* Dropdown Menu */}
               {isDropdownOpen && (
                 <div
                   className="absolute right-0 mt w-40 bg-white rounded-lg shadow-lg border z-50"
-                  style={{top: "100%"}}
+                  style={{ top: "100%" }}
                 >
                   <ul className="py-1">
                     <li>
@@ -238,101 +300,17 @@ export const Navbar: React.FC = () => {
       </div>
 
       {/* Sliding Sidebar for Mobile */}
-      <div
-        className={`fixed inset-y-0 left-0 z-50 w-full bg-white transform transition-transform duration-500 ease-in-out 
-        ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} 
-        lg:hidden text-black overflow-x-hidden`}
-      >
-        <div className="flex justify-between items-center p-4 border-b">
-          <button
-            onClick={toggleSidebar}
-            className="btn btn-ghost text-black"
-          >
-            <FaTimes size={20} />
-          </button>
-
-          {/* Logo */}
-          <a
-            href="/"
-            className="flex items-center text-xl text-black ml-4"
-          >
-            <img
-              src="/src/assets/img/LOGO.png"
-              alt="Ngaraga Logo"
-              className="w-8 h-8 mr-2"
-            />
-            NGARAGA
-          </a>
-
-          <div className="flex items-center space-x-4 ml-auto">
-            {!isAuthenticated ? (
-              <>
-                <a
-                  className="btn bg-white border-call-to-action rounded-lg text-orange-300 sm:flex lg:flex items-center gap-2 hover:bg-call-to-actions-800 hover:text-white transition"
-                  onClick={() => navigateToPage("login")}
-                >
-                  Sign In
-                </a>
-                <a
-                  className="btn bg-call-to-action border-transparent rounded-lg text-white hidden lg:flex items-center gap-2 hover:bg-call-to-actions-800 transition"
-                  onClick={() => navigateToPage("signup")}
-                >
-                  <FaUserFriends size={18} />
-                  Sign Up
-                </a>
-              </>
-            ) : (
-              <div className="flex items-center space-x-4">
-                <a
-                  className="cursor-pointer"
-                  onClick={() => navigateToPage("cart")}
-                >
-                  <CiShoppingCart size={31} />
-                </a>
-                <button
-                  className="avatar btn btn-ghost"
-                  onClick={() => navigateToPage("user")}
-                >
-                  <div className="w-8 h-8 rounded-full">
-                    <img
-                      src={avatarUrl}
-                      alt="User Avatar"
-                    />
-                  </div>
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-
-        <ul className="menu p-4 space-y-4 text-black">
-          <li>
-            <a
-              className="flex items-center"
-              onClick={() => navigateToPage("marketplace")}
-            >
-              Marketplace
-            </a>
-          </li>
-          <li>
-            <a
-              className="flex items-center"
-              onClick={() => navigateToPage("rankings")}
-            >
-              Rankings
-            </a>
-          </li>
-          <li>
-            <a
-              className="flex items-center"
-              onClick={() => navigateToPage("events")}
-            >
-              Events
-            </a>
-          </li>
-        </ul>
-      </div>
-
+      <Suspense fallback={<div>Loading Sidebar...</div>}>
+        {isSidebarOpen && (
+          <Sidebar
+            isSidebarOpen={isSidebarOpen}
+            toggleSidebar={toggleSidebar}
+            navigateToPage={navigateToPage}
+            isAuthenticated={isAuthenticated}
+            avatarUrl={avatarUrl}
+          />
+        )}
+      </Suspense>
       {/* Overlay when sidebar is open */}
       {isSidebarOpen && (
         <div
@@ -342,4 +320,4 @@ export const Navbar: React.FC = () => {
       )}
     </>
   );
-};
+});

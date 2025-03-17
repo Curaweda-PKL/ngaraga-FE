@@ -17,16 +17,31 @@ export const RegisteredUsers = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
+  // Helper function to parse and format the registeredAt date string.
+  // Assumes the input format is "dd/mm/yyyy, HH.mm.ss"
+  const parseRegisteredAt = (dateString: string): string => {
+    const parts = dateString.split(",");
+    if (parts.length < 2) return dateString;
+    const datePart = parts[0].trim();
+    const timePart = parts[1].trim().replace(/\./g, ":");
+    // Assuming datePart is in dd/mm/yyyy format
+    const [day, month, year] = datePart.split("/");
+    // Construct an ISO formatted string "yyyy-mm-ddTHH:MM:SS"
+    const isoString = `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}T${timePart}`;
+    const parsedDate = new Date(isoString);
+    return parsedDate.toLocaleString();
+  };
+
   // --- Fetch Registrations (for the logged-in user) ---
   useEffect(() => {
     axios
-      .get(`${SERVER_URL}/api/event/account`, {withCredentials: true})
+      .get(`${SERVER_URL}/api/event/account`, { withCredentials: true })
       .then((response) => {
         // Map the fetched data to the expected fields
         const mappedData = response.data.map((reg: any) => ({
           id: reg.id,
           userName: reg.userName,
-          registeredAt: new Date(reg.registeredAt).toLocaleString(), // Format date/time as desired
+          registeredAt: parseRegisteredAt(reg.registeredAt),
           eventName: reg.eventName,
         }));
         setRegistrations(mappedData);

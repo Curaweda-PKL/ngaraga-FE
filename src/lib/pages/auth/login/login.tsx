@@ -6,6 +6,7 @@ import LoginImage from "@/assets/img/spacestarry.png";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { SERVER_URL } from "@/middleware/utils";
+import { useNavigate } from "react-router-dom";
 
 type LoginFormData = {
   email: string;
@@ -27,6 +28,8 @@ const Login: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [thumbnailData, setThumbnailData] = useState<any>(null);
+
+  const navigate = useNavigate();
 
   // Fetch thumbnail data
   useEffect(() => {
@@ -108,26 +111,27 @@ const Login: React.FC = () => {
       );
 
       // Assume the API returns a user object with a role property
-      const user = response.data?.user;
-      if (user && user.role === "ADMIN") {
-        const adminError = "Admins must log in through the admin portal.";
-        setError({ general: adminError });
-        setNotification({ type: "error", message: adminError });
-        setLoading(false);
-        return;
+      const user = response.data?.account;
+
+      if (user && (user.role === "ADMIN" || user.role === "SUPERADMIN")) {
+        // Admin or Superadmin users go to the admin dashboard
+        setNotification({
+          type: "success",
+          message: "Logged in successfully! Redirecting to admin dashboard...",
+        });
+        setTimeout(() => {
+          navigate("/admin/dashboard", { replace: true });
+        }, 0);
+      } else {
+        // Regular users are redirected to the home page
+        setNotification({
+          type: "success",
+          message: "Logged in successfully! Redirecting...",
+        });
+        setTimeout(() => {
+          navigate("/", { replace: true });
+        }, 0);
       }
-
-      // Login success
-      setNotification({
-        type: "success",
-        message: "Logged in successfully! Redirecting...",
-      });
-      // Optionally, store token or user data here
-
-      // Redirect after a short delay
-      setTimeout(() => {
-        window.location.href = "/";
-      }, 2000);
     } catch (err: any) {
       console.error("Error during login:", err);
       let errorMessage = "Login failed! Please try again.";
@@ -136,7 +140,6 @@ const Login: React.FC = () => {
         errorMessage = err.response.data.message || errorMessage;
       }
 
-      // Check for a specific error message fragment and update it
       if (errorMessage.toLowerCase().includes("must have number")) {
         errorMessage = "Incorrect password. Please try again.";
       }
