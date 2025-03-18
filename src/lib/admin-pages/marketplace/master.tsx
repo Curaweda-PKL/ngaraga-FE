@@ -119,6 +119,7 @@ export const Master = () => {
     fetchMasterList();
   }, [fetchMasterList]);
 
+  // Reset current page when search changes
   useEffect(() => {
     setCurrentPage(1);
   }, [searchQuery]);
@@ -336,26 +337,28 @@ export const Master = () => {
         </table>
       </div>
 
-      {/* Simplified Pagination Controls */}
-      <div className="mt-4 flex justify-end items-center space-x-2">
-        <button
-          onClick={() => goToPage(currentPage - 1)}
-          disabled={currentPage === 1}
-          className="px-3 py-1 border rounded"
-        >
-          Previous
-        </button>
-        <span className="px-3 py-1 border rounded">
-          Page {currentPage} of {totalPages}
-        </span>
-        <button
-          onClick={() => goToPage(currentPage + 1)}
-          disabled={currentPage === totalPages}
-          className="px-3 py-1 border rounded"
-        >
-          Next
-        </button>
-      </div>
+      {/* Pagination Controls */}
+      {totalPages > 1 && (
+        <div className="mt-4 flex justify-end items-center space-x-2">
+          <button
+            onClick={() => goToPage(currentPage - 1)}
+            disabled={currentPage === 1}
+            className="px-3 py-1 border rounded"
+          >
+            Previous
+          </button>
+          <span className="px-3 py-1 border rounded">
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            onClick={() => goToPage(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className="px-3 py-1 border rounded"
+          >
+            Next
+          </button>
+        </div>
+      )}
 
       {/* Modals */}
       <Modal

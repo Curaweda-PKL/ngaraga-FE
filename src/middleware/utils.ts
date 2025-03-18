@@ -20,5 +20,4 @@ export const getEnv = (key: string, defaultValue = ""): string => {
 export const SERVER_URL = getEnv("VITE_SERVER_URL", "http://localhost:3000");
 
 // Determine if we're in development mode. i usually use this for image URLs to not use from our servers. but direct Links.
-export const IS_DEV = import.meta.env.MODE === "development";
 // export const IS_DEV = false; // Force production mode
