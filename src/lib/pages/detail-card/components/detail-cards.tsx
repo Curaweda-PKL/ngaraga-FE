@@ -235,10 +235,6 @@ const getImageUrl = (img? : string, directory? : string) => {
 
   const dirPath = directory ? `/${directory}` : "";
 
-  // In development, return a relative URL.
-  if (IS_DEV) {
-    return `${dirPath}/${imageUrl}`;
-  }
 
   // In production, prefix with the SERVER_URL.
   return `${SERVER_URL}${dirPath}/${imageUrl}`;

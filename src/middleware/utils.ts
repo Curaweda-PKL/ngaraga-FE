@@ -10,7 +10,7 @@ export const getEnv = (key: string, defaultValue = ""): string => {
   const value = import.meta.env[key] ?? defaultValue;
   if (value === defaultValue) {
     // sometimes it's useful to warn if a default value is used
-    console.warn(`Environment variable ${key} is not defined. Using default: "${defaultValue}"`);
+    console.warn(`Environment variable ${key} Using: "${defaultValue}"`);
   }
   envCache[key] = value;
   return value;
