@@ -1,4 +1,4 @@
-import React, {ChangeEvent, useEffect, useState} from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
 
 interface CardSettingsProps {
   formData: {
@@ -44,17 +44,16 @@ interface CardSettingsProps {
       cardType: string;
     }>
   >;
-  apiCategories: {id: number; name: string; image: string | null}[];
+  apiCategories: { id: number; name: string; image: string | null }[];
   categoriesLoading: boolean;
   categoriesError: string | null;
-  apiCreators: {id: number; name: string; image: string | null}[];
+  apiCreators: { id: number; name: string; image: string | null }[];
   creatorsLoading: boolean;
   creatorsError: string | null;
-  apiTags: {id: number; name: string}[];
+  apiTags: { id: number; name: string }[];
   tagsLoading: boolean;
   tagsError: string | null;
 }
-
 
 const CardSettings: React.FC<CardSettingsProps> = ({
   formData,
@@ -88,57 +87,59 @@ const CardSettings: React.FC<CardSettingsProps> = ({
       {/* Categories Section */}
       <div>
         <label className="block mb-2 text-sm">Categories *</label>
-        <div className="space-y-2 bg-white p-4 rounded-lg border">
+        <div className="bg-white p-4 rounded-lg border">
           {categoriesLoading ? (
             <div className="text-gray-500">Loading categories...</div>
           ) : categoriesError ? (
             <div className="text-red-500">{categoriesError}</div>
           ) : (
-            apiCategories.map((category) => {
-              const id = `category-${category.id}`;
-              return (
-                <div
-                  key={category.id}
-                  className="category-checkbox flex items-center gap-y-2 mb-2"
-                >
-                  <input
-                    type="checkbox"
-                    id={id}
-                    className="hidden"
-                    checked={formData.categories.includes(
-                      category.id.toString()
-                    )}
-                    onChange={(e) => {
-                      const newCategories = e.target.checked
-                        ? [...formData.categories, category.id.toString()]
-                        : formData.categories.filter(
-                            (c) => c !== category.id.toString()
-                          );
-                      setFormData((prev) => ({
-                        ...prev,
-                        categories: newCategories,
-                      }));
-                    }}
-                  />
-                  <label
-                    htmlFor={id}
-                    className="flex items-center gap-2"
+            <div className="max-h-[20rem] overflow-y-auto space-y-2">
+              {apiCategories.map((category) => {
+                const id = `category-${category.id}`;
+                return (
+                  <div
+                    key={category.id}
+                    className="category-checkbox flex items-center gap-y-2 mb-2"
                   >
-                    {category.image && (
-                      <img
-                        src={category.image}
-                        alt={category.name}
-                        className="w-4 h-4 object-contain inline-block"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).style.display = "none";
-                        }}
-                      />
-                    )}
-                    <span className="inline-block ml-2">{category.name}</span>
-                  </label>
-                </div>
-              );
-            })
+                    <input
+                      type="checkbox"
+                      id={id}
+                      className="hidden"
+                      checked={formData.categories.includes(
+                        category.id.toString()
+                      )}
+                      onChange={(e) => {
+                        const newCategories = e.target.checked
+                          ? [...formData.categories, category.id.toString()]
+                          : formData.categories.filter(
+                              (c) => c !== category.id.toString()
+                            );
+                        setFormData((prev) => ({
+                          ...prev,
+                          categories: newCategories,
+                        }));
+                      }}
+                    />
+                    <label htmlFor={id} className="flex items-center gap-2">
+                      {category.image && (
+                        <img
+                          src={category.image}
+                          alt={category.name}
+                          className="w-4 h-4 object-contain inline-block"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).style.display =
+                              "none";
+                          }}
+                        />
+                      )}
+                      <span className="inline-block ml-2">
+                        {category.name}
+                      </span>
+                    </label>
+                  </div>
+                );
+              })}
+            </div>
           )}
         </div>
       </div>
@@ -159,7 +160,7 @@ const CardSettings: React.FC<CardSettingsProps> = ({
           </label>
         </div>
         <div
-          className={`space-y-2 bg-white p-4 rounded-lg border transition-all duration-150 overflow-hidden ${
+          className={`bg-white p-4 rounded-lg border transition-all duration-150 overflow-hidden ${
             formData.creator ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
           }`}
         >
@@ -174,29 +175,33 @@ const CardSettings: React.FC<CardSettingsProps> = ({
           ) : creatorsError ? (
             <div className="text-red-500">{creatorsError}</div>
           ) : (
-            apiCreators.map((creator) => (
-              <label
-                key={creator.id}
-                className="flex items-center gap-2 p-2 hover:bg-gray-50 rounded-lg cursor-pointer"
-              >
-                <input
-                  type="radio"
-                  name="selectedCreator"
-                  value={creator.id.toString()}
-                  checked={formData.selectedCreator === creator.id.toString()}
-                  onChange={handleInputChange}
-                  className="form-radio"
-                />
-                {creator.image && (
-                  <img
-                    src={creator.image}
-                    alt={creator.name}
-                    className="w-8 h-8 rounded-full object-contain"
+            <div className="max-h-[20rem] overflow-y-auto space-y-2">
+              {apiCreators.map((creator) => (
+                <label
+                  key={creator.id}
+                  className="flex items-center gap-2 p-2 hover:bg-gray-50 rounded-lg cursor-pointer"
+                >
+                  <input
+                    type="radio"
+                    name="selectedCreator"
+                    value={creator.id.toString()}
+                    checked={
+                      formData.selectedCreator === creator.id.toString()
+                    }
+                    onChange={handleInputChange}
+                    className="form-radio"
                   />
-                )}
-                <span>{creator.name}</span>
-              </label>
-            ))
+                  {creator.image && (
+                    <img
+                      src={creator.image}
+                      alt={creator.name}
+                      className="w-8 h-8 rounded-full object-contain"
+                    />
+                  )}
+                  <span>{creator.name}</span>
+                </label>
+              ))}
+            </div>
           )}
         </div>
       </div>
@@ -217,40 +222,39 @@ const CardSettings: React.FC<CardSettingsProps> = ({
           </label>
         </div>
         {formData.tag && (
-          <div className="space-y-2 bg-white p-4 rounded-lg border">
+          <div className="bg-white p-4 rounded-lg border">
             {tagsLoading ? (
               <div className="text-gray-500">Loading tags...</div>
             ) : tagsError ? (
               <div className="text-red-500">{tagsError}</div>
             ) : (
-              apiTags.map((tag) => {
-                const id = `tag-${tag.id}`;
-                return (
-                  <div
-                    key={tag.id}
-                    className="tag-checkbox"
-                  >
-                    <input
-                      type="checkbox"
-                      id={id}
-                      className="hidden"
-                      checked={formData.tags.includes(tag.id.toString())}
-                      onChange={(e) => {
-                        const newTags = e.target.checked
-                          ? [...formData.tags, tag.id.toString()]
-                          : formData.tags.filter(
-                              (t) => t !== tag.id.toString()
-                            );
-                        setFormData((prev) => ({
-                          ...prev,
-                          tags: newTags,
-                        }));
-                      }}
-                    />
-                    <label htmlFor={id}>{tag.name}</label>
-                  </div>
-                );
-              })
+              <div className="max-h-[20rem] overflow-y-auto space-y-2">
+                {apiTags.map((tag) => {
+                  const id = `tag-${tag.id}`;
+                  return (
+                    <div key={tag.id} className="tag-checkbox">
+                      <input
+                        type="checkbox"
+                        id={id}
+                        className="hidden"
+                        checked={formData.tags.includes(tag.id.toString())}
+                        onChange={(e) => {
+                          const newTags = e.target.checked
+                            ? [...formData.tags, tag.id.toString()]
+                            : formData.tags.filter(
+                                (t) => t !== tag.id.toString()
+                              );
+                          setFormData((prev) => ({
+                            ...prev,
+                            tags: newTags,
+                          }));
+                        }}
+                      />
+                      <label htmlFor={id}>{tag.name}</label>
+                    </div>
+                  );
+                })}
+              </div>
             )}
           </div>
         )}
@@ -277,10 +281,7 @@ const CardSettings: React.FC<CardSettingsProps> = ({
           }`}
         >
           <div className="flex flex-col">
-            <label
-              htmlFor="sourceImageWebsite"
-              className="text-sm mb-1"
-            >
+            <label htmlFor="sourceImageWebsite" className="text-sm mb-1">
               Website
             </label>
             <input
@@ -294,10 +295,7 @@ const CardSettings: React.FC<CardSettingsProps> = ({
             />
           </div>
           <div className="flex flex-col">
-            <label
-              htmlFor="sourceImageAlt"
-              className="text-sm mb-1"
-            >
+            <label htmlFor="sourceImageAlt" className="text-sm mb-1">
               Alt Website
             </label>
             <input

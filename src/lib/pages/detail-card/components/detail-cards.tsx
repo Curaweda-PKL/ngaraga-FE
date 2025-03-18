@@ -3,7 +3,7 @@ import axios from "axios";
 import parse from "html-react-parser";
 import { CiShoppingCart } from "react-icons/ci";
 import { useParams, useNavigate } from "react-router-dom";
-import { SERVER_URL, IS_DEV } from "@/middleware/utils";
+import { SERVER_URL,  } from "@/middleware/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { useQuery, useMutation } from "@tanstack/react-query";
 
@@ -235,10 +235,6 @@ const getImageUrl = (img? : string, directory? : string) => {
 
   const dirPath = directory ? `/${directory}` : "";
 
-  // In development, return a relative URL.
-  if (IS_DEV) {
-    return `${dirPath}/${imageUrl}`;
-  }
 
   // In production, prefix with the SERVER_URL.
   return `${SERVER_URL}${dirPath}/${imageUrl}`;
