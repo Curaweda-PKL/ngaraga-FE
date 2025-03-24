@@ -19,14 +19,14 @@ jobs:
         DATABASE_URL: ${{ secrets.DATABASE_URL }}
         JWT_SECRET: ${{ secrets.JWT_SECRET }}
         GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
-        GMAIL_USER: ${{ secrets.VITE_REACT_API_PMB_URL }}
-        VITE_CLIENT_URL: ${{ secrets.VITE_REACT_TICKETING_API_KEY }}
-        VITE_SERVER_URL: ${{ secrets.VITE_REACT_PMB_EMAIL }}
-        PORT: ${{ secrets.VITE_REACT_PMB_PASSWORD }}
+        GMAIL_USER: ${{ secrets.GMAIL_USER }}
+        VITE_CLIENT_URL: ${{ secrets.VITE_CLIENT_URL }}
+        VITE_SERVER_URL: ${{ secrets.VITE_SERVER_URL }}
+        PORT: ${{ secrets.PORT }}
         SOCKET_SERVER_URL: ${{ secrets.SOCKET_SERVER_URL }}
         SHIPPING_COST_KEY: ${{ secrets.SHIPPING_COST_KEY }}
-        Shipping_Delivery_KEY: ${{ secrets.Shipping_Delivery_KEY }}
-        FOREMAIL_CLIENT: ${{ secrets.FOREMAIL_CLIENT_ID }}
+        SHIPPING_DELIVERY_KEY: ${{ secrets.SHIPPING_DELIVERY_KEY }}
+        FOREMAIL_CLIENT: ${{ secrets.FOREMAIL_CLIENT }}
     - name: Upload to cPanel
       uses: SamKirkland/FTP-Deploy-Action@v4.3.4
       with:
