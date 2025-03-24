@@ -11,8 +11,18 @@ jobs:
     environment: SECRET
     steps:
     - uses: actions/checkout@v2
-    - name: Install Dependencies
-      run: npm install
+
+    - name: Clean Install Dependencies
+      run: |
+        rm -rf node_modules package-lock.json
+        npm cache clean --force
+        npm install
+
+    - name: Update npm and Install Rollup
+      run: |
+        npm install -g npm
+        npm install --save-dev rollup
+
     - name: Build
       run: npm run build
       env:
@@ -27,6 +37,7 @@ jobs:
         SHIPPING_COST_KEY: ${{ secrets.SHIPPING_COST_KEY }}
         SHIPPING_DELIVERY_KEY: ${{ secrets.SHIPPING_DELIVERY_KEY }}
         FOREMAIL_CLIENT: ${{ secrets.FOREMAIL_CLIENT }}
+
     - name: Upload to cPanel
       uses: SamKirkland/FTP-Deploy-Action@v4.3.4
       with:
@@ -35,4 +46,3 @@ jobs:
         password: ${{ secrets.FTP_PASSWORD }}
         local-dir: ./dist/
         server-dir: /
-
