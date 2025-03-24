@@ -27,6 +27,7 @@ function lineCountPlugin(options: { ignore: string[] } = { ignore: [] }) {
 }
 
 export default defineConfig({
+  base: './',
   define: {
     "process.env": process.env,
   },
@@ -53,17 +54,20 @@ export default defineConfig({
       deleteOriginFile: false, // Keep original uncompressed files for fallback
     }),
   ],
-  server: {
-    open: true,
-  },
   build: {
     // Production build options
+    outDir: 'dist',
+    emptyOutDir: true,
     minify: 'esbuild',
     sourcemap: true, // Enable sourcemaps
     rollupOptions: {
+      input: 'index.html',
       output: {
         // Customize chunking if necessary.
       },
     },
+  },
+  server: {
+    open: true,
   },
 });

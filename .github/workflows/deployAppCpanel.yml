@@ -1,0 +1,38 @@
+name: Deploy Ngaraga FE
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    environment: SECRET
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install Dependencies
+      run: npm install
+    - name: Build
+      run: npm run build
+      env:
+        DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        JWT_SECRET: ${{ secrets.JWT_SECRET }}
+        GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+        GMAIL_USER: ${{ secrets.VITE_REACT_API_PMB_URL }}
+        VITE_CLIENT_URL: ${{ secrets.VITE_REACT_TICKETING_API_KEY }}
+        VITE_SERVER_URL: ${{ secrets.VITE_REACT_PMB_EMAIL }}
+        PORT: ${{ secrets.VITE_REACT_PMB_PASSWORD }}
+        SOCKET_SERVER_URL: ${{ secrets.SOCKET_SERVER_URL }}
+        SHIPPING_COST_KEY: ${{ secrets.SHIPPING_COST_KEY }}
+        Shipping_Delivery_KEY: ${{ secrets.Shipping_Delivery_KEY }}
+        FOREMAIL_CLIENT: ${{ secrets.FOREMAIL_CLIENT_ID }}
+    - name: Upload to cPanel
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+      with:
+        server: ${{ secrets.FTP_HOSTNAME }}
+        username: ${{ secrets.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD }}
+        local-dir: ./dist/
+        server-dir: /
+
