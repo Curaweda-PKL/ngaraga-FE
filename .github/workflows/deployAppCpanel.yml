@@ -20,7 +20,7 @@ jobs:
 
     - name: Update npm and Install Rollup
       run: |
-        npm install -g npm
+        npm install
         npm install --save-dev rollup
 
     - name: Build
