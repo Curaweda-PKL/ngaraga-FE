@@ -1,7 +1,7 @@
 import React, { ChangeEvent, useRef } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
-import {Upload} from "lucide-react";
+import { Upload, X } from "lucide-react"; 
 
 interface CardFormProps {
   formData: {
@@ -10,7 +10,7 @@ interface CardFormProps {
     sku: string;
     price: string;
     salePrice: boolean;
-    discountedPrice: string; // NEW FIELD
+    discountedPrice: string; // 
     stock: string;
     cardDetails: string;
     categories: string[];
@@ -68,16 +68,27 @@ const CardForm: React.FC<CardFormProps> = ({
       <div>
         <label className="block mb-2 text-sm">Card Image *</label>
         <div
-          className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center bg-gray-50"
+          className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center bg-gray-50 relative"
           onDragOver={handleDragOver}
           onDrop={handleDrop}
         >
           {formData.cardImage ? (
-            <img
-              src={formData.cardImage.toString()}
-              alt="Card"
-              className="w-full h-full object-contain rounded-lg"
-            />
+            <div className="relative">
+              <img
+                src={formData.cardImage.toString()}
+                alt="Card"
+                className="w-full h-full object-contain rounded-lg"
+              />
+              <button
+                type="button"
+                onClick={() =>
+                  setFormData((prev) => ({ ...prev, cardImage: null }))
+                }
+                className="absolute top-2 right-2 bg-white rounded-full p-1 shadow hover:bg-gray-100"
+              >
+                <X size={20} />
+              </button>
+            </div>
           ) : (
             <div className="space-y-4">
               <div className="flex justify-center">
@@ -182,7 +193,7 @@ const CardForm: React.FC<CardFormProps> = ({
           <ReactQuill
             value={formData.cardDetails}
             onChange={(value) =>
-              setFormData((prev) => ({...prev, cardDetails: value}))
+              setFormData((prev) => ({ ...prev, cardDetails: value }))
             }
             placeholder="Write your card details..."
           />

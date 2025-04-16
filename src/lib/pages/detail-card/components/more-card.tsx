@@ -3,7 +3,7 @@ import { FaRocket } from "react-icons/fa";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useInView } from "react-intersection-observer";
-import { SERVER_URL, IS_DEV } from "@/middleware/utils";
+import { SERVER_URL,  } from "@/middleware/utils";
 
 export type Card = {
   id: number;
@@ -18,7 +18,7 @@ export type Card = {
 const getImageSrc = (src: string): string => {
   if (!src) return "/placeholder.svg";
   let cleaned = src.replace(/\\/g, "/").replace(/^https?:\/\//, "");
-  return IS_DEV ? `https://${cleaned}` : `${SERVER_URL}/${cleaned}`;
+  return  `${SERVER_URL}/${cleaned}`;
 };
 
 const CardItem: React.FC<{ card: Card; onClick: () => void }> = ({ card, onClick }) => {

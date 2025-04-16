@@ -1,7 +1,7 @@
 import React, { memo, useEffect, useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
-import { SERVER_URL, IS_DEV } from "@/middleware/utils";
+import { SERVER_URL,  } from "@/middleware/utils";
 import { useInView } from "react-intersection-observer";
 import { useQuery } from "@tanstack/react-query";
 
@@ -24,7 +24,7 @@ interface MarketplaceCardSectionProps {
 const getImageSrc = (src: string): string => {
   if (!src) return "/placeholder.svg";
   let cleaned = src.replace(/\\/g, "/").replace(/^https?:\/\//, "");
-  return IS_DEV ? `${SERVER_URL}/${cleaned}` : `${SERVER_URL}/${cleaned}`;
+  return  `${SERVER_URL}/${cleaned}`;
 };
 
 const CardItem: React.FC<{ card: Card }> = memo(({ card }) => {

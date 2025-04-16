@@ -1,3 +1,4 @@
+import 'react';
 
 // typescript
 declare module '*.png';
@@ -13,3 +14,9 @@ declare module '*.webm';
 declare module '*.mov';
 declare module '*.js';
 declare module 'react-qr-scanner';
+
+declare module 'react' {
+    interface SVGProps<T> extends React.SVGProps<T> {
+      title?: string;
+    }
+  }
