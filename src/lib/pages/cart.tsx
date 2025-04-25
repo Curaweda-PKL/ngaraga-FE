@@ -30,7 +30,6 @@ const Cart: React.FC = () => {
         getImageUrl(item.card.product.image) ||
         getImageUrl(item.card.product.cardImage) ||
         "https://via.placeholder.com/100",
-      // Extracting the first creator's name
       creatorName:
         item.card.creators && item.card.creators.length > 0
           ? item.card.creators[0].name
@@ -144,6 +143,26 @@ const Cart: React.FC = () => {
       console.error("Error applying coupon:", err);
     }
   };
+
+  // New: Handle checkout of selected items
+  const handleCheckout = async () => {
+    if (!selectedItems.length) return;
+    try {
+      await axios.post(
+        `${SERVER_URL}/api/secure/checkout`,
+        { selectedCartItemIds: selectedItems },
+        { withCredentials: true }
+      );
+      // clear checkboxes
+      setSelectedItems([]);
+      setSelectAll(false);
+      // then redirect
+      window.location.href = "/checkout";
+    } catch (err) {
+      console.error("Error creating checkout:", err);
+    }
+  };
+  
 
   // Calculate the subtotal.
   const subtotal = cartItems.reduce(
@@ -268,8 +287,7 @@ const Cart: React.FC = () => {
             hasSelectedItems
               ? "transform translate-y-0"
               : "transform translate-y-full"
-          } lg:col-span-1 lg:static lg:translate-y-0 fixed bottom-0 left-0 w-full p-4 border border-[#D4D4D4] bg-white shadow-lg rounded-t-lg`}
-        >
+          } lg:col-span-1 lg:static lg:translate-y-0 fixed bottom-0 left-0 w-full p-4 border border-[#D4D4D4] bg-white shadow-lg rounded-t-lg`}>
           <h2 className="text-lg font-bold mb-4 text-[#171717] border-b border-gray-300 pb-2">
             Summary Order
           </h2>
@@ -285,17 +303,11 @@ const Cart: React.FC = () => {
                 <span className="text-[#262626]">Discount</span>
                 <span className="font-bold text-[#171717] text-lg">
                   {appliedCoupon.discountType.toLowerCase() === "percentage"
-                    ? `- Rp ${(
-                        (subtotal * appliedCoupon.discountValue) /
-                        100
-                      ).toLocaleString("id-ID")}`
-                    : `- Rp ${Number(
-                        appliedCoupon.discountValue
-                      ).toLocaleString("id-ID")}`}
+                    ? `- Rp ${(subtotal * appliedCoupon.discountValue / 100).toLocaleString("id-ID")}`
+                    : `- Rp ${Number(appliedCoupon.discountValue).toLocaleString("id-ID")}`}
                 </span>
               </div>
             )}
-            {/* Horizontal line above Total */}
             <hr className="my-2 border-gray-300" />
             <div className="flex items-center justify-between mt-2">
               <span className="text-[#262626]">Total</span>
@@ -309,8 +321,7 @@ const Cart: React.FC = () => {
           {appliedCoupon ? (
             <div className="mb-4">
               <p className="text-green-500 font-bold">
-                Coupon Applied: {appliedCoupon.couponCode} -{" "}
-                {appliedCoupon.discountType.toLowerCase() === "percentage"
+                Coupon Applied: {appliedCoupon.couponCode} - {appliedCoupon.discountType.toLowerCase() === "percentage"
                   ? `${appliedCoupon.discountValue}% off`
                   : `Rp ${appliedCoupon.discountValue} off`}
               </p>
@@ -335,11 +346,15 @@ const Cart: React.FC = () => {
               </button>
             </div>
           )}
-          <button className="w-full py-2 text-white bg-call-to-action rounded-md flex items-center justify-center space-x-2">
+
+          {/* Checkout Button */}
+          <button
+            onClick={handleCheckout}
+            disabled={!hasSelectedItems}
+            className="w-full py-2 text-white bg-call-to-action rounded-md flex items-center justify-center space-x-2 disabled:opacity-50"
+          >
             <FaTrash />
-            <a href="/checkout">
-              <span>Checkout Now ({cartItems.length} items)</span>
-            </a>
+            <span>Checkout Now ({selectedItems.length} items)</span>
           </button>
         </div>
       </div>
